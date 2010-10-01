@@ -1,0 +1,105 @@
+\section{Grasp Force Optimization}
+
+The Grasp Quality Metrics that we have discussed so far only deal with
+forces applied at the contacts. The form-closure criterion asks
+whether there exists some combination of legal \textbf{contact forces}
+that add up to a certain resultant on the target object. In practice
+though, robotic hands are controlled by setting \textbf{joint
+  forces}. The Grasp Force Optimization (GFO) problem, in a nutshell,
+asks the following questions: is there a combination of legal joint
+forces that result in the desired contact forces? If there are
+multiple solutions to this problem, which one is ``optimal''?
+
+GFO is an active area of research in itself, and many publications
+present various formulations and solvers. As a starting point, we
+recommend the Grasping Chapter (authored by Domenico Prattichizzio and
+Jeffrey C. Trinkle) in the \textit{Springer Handbook of
+  Robotics}. Here we just give a very quick overview of the GFO tools
+that are available in GraspIt.
+
+The GraspIt code for performing GFO has gone through two
+iterations. The first one is from GraspIt release 0.9. That version was
+based on the beautiful mathematical formulation presented in the paper
+\textit{Grasp Analysis as Linear Matrix Inequality Problems}, by Li
+Han, Jeffrey Trinkle and Zexiang Li, IEEE Transactions on Robotics and
+Automation, vol. 16, 1998. However, this code was not thoroughly
+tested and was not commented, and unfortunately has fallen into
+disrepair. As such, it might be removed from future releases; please
+contact us if you are interested in obtaining a copy of that code.
+
+The new version is based on a different mathematical formulation,
+using Quadratic Programming. It has been thoroughly tested and is
+extremely well commented in the source code. However, you will need a
+Quadratic Program solver for it to work. We strongly recommend the
+excellent commercial solver
+\xlink{Mosek}{http://www.mosek.com}. Student licenses are free, and
+the integration with GraspIt is seamless - just uncomment the
+appropriate line in the file \texttt{graspit.pro}.
+
+\subsection{GFO computations through the main interface}
+
+A subset of the GFO functionality is available through a simple dialog
+accessible from the GraspIt GUI. You can use this anytime you have a
+grasp - for example, load the example world file
+\texttt{dlr\_flask.xml} and then click Grasp $\rightarrow$ Auto
+Grasp. You can now use Grasp $\rightarrow$ Grasp Force Optimization to
+access the GFO dialog.
+
+The drop-down list allows you to choose the optimization type being
+performed. The main options are:
+\begin{itemize}
+\item \textbf{Grasp force} - GraspIt will attempt to compute the
+  optimal joint forces so that contact forces result in a null wrench
+  on the object.
+\item \textbf{Compliant joint equilibrium} - GraspIt will attempt to
+  compute the contact forces that balance out a set of given joint
+  forces, while resulting in an object wrench of the smallest possible
+  magnitude. This case is of particular interest for underactuated
+  hands with compliant, spring joints where not all joint forces can
+  be set independently. See the \link{Joint Coupling}{sec:coupling}
+  chapter for details.
+\item \textbf{DOF force equilibrium} - GraspIt will attempt to compute
+  the contact forces that balance out a set of given DOF forces, while
+  resulting in an object wrench of the smallest possible magnitude.
+\end{itemize}
+
+When the \texttt{On} button is checked, GraspIt will attempt to solve
+the optimization problem of the specified type each time the grasp is
+changed (contacts are added or broken). The dialog will inform you of
+the outcome of the optimization. Note that some optimization problems
+can be unfeasible in certain hand configurations. If the optimization
+is solved, GraspIt will display the computed contact forces in the
+dedicated space of the main window, and also visually indicate the
+contact forces using the same mechanism used for displaying computed
+contact forces during dynamic simulation (yellow arrows at each
+contact). Note that computed joint torques are not displayed through
+the GUI, but rather printed to the console.
+
+\subsection{GFO code and advanced details}
+
+We have found that the mathematical formulations for GFO allow for
+almost endless possibilities and combinations of optimization criteria
+vs. constraints. In general, the GFO code in GraspIt is concerned with
+the following aspects:
+\begin{itemize}
+\item goal is to compute contacts forces and/or joint torques
+\item contact forces must be legal (inside friction cones)
+\item contact forces must be balanced by joint torques
+\item resultant object wrench should have a small (or null) magnitude
+\end{itemize}
+
+In general, any 1 of these 3 goals can be made into an optimization
+objective, while the other 2 become constraints. You can mix and match
+in many ways, which is why we have not included more options inside
+the GUI. However, the code is really well documented and you should be
+able to write up your own GFO routines to match your project. The best
+place to start is the \texttt{Grasp} class, more specifically the
+function \texttt{int Grasp::computeQuasistaticForcesAndTorques(Matrix
+  *robotTau);}. Inside this function you will find multiple options
+for performing the core optimization, all are documented.
+
+Finally, as of the writing of this chapter, we have one paper in press
+that will detail the GFO engine. Please see the
+\link{Publications}{sec:publications} section of this manual for
+details.
+

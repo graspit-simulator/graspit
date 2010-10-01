@@ -1,0 +1,31 @@
+#Inventor V2.1 ascii
+#plastic
+#1000
+
+Separator {
+	Transform {
+		translation -40.4 0 0
+	}
+#File {name CoordinateSystem2.iv}
+	Transform {
+		translation 0 0 0
+		rotation 1 0 0 3.14159265359
+	} 
+
+#File {
+#	name CoordinateSystem1.iv
+#}
+#	Transform {
+#		rotation 0 1 0 -1.57
+#	} 
+
+#File {name armar/hands/axis_arrows.iv }
+
+#File {
+#	name CoordinateSystem2.iv
+#}
+	Separator 
+	{
+		File {name armar/hands/palm2_r.iv }
+	}
+}

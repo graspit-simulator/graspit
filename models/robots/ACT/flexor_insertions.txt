@@ -1,0 +1,71 @@
+Metacarpal Rockers:
+------------------
+
+everything wrt INDEX_FINGER_ORIGIN
+
+first rocker:
+PNT0 (long flexor)
+4.671793 3.070343 5.455519 (inches)
+PNT1 (short flexor)
+4.669061 3.040689 5.459147 (inches)
+
+second rocker:
+PNT0 (long flexor)
+4.933208 3.094143 6.095028 (inches)
+PNT1 (short flexor)
+4.930476 3.064495 6.098656 (inches)
+
+Prox. Phalanx Rockers:
+---------------------
+
+everything wrt PIP_CS_MATEI which coincides with the GRASPIT origin of the prox. phlx.
+
+first rocker:
+PNT1 (long flexor)
+-1.60 0.29 -0.015 (inches)
+-40.64 7.3 -0.38
+PNT0 (short flexor)
+-1.60 0.29 0.015 (inches)
+-40.64 7.3 0.38
+
+second rocker:
+PNT1(long flexor)
+-1.09 0.093 0.022 (inches)
+-27.68 2.36 0.55
+PNT0 (short flexor)
+-1.09 0.093 -0.008 (inches)
+-27.68 2.36 -0.20
+
+third rocker:
+PNT1 (long flexor)
+-0.357 0.058 0.030 (inches)
+-9.06 1.47 0.76
+PNT0 (short flexor)
+-0.357 0.058 0.000 (inches)
+-9.06 1.47 0.0
+
+Mid Phalanx:
+-----------
+
+everything wrt DIP_CS_MATEI which coincides with the GRASPIT origin of the mid phlx.
+
+Short flexor insertion point:
+MID_FLEX_INSERTION
+-0.74 0.14 -0.004 (inches)
+-18.79 3.55 -0.1
+
+First Rocker:
+PNT0 (long flexor)
+-0.76 0.19 0.03 (inches)
+-19.3 4.82 0.76
+
+Second Rocker:
+PNT0 (long flexor)
+-0.19 0.09 0.002 (inches)
+-4.82 2.28 0.05
+
+Dist Phalanx:
+------------
+
+-0.52 0.16 -0.002 (inches)
+-13.2 4.06 -0.05

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>wood</material>
+	<geometryFile type = "Inventor">gun.iv</geometryFile>
+	<mass>200</mass>
+	<cog>0.399207 0.457478 0.081596</cog>
+	<inertia_matrix>0 0 0 0 0 0 0 0 0</inertia_matrix>
+</root>

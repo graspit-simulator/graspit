@@ -1,0 +1,41 @@
+#Inventor V1.0 ascii
+#rubber
+#40
+
+Separator {
+    Transform {
+        translation 0 0 -0.5
+    }
+
+#    File {name    "axis_arrows.iv"}
+
+    File {name    "thumb_l2.iv"}
+
+    RotationXYZ {
+    	axis    Z
+        angle   3.141592653589793
+    }
+    RotationXYZ {
+        axis    Y
+        angle   3.141592653589793
+    }
+
+    Transform {
+    	translation     40.65 0 0
+    }
+    RotationXYZ { #bend
+   		axis Z
+        angle 0.3490658503988659
+    }
+
+    Transform {
+            translation     16.5 0 0
+    }
+    RotationXYZ { #bend
+            axis Z
+            angle 0.7853981633974483
+    }
+
+
+    File {name    "tip.iv"}
+}

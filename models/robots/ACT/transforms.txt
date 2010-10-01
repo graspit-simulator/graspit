@@ -1,0 +1,65 @@
+Key to transforms for ACT hand
+------------------------------
+
+We use the Pro/E file with new coordinate systems defined to match GraspIt needs. We have 5 coordinate systems:
+
+NEW_MCP_DUCT_MATEI
+- abd/add DOF
+
+NEW_MCP_CS_MATEI
+- flex dof. Z axis aligned with DOF and X axis pointing to location of PIP_CS
+
+PIP_CS_MATEI
+- origin of prox. phlx. in GraspIt
+- flex dof. Z axis aligned with DOF and X axis COMING FROM NEW_MCP_CS_MATEI
+
+DIP_CS_MATEI
+- origin of med. phlx in GraspIt
+- flex dof. Z axis aligned with DOF and X axis COMING FROM PIP_CS_MATEI
+
+DIST_PHAL_REF_MATEI
+
+All of these have the Z axis as the axis of rotation, as any well-behaved D-H configuration should.
+
+First, we have the transform from the origin of the whole thing (INDEX_FINGER_ORIGIN in Pro/E) to where the Abd/Add DOF is (NEW_MCP_DUCT_MATEI):
+
+-0.376601 -0.091064 0.921889
+0.146601 -0.988475 -0.037753
+0.914702 0.120932 0.385611
+
+-0.376601 0.146601 0.914702
+-0.091064 -0.988475 0.120932
+0.921889 -0.037753 0.385611
+
+4.7497 3.1405 6.4603
+120.3 79.7 164.0
+
+120.3 
+
+Here comes the abd/add DOF
+
+Then rotate 90 around X to get Z aligned with the flexion DOF.
+
+Then comes the flexion DOF
+Subtract 29.96 degrees to the flexion to align the X axis so that it points to the next DOF
+
+Translate 51.3 to get to PIP_CS_MATEI
+
+This is the origin of the prox. phlx in graspit. Since in the geometry file the origin was at NEW_MCP_DUCT, add transform to PIP_CS in the geometry file:
+0.866345 -0.499446 -0.0 44.4
+0.0 0.0 -1.0 0.0
+0.499446 0.866345 0.0 25.6
+
+0.499446 0.866345 0.0 25.6
+0.0 0.0 1.0 0.0
+0.866345 -0.499446 -0.0 44.4
+
+0.499446 0.0 0.866345    -51.3
+0.866345 0.0 -0.499446    0.0
+0.0      1.0  0.0         0.0
+
+Then comes the PIP flexion in Graspit, add a little bit to align X axis to point to the next DOF
+Translate along X and reach DIP_CS_MATEI were the Graspit origin of the med. phalanx is.
+In ProE the origin of the med. phlx. geometry is PIP_CS so add the transform betweem the two to the geometry file
+
+Same thinf for DIP

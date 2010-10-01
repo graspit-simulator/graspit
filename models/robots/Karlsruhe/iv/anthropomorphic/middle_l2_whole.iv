@@ -1,0 +1,14 @@
+#Inventor V1.0 ascii
+#rubber
+#20
+
+Separator {
+#    File {name    "axis_arrows.iv"}
+    File {name    "index_l2.iv"}
+
+	Transform {
+    	translation     24.15 0 0
+    }
+
+    File {name    "tip.iv"}
+}

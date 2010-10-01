@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<robot type="Puma560">
+    <palm>puma0.xml</palm>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+12</maxEffort>
+        <Kp>1.0e+13</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>80.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+12</maxEffort>
+        <Kp>1.0e+13</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>80.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+12</maxEffort>
+        <Kp>1.0e+13</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>80.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+12</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+9</Kd>
+        <draggerScale>40.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+12</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+9</Kd>
+        <draggerScale>40.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+12</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+9</Kd>
+        <draggerScale>40.0</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>0 0 0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-160</minValue>
+            <maxValue>160</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>431.8</a>
+            <alpha>0</alpha>
+            <minValue>-40</minValue>
+            <maxValue>215</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>149.0</d>
+            <a>20.3</a>
+            <alpha>-90</alpha>
+            <minValue>-232</minValue>
+            <maxValue>51.5</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>431.8</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-135</minValue>
+            <maxValue>110</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d4</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>-90</alpha>
+            <minValue>-100</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-215</minValue>
+            <maxValue>215</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">puma1.xml</link>
+        <link dynamicJointType="Revolute">puma2.xml</link>
+        <link dynamicJointType="Revolute">puma3.xml</link>
+        <link dynamicJointType="Revolute">puma4.xml</link>
+        <link dynamicJointType="Revolute">puma5.xml</link>
+        <link dynamicJointType="Revolute">puma6.xml</link>
+    </chain>
+</robot>

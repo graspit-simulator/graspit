@@ -1,0 +1,60 @@
+#Inventor V2.1 ascii
+
+Separator {
+    Material {
+	ambientColor	0.9 0.9 0.9
+	diffuseColor	0.9 0.9 0.9
+	emissiveColor	0.4 0.4 0.4
+    }
+    Translation {
+	translation	0 559.1 -539.938
+    }
+    Separator {
+	Texture2 {
+	    filename	"textures/wood.jpg"
+	}
+	Cube {
+	    width	1830
+	    height	915
+	    depth	48
+	}
+    }
+    Separator {
+	Translation {
+	    translation	890 432.5 -381
+	}
+	DEF leg+0 Separator {
+	    BaseColor {
+		rgb	0.2 0.1 0.2
+	    }
+	    RotationXYZ {
+		axis	X
+		angle	1.5708
+	    }
+	    Cylinder {
+		radius	25
+		height	762
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	-890 432.5 -381
+	}
+	USE leg+0
+    }
+    Separator {
+	Translation {
+	    translation	890 -432.5 -381
+	}
+	USE leg+0
+    }
+    Separator {
+	Translation {
+	    translation	-890 -432.5 -381
+	}
+	USE leg+0
+    }
+    EventCallback {
+    }
+}

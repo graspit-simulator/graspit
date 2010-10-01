@@ -1,0 +1,164 @@
+#Inventor V2.1 ascii
+Separator {
+    Separator {
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }
+    Separator {
+        Translation {
+	    translation 305 32.5 10
+        }
+	DEF bottomx Cube {
+            width	610
+	    height	65
+	    depth	20
+	}
+    }
+    Separator {
+	Translation {
+	    translation 305 647.5 10
+        }
+	USE bottomx
+    }
+    Separator {
+	Translation {
+	    translation 10 340 270
+	}
+	Cube {
+	    width   20
+	    height  550
+	    depth   40
+	}
+    }
+    Separator {
+	Translation {
+	    translation 10 32.5 260
+	}
+	DEF bottomz Cube {
+	    width   20
+	    height  65
+	    depth   520
+	}
+    }
+    Separator {
+	Translation {
+	    translation 10 647.5 260
+	}
+	USE bottomz
+    }
+    Separator {
+	Translation {
+	    translation 325 32.5 530
+	}
+	DEF midx Cube {
+	    width   650
+	    height  65
+	    depth   20
+	}
+    }
+    Separator {
+	Translation {
+	    translation 325 647.5 530
+	}
+	USE midx
+    }
+    Separator {
+	Translation {
+	    translation 640 32.5 575
+	}
+	DEF midz Cube {
+	    width   20
+	    height  65
+	    depth   70
+	}
+    }
+    Separator {
+	Translation {
+	    translation 640 647.5 575
+	}
+	USE midz
+    }
+    Separator {
+	Translation {
+	    translation 640 97.5 610
+	}
+	DEF backz Cube {
+	    width   20
+	    height  65
+	    depth   620
+	}
+    }
+    Separator {
+	Translation {
+	    translation 640 585.5 610
+	}
+	USE backz
+    }
+    Separator {
+	Translation {
+	    translation 325 97.5 290
+	}
+	DEF backx Cube {
+	    width   630
+	    height  65
+	    depth   20
+	}
+    }
+    Separator {
+	Translation {
+	    translation 325 585.5 290
+	}
+	USE backx
+    }
+    Separator {
+	Translation {
+	    translation 640 340 885
+	}
+	DEF backrib Cube {
+	    width   10
+	    height  420
+	    depth   50
+	}
+    }
+    Separator {
+	Translation {
+	    translation 640 340 735
+	}
+	USE backrib
+    }
+    Separator {
+	Translation {
+	    translation 640 340 585
+	}
+	USE backrib
+    }
+    Separator {
+	Translation {
+	    translation 640 340 435
+	}
+	USE backrib
+    }
+    }
+    Separator {
+	Translation {
+	    translation 605 340 625
+	}
+	Cube {
+	    width   50
+	    height  550
+	    depth   610
+	}
+    }
+    Separator {
+	Translation {
+	    translation 260 340 325
+	}
+	Cube {
+	    width   720
+	    height  550
+	    depth   50
+	}
+    }
+
+
+}

@@ -1,0 +1,610 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>Frequently Asked Questions about Qhull</title>
+<!-- Navigation links 
+NOTE -- verify all links by 'grep href=' 'grep name=' add # 'sort /+7'
+-->
+</head>
+
+<body>
+
+<p><a name="TOP"><b>Up:</b></a> <a
+href="http://www.geom.umn.edu/locate/qhull">Home page for Qhull</a>
+(http://www.geom.umn.edu/locate/qhull)<br>
+<b>Up:</b> <a href="qh-man.htm">Qhull manual</a><br>
+</p>
+
+<p><b>To:</b> <a href="#TOC">FAQ: Table of Contents</a>
+(please wait while loading) <br>
+
+<hr>
+<!-- Main text of document -->
+<h1><a
+href="http://www.geom.umn.edu/graphics/pix/Special_Topics/Computational_Geometry/4dcube.html"><img
+src="qh--4d.gif" alt="[4-d cube]" align="middle" width="100"
+height="100"></a> Frequently Asked Questions about Qhull</h1>
+<p>
+<!--
+<i>This is the most recent FAQ.  It was updated February 17, 1998.</i>
+-->
+
+<p>If your question does not appear here, see: </p>
+
+<ul>
+    <li><a href="http://www.geom.umn.edu/~bradb/qhull-news.html">News</a>
+        about Qhull </li>
+    <li><a href="qh-man.htm#TOC">Qhull manual:</a> table of
+        contents </li>
+    <li><a
+        href="http://www.geom.umn.edu/software/download/qhull.html">Download
+        page</a> for Qhull </li>
+    <li><a href="README.txt">Installation</a> instructions for
+        Qhull and rbox</li>
+    <li><a href="mailto:qhull@geom.umn.edu">Send e-mail</a> to
+        qhull@geom.umn.edu </li>
+    <li><a href="mailto:qhull_bug@geom.umn.edu">Report bugs</a>
+        to qhull_bug@geom.umn.edu </li>
+</ul>
+
+<p>Qhull is a general dimension code for computing convex hulls,
+Delaunay triangulations, halfspace intersections, Voronoi diagrams,
+furthest-site Delaunay triangulations, and
+furthest-site Voronoi diagrams. These structures have
+applications in science, engineering, statistics, and
+mathematics. For a detailed introduction, see O'Rourke [<a
+href="qh-man.htm#orou94">'94</a>], <i>Computational Geometry in C</i>.
+</p>
+
+<p><i>Brad Barber, Cambridge 
+MA, February 18, 1998
+<!--
+-->
+</i></p>
+
+<p><b>Copyright © 1998 The Geometry Center, Minneapolis MN</b></p>
+
+<hr>
+
+<h2><a href="#TOP">»</a><a name="TOC">FAQ: Table of
+Contents </a></h2>
+
+<ul>
+    <li>Startup questions <ul>
+            <li><a href="#console">How</a> do I run Qhull from
+                Windows?</li>
+            <li><a href="#input">How</a> do I enter points for
+                Qhull?</li>
+            <li><a href="#learn">How</a> do I learn to use Qhull?</li>
+            <li><a href="#options">Why</a> does Qhull have so many options?</li>
+        </ul>
+    </li>
+    <li>Delaunay and Voronoi diagram questions<ul>
+            <li><a href="#3dd">How</a> do I construct a 3-d Delaunay
+            	triangulation?</li>
+            <li><a href="#constrained">Can</a> Qhull produce a
+                triangular mesh for an object?</li>
+            <li><a href="#2d">How</a> do I get the triangles for
+                a 2-d Delaunay triangulation and the vertices of
+                its Voronoi diagram?</li>
+            <li><a href="#rays">Can</a> Qhull compute the
+                unbounded rays of the Voronoi diagram?</li>
+            <li><a href="#big">Can </a>Qhull triangulate a
+                hundred 16-d points?</li>
+        </ul>
+    </li>
+    <li>Approximation questions<ul>
+            <li><a href="#simplex">How</a> do I approximate data
+                with a simplex</li>
+        </ul>
+    </li>
+    <li>Qhull library questions<ul>
+            <li><a href="#vertices">How</a> do I list the vertices?</li>
+            <li><a href="#test">How</a> do I test code that uses
+                the Qhull library?</li>
+            <li><a href="#orient">When</a> I compute a plane
+                equation from a facet, I sometimes get an outward-pointing
+normal and sometimes an inward-pointing normal</li>
+        </ul>
+    </li>
+</ul>
+<!--
+Within each category, most recent questions are first.
+-->
+<hr>
+
+<h2><a href="#TOC">»</a><a name="startup">Startup</a> questions</h2>
+
+<h4><a href="#TOC">»</a><a name="console">How</a> do I run
+Qhull from Windows?</h4>
+
+<p>Qhull is a console program. You will first need a DOS window
+(i.e., a &quot;DOS prompt&quot;). You can double click on
+'qhull-go.bat' in the Qhull directory. It loads 'doskey' to
+simplify rerunning qhull and rbox. </p>
+
+<ul>
+    <li>Type 'qhull' for a synopsis. </li>
+    <li>Type 'rbox c D2 | qhull s i' to compute the convex hull
+        of a cube. </li>
+    <li>Type 'rbox c D2 | qhull s i TO results.txt' to write the
+        results to the file 'results.txt'. A summary is still
+        printed on the the console. </li>
+    <li>Type 'rbox c D2' to see the input format for Qhull. </li>
+    <li>Type 'qhull &lt; data.txt s i TO results.txt' to read
+        input data from 'data.txt'. </li>
+    <li>If you want to enter data by hand, type 'qhull s i TO
+        results.txt' to read input data from the console. Type in
+        the numbers and end with a ctrl-D. </li>
+</ul>
+
+<h4><a href="#TOC">»</a><a name="input">How</a> do I enter
+points for Qhull?</h4>
+
+<p>Qhull takes its data from standard input. For example, create
+a file named 'data.txt' with the following contents: </p>
+
+<blockquote>
+    <pre>
+2  #sample 2-d input
+5  #number of points
+1 2  #coordinates of points
+-1.1 3
+3 2.2
+4 5
+-10 -10
+</pre>
+</blockquote>
+
+<p>Then call qhull with 'qhull &lt; data.txt'. It will print a
+summary of the convex hull. Use 'qhull &lt; data.txt o' to print
+the vertices and edges. See also <a href="qh-man.htm#input">input
+format</a>. </p>
+
+<p>You can generate sample data with rbox, e.g., 'rbox 10'
+generates 10 random points in 3-d. Use a pipe ('|') to run rbox
+and qhull together, e.g., </p>
+
+<blockquote>
+    <p>rbox c | qhull o </p>
+</blockquote>
+
+<p>computes the convex hull of a cube. </p>
+
+<h4><a href="#TOC">»</a><a name="learn">How</a> do I learn to
+use Qhull?</h4>
+
+<p>First read: </p>
+
+<ul>
+    <li><a href="qh-man.htm#when">When</a> to use Qhull</li>
+    <li><a href="qh-man.htm#synopsis">Synopsis</a> and examples
+        of Qhull</li>
+    <li><a href="qh-opt.htm">Options</a> for Qhull, the
+        introduction</li>
+    <li><a href="qh-opt.htm#opt">Main</a> options, for your
+        application</li>
+    <li><a href="qh-rbox.htm">Rbox</a>, for sample inputs </li>
+</ul>
+
+<p>Look at Qhull's on-line documentation: </p>
+
+<ul>
+    <li>'qhull' gives a quick overview of Qhull and its options </li>
+    <li>'rbox' lists all of the options for generating point sets
+    </li>
+    <li>'qhull - | more' lists all of Qhull options </li>
+    <li>'qhull .' gives a concise list of Qhull's options </li>
+</ul>
+
+<p>Then try out Qhull on small examples. </p>
+
+<ul>
+    <li>'rbox c' lists the vertices of a cube </li>
+    <li>'rbox c | qhull' is the convex hull of a cube </li>
+    <li>'rbox c | qhull o' lists the vertices and facets of a
+        cube </li>
+    <li>'rbox c | qhull QJ o' joggles the input and triangulates
+        the cube </li>
+    <li>'rbox c D2 | qhull' generates the convex hull of a square
+    </li>
+    <li>'rbox c D4 | qhull' generates the convex hull of a
+        hypercube </li>
+    <li>'rbox 6 s D2 | qhull p Fx' lists 6 random points in a
+        circle and lists the vertices of their convex hull in
+        order </li>
+    <li>'rbox c D2 c G2 | qhull d' computes the Delaunay
+        triangulation of two embedded squares. It merges the
+        cospherical facets. </li>
+    <li>'rbox c D2 c G2 | qhull v o' computes the corresponding
+        Voronoi vertices and regions. </li>
+    <li>'rbox c D2 c G2 | qhull v Fv' shows the Voronoi diagram
+        for the previous example.  Each line is one edge of the
+        diagram.  The first number is 4, the next two numbers list
+        a pair of input sites, and the last two numbers list the
+        corresponding pair of Voronoi vertices. </li>
+</ul>
+
+<p>Install <a href="http://www.geom.umn.edu/locate/geomview">Geomview</a>
+if you are running SGI Irix, Solaris, SunOS, Linux, HP, IBM
+RS/6000, DEC Alpha, or Next. You can then visualize the output of
+Qhull. Qhull comes with Geomview <a href="qh-eg.htm">examples</a>.
+</p>
+
+<p>Then try Qhull with a small example of your application. Work
+out the results by hand. Then experiment with Qhull's options to
+find the ones that you need. </p>
+
+<p>You will need to decide how Qhull should handle precision
+problems. It can either joggle the input ('<a
+href="qh-optq.htm#QJn">QJ</a>') or merge facets ('<a
+href="qh-optc.htm#C0">C-0</a>' or '<a href="qh-optq.htm#Qx">Qx</a>').
+Qhull will merge facets by default. </p>
+
+<ul>
+    <li>With joggle, Qhull produces simplicial (i.e., triangular)
+        output. </li>
+    <li>With facet merging, Qhull produces a better approximation
+        and does not modify the input. </li>
+    <li>See <a href="qh-impre.htm#joggle">Joggled input or merged
+        facets</a>. </li>
+</ul>
+
+<h4><a href="#TOC">»</a><a name="options">Why</a> does Qhull have
+so many options?</h4>
+
+<p>Qhull contains many options. A simpler choice would be a
+customized version for each application, but this is impractical
+to maintain. Each option has a purpose. Most of the options
+extract useful information from Qhull's data structures. The
+remaining options configure Qhull for an application, adjust
+Qhull's performance for experimentation, or help locate errors. </p>
+
+<p>Delaunay triangulations and Voronoi diagrams cause the most
+trouble. Qhull computes these structures as convex hulls in one
+higher dimension. The terminology is confusing since the same
+options may be used for convex hulls, Delaunay triangulations,
+Voronoi diagrams, and halfspace intersections. </p>
+
+<p>The best approach is to try examples from <a
+href="qh-man.htm#synopsis">Synopsis and examples</a> and <a
+href="qh-opt.htm#opt">Main options</a>. Also try small inputs
+that you have computed by hand. </p>
+
+<h2><a href="#TOC">»</a><a name="delaunay">Delaunay and Voronoi
+diagram questions</a></h2>
+
+<h4><a href="#TOC">»</a><a name="3dd">How</a> do I construct a 3-d Delaunay
+            	triangulation?</h4>
+
+<p>The documentation is confusing for Delaunay triangulation and
+Voronoi diagrams.  Qhull computes these structures by computing
+a convex hull in one higher dimension.  In reading the documentation
+you will need to translate from triangulations to the corresponding
+convex hull.  O'Rourke's <i>Computational Geometry in C</i> contains
+a good introduction.
+
+<p>For example, option 
+'<a href="qh-opto.htm#i">i</a>'
+produces the vertices of the convex hull.  These correspond to input
+sites of the Delaunay triangulation.  A facet is <i>non-simplicial</i>
+if multiple input sites are cospherical.  For 3-d Delaunay triangulations
+(a 4-d convex hull), option 'i' triangulates non-simplicial facets by 
+adding a point to the facet.
+Option 'i' is not convenient in this case.  As shown below, better
+choices are to prevent cospherical input sites with option 'QJ', or
+to report all cospherical input sites with options 'Fv' or 'o'.
+
+<p>If you want non-simplicial output for cospherical sites, use options
+'<a href="qh-optv.htm#d">d</a> 
+<a href="qh-optq.htm#Qbb">Qbb</a> 
+<a href="qh-optf.htm#Fv">Fv</a>' 
+or
+'<a href="qh-optv.htm#d">d</a> 
+<a href="qh-optq.htm#Qbb">Qbb</a> 
+<a href="qh-opto.htm#o">o</a>'.  For option 'o', ignore the last
+coordinate.  It is the lifted coordinate for the corresponding convex
+hull in 4-d.  Option 'Qbb' normalizes the lifted coordinate.  It is especially
+important for coordinates greater than 100.0.  The following 
+example is a cube inside a tetrahedron.  The 8-vertex
+facet is the cube.  Ignore the last coordinates.
+<blockquote>
+<pre>
+C:\qhull>rbox r y c G0.1 | qhull d Qbb Fv
+4
+12 20 44
+   0.5      0      0 0.3055555555555555
+   0    0.5      0 0.3055555555555555
+   0      0    0.5 0.3055555555555555
+  -0.5   -0.5   -0.5 0.9999999999999999
+  -0.1   -0.1   -0.1 -6.938893903907228e-018
+  -0.1   -0.1    0.1 -6.938893903907228e-018
+  -0.1    0.1   -0.1 -6.938893903907228e-018
+  -0.1    0.1    0.1 -6.938893903907228e-018
+   0.1   -0.1   -0.1 -6.938893903907228e-018
+   0.1   -0.1    0.1 -6.938893903907228e-018
+   0.1    0.1   -0.1 -6.938893903907228e-018
+   0.1    0.1    0.1 -6.938893903907228e-018
+4 2 11 1 0
+4 10 1 0 3
+4 11 10 1 0
+4 2 9 0 3
+4 9 11 2 0
+4 7 2 1 3
+4 11 7 2 1
+4 8 10 0 3
+4 9 8 0 3
+5 8 9 10 11 0
+4 10 6 1 3
+4 6 7 1 3
+5 6 8 10 4 3
+5 6 7 10 11 1
+4 5 9 2 3
+4 7 5 2 3
+5 5 8 9 4 3
+5 5 6 7 4 3
+8 5 6 8 7 9 10 11 4
+5 5 7 9 11 2
+</pre>
+</blockquote>
+	
+If you want simplicial output use options
+'<a href="qh-optv.htm#d">d</a> 
+<a href="qh-optq.htm#QJn">QJ</a>
+<a href="qh-optf.htm#Ft">i</a>'
+or
+'<a href="qh-optv.htm#d">d</a> 
+<a href="qh-optq.htm#QJn">QJ</a>
+<a href="qh-optf.htm#Ft">Ft</a>'.
+Option 'QJ' adds a small random quantity to the input points, e.g.,
+<blockquote>
+<pre>
+C:\qhull>rbox r y c G0.1 | qhull d QJ Ft
+3
+12 32 64
+0.499999999939516 -4.457283719588488e-011 3.092055050303195e-011
+3.963849488044223e-012 0.4999999999660025 -5.479396782402126e-011
+2.168946845951116e-011 5.258475653706346e-011 0.4999999999859073
+-0.4999999999599631 -0.5000000000563027 -0.5000000000540177
+-0.09999999997929608 -0.1000000000595537 -0.1000000000141032
+-0.1000000000099817 -0.09999999997740613 0.1000000000107635
+-0.09999999995812423 0.1000000000032576 -0.10000000004936
+-0.1000000000101616 0.100000000024338 0.1000000000496365
+0.09999999997126396 -0.1000000000547432 -0.0999999999714412
+0.1000000000160453 -0.09999999996898205 0.1000000000594008
+0.09999999996939933 0.1000000000583741 -0.0999999999730648
+0.1000000000183292 0.09999999994830786 0.1000000000159239
+4 2 11 1 0
+4 11 7 2 1
+4 10 1 0 3
+4 11 10 1 0
+4 10 7 11 1
+4 2 9 0 3
+4 9 11 2 0
+4 7 9 11 2
+4 8 10 11 0
+4 9 8 11 0
+4 8 10 0 3
+4 9 8 0 3
+4 5 9 7 2
+4 7 5 2 3
+4 4 5 7 3
+4 5 9 2 3
+4 9 5 7 11
+4 5 8 9 3
+4 8 5 4 3
+4 8 5 9 11
+4 5 6 4 7
+4 10 6 7 1
+4 6 10 7 11
+4 5 6 7 11
+4 5 6 8 4
+4 6 7 1 3
+4 6 4 7 3
+4 10 6 1 3
+4 6 8 10 11
+4 6 5 8 11
+4 8 6 10 3
+4 6 8 4 3
+</pre>
+</blockquote>
+
+<h4><a href="#TOC">»</a><a name="constrained">Can</a> Qhull
+produce a triangular mesh for an object?</h4>
+
+<p>Yes for convex objects, no for non-convex objects. For
+non-convex objects, it triangulates the concavities. Unless the
+object has many points on its surface, triangles may cross the
+surface. </p>
+
+<h4><a href="#TOC">»</a><a name="2d">How</a> do I get the
+triangles for a 2-d Delaunay triangulation and the vertices of
+its Voronoi diagram?</h4>
+
+<p>To compute the Delaunay triangles indexed by the indices of
+the input sites, use </p>
+
+<blockquote>
+    <p>rbox 10 D2 | qhull d QJ i </p>
+</blockquote>
+
+<p>To compute the Voronoi vertices and the Voronoi region for
+each input site, use </p>
+
+<blockquote>
+    <p>rbox 10 D2 | qhull v QJ o </p>
+</blockquote>
+
+<p>To compute each edge (&quot;ridge&quot;) of the Voronoi diagram
+for each pair of adjacent input sites, use</p>
+<blockquote>
+    <p>rbox 10 D2 | qhull v QJ Fv </p>
+</blockquote>
+
+
+<p>To compute the area of the Voronoi region for input site 5,
+use </p>
+
+<blockquote>
+    <p>rbox 10 D2 | qhull v QJ QV5 Pg p | qhull s FS </p>
+</blockquote>
+
+<p>To compute the lines (&quot;hyperplanes&quot;) that define the
+Voronoi region for input site 5, use </p>
+
+<blockquote>
+    <p>rbox 10 D2 | qhull v QJ QV5 Pg p | qhull n </p>
+</blockquote>
+
+<p>To list the extreme points of the input sites use </p>
+
+<blockquote>
+    <p>rbox 10 D2 | qhull d Fx </p>
+</blockquote>
+
+<p>You will get the same point ids with </p>
+
+<blockquote>
+    <p>rbox 10 D2 | qhull Fx </p>
+</blockquote>
+
+<h4><a href="#TOC">»</a><a name="rays">Can</a> Qhull compute the
+unbounded rays of the Voronoi diagram?</h4>
+
+<p>Use '<a href="qh-optf#Fo2">Fo</a> to compute the separating
+hyperplanes for unbounded Voronoi regions.  The corresponding ray
+goes to infinity from the Voronoi vertices.  If you enclose the 
+input sites in a large enough
+box, the outermost bounded regions will represent the unbounded
+regions of the original points. </p>
+
+<p>If you do not box the input sites, you can identify the
+unbounded regions. They list '0' as a vertex. Vertex 0 represents
+&quot;infinity&quot;.  Each unbounded ray includes vertex 0 in 
+option '<a href="qh-optf#Fv2">Fv</a>.  
+See <a href="qh-optv#v-graphics">Voronoi
+graphics</a> and <a href="qh-optv#v-notes">Voronoi notes</a>. </p>
+
+<h4><a href="#TOC">»</a><a name="big">Can </a>Qhull triangulate
+a hundred 16-d points?</h4>
+
+<p>No. This is an immense structure. A triangulation of 19, 16-d
+points has 43 simplicies. If you add one point at a time, the
+triangulation increased as follows: 43, 189, 523, 1289, 2830,
+6071, 11410, 20487. The last triangulation for 26 points used 13
+megabytes of memory. When Qhull uses virtual memory, it becomes
+too slow to use. </p>
+
+<h2><a href="#TOC">»</a><a name="library">Approximation
+questions</a></h2>
+
+<h4><a href="#TOC">»</a><a name="simplex">How</a> do I
+approximate data with a simplex</h4>
+
+<p>Qhull may be used to help select a simplex that approximates a
+data set. It will take experimentation. Geomview will help to
+visualize the results. This task may be difficult to do in 5-d
+and higher.  Use rbox options 'x' and 'y' to produce random
+distributions within a simplex. Your methods work if you can
+recover the simplex. </p>
+
+<p>Use Qhull's precision options to get a first
+approximation to the hull, say with 10 to 50 facets. For example,
+try 'C0.05' to remove small facets after constructing the hull.
+Use 'W0.05' to ignore points within 0.05 of a facet.  Use 'PA5' to
+print the five largest facets by area. </p>
+
+<p>Then use other methods to fit a simplex to this data. Remove
+outlying vertices with few nearby points. Look for large facets
+in different quadrants. You can use option 'Pd0d1d2' to print all
+the facets in a quadrant. </p>
+
+<p>In 4-d and higher, use the outer planes (option 'Fo' or
+'facet-&gt;maxoutside') since the hyperplane of an approximate
+facet may be below many of the input points. </p>
+
+<p>For example, consider fitting a cube to 1000 uniformly random
+points in the unit cube. In this case, the first try was good: </p>
+
+<blockquote>
+    <pre>
+rbox 1000 | qhull W0.05 C0.05 PA6 Fo
+4
+6
+0.35715408374381 0.08706467018177928 -0.9299788727015564 -0.5985514741284483
+0.995841591359023 -0.02512604712761577 0.08756829720435189 -0.5258834069202866
+0.02448099521570909 -0.02685210459017302 0.9993396046151313 -0.5158104982631999
+-0.9990223929415094 -0.01261133513150079 0.04236994958247349 -0.509218270408407
+-0.0128069014364698 -0.9998380680115362 0.01264203427283151 -0.5002512653670584
+0.01120895057872914 0.01803671994177704 -0.9997744926535512 -0.5056824072956361
+</pre>
+</blockquote>
+
+<h2><a href="#TOC">»</a><a name="library">Qhull library
+questions</a></h2>
+
+<h4><a href="#TOC">»</a><a name="vertices">How</a> do I list the
+vertices?</h4>
+
+To list the vertices (i.e., extreme points) of the convex hull use
+<blockquote>
+    <pre>
+    vertexT *vertex;
+    
+    FORALLvertices {
+      ...
+      // vertex->point is the coordinates of the vertex
+      // qh_pointid (vertex->point) is the point id of the vertex
+      ...
+    }
+    </pre>
+</blockquote>
+
+
+<h4><a href="#TOC">»</a><a name="test">How</a> do I test code
+that uses the Qhull library?</h4>
+
+<p>Compare the output from your program with the output from
+the Qhull program.  Use option 'T1' or 'T4' to trace what Qhull is
+doing. Prepare a <i>small</i> example for which you know the
+output. Run the example through the Qhull program and your code.
+Compare the trace outputs. If you do everything right, the two
+trace outputs should be almost the same. The trace output will
+also guide you to the functions that you need to review. </p>
+
+<h4><a href="#TOC">»</a><a name="orient">When</a> I compute a
+plane equation from a facet, I sometimes get an outward-pointing
+normal and sometimes an inward-pointing normal</h4>
+
+<p><a>Qhull orients simplicial facets, and prints oriented output
+for 'i', 'Ft', and other options. The orientation depends on <i>both</i>
+the vertex order and the flag facet-&gt;toporient. </a></p>
+
+<p><a>Qhull does not orient non-simplicial facets. Instead it
+orients the facet's ridges. These are printed with the 'Ft'
+option. The facet's hyperplane is oriented. <!-- Navigation links --> </a></p>
+
+<hr>
+
+<p><a><b>Up:</b> </a><a
+href="http://www.geom.umn.edu/locate/qhull">Home page for Qhull</a>
+<br>
+<b>Up:</b> <a href="qh-man.htm">Qhull manual</a> <b><br>
+To:</b> <a href="#TOC">FAQ: Table of Contents</a><br>
+<!-- GC common information -->
+<hr>
+
+<p><a href="http://www.geom.umn.edu/"><img src="qh--geom.gif"
+align="middle" width="40" height="40"></a><i>The Geometry Center
+Home Page </i></p>
+
+<p>Comments to: <a
+href="http://www.geom.umn.edu/software/qhull/qhull-mail.html">qhull@geom.umn.edu
+</a><br>
+Created: Sept. 25, 1995 --- <!-- hhmts start --> Last modified: see top <!-- hhmts end --> </p>
+</body>
+</html>

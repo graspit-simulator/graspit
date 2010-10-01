@@ -1,0 +1,37 @@
+                    Qhull, Copyright (c) 1993-1998
+
+       The National Science and Technology Research Center for
+        Computation and Visualization of Geometric Structures
+                        (The Geometry Center)
+                       University of Minnesota
+                            400 Lind Hall
+                        207 Church Street S.E.
+                      Minneapolis, MN 55455  USA
+
+                       email: qhull@geom.umn.edu
+
+This software is copyrighted as noted above.  It is free software and
+may be obtained via anonymous ftp from geom.umn.edu.  It may be freely
+copied, modified, and redistributed under the following conditions:
+
+1. All copyright notices must remain intact in all files.
+
+2. A copy of this file (COPYING.txt) must be distributed along with any
+   copies which you redistribute; this includes copies which you have
+   modified, or copies of programs or other software products which
+   include this software.
+
+3. If you modify this software, you must include a notice giving the
+   name of the person performing the modification, the date of
+   modification, and the reason for such modification.
+
+4. When distributing modified versions of this software, or other
+   software products which include this software, you must provide
+   notice that the original source code may be obtained as noted
+   above.
+
+5. There is no warranty or other guarantee of fitness for this
+   software, it is provided solely "as is".  Bug reports or fixes may
+   be sent to qhull_bug@geom.umn.edu; the authors may or may not act
+   on them as they desire.
+

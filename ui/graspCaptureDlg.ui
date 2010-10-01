@@ -1,0 +1,109 @@
+<ui version="4.0" >
+ <class>GraspCaptureDlgUI</class>
+ <widget class="QDialog" name="GraspCaptureDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>240</width>
+    <height>181</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Grasp capture</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox_2" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>221</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Recorded grasps</string>
+   </property>
+   <widget class="QLabel" name="recordedGraspsLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Recorded grasps: 0</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="saveToFileButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Save to file...</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="saveToDBaseButton" >
+    <property name="geometry" >
+     <rect>
+      <x>120</x>
+      <y>70</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Save to DBase</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="clearListButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>201</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Clear list</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="captureButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>201</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Capture</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="exitButton" >
+   <property name="geometry" >
+    <rect>
+     <x>160</x>
+     <y>150</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

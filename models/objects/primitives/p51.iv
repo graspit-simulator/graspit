@@ -1,0 +1,45 @@
+#Inventor V2.1 ascii
+#plastic
+#750
+Separator {
+    Translation {
+	translation	-26.7264 13.2212 0.48749
+    }
+    ShapeHints {
+	vertexOrdering	COUNTERCLOCKWISE
+	shapeType	SOLID
+	faceType	CONVEX
+    }
+    Separator {
+	Info {
+	    string	"Inventor file translated from .obj file to p51_mustang.iv
+         with ObjToIv version 1.0 from Acuris, Inc. "
+	}
+
+Cube {
+  width 355.6
+  height 101.6
+  depth 40.132
+}
+Separator{
+Translation{
+  translation 45.72 -27.94 121.666
+}
+Cube {
+  width 109.22
+  height 10.16
+  depth 203.2
+}
+}
+Separator {
+Translation {
+ translation 45.72 -27.94 -121.666
+}
+Cube {
+  width 109.22
+  height 10.16
+  depth 203.2
+}
+}
+}
+}

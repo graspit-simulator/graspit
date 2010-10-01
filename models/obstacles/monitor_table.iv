@@ -1,0 +1,115 @@
+#Inventor V2.1 ascii
+
+Separator {
+    Separator {
+	Texture2 {
+	    filename	"textures/wood.jpg"
+	}
+	Translation {
+	    translation	400 600 710
+	}
+	Cube {
+	    width	800
+	    height	1200
+	    depth	20
+	}
+    }
+    Material {
+	ambientColor	0.939577 0.939577 0.939577
+	diffuseColor	0.936556 0.936556 0.936556
+	specularColor	0.936556 0.936556 0.936556
+	shininess	0.966767
+    }
+    Separator {
+	Translation {
+	    translation	400 215 350.5
+	}
+	DEF leg+0 Separator {
+	    Cube {
+		width	50
+		height	50
+		depth	701
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	400 985 350.5
+	}
+	USE leg+0
+    }
+    Separator {
+	Translation {
+	    translation	400 600 430
+	}
+	Separator {
+	    Cube {
+		width	20
+		height	722
+		depth	40
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	400 215 685.5
+	}
+	Separator {
+	    Cube {
+		width	530
+		height	6
+		depth	31
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	400 993 685.5
+	}
+	Separator {
+	    Cube {
+		width	530
+		height	16
+		depth	31
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	400 215 25
+	}
+	DEF bottom_pin+1 Separator {
+	    Cube {
+		width	610
+		height	25
+		depth	50
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	400 985 25
+	}
+	USE bottom_pin+1
+    }
+    Separator {
+	Translation {
+	    translation	400 180.5 430
+	}
+	DEF plop+2 Separator {
+	    Cube {
+		width	20
+		height	21
+		depth	20
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation	400 1019.5 430
+	}
+	USE plop+2
+    }
+    EventCallback {
+    }
+}

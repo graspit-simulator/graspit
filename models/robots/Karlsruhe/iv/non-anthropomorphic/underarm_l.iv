@@ -1,0 +1,18 @@
+#Inventor V2.1 ascii
+
+Separator {
+#File {name armar/hands/axis_arrows.iv }
+	Transform {
+		translation 0 0 -46.5
+		rotation 0 0 0 0 
+	}
+	Transform {
+		translation 0 0 0
+		rotation 0 1 0 3.14
+	}
+
+   	File { 
+#      		name "armar/left_arm/underarm.iv"
+      		name "armar/left_arm/underarm_l.iv"
+    	}
+}

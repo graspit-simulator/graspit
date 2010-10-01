@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>200</mass>
+    <geometryFile>RF_Meta.iv</geometryFile>
+</root>

@@ -1,0 +1,10 @@
+#Inventor V2.1 ascii
+Separator { #Model
+Transform {
+translation 46.5 0 0
+rotation 0 0 1 0
+}
+File { 
+  name "armar/eyes/eyes_pitch_link_left.iv"
+}
+} #Model

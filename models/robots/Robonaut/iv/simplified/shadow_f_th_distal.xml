@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <youngs>1500000</youngs>
+    <mass>100</mass>
+    <geometryFile>shadow_f_th_distal.iv</geometryFile>
+</root>

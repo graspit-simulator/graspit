@@ -1,0 +1,13 @@
+#GraspIt! version 2.0 beta
+GraspableBody
+models/objects/p51.iv
+T (+1 0 0 0)[0 -8.93848 +6.00098]
+
+Robot
+models/robots/Barrett/Barrett.cfg
+0 0 +0 +0 0 +0 +0 0 +0 +0 
+T (+0.545704 +0.833182 +0.0363645 +0.0818089)[0 +191.479 +38.2417]
+
+CameraFull
++512.727 +11.2119 +92.4714 +0.494626 +0.482173 +0.511852 +0.510746 +501
+

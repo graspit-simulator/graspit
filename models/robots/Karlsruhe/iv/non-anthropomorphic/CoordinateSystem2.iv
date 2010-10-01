@@ -1,0 +1,134 @@
+#Inventor V2.1 ascii
+
+
+Separator {
+
+  Separator {
+
+    DrawStyle {
+      lineWidth 4
+
+    }
+    BaseColor {
+      rgb 1 0 0
+
+    }
+    Coordinate3 {
+      point [ 0 0 0,
+          20 0 0 ]
+
+    }
+    LineSet {
+      numVertices 2
+
+    }
+    Transform {
+      translation 20 0 0
+      rotation -0 -0 -1  1.5707964
+
+    }
+    Translation {
+      translation 0 -2 0
+
+    }
+    Cone {
+      bottomRadius 2
+      height 4
+      parts (SIDES | BOTTOM)
+
+    }
+    Translation {
+      translation 0 4 0
+
+    }
+    Text2 {
+      string "X[2]"
+
+    }
+  }
+  Separator {
+
+    DrawStyle {
+      lineWidth 4
+
+    }
+    BaseColor {
+      rgb 0 1 0
+
+    }
+    Coordinate3 {
+      point [ 0 0 0,
+          0 20 0 ]
+
+    }
+    LineSet {
+      numVertices 2
+
+    }
+    Transform {
+      translation 0 20 0
+
+    }
+    Translation {
+      translation 0 -2 0
+
+    }
+    Cone {
+      bottomRadius 2
+      height 4
+      parts (SIDES | BOTTOM)
+
+    }
+    Translation {
+      translation 0 4 0
+
+    }
+    Text2 {
+      string "Y[2]"
+
+    }
+  }
+  Separator {
+
+    DrawStyle {
+      lineWidth 4
+
+    }
+    BaseColor {
+      rgb 0 0 1
+
+    }
+    Coordinate3 {
+      point [ 0 0 0,
+          0 0 20 ]
+
+    }
+    LineSet {
+      numVertices 2
+
+    }
+    Transform {
+      translation 0 0 20
+      rotation 1 -0 -0  1.5707964
+
+    }
+    Translation {
+      translation 0 -2 0
+
+    }
+    Cone {
+      bottomRadius 2
+      height 4
+      parts (SIDES | BOTTOM)
+
+    }
+    Translation {
+      translation 0 4 0
+
+    }
+    Text2 {
+      string "Z[2]"
+
+    }
+  }
+}

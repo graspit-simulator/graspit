@@ -1,0 +1,120 @@
+####################################################################
+#  Borland C++ 4.02 for Win32 and DOS Power Pack                   #
+#  Makefile for qhull and rbox                                     #
+#                                                                  #
+#       make all       to produce qhull                            #
+#       make user_eg   to produce user_eg                          #
+#       make new       to rebuild qhull and rbox from source       #
+#       make clean     to remove object files                      #
+#       make cleanall  to remove all generated files               #
+#       make test      to test rbox and qhull                      #
+#                                                                  #
+#  Author: D. Zwick of Germany, C.B. Barber                        #
+####################################################################
+
+CC      = bcc32    # 32 bit compiler for DOS
+                   # bcc32i - Intel's compiler
+LINKER  = $(CC)    # bcc calls tlink32 with needed options
+CFLAGS  = -w- -A -v	# -w- no warnings, bcc doesn't handle assigns in conditions
+                	# -A Ansi standard
+                	# -X no auto-dependency outputs
+                	# -v debugging, use CCOPTS for both 
+                	# -O2 optimization   
+!if $d(_DPMI)
+LFLAGS  = -WX -w-       # -WX loads DPMI library
+!else
+LFLAGS  = -lap -lx -lc  # -lap 32-bit console application
+			# -lx no map file
+			# -lc case is significant 
+!endif
+
+EXERB = rbox
+EXEQH = qhull
+EXEEG = user_eg
+
+TMPFILE = BCC32tmp.cfg
+
+OBJS1 =   global.obj stat.obj geom2.obj poly2.obj io.obj
+OBJS2 =   merge.obj qhull.obj mem.obj set.obj poly.obj geom.obj
+
+HFILES1 = qhull.h stat.h qhull_a.h user.h
+
+
+# General rules
+
+.c.obj:
+	$(CC) -c $(CFLAGS) $<
+
+# Default
+
+help:
+	@echo  USAGE:
+	@echo  "make all       to produce qhull and rbox"
+	@echo  "make user_eg   to produce user_eg"
+	@echo  "make new       to rebuild qhull and rbox from source"
+	@echo  "make clean     to remove object files"
+	@echo  "make cleanall  to remove all generated file"
+	@echo  "make test      to test rbox and qhull"
+	@echo  OPTIONS (default is 32-bit console app):
+	@echo  "-D_DPMI        for C++ 4.01 and DOS Power Pack"
+
+# Executables
+
+all:          $(EXERB) $(EXEQH)
+
+$(EXEQH):     $(EXEQH).exe
+	@echo Made $(EXEQH).exe
+
+$(EXEQH).exe: unix.obj user.obj $(OBJS1) $(OBJS2)
+	@echo unix.obj user.obj > $(TMPFILE)
+	@echo $(OBJS1) >> $(TMPFILE)
+	@echo $(OBJS2) >> $(TMPFILE)
+	$(LINKER) -e$@ $(CFLAGS) $(LFLAGS) @$(TMPFILE)
+
+$(EXEEG):     $(EXEEG).exe
+	@echo Making $(EXEEG).exe
+
+$(EXEEG).exe: user_eg.obj $(OBJS1) $(OBJS2)
+	@echo user_eg.obj > $(TMPFILE)
+	@echo $(OBJS1) >> $(TMPFILE)
+	@echo $(OBJS2) >> $(TMPFILE)
+	$(LINKER) -e$@ $(CFLAGS) $(LFLAGS) @$(TMPFILE)
+
+$(EXERB):     $(EXERB).exe
+	@echo Made $(EXERB).exe
+
+$(EXERB).exe: rbox.obj
+	$(LINKER) -e$@ $(CFLAGS) $(LFLAGS) rbox.obj
+
+# Test rbox and qhull (makes rbox and qhull first)
+
+test:   all
+	@rbox D4 > qh_test.in
+	@qhull < qh_test.in
+	@del qh_test.in
+
+# Clean up
+
+clean:
+	@del *.obj
+	@del $(TMPFILE)
+
+cleanall: clean
+	@del $(EXERB).exe
+	@del $(EXEQH).exe
+	@del $(EXEEG).exe
+
+# Clean up and rebuild all
+
+new:      cleanall all
+
+# Header file dependencies
+
+qhull.obj stat.obj user.obj global.obj: $(HFILES1)
+geom.obj geom2.obj:  $(HFILES1) geom.h
+poly.obj poly2.obj:  $(HFILES1) poly.h
+io.obj:     $(HFILES1) io.h
+merge.obj:  $(HFILES1) merge.h
+mem.obj:    mem.h
+set.obj:    set.h mem.h
+unix.obj:   qhull.h user.h

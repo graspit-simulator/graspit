@@ -1,0 +1,175 @@
+\subsection{GraspIt! Installation - Windows}
+
+We assume you are using the Microsoft Visual Studio compiler. Some of
+the paths provided as examples in this installer are taken from MS
+Visual Studio 2003; the change to your particular version of the
+compiler should be straightforward.
+
+\subsubsection{Qt}
+
+Download Qt for C++ from the the \xlink{Qt
+  website}{http://www.qtsoftware.com/downloads}.
+
+GraspIt! is currently tested using Qt 4.5.2. So far, we have had the
+best experience with \textbf{the source code version of Qt}, NOT any
+of the installers that come with pre-built binaries. On the Qt
+website, choose "Qt: Framework Only", then "Download Qt libraries 4.5
+for Windows (166 Mb)" and finally click the link under "Source code
+available on this link:". Currently, the recommended download link
+that you will arrive at is
+\xlink{http://get.qtsoftware.com/qt/source/qt-win-opensource-src-4.5.2.zip}{http://get.qtsoftware.com/qt/source/qt-win-opensource-src-4.5.2.zip}. However,
+this will change as new versions are added to the website. Unzip the
+archive to a directory of your choice.
+
+Set the following environment variables:
+
+\begin{itemize}
+\item \texttt{QTDIR} - the directory where you unzipped Qt (e.g. \texttt{C:/Qt/4.4.3})
+\item \texttt{QMAKESPEC} - this has to be set depending on your c++
+  compiler and platform. See \texttt{\$QTDIR/mkspecs} for a list of
+  options. If using Microsoft Visual Studio 2003, set this variable to
+  \texttt{win32-msvc2003}.
+\item \texttt{PATH} - add \texttt{\$QTDIR/bin} to your \texttt{PATH}
+\end{itemize}
+
+You might also need to add to some compiler-specific paths to your
+environment variables. If Qt's configure script fails, try to look
+what file it failed to find, then add the respective path to either
+\texttt{PATH}, \texttt{INCLUDE} or \texttt{LIB}. Also be aware of where in the particular environment variable you add a certain path - when searching for a
+file, the system will use the first one that it finds, which might not
+be the one that you intended. Here are, as examples, the paths that
+need to be added when using MS Visual Studio 2003:
+
+\begin{itemize}
+
+\item \texttt{PATH}:
+\begin{itemize}
+\item the path to \texttt{nmake.exe} (e.g. \texttt{C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/bin} )
+\item the path to the common dlls (e.g. \texttt{C:/Program Files/Microsoft Visual Studio .NET 2003/Common7/IDE} )
+\end{itemize}
+
+\item \texttt{INCLUDE}:
+\begin{itemize}
+\item \texttt{C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/include}
+\item \texttt{C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/PlatformSDK/Include}
+\end{itemize}
+
+\item \texttt{LIB}:
+\begin{itemize}
+\item \texttt{C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/PlatformSDK/Lib}
+\item \texttt{C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/lib}
+\end{itemize}
+
+\end{itemize}
+
+Follow the instructions provided with the Qt distribution for
+installing (note: installation might take a couple of hours). We
+recommend building both release and debug versions of Qt, so you have
+all your options for linking later
+on. Use \texttt{configure~-debug-and-release} for that.
+
+WARNING: Other programs use Qt binaries, and often include the Qt
+dll's (such as \texttt{QtGui4.dll}) in their distribution. If a path
+to some other version of a Qt dll exists in you \texttt{PATH}
+environment variable \textbf{before} \texttt{\$QTDIR/bin}, the system
+will link GraspIt against the wrong version, often causing failure to
+run. To be sure that you are linking against the right dll's, put
+\texttt{\$QTDIR/bin} at the beginning of your \texttt{PATH}.
+
+\subsubsection{Coin}
+
+Download Coin3d for your C++ compiler from the \xlink{Coin3D
+website}{http://www.coin3d.org}.
+
+We have tested the installation of GraspIt! using Coin 2.4.6. If using
+MS Visual Studio 2003, we recommend downloading Coin 2.4.6 VC7
+binaries, no installer.
+
+Set the following environment variables:
+
+\begin{itemize}
+\item \texttt{COINDIR} - the directory where you unzipped Coin (e.g. \texttt{C:/Coin3D/2.4.6}).
+\item \texttt{PATH} - add the path to \texttt{coin2.dll} (e.g. \texttt{C:/Coin3D/2.4.6/bin}).
+\end{itemize}
+
+\subsubsection{SoQt}
+
+Download SoQt from the \xlink{Coin3D website}{http://www.coin3d.org}.
+
+You will need to build SoQt yourself from source code. The source code
+comes with MS Visual Studio solution files, choose the appropriate one
+depending on your compiler. Again, we recommend building both debug
+and release versions. After the build completes, take a look in
+\texttt{\$COINDIR/bin} to make sure that the appropriate SoQt dlls (\texttt{soqt1.dll} and/or \texttt{soqt1d.dll}) have been built.
+
+\subsubsection{Lapack}
+
+You will need to link GraspIt! against your favorite implementation of
+Lapack. This usually involves two steps: using a ``wrapper'' file so
+you can call Fortran functions from C code and linking against the
+correct library.
+
+We have tested GraspIt! with two Lapack implementations:
+\begin{itemize}
+\item Intel Math Kernel Library (MKL), available from
+  \xlink{http://software.intel.com/en-us/intel-mkl/}{http://software.intel.com/en-us/intel-mkl/}
+  (free trial available);
+\item CLapack, available from
+  \xlink{http://www.netlib.org/clapack/}{http://www.netlib.org/clapack/}.
+\end{itemize}
+
+If you install one of these two, you can use them as follows:
+\begin{itemize}
+\item set the environment variable \texttt{MKLDIR} or
+  \texttt{CLAPACKDIR} to the root of the respective Lapack library
+  installation;
+\item set the appropriate flag in the main GraspIt! project file (see below).
+\end{itemize}
+
+Unfortunately, it is possible that you might have to change these
+settings to get the installation to work on your system, or you might
+be using a different version of Lapack altogether. Due to the large
+number of possible configurations, we can not provide more in-depth
+guidelines. If linking against Lapack fails, please see the
+Windows-specific GraspIt! project file
+(\texttt{graspit-lib-WINDOWS.pro}), find the blas/lapack block, and
+try to adapt it to your settings.
+
+\subsubsection{GraspIt!}
+
+Download and unzip the GraspIt! code itself. Set the following
+environment variable:
+
+\begin{itemize}
+\item \texttt{GRASPIT} - the directory where you unzipped GraspIt! (e.g. \texttt{C:/Documents and Settings/your\_username/My Documents/Graspit}).
+\end{itemize}
+
+Build QHull. Open and build the MS Visual Studio solution
+\texttt{\$GRASPIT/qhull/windows/qhull.sln}. Once again, we recommend building
+both debug and release versions. Make sure \texttt{qhull.lib} has been
+installed in the appropriate directory
+(\texttt{\$GRASPIT/qhull/windows/Debug}
+and/or \texttt{\$GRASPIT/qhull/windows/Release}).
+
+Edit \texttt{\$GRASPIT/graspit.pro} to suit your particular
+installation. Among other options, you can choose which version of
+Lapack to use. Then, create the GraspIt! MS Visual Studio project file
+from the Qt project file. Execute the following command from inside
+\texttt{\$GRASPIT} in a command prompt:
+
+\texttt{qmake -t vcapp -o graspit.vcproj graspit.pro}
+
+This will create your GraspIt! MS Visual Studio project file. Open
+\texttt{graspit.vcproj} in MS Visual Studio. Build GraspIt! and run.
+
+\textbf{IMPORTANT}: 
+based on the choice of Debug vs. Release made in
+the \texttt{graspit.pro} file, make sure the appropriate configuration
+(Debug or Release) is \textbf{also} selected in MS Visual Studio. This
+ensures linking against the correct Qt libraries.
+
+\textbf{WARNING}: it is not enough to switch between Debug and Release builds
+using only the option in in MS Visual Studio. This will link against
+the appropriate Qt libraries but NOT against the appropriate Coin,
+SoQt and QHull libraries! The correct way of choosing a Debug or
+Release build is to also edit the \texttt{graspit.pro} file.

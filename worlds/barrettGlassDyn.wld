@@ -1,0 +1,38 @@
+#GraspIt! version 2.0 beta
+Obstacle
+models/obstacles/simpleFloor.iv
+wood
+T (+1 0 0 0)[0 0 0]
+
+Obstacle
+models/obstacles/table.iv
+wood
+T (+1 0 0 0)[0 0 0]
+
+Obstacle
+models/obstacles/puma_stand.iv
+wood
+T (+1 0 0 0)[0 0 -1]
+
+GraspableBody
+models/objects/glass.iv
+T (+0.996 -0.0781588 +0.0111872 +0.0418439)[+1.31244 +525.048 -465.928]
+
+Robot
+models/robots/Puma560/Puma560.cfg
++1.85318 +0.43586 -3.20326 +0.00906244 -0.397201 +0.218149 
+T (+1 0 0 0)[0 0 0]
+
+Robot
+models/robots/Barrett/Barrett.cfg
++4.98626e-06 +0.9 +0 +0 +0.9 +0 +0 +0.9 +0 +0 
+T (-0.00733326 -0.726523 +0.687044 -0.00902717)[-4.15554 +546.842 -402.042]
+
+Connection
++0 +0 +1 
+models/robots/Barrett/iv/barrettmount.iv
+T (+1 0 0 0)[0 0 +175.05]
+
+CameraFull
+-50.3792 +1987.84 +359.447 -0.0133373 +0.554021 +0.832395 -0.00105661 +2155.4
+

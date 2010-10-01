@@ -1,0 +1,46 @@
+#Inventor V2.1 ascii
+Separator {
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }    
+    Separator {
+        Translation {
+	    translation 450 550 425
+        }
+	Cube {
+            width	900
+	    height	1100
+	    depth	40
+	}
+    }
+    Separator {
+	Translation {
+	    translation 47.5 47.5 203
+        }
+        DEF leg Separator {
+	    Cube {
+		width	55
+		height	55
+		depth	406
+	    }
+        }
+    }
+    Separator {
+	Translation {
+	    translation 47.5 1052.5 203
+	}
+	USE leg
+    }
+    Separator {
+	Translation {
+	    translation 852.5 47.5 203
+	}
+	USE leg
+    }
+    Separator {
+        Translation {
+	    translation 852.5 1052.5 203
+	}
+	USE leg
+    }
+}

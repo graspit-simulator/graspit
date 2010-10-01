@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>400</mass>
+	<cog>0 0 0</cog>
+	<inertia_matrix>53370.0 0.0 0.0 0.0 3367.0 0.0 0.0 0.0 56670.0</inertia_matrix>
+	<geometryFile type="Inventor">plate.iv</geometryFile>
+</root>

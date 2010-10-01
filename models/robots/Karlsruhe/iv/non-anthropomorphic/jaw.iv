@@ -1,0 +1,15 @@
+#Inventor V2.1 ascii
+Separator { #Model
+
+Transform {
+translation 0 0 0
+rotation 0 1 0 3.14
+}
+Transform {
+translation 0 0 0
+rotation 1 0 0 1.57
+}
+File { 
+  name "armar/head/jaw.iv"
+}
+} #Model

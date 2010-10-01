@@ -1,0 +1,212 @@
+\subsection{Robots}
+\label{sec:robotfile}
+
+A Robot is made up of multiple links, connected into kinematic
+chains. A link is simply a dynamic body, as described above. A Robot
+always has a base link (called "palm" for hands) and one or more
+kinematic chains attached to it. Each chain is in turn made up of a
+succession of links, connected by joints. In order to define a robot,
+two things are needed: the Body files for all the links that are part
+of the Robot, plus an overall Robot configuration file, which has all
+the kinematic information and references the appropriate body files
+for the links. Here we describe the structure of the Robot
+configuration file.
+
+Robot configuration files can seem daunting at first, and they are a
+bit annoying to get used to. However, you can start from one of the
+many robots that are included with this distribution, and use it as a
+starting block for your own robot that you are trying to
+build. Starting in version 2.1, GraspIt! robot files are now stored in
+an XML compatible format.
+
+In general, a Robot configuration file contains the following data:
+\begin{itemize}
+\item the palm - this is simply a pointer to the Body file that
+  contains the palm.
+\item{degrees of freedom} - contained in the XML tag
+  \texttt{\texttt{<dof>}}. We will discuss them in detail below.
+\item{kinematic chains} - contained in the XML tag
+  \texttt{\texttt{<chain>}}. We will discuss them in detail below.
+\end{itemize}
+
+In this example, we will walk through the file for the Robonaut
+hand. The first XML tag, \texttt{\texttt{<robot>}}, encloses the entire
+contents of the file. It also has a specified property \texttt{type},
+which tells GraspIt! whether this is a generic robot or hand or a
+particular subclass of one of those. A hand should use the "Hand"
+type. In some cases, if a robot has special features or its own
+inverse kinematics algorithm, it is necessary to use a subclass of
+these generic types, such as "Barrett", or "Puma560":
+
+\begin{verbatim}
+<robot type="Robonaut">
+... (rest of Robot file)
+</robot>
+\end{verbatim}
+
+The next item is the filename for the palm link:
+
+\begin{verbatim}
+<palm>right_palm.xml</palm>
+\end{verbatim}
+
+\subsubsection{Degrees of Freedom}
+
+In each robot file, we have a set of degree of freedom tags
+\texttt{\textbf{\texttt{<dof>}}}, each describing one DOF of the robot. Note
+that a DOF can be connected to one or more joints in the kinematic
+chains, this information will be supplied later in the Robot
+configuration file. For more details about DOF's and joints in
+GraspIt!, see the \link{Joint Coupling and Underactuated Hands
+  chapter}{sec:coupling}. Also note that the \textbf{ORDER} in which
+\texttt{<dof>} tags appear in the file is important: dof's will later be
+referenced by their position in this order!
+
+For each DOF, the XML tag contains the following information:
+\begin{itemize}
+\item a \texttt{type} property of the \texttt{<dof>} tag. Its value is a
+  letter, showing the DOF type. For the Robonaut hand, all DOF's are
+  of the type "rigid", depicted by the letter "r". This is the most
+  common type of DOF in GraspIt!. Unless you are building robots with
+  coupled joints (multiple joints connected to a single DOF), you can
+  always use this type of DOF.
+\item all the other properties of the DOF are stored as sub-tags of
+  the \texttt{<dof>} tag, as listed below.
+\item \texttt{<defaultVelocity>} - the default velocity for that DOF during an
+  autograsp operation. This is used to pre-define the "closing" motion
+  of a hand. For anthropomorphic hands, these pre-defined directions
+  tell GraspIt! how to move each DOF in order to "autograsp", or how
+  to "close the hand". This generally means moving the DOF's of the
+  MCP, PIP and DIP joints in the "flexing" direction, and no movement
+  for the abduction - adduction DOFs.
+\item \texttt{<maxEffort>} - the max force the DOF can apply to each joint it
+  is connected to. The unit is N * 1.0e6 * mm for torques and N *
+  1.0e6 for forces.
+\item \texttt{<Kp>} and \texttt{<Kd>} - the Kp and Kv coefficients for a PD force
+  controller built into the DOF
+\item \texttt{<draggerScale>} - the visual scale of the dragger that allows the
+  user to control this DOF through the GraspIt! GUI.
+\item a number of optional sub-tags, depending on the DOF type. For
+  the "rigid" DOF, no more sub-tags are needed.
+\end{itemize}
+
+Here's an example \texttt{<dof>} tag from the Robonaut.xml file:
+\begin{verbatim}
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+10</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+\end{verbatim}
+
+\subsubsection{Kinematic Chains}
+
+Each kinematic chain is stored in the tag
+\texttt{\textbf{chain}}. This tag has no properties, and can contain
+the following sub-tags:
+\begin{itemize}
+\item \texttt{<transform>} - the transform from the origin of the palm (which
+  is also the origin of the robot) to the base of this chain, which is
+  where the first joint in the chain is placed. Note that, anywhere in
+  GraspIt! XML files, a \texttt{<transform>} tag can have an unspecified number
+  of sub-tags, each containing a translation, a rotation, or both.
+\item \texttt{<joint>} - a joint in the chain. This tag can contain the
+  following information:
+  \begin{itemize}
+    \item the joint type, as a property. This can be either
+      ``Revolute'' or ``Prismatic''
+    \item the Denavit-Hartenberg (D-H) parameters of this joint, as
+      sub-tags:
+    \begin{itemize}
+      \item \texttt{\texttt{<d>}}
+      \item \texttt{<a>}
+      \item \texttt{<alpha>}
+      \item \texttt{<theta>}
+      \item one of the 4 D-H parameters must be connected to a degree
+        of freedom of the robot. For revolute joints, this will be
+        \texttt{<d>}. For prismatic joints, this will be \texttt{<a>}. For example, to
+        show that a revolute joint is connected to the 5th degree of
+        freedom of the robot, the XML tag will have the form
+        \texttt{\texttt{<d>}d5\texttt{</d>}}.
+      \item you can also specify a linear relationship between the DOF
+        value and the joint value. This is done in the form d\#*k+c (no
+        spaces!). For example, to specify that the value of the joint
+        will be one third of the second DOF value, plus an offset of
+        30 degrees, the XML tag will have the form:
+        \texttt{\texttt{<d>}d2*0.33+30.0\texttt{</d>}}
+      \item the other 3 D-H parameters will have fixed values,
+        specified in their respective XML tag. Example:
+        \texttt{\texttt{<a>}46\texttt{</a>}}.
+    \end{itemize}
+    \item \texttt{<minValue>} - the lower joint limit for this joint
+    \item \texttt{<maxValue>} - the upper joint limit for this joint
+    \item other optional sub-tags are also possible, but they are not
+      used in this example file, They can contain things like joint
+      friction coefficients, spring stiffness etc.
+  \end{itemize}
+\item \texttt{<link>} - a link in this chain.
+  \begin{itemize}
+    \item this tag has a property called ``dynamicJointType''. This
+      property tells us how each link is connected to the one
+      before. It can be one of the following: "Revolute", "Prismatic",
+      "Universal", "Ball", or "Fixed". Depending on which one is used,
+      the chain will take some of the joints from the joint list
+      above, and put them together to create a connection of that
+      type. For example:
+    \begin{itemize}
+      \item Revolute: the link is connected to the one before by
+        through a single revolute joint
+      \item Universal: the link is connected to the one before by two
+        revolute joints, usually with perpendicular axes
+      \item Ball: the link is connected to the one before by three
+        revolute joints, usually with perpendicular axes
+    \end{itemize}
+    \item the value of the \texttt{<link>} tag is a pointer to the Body file
+      which contains the link.
+  \end{itemize}
+\end{itemize}
+
+Example of a kinematic chain from the Robonaut.xml file:
+
+\begin{verbatim}
+    <chain>
+        <transform>
+            <translation>46.183982 -26.490473 5.890768</translation>
+            <rotationMatrix>0.56107 -0.820276 -0.111118 0.145778 0.230056 -0.962197 0.814831 0.523661 0.248656</rotationMatrix>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>6.35</a>
+            <alpha>90</alpha>
+            <minValue>-60</minValue>
+            <maxValue>5</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+8.9</theta>
+            <d>0</d>
+            <a>46.8376</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>85</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>75</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">tyoke.xml</link>
+        <link dynamicJointType="Revolute">thumbphl.xml</link>
+        <link dynamicJointType="Revolute">thdph1.xml</link>
+    </chain>
+\end{verbatim}
+
+Finally, the Robot file can contain some optional tags. These usually
+includes things such as Eigengrasp information, connection to a Flock
+of Birds sensor, etc. These are described in more detail in the
+dedicated chapters of this manual.

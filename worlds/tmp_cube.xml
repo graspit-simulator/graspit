@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+    <graspableBody>
+        <filename>models/objects/cube.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+130.033 -54.962 +69.9138]</fullTransform>
+        </transform>
+    </graspableBody>
+    <robot>
+        <filename>models/robots/harvardHand/harvardHand.xml</filename>
+        <dofValues>-0.0196582</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </robot>
+    <camera>
+        <position>+130.103 -34.1884 +312.72</position>
+        <orientation>+0.0917766 -0.0495225 +0.825227 -0.55509</orientation>
+        <focalDistance>+229.456</focalDistance>
+    </camera>
+</world>

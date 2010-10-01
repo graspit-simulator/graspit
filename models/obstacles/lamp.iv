@@ -1,0 +1,89 @@
+#Inventor V2.1 ascii
+
+Separator {
+    Material {
+	ambientColor	0.19131 0.2 0.149607
+	diffuseColor	0.765241 0.8 0.598426
+	shininess	0.0966767
+    }
+    Separator {
+	Rotation {
+	    rotation	1 0 0  1.5708
+	}
+	Separator {
+	    Translation {
+		translation	0 57.5 0
+	    }
+	    Cone {
+		bottomRadius	110
+		height	115
+	    }
+	}
+	Separator {
+	    Translation {
+		translation	0 70 0
+	    }
+	    Cone {
+		bottomRadius	180
+		height	90
+	    }
+	}
+	Separator {
+	    Translation {
+		translation	0 120 0
+	    }
+	    Cone {
+		bottomRadius	400
+		height	120
+	    }
+	}
+	Separator {
+	    Transform {
+		translation	0 870 0
+		rotation	1 0 0  3.14159
+	    }
+	    Cone {
+		bottomRadius	90
+		height	80
+	    }
+	}
+	Separator {
+	    Translation {
+		translation	0 140 0
+	    }
+	    Cylinder {
+		radius	70
+		height	70
+	    }
+	}
+	Separator {
+	    Translation {
+		translation	0 200 0
+	    }
+	    Cylinder {
+		radius	20
+		height	30
+	    }
+	}
+	Separator {
+	    Translation {
+		translation	0 622.5 0
+	    }
+	    Cylinder {
+		radius	7
+		height	815
+	    }
+	}
+	Separator {
+	    Translation {
+		translation	0 480 0
+	    }
+	    Cylinder {
+		radius	50
+		height	50
+	    }
+	}
+    }
+    EventCallback {
+    }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>glass</material>
+    <mass>200</mass>
+    <geometryFile type="Inventor">glass.iv</geometryFile>
+</root>

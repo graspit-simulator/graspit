@@ -1,0 +1,335 @@
+\section{The Columbia Grasp Database - Part I}
+\label{sec:cgdb}
+
+\htmlmenu{2}
+
+\subsection{Overview}
+
+The Columbia Grasp Database (CGDB) is a repository of more than
+250,000 grasps over a set of approximately 8,000 3D models. The
+interface discussed here allows you to load these models into GraspIt,
+load and inspect the grasps for these objects stored in the database
+and use them for data-drive, machine-learning based algorithms inside
+GraspIt.
+
+This chapter is dedicated to the interface between the CGDB and
+GraspIt. It will show you how to install and use this interface. The
+next chapter, \link{The Columbia Grasp Database - Part II}{sec:cgdb2},
+presents the database itself in much more detail, discusses some of
+its design choices, shows you how to extend it, etc. Finally, see the
+\link{Publications}{sec:publications} section for a complete
+discussion of theoretical aspects and research questions.
+
+Formally, the database contains:
+\begin{itemize}
+	\item the set of objects used is the Princeton Shape Benchmark
+      (PSB). This set consists of approx. 1800 3D models, and is
+      separate from GraspIt. However, it is freely available for
+      download (see below for installation instructions).
+	\item since grasping is inherently scale-dependant, in the CGDB,
+      each of these 1,800 models is used at 4 different
+      scales. Therefore, the CGDB can be considered to use
+      approx. 1,800 * 4 = 7,200 individual 3D models.
+	\item for each of these models, the CGDB contains a number of
+      grasps. A grasp is defined as:
+	\begin{itemize}
+		\item a hand position relative to the object
+		\item a set of hand joint angles
+	\end{itemize}
+	\item quality metrics for all the grasps. Note that all of the
+	\item hand-object contact points for all the grasps, for use in
+      machine learning grasps from the CGDB have form-closure.
+	\item grasps have been stored in the database for 3 hand models:
+	\begin{itemize}
+		\item the Barrett hand assuming plastic finger covers (low
+          friction coefficient)
+		\item the Barrett hand assuming rubber finger covers (high
+          friction coefficient)
+		\item the Human Hand model
+	\end{itemize}
+	\item in total, the CGDB contains more than 250,000 grasps.
+\end{itemize}
+
+The interface between GraspIt and the CGDB will enable you to:
+
+\begin{itemize}
+	\item load any model from the PSB into GraspIt!, automatically
+      rescaled to a size appropriate for grasping.
+	\item see the other models in the PSB that are "geometrically
+      similar" to the loaded model.
+	\item load the grasps for that model that have been saved in the
+      CGDB, using any of the three hand models above.
+	\item use this information for data-driven grasp planning.
+\end{itemize}
+
+\subsection{Caveats}
+
+An aspect of particular importance concerns the quality of the
+information available in the CGDB. Many of the objects in the PSB are
+not intuitively graspable. You will find extensive sets of ants and
+spiders, battleships, furniture etc. For the purposes of the CGDB, all
+objects have been rescaled to what we empirically considered to be
+"graspable" size. Informally, this is approximately the size of a toy model
+of the object.
+
+Since the majority of the grasps in the database were found using an 
+\textbf{automated planner}, not all of the grasps are truly humanlike or
+reliable. There can be cases where a grasp satisfies our quality
+metrics, but would require a degree of precision that cannot be
+obtained in real-life execution. Aside from the intrinsic limitations
+of grasp quality metrics, for which there is as of yet no firm
+consensus on which to use, our approach to grasp planning is purely
+geometric. This presents problems for objects that do not match our
+assumptions. For example, our assumption that all objects are rigid
+plastic results in geometrically correct but unrealistic grasps on
+objects such as flowers or leaves. Furthermore, the lack of
+domain-specific knowledge means that some of our grasps are
+semantically incorrect, such as a mug grasped by placing the fingers
+inside.
+
+Finally, our automatically computed grasps were obtained from pre-grasps that
+sample a low-dimensional subspace of the hand DOF space. This is for the moment
+a necessary simplification, without which the planning problem for
+dexterous hands is intractable at this scale. While our choice of
+subspace is theoretically justified and shown to be effective [3], we
+cannot reasonably claim that the database covers the entire space of
+possible grasps.
+
+\subsection{Database installation}
+
+The CGDB comes as a separate download from GraspIt!, at the
+\xlink{Columbia Robotics
+  website}{http://grasping.cs.columbia.edu/}. It is available for
+download as a PostgreSQL database backup file (70M) and requires a PostgreSQL
+installation to use. In order to use the interface presented here, you
+will need to install a PostgreSQL server on your machine and load the
+provided backup file. PostgreSQL is open source, and easy to
+install. We recommend getting the binary package.
+
+\subsection{GraspIt Interface Installation}
+\label{sec:cgdbinterface}
+\subsubsection{Windows}
+\begin{itemize}
+\item Download PostgreSQL from the \xlink{PostgreSQL
+  website}{http://www.postgresql.org/} and install. We recommend
+  installing the binary package.
+\begin{itemize}
+\item add \texttt{\$PSQLDIR/bin} to your \texttt{PATH}, where
+  \texttt{\$PSQLDIR} is the directory where you installed PostgreSQL
+  (\textit{e.g.} \texttt{C:/postgresql-8.3.4}).
+\item WARNING: if Qt can not find the PostgreSQL dll's it will NOT
+  complain about it, but just fail to open any databases. If that
+  happens, make sure the path to the dll is in your \texttt{PATH}.
+\item WARNING: some of the dll's from \texttt{\$PSQLDIR/bin} are
+  sometimes also present in other places on your system, such as
+  \texttt{Windows/system32} etc. For some reason, the system will try
+  to use the wrong version at run-time and \texttt{libpq} won't
+  operate well. If this happens, you will get a "driver not loaded"
+  error from the GraspIt CGDB interface. The solution is to copy some
+  of the dll's from \texttt{\$PSQLDIR/bin} to the directory that
+  you're running GraspIt from (\texttt{\$GRASPIT} if running from
+  Visual Studio or \texttt{\$GRASPIT/bin} if running the executable
+  directly). For example, I have had to do this with
+  \texttt{libeay32.dll} and \texttt{ssleay32.dll}.
+\end{itemize}
+\item Build the \texttt{qpsql} according to "How to Build the QPSQL
+  Plugin on Windows" in the Qt Assistant:
+\begin{itemize}
+\item \texttt{cd \$QTDIR/src/plugins/sqldrivers/psql}
+\item \texttt{qmake "INCLUDEPATH+=\$PSQLDIR/include"
+  "LIBS+=\$PSQLDIR/lib/libpq.lib" psql.pro}
+\item \texttt{nmake}
+\item after this, check that the qsqlpsql lib and dll files have been
+  built in \texttt{\$QTDIR/plugins/sqldrivers}
+\end{itemize}
+\item Create your root for the CGDB, such as \texttt{C:/cgdb}. Set the
+  environment variable \texttt{CGDB\_MODEL\_ROOT} to point to it.
+\item download the \xlink{Princeton Shape
+  Benchmark}{http://shape.cs.princeton.edu/benchmark/download.cgi?file=download/psb\_v1.zip}
+  and unpack it in to \texttt{\$CGDB\_MODEL\_ROOT/psb}.
+\begin{itemize}
+\item for example, the model \texttt{m0} should be in
+  \texttt{\$CGDB\_MODEL\_ROOT/psb/benchmark/db/0/m0/m0.off}
+\end{itemize}
+\item Enable the CGDB by uncommenting the appropriate line in the
+  \texttt{graspit.pro} file and rebuild GraspIt.
+\end{itemize}
+
+\subsubsection{Linux}
+\begin{itemize}
+\item install the SQL module for Qt. Using the Package Manager,
+  install the package \texttt{libqt4-sql}.
+\item Create your root for the CGDB, such as \texttt{/data/cgdb}. Set
+  the environment variable \texttt{CGDB\_MODEL\_ROOT} to point to it.
+\item download the \xlink{Princeton Shape Benchmark}{http://shape.cs.princeton.edu/benchmark/download.cgi?file=download/psb\_v1.zip}
+  and unpack it in to \texttt{\$CGDB\_MODEL\_ROOT/psb}.
+\begin{itemize}
+\item for example, the model \texttt{m0} should be in
+  \texttt{\$CGDB\_MODEL\_ROOT/psb/benchmark/db/0/m0/m0.off}
+\end{itemize}
+\item Enable the CGDB by uncommenting the appropriate line in the
+  \texttt{graspit.pro} file and rebuild GraspIt.
+\end{itemize}
+
+
+\subsection{Connecting to and browsing the database}
+Connecting to the CGDB:
+\begin{itemize}
+\item start GraspIt and load one of the hand models that are used in
+  the CGDB (the Human hand or the Barrett hand). You don't need to
+  explicitly load any objects.
+\item The Database menu gives you access to all CGDB functionality
+  from GraspIt. The first step is to establish a connection to the
+  CGDB, using the Database $\rightarrow$ Connect and Browse
+  menu. After a connection is established, you can use the other
+  functions in the Database menu as well. Click Database $\rightarrow$
+  Connect and Browse to bring up the CGDB-Browser dialog.
+\item set the connection parameters based on PostgreSQL server that
+  you are connecting to. You must have access to a machine running a
+  PostgreSQL server that serves the CGDB, as downloaded above. Most
+  often, the machine running the server will be the same that GraspIt
+  is running on; in this case, set the Host to \texttt{localhost}. The
+  Port number is usually 5432. Set the User Name and Password based on
+  the settings that you used when setting up your PostgreSQL server.
+\item note that it is also possible to connect to a remote machine
+  running the PostgreSQL server. In the future, we might set up a
+  machine in the Columbia Robotics lab that will offer a read-only
+  version of the database for everybody. For now though, you have to
+  set up your own PostgreSQL server.
+\item click \texttt{Connect}. If the connection is successful, the
+  \texttt{Browser} group will become enabled, the \texttt{Models}
+  drop-down list will be populated with a list of models and the
+  currently selected model thumbnail will be shown in the dedicated
+  space.
+\item if the connection fails, you will get an error message in the
+  console. Usually, this error message will say that the Qt SQL driver
+  is not properly loaded. Go back to the \link{Interface
+    Installation}{sec:cgdbinterface} section for details.
+\end{itemize}
+
+Browsing the CGDB:
+\begin{itemize}
+\item select a model from the \texttt{Models} drop-down list. The
+  model's thumbnail will be shown. Note that the names of the models
+  from the PSB are set as follows: psb\_scale\_modelnumber. Each model
+  can be selected at one of four different scales (\texttt{0.75, 1.0,
+    1.25 or 1.5}, each compared to a reference size which has been
+  determined empirically by us).
+\item click \texttt{Load Model}. The model will be loaded into GraspIt
+  and set as the reference object for grasp quality computations.
+\item select the type of grasps that you want to load. There are three
+  grasp types stored in the database:
+\begin{itemize}
+  \item \texttt{EIGENGRASPS} - this is the actual database, the grasps
+    computed by our automatic planner. You will find this type of
+    grasps for all the objects in the database. We recommend using
+    only this type of grasps when using the CGDB.
+  \item \texttt{HUMAN} - grasps created by a human operator. This are
+    being used for a current unfinished project in the Columbia
+    Robotics Lab. For the moment, there are very few grasps of this
+    type saved in the CGDB, approx 100 grasps over a set of 15
+    objects. In the future, the CGDB might include more grasps of this
+    type, for comparison against the automatically generated grasps
+    above.
+  \item \texttt{HUMAN\_REFINED} - the same operator-created grasps,
+    but further refined inside GraspIt by an operator. Again, very few
+    of these are available.
+\end{itemize}
+\item click \texttt{Load Grasps} and use the \texttt{Grasps} button
+  group to browse the loaded grasps. Note that, for each grasp, you
+  can look at either the final grasp posture, or the pre-grasp. See
+  the CGDB Publications for the difference between these two.
+\end{itemize}
+
+\subsection{Geometric similarity}
+
+A very important aspect of the CGDB concerns geometric similarity
+between objects. Our group has been implementing existing tools, and
+also developing new methods for this area. These tools are not
+included with GraspIt! - this means that, if you have a \textbf{new 3D
+  model}, this interface will not be able to find its geometric
+"neighbors" in the CGDB. However, we have \textbf{precomputed} this
+information for all the models that are already part of the CGDB, and
+\textbf{included} this information in the CGDB. This means that, for
+any model in the CGDB, you can see which other models are
+"geometrically similar" based on our set of tools.
+
+Geometric similarity is a vibrant research area, far exceeding the
+scope of this user manual. For more details, please see the
+\link{Publications}{sec:publications} section.
+
+\subsection{Database-backed grasp planning}
+
+Database-backed grasp planning works by finding geometrically similar
+``neighbor'' objects to the target object in the CGDB. Due to the
+reasons explained above, the version of the planner included with this
+distribution only works for models that are \textbf{already in the
+  CGDB} and as such have pre-computed neighbor information. However,
+we are providing this code in the hope that it will serve as a
+blueprint for developing your own CGDB-backed algorithms.
+
+Please note that this is a fairly complex machinery, and all the
+details of its execution exceed the scope of this chapter. More
+information is provided in the next chapter, which discusses advanced
+concepts pertaining to the CGDB. You might need to peruse the code
+itself, and its documentation for more details.
+
+To start, use the following steps:
+\begin{itemize}
+\item establish a connection to the CGDB as discussed above.
+\item load a model from the CGDB. This will serve as the target
+  object, the one that we will plan grasps on.
+\item start the planner using the Database $\rightarrow$ Database
+  Planner menu.
+\end{itemize}
+
+The CGDB Planner goes through a few steps, each with its own dedicated
+button group in the Planner dialog.
+\begin{itemize}
+\item \textbf{Neighbor Generator}
+\begin{itemize}
+  \item select the distance function used for finding geometric
+    neighbors. Use \texttt{SIFT\_12\_view\_0} for our most up-to-date
+    results on shape search. For more details, please see the CGDB
+    publications.
+  \item choose the number of neighbors you want to use. Usually, a
+    number between 3 and 5 does the job, but you can choose to use
+    more of fewer neighbors based on your computational
+    resources. Note that the more neighbors you use, the worse the
+    ``geometric matching'' will get.
+  \item click \texttt{Get Neighbors}. The drop-down list of neighbors
+    will be populated and you can browse through it and see the
+    associated thumbnails.
+\end{itemize}
+\item \textbf{Alignment} - Choose a method for aligning neighbors to
+  the original model. \texttt{SIFT\_PI\_ICP\_FULL} gives the best
+  results.
+\item \textbf{Grasp retrieval and ranking}. Here we retrieve the
+  grasps from the neighbors and rank them. Click \texttt{Retrieve
+    Grasps}. Currently, the ranking methods we are using are still
+  under development, so choose \texttt{No ranking}, then click
+  \texttt{Rank Grasps}. After you have done this, the \texttt{Selected
+    Grasps} group should become enabled, and the counter will show you
+  the total number of grasps retrieved from neighbors.
+\item \textbf{Grasp Browsing} - you can browse through the list of
+  retrieved grasps in the \texttt{Selected Grasps} group. Make sure
+  that \texttt{aligned original grasp} is selected.
+\item \textbf{Grasp execution} - here we execute the retrieved grasps
+  on the target object, and compute their quality. Make sure
+  \texttt{Static} is selected in the grasp execution type drop down
+  box (the other option, \texttt{Dynamic} execution, is still under
+  development). You can test the grasps one at a time, by selecting
+  \texttt{Test current}, or all at once, by selecting \texttt{Test
+    All}. Note that this option will usually take up to a minute of
+  computation, depending on the number of neighbors and the number of
+  retrieved grasps.
+\item \textbf{Solution inspection} - after using the \texttt{Test All}
+  option, you can browse the results of the planner, sorted by
+  quality. Use the \texttt{Selected Grasps} group, but this time
+  select \texttt{tested grasps} in the radio box.
+\end{itemize}
+
+This is just a very high-level overview and walk-through for the
+CGDB-backed planner. For more details, please see the next chapter of
+this manual, the source code documentation, the Publications chapter,
+or contact us.

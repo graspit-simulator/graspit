@@ -1,0 +1,87 @@
+\section{Joint Coupling and Underactuated Hands}
+\label{sec:coupling}
+
+\htmlmenu{2}
+
+In the chapters so far we have used the terms "joint" and "DOF" as if
+they were the same thing, and one DOF always correspond to one and
+only one joint. This is not always true in real hand models, and it is
+not always true in GraspIt! either. GraspIt! allows you to connect
+multiple joints to a single DOF (joint coupling) and allows support
+for multiple coupling methods.
+
+The best way to think of a DOF in GraspIt! is as a motor. It is
+responsible for moving the joints of a robot, and it is the only
+external interface to the robot available for doing that. In the
+GraspIt! GUI, joint draggers are not actually "joint" draggers but
+rather "DOF" dragger: only one dragger is presented to the user for
+each DOF. In the case of the Barrett hand for example, you will notice
+that there is only one dragger per finger, even though each finger has
+two joints. Moving the one dragger however affects both joints, as
+they are coupled to the same DOF.
+
+In a fully actuated robot, there is one motor for each joint. In many
+cases however, we have joint coupling, that is multiple joints
+connected to a single DOF. The key aspect here is how exactly this
+coupling is implemented from a hardware standpoint, and whether we can
+replicate that in software.
+
+A GraspIt! DOF is responsible for telling us how all of the joints
+that are attached to it respond to changes in the DOF. This
+intelligence is built into the DOF class and its
+implementations. Depending on how the joint coupling is achieved, DOF
+behave differently, which is why there are multiple
+implementations. The most important question is: when one of the
+joints of a DOF can not move (presumably due to some contact on its
+links), what happens to the other joints connected to the same DOF?
+
+In dynamics mode, a DOF is also responsible for enforcing the same
+mode of operation. This is done via "DOF constraints" which must be
+built into the LCP solved by the dynamics engine. For instance, a
+rigidly coupled DOF must ensure that all of its joints always move at
+the same rate. Finally, the DOF is also responsible for applying
+forces to its joints (which then pass them on to the links) in
+dynamics mode. This is the only way of moving a Robot in
+dynamics. Force generation capabilities also depend on the
+implementation of the DOF, see the classes described below for
+details.
+
+\subsection{Rigid coupling}
+
+The simplest type of coupling is rigid, implemented in practice
+through gear transmission of steel cables. This means that whenever
+one joint from a DOF stops moving, all the other joints from the same
+DOF stop as well. In code, this is implemented in the RigidDOF
+class. Most hands in GraspIt! use this kind of underactuation
+(Robonaut, DLR, the 16 DOF version of the HumanHand).  See the
+\texttt{RigidDOF} class for details.
+
+\subsection{Breakaway transmission}
+
+This kind of coupling allows a distal joint to "break away" and
+continue to close if a proximal link has been stopped. The break away
+point is marked, and the proximal joint is only re-engaged if the DOF
+goes back to the break away point. This is the type of transmission
+built into the Barrett hand. In code, this is the
+\texttt{BreakAwayDOF}, see this class for details.
+
+\subsection{Under development: compliant joints}
+
+This is the transmission achieved in practice through tendon networks
+and compliant (spring-like) joints. It is more difficult to simulate
+that the BreakawayDOF, as stopped joints are always connected to the
+DOF. In the code, this is the \texttt{CompliantDOF}. However, this is
+still an active area of research for us, and this kind of DOF has
+proven difficult to simulate in static mode.
+
+For the compliant DOF we have also built a mechanism for hand
+quasistatic analysis. This mechanism exists for any kind of DOF, but
+is only relevant for the compliant one: due to its nature, the
+Compliant DOF will apply some unbalanced forces through existing
+contacts during the hand closing process. The Compliant DOF is thus
+responsible for computing these forces, which are then passed on to
+the quasi-static computation. This computation is then performed by
+the \texttt{Grasp} class; also see the \link{Grasp quality
+  metrics}{sec:quality} chapter for details. A complete description of
+this engine and its applications can be found in the
+\link{Publications}{sec:publications} chapter.

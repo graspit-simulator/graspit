@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>150.0</mass>
+    <geometryFile>thumb2.wrl</geometryFile>
+</root>

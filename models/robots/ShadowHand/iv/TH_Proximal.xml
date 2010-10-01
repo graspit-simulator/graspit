@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>100</mass>
+    <geometryFile>TH_Proximal.iv</geometryFile>
+</root>

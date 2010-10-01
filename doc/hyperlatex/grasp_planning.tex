@@ -1,0 +1,94 @@
+\section{Grasp Planning}
+
+\htmlmenu{2}
+
+\subsection{General concepts and planner types}
+
+Grasp planning is one the most useful (and most widely used) tools in
+GraspIt!. The core of this process is the ability of the system to
+evaluate many hand postures quickly, and from a functional point of
+view (i.e. through grasp quality measures). Using a simulated
+environment allows us to test grasps much much faster than in real
+life, and also at a lower cost. The quality metrics give us feedback
+on the grasps, often more than just a binary success / fail
+outcome. This is therefore the general concept: try out lots of grasps
+really fast and see which work. Of course, there is an infinite number
+of possible implementations, optimizations, refinements, etc. that can
+be played starting from this simplified idea. GraspIt! comes with a
+couple of grasp planners, each of them different in its own way, but
+all have roots in the same concept presented above.
+
+The grasp planners within GraspIt! are grouped in three families:
+\begin{itemize}
+\item the Primitive-based Planner, primitive not in the sense that it
+  is ancient but rather in the sense that it uses primitive
+  decompositions for the grasped object.
+\item the Eigengrasp Planner family, which relies on hand posture
+  space dimensionality reduction.
+\item the Database Planner family, which relies on a huge database of
+  pre-computed grasps to plan grasps for novel objects.
+\end{itemize}
+
+This section only presents the Primitive-based Planner; the other two
+families have their own sections in this manual.
+
+All the types of grasp planners have been extensively described in
+various publications. If you are interested in the machinery behind
+the scenes and the theory of the planners, the
+\link{Publications}{sec:publications} section has many more details
+than presented here.
+
+\subsection{The Primitive-based Grasp Planner}
+
+The Primitive-based Planner is accessible via the Grasp $\rightarrow$ Planner
+menu. It has a couple of restrictions: it only works on the Barrett
+hand, and only if the user also supplies a primitive approximation of
+the object to be grasped. When the Planner dialog is opened, GraspIt!
+will attempt to load the primitive version of the current object from
+the \texttt{\$GRASPIT/models/objects/primitives} directory. In order
+to create a primitive file, see the examples in the primitives
+directory that are included with the distribution. Note that a
+primitive file may only include spheres, cubes, cylinders and
+cones. For more details, see the relevant publication.
+
+The Planner itself goes through 2 stages. The Planner dialog window
+has two groups, one for each stage. The first stage (accessed through
+the button group on the left) is to generate many pre-grasps for your
+object. Pre-grasps are generated based on the primitive version of
+your object. You can generate as many pre-grasps as your computational
+resources and allocated time will allow you to test. The number of
+pre-grasps generated is controlled by the density factors. You can
+either choose a master density factor (Automated sampling) and allow
+GraspIt! to do the rest, or choose sampling densities along different
+dimensions separately. Alternatively, you can pre-specify the exact
+pre-grasps to be tested by loading them from a file, which is useful
+for debug purposes. Once you have set the desired parameters, click
+the Generate button to generate your pre-grasps.
+
+The second stage is to compute the grasps that result from the chosen
+pre-grasps. Note that grasp execution is done on the actual object
+(even though pre-grasps are generated on the simplified primitive
+version). You can also choose which Quality Measure should be used to
+rank these grasps. If a usable QM exists already, you can select it
+from the drop-down list. If not, use the New button to fire up the QM
+creation dialog and create a new one. Once you have set the desired
+metric, you are ready to test all the pre-grasps by clicking the Test
+button.
+
+After testing is finished, the hand will be set back to its initial
+position and the Show button will become enabled. Use the Show button
+to cycle through the list of found grasps, sorted in order of the
+Quality Metric.
+
+\textbf{IMPORTANT}: you can choose to visualize the testing process by
+checking the Visualize process box. This means that the process of
+executing all the grasps will be rendered, and you can see the hand
+trying out each of them. You must check the Visualize box
+\textbf{before} clicking the Generate button for this to
+work. Visualization makes for a more compelling demo, but rendering
+slows down the planning process considerably. For time-sensitive
+applications, we recommend disabling the visualization.
+
+When rendering is disabled, we have found that the computational
+bottleneck for the Primitive-based planner is collision and contact
+detection.

@@ -1,0 +1,127 @@
+\section{Grasp Quality Metrics}
+\label{sec:quality}
+
+\htmlmenu{2}
+
+This section is intended as a practical guide on how to access the
+grasp quality tools in GraspIt!. Grasp quality metrics are an active
+area of research; for discussions of their theoretical aspects please
+see the \link{Publications}{sec:publications} section.
+
+In GraspIt!, a grasp is completely defined by an object and a set of
+contacts, presumably created by a hand. In the context of grasp
+quality computations, the posture of the hand, or it's position
+relative to the object are not important; all that matters is the
+location of the contacts. The interface to all of the quality
+computations is the \texttt{Grasp} class, which collects the contact
+between a hand and an object. However, an instance of this class never
+needs to know about joint angles, etc (with a few exceptions listed
+below).
+
+In order to create a grasp, you must load a hand and an object into a
+simulation world, then place them relative to each other and change
+the joint values of the hand until multiple contacts are formed. To
+facilitate this process, load the \texttt{dlr\_flask.wld} world file
+provided with the GraspIt! distribution. Then use the Grasp $\rightarrow$ Auto
+Grasp menu command. This should result in multiple contacts, using all
+the fingers as well as the palm. We will investigate the quality of
+the grasp in the following steps.
+
+\subsection{Grasp Wrench Space metrics}
+
+All the grasp quality metrics computed in GraspIt! rely on building
+the Grasp Wrench Space (GWS) from the individual Contact Wrench Spaces
+of all contacts (see \link{Publications}{sec:publications} for
+theoretical details). There are multiple ways to build a GWS, and then
+multiple ways to compute a quality metric on one. In GraspIt! a
+Quality Measure (QM) is more than just a number - it is an object that
+hangs around from the moment you create it until you dismiss it. At
+any point, you can ask a QM to update itself and provide you the
+computed quality value. You can access this functionality through the
+Grasp $\rightarrow$ Quality measures menu. The Quality measures window allows you
+to:
+\begin{itemize}
+\item create a new Quality Measure, and assign it:
+\begin{itemize}
+\item a name
+\item a Quality Measure type
+\item a GWS type
+\end{itemize}
+\item edit (change the name or type) of an already built Quality Measure
+\end{itemize}
+
+Once you have constructed a QM, the main GraspIt! window will display
+it, along with the most recently computed value, in the space provided
+in the lower left corner of the GUI.
+
+Note that this dialog said nothing of GWS construction. The GraspIt!
+GUI does all that behind the scenes. Whenever a QM needs a particular
+type of GWS, one is constructed. However, multiple QM's can share a
+GWS: if a QM requests a GWS type that exists already, it will be
+redirected to the existing GWS rather than building a new
+one. GraspIt! does the reference counting for you, so when a GWS is no
+longer needed by any QM, it is deleted. In general, it is building the
+GWS that is the computationally expensive part of the QM computation.
+
+From a code standpoint, quality measures are organized as follows:
+\begin{itemize}
+\item the \texttt{Grasp} class keeps track of the hand, the object and
+  the contacts between them
+\item the implementations of the \texttt{QualityMeasure} interface can
+  compute quality metrics and provide you with the results. Any
+  implementation of QualityMeasure needs an instance of a \texttt{GWS}
+  class (but the same instance of the \texttt{GWS} class may be shared
+  by multiple \texttt{QualityMeasures}).
+\item the \texttt{GWS} implementations actually build the GWS from the
+  set of contacts. This is usually done by computing the convex hull
+  of individual Contact Wrench Spaces using QHull, an excellent
+  library for building high-dimensional convex hulls. Building a GWS
+  is a fairly expensive process (especially when many contacts are
+  involved) and a bottleneck for many GraspIt! algorithms.
+\end{itemize}
+
+In general, a GWS is a 6-dimensional convex polyhedron. As such, it
+can not be visualized directly. However, GraspIt! allows you to view
+3D projections of a GWS. Use the Grasp $\rightarrow$ Create GWS Projection menu
+for that. You will need to choose which 3D are fixed (used for
+projection). Note that a GWS (and its projections) are independent
+from Quality Measures - you do not need a QM to visualize a
+GWS. However, if the GWS does not contain the origin (the grasp does
+not have form-closure), or the GWS is a degenerate 6D object, the GWS
+construction process might be aborted and the visualization might not
+show anything. In general, form-closed grasps with a true 6D GWS
+create correct 3D projections.
+
+\subsection{Under development: Grasp Force Optimization}
+
+All of the QM's discussed above share a common trait: they assume that
+the amount of normal force that can be applied at each contact is
+identical, and normalized to magnitude 1. In practice this is not
+true: a given contact can only apply the level of normal force that is
+possible given the actuation of the hand. A great amount of
+theoretical work exists on taking hand actuation into account when
+evaluating a grasp. In GraspIt! we have two tools for this, but one of
+them has never been extensively used or tested, and the other is still
+under development.
+
+The first tool is an implementation of the Grasp Force Optimization
+approach proposed by L. Han, J. Trinkle, and Z. Li, \textit{Grasp
+  analysis as linear matrix inequality problems}, IEEE Trans. on
+Robotics and Automation, vol. 16, 2000. GraspIt! has the code
+necessary for all the concepts found in that paper, however, this part
+of the code has not been tested or used lately. It can all be found in
+the \texttt{Grasp} class, marked as Grasp Force Optimization
+(\texttt{GFO}) code.
+
+The second tool is somewhat similar, but employs a different
+mathematical model (Quadratic Programming instead of Linear Matrix
+Inequalities) and is geared towards underactuated compliant hands. It
+performs a Quasi-static (QS) force equilibrium computation to see
+whether contacts are stable given the actuation scheme of the
+robot. All the details are in the
+\link{Publications}{sec:publications} chapter of this manual. The code
+itself is also in the \texttt{Grasp} class, marked as quasi-static
+analysis routines. However, this is still work in progress in our lab,
+so use with care. Also see the \link{Joint coupling}{sec:coupling}
+chapter of this manual for more details on DOF force generation
+capabilities in GraspIt!.

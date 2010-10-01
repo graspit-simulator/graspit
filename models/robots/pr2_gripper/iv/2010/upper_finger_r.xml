@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>1000</mass>
+    <cog>0 0 0</cog>
+    <geometryFile>upper_finger_r.iv</geometryFile>
+    <geometryScaling>1000</geometryScaling>
+    <geometryOffset>
+      <transform>
+        <translation>-91.503986 0.0 0.0</translation>	
+        <rotation>3.100986421 z</rotation>	
+      </transform>
+    </geometryOffset>
+</root>

@@ -1,0 +1,17 @@
+#Inventor V2.1 ascii
+Separator { #Model
+#File {name armar/hands/axis_arrows.iv }
+RotationXYZ{
+  axis Z
+  angle 1.57
+}
+
+
+#Transform{
+#  translation 0 0 52
+#}
+
+File { 
+  name "armar/torso/hd_torso.iv"
+}
+} #Model

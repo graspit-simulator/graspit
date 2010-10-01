@@ -1,0 +1,81 @@
+\subsection{GraspIt! Installation - Linux}
+
+\subsubsection{Qt}
+
+Download Qt for C++ from the \xlink{Qt
+  website}{http://www.qtsoftware.com/downloads}.
+
+Follow the installation instructions (this usually amounts to just
+doing \texttt{configure} and \texttt{make}). The installation
+automatically goes to \texttt{/usr/local/Trolltech/Qt-4.4.3}, unless
+you specify a different installation path. Set the following
+environment variables:
+
+\begin{itemize}
+\item \texttt{QTDIR} - the path to your Qt installation 
+\item \texttt{PATH} - add the path to \texttt{\$QTDIR/bin}
+\end{itemize}
+
+On Ubuntu systems it is probably possible to get Qt from the package
+manager. We have not tested this, but you will probably need all of
+the following packages:
+
+\begin{itemize}
+\item libqt4-core
+\item libqt4-debug
+\item libqt4-dev
+\item libqt4-gui
+\item libqt4-qt3support
+\end{itemize}
+
+\subsubsection{Coin}
+
+Download Coin3d from the \xlink{Coin3D website}{www.coin3d.org} and
+follow installation instructions. The examples below assume you choose
+to install Coin in \texttt{/usr/local/Coin} (i.e. use
+\texttt{configure~--prefix=/usr/local/Coin}). Set the following
+environment variables:
+
+\begin{itemize}
+\item \texttt{COINDIR} - the directory where you installed Coin
+  (e.g. \texttt{/usr/local/Coin})
+\item \texttt{PATH} - add \texttt{\$COINDDIR/bin}
+  (e.g. \texttt{/usr/local/Coin/bin})
+\item \texttt{LD\_LIBRARY\_PATH} - add \texttt{\$COINDIR/lib}
+  (e.g. \texttt{/usr/local/Coin/lib})
+\end{itemize}
+
+\subsubsection{SoQt}
+
+Download SoQt from the \xlink{Coin3D website}{http://www.coin3d.org}
+and follow the installation instruction. The configure script needs
+the path to your Coin installation -
+e.g. \texttt{configure~--prefix=/usr/local/Coin}. Then just type
+\texttt{make install}.
+
+\subsubsection{Lapack}
+
+On Ubuntu, all you need to do is install the following packages form
+the package manager:
+\begin{itemize}
+\item libblas-dev
+\item liblapack-dev
+\end{itemize}
+
+\subsubsection{GraspIt!}
+
+Download and unzip the GraspIt! code itself. Set the following
+environment variable:
+
+\begin{itemize}
+\item \texttt{GRASPIT} - the directory where you unzipped GraspIt!
+\end{itemize}
+
+Build QHull. Go to the \texttt{\$GRASPIT/qhull} directory and type
+\texttt{make}.
+
+Create the GraspIt! Makefile from the Qt project file. Edit
+\texttt{\$GRASPIT/graspit.pro} to suit your system and
+installation needs. Then type \texttt{qmake graspit.pro}.
+
+Build and go. From \texttt{\$GRASPIT/} type \texttt{make}.

@@ -1,0 +1,128 @@
+#Inventor V2.1 ascii
+Separator {
+    Separator {
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }
+    Separator {
+        Translation {
+	    translation 140 10 1010
+        }
+	DEF side Cube {
+            width	280
+	    height	20
+	    depth	2020
+	}
+    }
+    Separator {
+	Translation {
+	    translation 140 790 1010
+	}
+	USE side
+    }
+    Separator {
+	Translation {
+	    translation 269.5 400 1009.5
+        }
+	Cube {
+	    width	19
+	    height	762
+	    depth	2019
+	}
+    }
+    Separator {
+	Translation {
+	    translation	164.5 400 40.5
+	}
+	Cube {
+	    width	229	
+	    height	762
+	    depth	81
+	}
+    }		
+    Separator {
+	Translation {
+	    translation 142 400 100
+	}
+        Cube {
+	    width	274
+	    height	762
+	    depth	40
+        }
+    }
+    Separator {
+        Translation {
+	    translation 142 400 437.5
+	}
+	DEF plate Separator {
+	    Cube {
+		width	274
+		height	762
+		depth	15
+	    }
+        }
+    }
+    Separator {
+        Translation {
+	    translation 142 400 727.5
+        }
+	USE plate
+    }
+    Separator {
+        Translation {
+	    translation 142 400 1047.5
+	}
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 142 400 1307.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 142 400 1747.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 139.5 400 2010
+        }
+	Cube {
+	    width	279
+	    height	762
+	    depth	20
+	}
+    }	
+    }
+    Material {
+	 ambientColor 	0.329412 0.223529 0.027451
+	 diffuseColor 	0.780392 0.568627 0.113725
+         specularColor 	0.992157 0.941176 0.807843
+         shininess 	0.278974
+    }
+    Separator {
+	Translation {
+	    translation -38 400 2010
+        }
+        Cube {
+	    width 	74
+	    height	798
+	    depth	4
+	}
+    }
+    Separator {
+	Translation {
+	    translation	-72 400 1977.5
+        }
+	Cube {
+	    width	4
+	    height	798
+	    depth	65
+	}
+    }
+}
+
+

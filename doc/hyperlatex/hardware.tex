@@ -1,0 +1,114 @@
+\section{Hardware connections}
+
+We have found two main reasons for connecting GraspIt! to hardware
+devices. The first one if for GraspIt! to provide output: allow a real
+robot to be controlled from within the simulator. Usually, this is
+done by having a virtual model of the robot inside GraspIt! that uses
+an algorithm running in the simulated environment. The real robot
+must then match the pose of its virtual replica. The second
+application is to provide input to GraspIt!, in the form of object
+geometry from a scanner, object location from a tracker, robot pose,
+etc.
+
+For the moment we do not have a unified architecture for connecting
+GraspIt! to real world devices. This means that when you need such a
+connection, you will probably need to write some interface code
+yourself. In the future, we might write a general interface for the
+virtual robot to real robot paradigm.
+
+In our work, we have connected GraspIt! to the following external devices:
+\begin{itemize}
+\item a real Barrett hand
+\item a Flock of Birds tracker that can be used to move objects or
+  robots in the simulation world
+\item a Cyberglove which can be used to provide hand pose input.
+\end{itemize}
+
+All the code for these connections is included with the current
+distribution. However, it has two shortcomings: first it is
+Windows-only. The only reason for that is serial port communication
+which he have not yet made cross-platform. The second is that the code
+needs a good overhaul to improve its design and robustness.
+
+All the code that is specific to the hardware is offered as a separate
+Visual Studio project called \texttt{hardware}. It can be found in
+\texttt{\$GRASPIT/hardware}. You will need to compile this project
+separately into a static library. Then, inside the main GraspIt!
+project file (\texttt{graspit.pro}), indicate that you want GraspIt!
+linked against it and its features accessible. This project contains a
+simple Serial Port interface that is used by all hardware interfaces,
+and interfaces for each of the three pieces of hardware mentioned
+above.
+
+The second part of the interface is code that lives within GraspIt!
+itself. All of this code is guarded by pre-processor definitions so
+that it is only compiled if the \texttt{hardware} project had been
+built and linked against. We are really hoping to improve this design
+at some point. Most of this functionality is accessible from the
+GraspIt! GUI via the Sensors menu.
+
+\subsection{Barrett Hand}
+
+A virtual Barrett hand can be linked to a real Barrett hand. Then, the
+pose of the virtual hand can be replicated by the real hand, or vice
+versa. The GraspIt! GUI also provide a crude dialog window for doing
+this. The Barrett class is a good starting point to check out this
+implementation.
+
+\subsection{Flock of Birds}
+
+A Flock of Birds tracker can be used to set the position of any
+element (body or robot) in the GraspIt! simulation world. The
+following steps must be followed:
+\begin{itemize}
+\item at load time, the Robot configuration file, or the Body file,
+  must specify that the Robot or Body is to be controlled by the Flock
+  of Birds. In order to do this, you must also specify where on the
+  Robot (or Body) the Flock of Birds sensor is to be mounted. Remember
+  that the origin of a body's geometry in GraspIt! is often arbitrary,
+  and the location of the sensor makes a huge difference. For
+  examples, look at the \texttt{FlockSensor.iv} body file (in
+  \texttt{\$GRASPIT/models/objects}) and the \texttt{HumanHand20DOF}
+  robot configuration file.
+\item using the GraspIt! GUI, you must turn on Flock of Birds
+  tracking. When that happens, the GraspIt! world (in the
+  \texttt{World} class) will periodically monitor the Flock of Birds
+  and ask for an update of its position. Then, it will update the
+  position of all the elements in the simulated world that are
+  controlled by the flock. See the relevant functions in the
+  \texttt{World} class for details.
+\end{itemize}
+
+\subsection{Cyberglove}
+
+A Cyberglove can be used to set the pose of a hand. However, hand
+models in GraspIt! do not necessarily have a perfect correspondence
+between their DOF's and glove sensors. Therefore, some translation is
+necessary, telling the hand which DOF's correspond to which glove
+sensors. This functionality is built into the \texttt{GloveInterface}
+class. Furthermore, some form of calibration is also needed to map raw
+sensor values to DOF values. This turned out to be a very delicate
+thing to achieve in practice. The \texttt{GloveInterface} can also
+perform calibration for you, then save the calibration to a
+file. Similar steps to the Flock of Birds must then be taken:
+\begin{itemize}
+\item at load time, the Robot configuration file must indicate the
+  name of the Cyberglove calibration file that is to be used. See the
+  \texttt{HumanHand20DOF} config file for an example.
+\item using the GraspIt! GUI, you must turn on Cyberglove
+  tracking. When that happens, the GraspIt! world (in the
+  \texttt{World} class) will periodically monitor the Cyberglove and
+  ask for an update of its sensor readings. Then, it will update the
+  pose of all the robots in the simulated world that are controlled by
+  the glove. See the relevant functions in the \texttt{World} class
+  for details.
+\end{itemize}
+
+A calibration file is provided with the \texttt{HumanHand20DOF}
+model. We have done our best to calibrate it, but it is a difficult
+task, especially for the thumb joints. We have implemented a version
+of the algorithm presented by Weston B. Griffin, Ryan P. Findley,
+Michael L. Turner and Mark R. Cutkosky, \textit{Calibration and
+  Mapping of a Human Hand for Dexterous Telemanipulation}, Haptics
+Symposium 2000. However, the calibration code needs a major overhaul
+and the calibration itself probably could be improved.

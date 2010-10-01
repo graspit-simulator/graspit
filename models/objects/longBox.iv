@@ -1,0 +1,18 @@
+#Inventor V2.1 ascii
+#material rubber
+#mass 440
+#cog 0 0 0
+
+Separator { # Body
+
+	Material {
+		ambientColor	0.4 0.4 0.8
+		diffuseColor	0.4 0.4 0.8
+	  }
+
+	  Transform { translation 0 0 0 }
+	  
+	  Rotation{ rotation 0 0 1 1.5707963267 }
+
+	  Cube { width 44 height 180 depth 44}
+}

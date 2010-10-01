@@ -1,0 +1,54 @@
+#! /bin/sh
+set -v
+rbox c D3 | qhull s G >eg.01.cube
+rbox c d G2.0 | qhull s G >eg.02.diamond.cube
+rbox s 100 D3 | qhull s G >eg.03.sphere
+rbox s 100 D2 | qhull s G >eg.04.circle
+rbox 10 l | qhull s G >eg.05.spiral 
+rbox 1000 D2 | qhull s C-0.03 Qc Gapcv >eg.06.merge.square
+rbox 1000 D3 | qhull s G >eg.07.box 
+rbox c G0.4 s 500 | qhull s G >eg.08a.cube.sphere
+rbox d G0.6 s 500 | qhull s G >eg.08b.diamond.sphere
+rbox 100 L3 G0.5 s | qhull s G >eg.09.lens
+rbox 100 s P0.5,0.5,0.5 | qhull s Ga QG0 Pg >eg.10a.sphere.visible
+rbox 100 s P0.5,0.5,0.5 | qhull s Ga QG-0 Pg >eg.10b.sphere.beyond
+rbox 100 s P0.5,0.5,0.5 | qhull s Ga QG0 PG >eg.10c.sphere.horizon
+rbox 100 s P0.5,0.5,0.5 | qhull s Ga QV0 PgG >eg.10d.sphere.cone
+rbox 100 s P0.5,0.5,0.5 | qhull s Ga >eg.10e.sphere.new
+rbox 100 s P0.5,0.5,0.5 | qhull s Ga QV0g Q0 >eg.14.sphere.corner
+rbox 500 W0 | qhull s QR0 QJ5e-2 Qc Gvp >eg.15.joggle
+echo 2 = rbox 6 r s D2, rbox 15 B0.3 W0.25, c G0.5 >eg.data.17
+echo 25 >>eg.data.17
+rbox 15 D2 B0.3 W0.25 c G0.5 | tail +3 >>eg.data.17
+rbox 6 r s D2 B0.2 | tail +3 >>eg.data.17
+qhull s QJ <eg.data.17 d GnraD2 >eg.17a.delaunay.2
+qhull s <eg.data.17 d GnraD2 >eg.17b.delaunay.2i
+qhull s <eg.data.17 C-0 d Ga >eg.17c.delaunay.2-3
+qhull s QJ <eg.data.17 v Gna >eg.17d.voronoi.2
+qhull s <eg.data.17 v Gna >eg.17e.voronoi.2i
+rbox c G0.1 d | qhull d Gt Qz >eg.17f.delaunay.3
+rbox 10 D2 d | qhull s Qu d G >eg.18a.furthest.2-3
+rbox 10 D2 d | qhull s Qu Pd2 d G >eg.18b.furthest-up.2-3
+rbox 10 D2 d | qhull s Qu v Gv >eg.18c.furthest.2 
+rbox 10 D3 | qhull s FQ QV5 v p Pg | qhull s G >eg.19.voronoi.region.3
+rbox r s 20 Z1 G0.2 | qhull s QR1 G >eg.20.cone
+rbox 200 s | qhull s Qc R0.014 Gpav >eg.21b.roundoff.fixed
+rbox 1000 s| qhull s C0.01 Qc Gcrp >eg.22a.merge.sphere.01
+rbox 1000 s| qhull s C-0.01 Qc Gcrp >eg.22b.merge.sphere.-01
+rbox 1000 s| qhull s C0.05 Qc Gcrpv >eg.22c.merge.sphere.05
+rbox 1000 s| qhull s C-0.05 Qc Gcrpv >eg.22d.merge.sphere.-05
+rbox 1000 | qhull s Gcprvah C0.1 Qc >eg.23.merge.cube
+rbox 5000 D4 | qhull s GD0v Pd0:0.5 C-0.02 C0.1 >eg.24.merge.cube.4d-in-3d
+rbox 5000 D4 | qhull s s C-0.02 C0.1 Gh >eg.30.4d.merge.cube
+rbox 20 D3 | qhull s d G >eg.31.4d.delaunay
+rbox 30 s D4 | qhull s G Pd0d1d2D3 >eg.32.4d.octant
+rbox 10 r s Z1 G0.3 | qhull G >eg.33a.cone
+rbox 10 r s Z1 G0.3 | qhull FQ FV n | qhull H G >eg.33b.cone.dual
+rbox 10 r s Z1 G0.3 | qhull FQ FV n | qhull FQ H s Fp | qhull G >eg.33c.cone.halfspace
+
+echo ==the following should generate flipped and concave facets== >/dev/null
+rbox 200 s | qhull Q0 s R0.014 Gav Po >eg.21a.roundoff.errors
+echo ==the preceeding should report flipped and concave facets== >/dev/null
+
+
+

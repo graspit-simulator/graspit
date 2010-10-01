@@ -1,0 +1,43 @@
+Dear User of Geometry Center Software:
+
+We would like to find out how you are using our software.  Think of
+Geometry Center software as a new kind of shareware: you share your
+science and successes with us, and we share our software and support
+with you.  The Geometry Center is funded by the National Science
+Foundation, and it is important that we be able to report to NSF the
+ways in which our software is being used.
+
+If you use Geometry Center software, please send us a letter telling
+us what you are doing with it.
+
+We need to know:
+
+  (1) What you are working on - an abstract of your work would be
+      fine.
+
+  (2) What Geometry Center software you use.
+
+  (3) How that software has helped you, for example, by increasing
+      your productivity or allowing you to do things you could not do
+      before.  In particular, if you feel that Geometry Center
+      software has had a direct bearing on your work, please tell us
+      about this.
+
+We encourage you to cite the use of any Geometry Center software you
+have used in your publications.  
+
+Please send the letter either via email to
+
+	register@geom.umn.edu    qhull@geom.umn.edu
+
+
+or via regular mail to
+
+	Software Development Group
+        The Geometry Center
+        400 Lind Hall
+        207 Church Street S.E.
+        Minneapolis, MN 55455
+	USA
+
+Thank you!

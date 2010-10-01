@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>200</mass>
+    <geometryFile>LF_Meta3.iv</geometryFile>
+</root>

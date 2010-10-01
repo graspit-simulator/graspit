@@ -1,0 +1,557 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>Qhull options</title>
+</head>
+
+<body>
+<!-- Navigation links -->
+<p><a name="TOP"><b>Up</b></a><b>:</b> <a
+href="http://www.geom.umn.edu/locate/qhull">Home page for Qhull</a>
+<br>
+<b>Up:</b> <a href="qh-man.htm#TOC">Qhull manual: Table of Contents</a> <b><br>
+To:</b> <a href="qh-rbox.htm">Rbox manual</a><br>
+<b>To:</b> <a href="#TOC">Qhull options: Table of contents</a> (please wait
+while loading)<br>
+<b>To:</b> <a href="qh-optv.htm">Qhull options: Delaunay and Voronoi</a><br>
+<b>Dn:</b> <a href="qh-man.htm#synopsis">Synopsis</a> &#149; <a
+href="qh-opt.htm#opt">Main</a> &#149; <a
+href="qh-opto.htm#output">Output</a> &#149; <a
+href="qh-optf.htm#format">Formats</a> &#149; <a
+href="qh-optg.htm#geomview">Geomview</a> &#149; <a
+href="qh-optp.htm#print">Print</a> &#149; <a
+href="qh-optq.htm#qhull">Qhull</a> &#149; <a
+href="qh-optc.htm#prec">Precision</a> &#149; <a
+href="qh-optt.htm#trace">Trace</a> </p>
+
+<hr>
+<!-- Main text of document -->
+<h1><a
+href="http://www.geom.umn.edu/graphics/pix/Special_Topics/Computational_Geometry/delaunay.html"><img
+src="qh--dt.gif" alt="[delaunay]" align="middle" width="100"
+height="100"></a> Qhull options</h1>
+
+<p>These sections describe the options for Qhull. This section
+lists the main options. It includes the options for convex hulls
+and halfspace intersections.</p>
+
+<p>For an example of Qhull, the following computes the convex hull of the
+vertices of a hypercube. It returns the facet normals.</p>
+
+<blockquote>
+    <p><tt>rbox c D4 | qhull n</tt></p>
+</blockquote>
+
+<p>See <a href="qh-man.htm#synopsis">Synopsis and examples</a> and 
+<a href="qh-eg.htm">Qhull examples</a> for more
+examples. Execute <tt>'qhull'</tt> by itself for a synopsis and list
+of examples.  To get the full list of options, execute <tt>'qhull - | more'</tt>.
+To get a concise list of all options, execute <tt>'qhull .'</tt>.</p>
+
+<p>There are many options. The best way to learn an option is to
+try it with small examples. Use <a href="qh-rbox.htm">rbox</a> to
+generate input sets. If you have Unix, use <a
+href="qh-man.htm#geomview">Geomview</a> to view the results.
+Start with the following input sets:</p>
+
+<ul>
+    <li><tt>'rbox c</tt>' generates a cube. The facets are
+        non-simplicial.</li>
+    <li><tt>'rbox d</tt>' generates a diamond. The facets are
+        simplicial.</li>
+    <li><tt>'rbox 6</tt>' generates 6 random points.</li>
+</ul>
+
+<p><i>Brad Barber, Cambridge MA, January 8, 1998</i></p>
+
+<p><b>Copyright © 1995-1998 The Geometry Center, Minneapolis MN</b></p>
+
+<hr>
+
+<h2><a href="qh-man.htm#TOC">»</a><a name="TOC">Qhull options:
+Table of contents </a></h2>
+
+<ul>
+    <li><a href="qh-man.htm#synopsis">Synopsis and examples</a></li>
+    <li><a href="qh-man.htm#input">Input</a></li>
+    <li><a href="#opt">Main options</a><ul>
+            <li><a href="#convex">convex hull</a></li>
+            <li><a href="#H">halfspace intersection</a> ('Hn,n')</li>
+            <li><a href="qh-optv.htm#d">Delaunay triangulation</a>
+                ('d')</li>
+            <li><a href="qh-optv.htm#v">Voronoi diagram</a> ('v')</li>
+            <li><a href="qh-optv.htm#dQu">furthest-site Delaunay
+                triangulation</a> ('d Qu')</li>
+            <li><a href="qh-optv.htm#vQu">furthest-site Voronoi
+                diagram</a> ('v Qu')</li>
+            <li><a href="qh-impre.htm#joggle">Joggled input or merged facets</a> ('QJ')</li>
+        </ul>
+    </li>
+    <li><a href="qh-opto.htm#output">Output formats</a></li>
+    <li><a href="qh-optf.htm#format">Additional input &amp;
+        output formats (F)</a></li>
+    <li><a href="qh-optg.htm#geomview">Geomview output options
+        (G)</a></li>
+    <li><a href="qh-optp.htm#print">Print options (P)</a></li>
+    <li><a href="qh-optq.htm#qhull">Qhull control options (Q)</a></li>
+    <li><a href="qh-optc.htm#prec">Precision options</a></li>
+    <li><a href="qh-optt.htm#trace">Trace options (T)</a></li>
+    <li><a href="qh-c.htm">Qhull functions, macros, and data structures</a></li>
+</ul>
+
+<p>Single letters are used for output formats and precision
+constants. The other options are grouped into menus for formats
+('<a href="qh-optf.htm#format">F</a>'), Geomview ('<a
+href="qh-optg.htm#geomview">G </a>'), printing ('<a
+href="qh-optp.htm#print">P</a>'), Qhull control ('<a
+href="qh-optq.htm#qhull">Q </a>'), and tracing ('<a
+href="qh-optt.htm#trace">T</a>'). The menu options may be listed
+together (e.g., 'GrD3' for 'Gr' and 'GD3'). Options may be in any
+order. Capitalized options take a numeric argument (except for '<a
+href="qh-optp.htm#PG">PG</a>' and '<a href="qh-optf.htm#format">F</a>'
+options). Use option '<a href="qh-optf.htm#FO">FO</a>' to print
+the selected options.</p>
+
+<p>Qhull uses zero-relative indexing. If there are <i>n</i>
+points, the index of the first point is <i>0</i> and the index of
+the last point is <i>n-1</i>.</p>
+
+<p>The default options are:</p>
+
+<ul>
+    <li>convex hull (<a href="#convex">convex</a>)</li>
+    <li>summary output ('<a href="qh-opto.htm#s">s</a>') </li>
+    <li>facet merging ('<a href="qh-optc.htm#C0">C-0</a>' in 2-d,
+        3-d, 4-d; '<a href="qh-optq.htm#Qx">Qx</a>' in 5-d and
+        up)</li>
+</ul>
+
+<p>The Unix <tt>tcsh</tt> and <tt>ksh </tt>shells make it easy to
+try out different options. In Windows 95, use a DOS window with <tt>doskey</tt>
+and a window scroller (e.g., <tt>peruse</tt>). </p>
+
+<hr>
+
+<p><a href="#TOC">»</a> <a href="qh-man.htm#synopsis">Synopsis</a>
+<a name="opt">&#149;</a> <a href="#opt">Main</a> &#149; <a
+href="qh-opto.htm#output">Output</a> &#149; <a
+href="qh-optf.htm#format">Formats</a> &#149; <a
+href="qh-optg.htm#geomview">Geomview</a> &#149; <a
+href="qh-optp.htm#print">Print</a> &#149; <a
+href="qh-optq.htm#qhull">Qhull</a> &#149; <a
+href="qh-optc.htm#prec">Precision</a> &#149; <a
+href="qh-optt.htm#trace">Trace</a> </p>
+
+<h2>Main options</h2>
+
+<dl>
+    <dt><a href="#convex">Convex hull</a></dt>
+    <dd><a href="#conventions">co</a>nventions &#149; <a
+        href="#outputs">ou</a>tputs &#149; <a href="#controls">co</a>ntrols
+        &#149; <a href="#graphics">gr</a>aphics &#149; <a
+        href="#notes">no</a>tes</dd>
+    <dt>&nbsp;</dt>
+    <dt><a href="#Hn">Halfspace intersection about [n,n,0,...]</a>
+        ('Hn,n' or 'H')</dt>
+    <dd><a href="#h-input">in</a>put &#149; <a
+        href="#h-conventions" <a>co</a>nventions &#149; <a
+        href="#h-outputs">ou</a>tputs &#149; <a
+        href="#h-controls">co</a>ntrols &#149; <a
+        href="#h-graphics">gr</a>aphics &#149; <a href="#h-notes">no</a>tes</dd>
+    <dt>&nbsp;</dt>
+    <dt><a href="qh-optv.htm#d">Delaunay triangulation</a> ('d')</dt>
+    <dd><a href="qh-optv.htm#d-conventions">co</a>nventions
+        &#149; <a href="qh-optv.htm#d-outputs">ou</a>tputs &#149;
+        <a href="qh-optv.htm#d-controls">co</a>ntrols &#149; <a
+        href="qh-optv.htm#d-graphics">gr</a>aphics &#149; <a
+        href="qh-optv.htm#d-notes">no</a>tes</dd>
+    <dt>&nbsp;</dt>
+    <dt><a href="qh-optv.htm#v">Voronoi diagram</a>
+        ('v')</dt>
+    <dd><a href="qh-optv.htm#v-conventions">co</a>nventions
+        &#149; <a href="qh-optv.htm#v-outputs">ou</a>tputs &#149;
+        <a href="qh-optv.htm#v-controls">co</a>ntrols &#149; <a
+        href="qh-optv.htm#v-graphics">gr</a>aphics &#149; <a
+        href="qh-optv.htm#v-notes">no</a>tes</dd>
+    <dt>&nbsp;</dt>
+    <dt><a href="qh-optv.htm#dQu">Furthest-site Delaunay
+        triangulation</a> ('d Qu')</dt>
+    <dd><a href="qh-optv.htm#dQu-conventions">co</a>nventions
+        &#149; <a href="qh-optv.htm#dQu-outputs">ou</a>tputs
+        &#149; <a href="qh-optv.htm#dQu-controls">co</a>ntrols
+        &#149; <a href="qh-optv.htm#dQu-graphics">gr</a>aphics
+        &#149; <a href="qh-optv.htm#dQu-notes">no</a>tes</dd>
+    <dt>&nbsp;</dt>
+    <dt><a href="qh-optv.htm#vQu">Furthest-site Voronoi diagram</a> ('v Qu')</dt>
+    <dd><a href="qh-optv.htm#dQv-conventions">co</a>nventions
+        &#149; <a href="qh-optv.htm#dQv-outputs">ou</a>tputs
+        &#149; <a href="qh-optv.htm#dQv-controls">co</a>ntrols
+        &#149; <a href="qh-optv.htm#dQv-graphics">gr</a>aphics
+        &#149; <a href="qh-optv.htm#dQv-notes">no</a>tes</dd>
+    <dt>&nbsp;</dt>
+    <dt><a href="qh-impre.htm#joggle">Joggled input or merged facets</a></dt>
+</dl>
+
+<p>For an alphabetical list of all options, see <a
+href="qhull.txt">qhull.txt</a>. Execute <tt>'qhull'</tt> by
+itself for a <a href="qh-man.htm#synopsis">synopsis</a> of the
+most important options. To get one line descriptions of all
+options, execute <tt>'qhull -'</tt>. To get a concise list of all
+options, execute <tt>'qhull .'</tt>.</p>
+
+<hr>
+
+<h2><a href="#opt">»</a><a name="convex">Convex hull </a></h2>
+
+<p>The convex hull of a set of points is the smallest convex set
+containing the points. See the detailed introduction by O'Rourke
+[<a href="qh-man.htm#orou94">'94</a>]. See <a
+href="qh-man.htm#description">Description of Qhull</a> and <a
+href="qh-eg.htm#how">How Qhull adds a point</a>.</p>
+
+<dl>
+<dt><b>Example:</b> rbox 10 D3 | qhull <a href="qh-opto.htm#s">s</a> 
+        <a href="qh-opto.htm#o">o</a> <a href="qh-optt.htm#TO">TO result</a></dt>
+	<dd>Compute the 3-d convex hull of 10 random points.
+	Write a summary to the console and the points and facets to 'result'.</dd>
+</dl>
+
+<p>Qhull always computes a convex hull. </p>
+
+<h3><a href="#opt">»</a><a name="conventions">convex hull
+conventions</a></h3>
+
+<p>The following terminology is used for convex hulls in Qhull.
+See <a href="qh-man.htm#structure">Qhull's data structures</a>.</p>
+
+<ul>
+    <li><em>point</em> - <em>d</em> coordinates</li>
+    <li><em>vertex</em> - extreme point of the input set</li>
+    <li><em>ridge</em> - <i>d-1</i> vertices between two neighboring facets</li>
+    <li><em>hyperplane</em> - halfspace defined by a unit normal and
+        offset</li>
+    <li><em>coplanar point</em> - a nearly incident point to a
+        hyperplane</li>
+    <li><em>centrum</em> - a point on the hyperplane for testing
+        convexity</li>
+    <li><em>facet</em> - a facet with vertices, ridges, coplanar
+        points, neighboring facets, and hyperplane</li>
+    <li><em>simplicial facet</em> - a facet with <em>d</em>
+        vertices, <em>d</em> ridges, and <em>d</em> neighbors</li>
+    <li><em>non-simplicial facet</em> - a facet with more than <em>d</em>
+        vertices</li>
+    <li><em>good facet</em> - a facet selected by '<a
+        href="qh-optq.htm#QVn">QVn</a>', etc.</li>
+</ul>
+
+<h3><a href="#opt">»</a><a name="outputs">convex hull outputs</a></h3>
+
+<p>These options control the output from Qhull. They may be used
+individually or together.</p>
+
+<dl compact>
+    <dt>&nbsp;</dt>
+    <dd><b>General</b></dd>
+    <dt><a href="qh-optf.htm#FA">FA</a></dt><dd>compute total area and volume for '<a href="qh-opto.htm#s">s</a>' and '<a href="qh-optf.htm#FS">FS</a>'</dd>
+    <dt><a href="qh-opto.htm#s">s</a></dt><dd>print summary for the convex hull.  Use '<a href="qh-optf.htm#Fs">Fs</a>' for the numbers.</dd>
+
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+    <dd><b>Coordinates</b></dd>
+    <dt><a href="qh-optf.htm#Ft">Ft</a></dt><dd>print triangulation of the facets with added points</dd>
+    <dt><a href="qh-opto.htm#o">o</a></dt><dd>print coordinates for all points and list vertices in each facet</dd>
+    <dt><a href="qh-opto.htm#p">p</a></dt><dd>print vertex coordinates</dd>
+    <dt><a href="qh-optq.htm#Qc">Qc</a> <a href="qh-opto.htm#p">p</a></dt>
+     <dd>print coordinates of vertices and coplanar points</dd>
+
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+    <dd><b>Point indices</b></dd>
+    <dt><a href="qh-optf.htm#Fx">Fx</a></dt><dd>list extreme points (i.e., vertices)</dd>
+    <dt><a href="qh-opto.htm#i">i</a></dt><dd>list vertices for each facet</dd>
+    <dt><a href="qh-optq.htm#Qc">Qc</a> <a href="qh-optq.htm#Qi">Qi</a> <a href="qh-optf.htm#FP">FP</a></dt>
+     <dd>print distance to nearest vertex for each non-extreme point</dd>
+
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+    <dd><b>Facets</b></dd>
+    <dt><a href="qh-optq.htm#Qc">Qc</a> <a href="qh-optf.htm#Fc">Fc</a></dt><dd>list coplanar points for each facet (one facet per point)</dd>
+    <dt><a href="qh-optq.htm#Qi">Qi</a> <a href="qh-optf.htm#Fc">Fc</a></dt><dd>list interior points for each facet (one facet per point)</dd>
+    <dt><a href="qh-optf.htm#Fn">Fn</a></dt><dd>list neighboring facets for each facet</dd>
+    <dt><a href="qh-optf.htm#FN">FN</a></dt><dd>list neighboring facets for each vertex</dd>
+    <dt><a href="qh-optf.htm#Fa">Fa</a></dt><dd>print area for each facet</dd>
+
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+    <dd><b>Hyperplanes</b></dd>
+    <dt><a href="qh-opto.htm#n">n</a></dt><dd>print hyperplane for each facet</dd>
+    <dt><a href="qh-optf.htm#n">Fo</a></dt><dd>print outer plane for each facet</dd>
+</dl>
+
+<h3><a href="#opt">»</a><a name="controls">convex hull controls</a></h3>
+
+<p>These options provide additional control:</p>
+
+<dl compact>
+    <dt><a href="qh-optq.htm#QJn">QJ</a></dt><dd>joggle the input to guarantee triangular output</dd>
+    <dt><a href="qh-optq.htm#Qc">Qc</a></dt><dd>keep coplanar points</dd>
+    <dt><a href="qh-optq.htm#Qi">Qi</a></dt><dd>keep interior points</dd>
+    <dt><a href="qh-opto.htm#f">f </a></dt><dd>print all fields of all facets</dd>
+    <dt><a href="qh-optq.htm#QVn">QVn</a> <a href="qh-optp.htm#Pg">Pg</a></dt><dd>print facets adjacent to point <em>n</em></dd>
+    <dt><a href="qh-optp.htm#PDk">PDk:0</a></dt><dd>print facets with a negative coordinate for dimension <i>k</i></dd>
+    <dt><a href="qh-optt.htm#TFn">TFn</a></dt><dd>report progress after constructing <em>n</em> facets</dd>
+    <dt><a href="qh-optt.htm#Tv">Tv</a></dt><dd>verify result</dd>
+</dl>
+
+<h3><a href="#opt">»</a><a name="graphics">convex hull graphics</a></h3>
+
+<p>Display 2-d, 3-d, and 4-d convex hulls with Geomview ('<a
+href="qh-optg.htm#G">G</a>').</p>
+
+<p>Display 2-d and 3-d convex hulls with Mathematica ('<a
+href="qh-opto.htm#m">m</a>').</p>
+
+<p>To view 4-d convex hulls in 3-d, use '<a
+href="qh-optp.htm#Pdk">Pd0d1d2d3</a>' to select the positive octant
+and '<a href="qh-optg.htm#GDn">GrD2</a>' to drop dimension 2. </p>
+
+<h3><a href="#opt">»</a><a name="notes">convex hull notes</a></h3>
+
+<p>Qhull always computes a convex hull. As described below, the
+convex hull may be used for other geometric structures. The
+general technique is to transform the structure into an
+equivalent convex hull problem. For example, the Delaunay
+triangulation is equivalent to the convex hull of the input sites
+after lifting the points to a paraboloid.</p>
+
+<h2><a href="#opt">»</a><a name="Hn">Halfspace</a> <a name="H">intersection</a>
+about [n,n,0,...] ('Hn,n' or 'H')</h2>
+
+<p>The intersection of a set of halfspaces is a polytope. The
+polytope may be unbounded. See Preparata &amp; Shamos [<a
+href="qh-man.htm#pre-sha85">'85</a>] for a discussion. In low
+dimensions, halfspace intersection may be used for linear
+programming. 
+
+<dl compact>
+        <dt><b>Example:</b> rbox c | qhull 
+        <a href="qh-optf.htm#FV">FV</a> <a href="qh-opto.htm#n">n</a> | qhull 
+        H <a href="qh-optf.htm#Fp">Fp</a></dt>
+	<dd>Print the intersection of the facets of a cube.</dd>
+</dl>
+
+<p>Qhull computes a halfspace intersection by the geometric
+duality between points and halfspaces. See <a href="#h-notes">halfspace
+notes</a> and <a href="qh-eg.htm#half">halfspace examples</a>. </p>
+
+<h3><a href="#opt">»</a><a name="h-input"><font size="4">halfspace
+input</font></a></h3>
+
+<p>The input is a set of halfspaces. Each halfspace is defined by
+<em>d</em> coefficients followed by a signed offset.   This defines a linear
+inequality.  The coefficients define a vector that is normal to the
+halfspace.  The vector may have any length.  If it has length one, the
+offset is the distance from the origin to the halfspace's boundary.
+<p>
+This is the same
+format that is used by options '<a href="qh-opto.htm#n">n</a>', '<a
+href="qh-optf.htm#Fo">Fo</a>', and '<a href="qh-optf.htm#Fi">Fi</a>'.
+Use option '<a href="qh-optf.htm#Fd">Fd</a>' to use cdd format for
+the halfspaces.</p>
+
+<p>Qhull needs an interior point to compute the halfspace
+intersection. An interior point is inside all of the halfspaces <i>Hx+b
+&lt;= 0</i>. Option 'Hn,n' defines the interior point as
+[n,n,0,...] where <em>0</em> is the default coordinate (e.g.,
+'H0' is the origin). </p>
+
+<p>The input may start with a interior point. If so, use 'H' by
+itself. The input starts with a interior point when the first
+number is the dimension, the second number is &quot;1&quot;, and
+the coordinates complete a line. Options '<a
+href="qh-optf.htm#FV">FV</a> <a href="qh-opto.htm#n">n</a>'
+produces an interior point and a set of halfspaces.</p>
+<p>
+For example, here is the input for computing the intersection
+of halfplanes that form a square.  Option 'H' is used since the
+input starts with an interior point.
+<blockquote>
+rbox c | qhull FV n TO data
+<pre>
+2 1
+     0      0
+3
+4
+     0     -1   -0.5
+    -1      0   -0.5
+     1      0   -0.5
+     0      1   -0.5
+</pre>
+qhull &lt; data H Fp
+<pre>
+3
+8
+  -0.5    0.5    0.5
+   0.5    0.5    0.5
+  -0.5    0.5   -0.5
+   0.5    0.5   -0.5
+   0.5   -0.5    0.5
+  -0.5   -0.5    0.5
+  -0.5   -0.5   -0.5
+   0.5   -0.5   -0.5
+</pre>
+</blockquote>
+                        
+<h3><a href="#opt">»</a><a name="h-conventions"><font size="4">halfspace
+conventions</font></a></h3>
+
+<p>The following terminology is used for halfspace intersection
+in Qhull. This is the hardest structure to understand. The
+underlying structure is a convex hull with one vertex per
+nonredundant halfspace. See <a href="#conventions">convex hull
+conventions</a>.</p>
+
+<ul>
+    <li><em>interior point</em> - a point in the intersection of
+        the halfspaces. Qhull needs an interior point to compute
+        the intersection. See <a href="#h-input">halfspace input</a>.</li>
+    <li><em>halfspace</em> - <em>d</em> coordinates for the
+        normal and a signed offset. The distance to an interior
+        point is negative.</li>
+    <li><em>nonredundant halfspace</em> - a halfspace that
+        defines an output facet</li>
+    <li><em>vertex</em> - a dual vertex in the convex hull
+        corresponding to a nonredundant halfspace</li>
+    <li><em>coplanar point</em> - the dual point corresponding to
+        a similar halfspace</li>
+    <li><em>interior point</em> - the dual point corresponding to
+        a redundant halfspace</li>
+    <li><em>intersection point</em>- the intersection of <em>d</em>
+        or more nonredundant halfspaces</li>
+    <li><em>facet</em> - a dual facet in the convex hull
+        corresponding to an intersection point</li>
+    <li><em>non-simplicial facet</em> - more than <em>d</em>
+        halfspaces intersect at a point</li>
+    <li><em>good facet</em> - an intersection point that
+        satisfies restriction '<a href="qh-optq.htm#QVn">QVn</a>',
+        etc.</li>
+</ul>
+
+<h3><a href="#opt">»</a><a name="h-outputs">halfspace outputs</a></h3>
+
+<p>The following options control the output for halfspace
+intersection. The other output formats display the dual convex
+hull.</p>
+
+<dl compact>
+    <dt>&nbsp;</dt>
+    <dd><b>General</b></dd>
+    <dt><a href="qh-opto.htm#s">s</a></dt><dd>print summary for the halfspace intersection.  Use '<a href="qh-optf.htm#Fs">Fs</a>' for the numbers.</dd>
+    <dt><a href="qh-opto.htm#o">o</a></dt><dd>print the facets of the dual convex hull</dd>
+
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+    <dd><b>Intersections</b></dd>
+    <dt><a href="qh-optf.htm#FN">FN</a></dt><dd>list the intersection points for each nonredundant halfspace</dd>
+    <dt><a href="qh-optf.htm#Fn">Fn</a></dt><dd>list the neighboring intersection points for each intersection point</dd>
+    <dt><a href="qh-optf.htm#Fp">Fp</a></dt><dd>print the coordinates for each intersection point</dd>
+    
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+    <dd><b>Halfspaces</b></dd>
+    <dt><a href="qh-optf.htm#Fx">Fx</a></dt><dd>list the nonredundant halfspaces by input id.</dd>
+    <dt><a href="qh-opto.htm#i">i</a></dt><dd>list the nonredundant halfspaces for each intersection point.</dd>
+    <dt><a href="qh-optq.htm#Qc">Qi</a> <a href="qh-optf.htm#Fc">Fc</a></dt>
+     <dd>list the redundant halfspaces for each intersection point (one listing per halfspace)</dd>
+    <dt><a href="qh-optq.htm#Qc">Qc</a> <a href="qh-optf.htm#Fc">Fc</a></dt>
+     <dd>list the similar halfspaces for each intersection point (one listing per halfspace)</dd>
+</dl>
+
+<h3><a href="#opt">»</a><a name="h-controls">halfspace controls</a></h3>
+
+<p>These options provide additional control:</p>
+
+<dl compact>
+    <dt><a href="qh-optq.htm#QJn">QJ</a></dt><dd>joggle the input to remove singularities</dd>
+    <dt><a href="qh-opto.htm#f">f </a></dt><dd>print the data structure for each intersection (i.e., facet)</dd>
+    <dt><a href="qh-optt.htm#TFn">TFn</a></dt><dd>report summary after constructing <em>n</em> intersections</dd>
+    <dt><a href="qh-optq.htm#QVn">QVn</a> <a href="qh-optp.htm#Pg">Pg</a></dt>
+      <dd>select intersection points for halfspace <em>n</em> (marked 'good')</dd>
+    <dt><a href="qh-optt.htm#Tv">Tv</a></dt><dd>verify result</dd>
+</dl>
+
+<h3><a href="#opt">»</a><a name="h-graphics">halfspace graphics</a></h3>
+
+<p>To view the results with Geomview, compute the convex hull of
+the intersection points ('qhull FQ H0 Fp | qhull G'). See <a
+href="qh-eg.htm#half">Halfspace examples</a>.</p>
+
+<h3><a href="#opt">»</a><a name="h-notes">halfspace notes</a></h3>
+
+<p>If you do not know an interior point for the half-spaces, use
+linear programming to find one. Assume, <em>n</em> halfspaces
+defined by: <em>aj*x1+bj*x2+cj*x3+dj&gt;=0, j=1..n</em>. Perform
+the following linear program: </p>
+
+<blockquote>
+    <p>max(x5) aj*x1+bj*x2+cj*x3+dj*x4-x5&gt;=0, j=1..n</p>
+</blockquote>
+
+<p>Then, if <em>[x1,x2,x3,x4,x5]</em> is an optimal solution with
+<em>x4,x5&gt;0</em> we get: </p>
+
+<blockquote>
+    <p>aj*(x1/x4)+bj*(x2/x4)+cj*(x3/x4)+dj&gt;=(x5/x4)&gt;0,
+    j=1..n </p>
+</blockquote>
+
+<p>and conclude that the point <em>[x1/x4,x2/x4,x3/x4]</em> is in
+the interior of all the halfspaces. Note that <em>x5</em> is
+optimal, so this point is &quot;way in&quot; the interior (good
+for precision errors).</p>
+
+<p>After finding an interior point, the rest of the intersection
+algorithm is from Preparata &amp; Shamos [<a
+href="qh-man.htm#pre-sha85">'85</a>, p. 316, &quot;A simple case
+...&quot;]. Translate the halfspaces so that the interior point
+is the origin. Calculate the dual polytope. The dual polytope is
+the convex hull of the vertices dual to the original faces in
+regard to the unit sphere (i.e., halfspaces at distance <em>d</em>
+from the origin are dual to vertices at distance <em>1/d</em>).
+Then calculate the resulting polytope, which is the dual of the
+dual polytope, and translate the origin back to the interior
+point [S. Spitz and S. Teller].</p>
+<!-- Navigation links -->
+<hr>
+
+<p><b>Up:</b> <a href="http://www.geom.umn.edu/locate/qhull">Home
+page for Qhull</a> <br>
+<b>Up:</b> <a href="qh-man.htm#TOC">Qhull manual: Table of Contents</a> <b><br>
+To:</b> <a href="qh-rbox.htm">Rbox manual</a><br>
+<b>To:</b> <a href="#TOC">Qhull options: Table of contents</a><br>
+<b>To:</b> <a href="qh-optv.htm">Qhull options: Delaunay and Voronoi</a><br>
+<b>Dn:</b> <a href="qh-man.htm#synopsis">Synopsis</a> &#149; <a
+href="#opt">Main</a> &#149; <a href="qh-opto.htm#output">Output</a>
+&#149; <a href="qh-optf.htm#format">Formats</a> &#149; <a
+href="qh-optg.htm#geomview">Geomview</a> &#149; <a
+href="qh-optp.htm#print">Print</a> &#149; <a
+href="qh-optq.htm#qhull">Qhull</a> &#149; <a
+href="qh-optc.htm#prec">Precision</a> &#149; <a
+href="qh-optt.htm#trace">Trace</a> </p>
+<!-- GC common information -->
+<hr>
+
+<p><a href="http://www.geom.umn.edu/"><img src="qh--geom.gif"
+align="middle" width="40" height="40"></a><i>The Geometry Center
+Home Page </i></p>
+
+<p>Comments to: <a
+href="http://www.geom.umn.edu/software/qhull/qhull-mail.html">qhull@geom.umn.edu
+</a><br>
+Created: Sept. 25, 1995 --- <!-- hhmts start --> Last modified: see top <!-- hhmts end --> </p>
+</body>
+</html>

@@ -1,0 +1,14 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 150.0
+#cog 0.0 0.0 0.0
+
+Separator { 
+	 Translation {
+		translation 30 0 0
+	}
+	  Material { 
+	  diffuseColor 0.1 0.1 1.0
+	  }
+	  Sphere { radius 5 }
+}
