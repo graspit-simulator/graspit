@@ -255,7 +255,9 @@ ClientSocket::readClient()
       for (i=0;i<numRobots;i++)
 	if (readDOFForces(robVec[i])==FAILURE) continue;
     }
-    
+    else if (*strPtr == "moveToContacts")
+      graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->approachToContact(30, true);
+ 
     else if ((*strPtr) == "moveDynamicBodies") {
       strPtr++;
       if (strPtr == lineStrList.end()) ok = FALSE;
