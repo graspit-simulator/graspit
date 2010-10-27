@@ -46,6 +46,9 @@
 #ifdef MOSEK_QP
 #include "mosek_qp.h"
 #endif
+#ifdef OASES_QP
+#include "qpoases.h"
+#endif 
 
 const double Matrix::EPS = 1.0e-7;
 
@@ -259,7 +262,7 @@ Matrix
 Matrix::MIN_VECTOR(int rows)
 {
 	Matrix v(rows, 1);
-	v.setAllElements(std::numeric_limits<double>::min());
+	v.setAllElements(-std::numeric_limits<double>::max());
 	return v;
 }
 
@@ -961,6 +964,10 @@ int QPSolver(const Matrix &Q, const Matrix &Eq, const Matrix &b,
 	int result = mosekNNSolverWrapper(Q, Eq, b, InEq, ib, 
 									  lowerBounds, upperBounds, sol, 
 									  objVal, MOSEK_OBJ_QP);
+#elif defined OASES_QP
+        int result = QPOASESSolverWrapperQP(Q, Eq, b, InEq, ib, 
+                                            lowerBounds, upperBounds, sol, 
+                                            objVal);
 #else
 	int result = 0;
 	DBGA("No QP Solver installed");
@@ -1035,15 +1042,33 @@ int factorizedQPSolver(const Matrix &Qf,
 	return result;
 }
 
+/*! minimize    xT  | 1 0 | x 
+                    | 0 4 |
+                    
+                    | 1 -1 | x = -4
 
+                    x1 - x2 = -4
+
+                    |  1 1 |  x  <= |  7 |
+                    | -1 2 |        | -4 |
+
+                    x1 + x2 <= 7
+                   -x1 +2x2 <= -4
+
+                   possible solution: [6 -10]
+                   According to qpOASES, optimal solution is [-12 -8] with objective 200
+
+ */
 void testQP()
 {
-	Matrix Eq(Matrix::ZEROES<Matrix>(2,2));
-	Matrix b(Matrix::ZEROES<Matrix>(2,1));
+  
+	Matrix Eq(1,2);
+	Matrix b(1,1);
+        Eq.elem(0,0) = 1.0; Eq.elem(0,1) = -1.0; b.elem(0,0) = -4.0;
 
 	Matrix InEq(2,2);
 	Matrix ib(2,1);
-	InEq.elem(0,0) = 1; InEq.elem(0,1) = 1; ib.elem(0,0) = 7;
+	InEq.elem(0,0) =  1; InEq.elem(0,1) = 1; ib.elem(0,0) =  7;
 	InEq.elem(1,0) = -1; InEq.elem(1,1) = 2; ib.elem(1,0) = -4;
 
 	Matrix Q(Matrix::ZEROES<Matrix>(2,2));
@@ -1053,11 +1078,37 @@ void testQP()
 	Matrix lowerBounds(Matrix::MIN_VECTOR(2));
 	Matrix upperBounds(Matrix::MAX_VECTOR(2));
 	double objVal;
-#ifdef MOSEK_QP
-	mosekNNSolverWrapper(Q, Eq, b, InEq, ib, sol, lowerBounds, upperBounds, &objVal, MOSEK_OBJ_QP);
-#else
-	DBGA("No QP solver installed");
-#endif
+  
+  /*
+	Matrix Q(Matrix::ZEROES<Matrix>(2,2));
+	Q.elem(0,0) = 1.0; Q.elem(1,1) = 0.5;
+        Matrix Eq(0,0);
+        Matrix b(0,0);
+        Matrix InEq(1,2);
+        InEq.elem(0,0) = 1.0; InEq.elem(0,1) = 1.0;
+        Matrix ib(1,1);
+        ib.elem(0,0) = 2.0;
+        Matrix lowerBounds(2,1);
+        lowerBounds.elem(0,0) = 0.5;
+        lowerBounds.elem(1,0) = -2.0;
+        Matrix upperBounds(2,1);
+        upperBounds.elem(0,0) = 5.0;
+        upperBounds.elem(1,0) = 2.0;
+
+	Matrix sol(2,1);
+	double objVal;
+  */
+        int result = QPSolver(Q, Eq, b, InEq, ib, lowerBounds, upperBounds, sol, &objVal);
+
+        if (result == 0) {
+          DBGA("Test QP solved");
+          DBGA("Solution: [" << sol.elem(0,0) << " " << sol.elem(1,0) << "]");
+          DBGA("Objective: " << objVal);
+        } else if (result > 0) {
+          DBGA("Test QP reports problem is unfeasible");
+        } else {
+          DBGA("Test QP reports error in computation");
+        }
 }
 
 /*! Solves a linear program of the form:
@@ -1097,10 +1148,14 @@ LPSolver(const Matrix &Q,
 
 #ifdef MOSEK_QP
 	int result = mosekNNSolverWrapper(Q, Eq, b, InEq, ib, 
-									  lowerBounds, upperBounds, sol, objVal, MOSEK_OBJ_LP);
+                                          lowerBounds, upperBounds, sol, objVal, MOSEK_OBJ_LP);
+#elif defined OASES_QP
+        int result = QPOASESSolverWrapperLP(Q, Eq, b, InEq, ib, 
+                                            lowerBounds, upperBounds, sol, 
+                                            objVal);
 #else
 	int result = 0;
-	DBGA("No QP Solver installed");
+	DBGA("No LP Solver installed");
 	return result;
 #endif
 

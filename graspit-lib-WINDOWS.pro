@@ -52,6 +52,7 @@ cgdb {
                 error("ROS not available in Windows. Disable the graspit_ros option in graspit.pro")
         }
 }
+
 mosek {
 	!exists($(MOSEK5_0_INSTALLDIR)) {
 		error("Mosek not installed or MOSEK5_0_INSTALLDIR environment variable not set")
@@ -59,6 +60,10 @@ mosek {
 	INCLUDEPATH += $(MOSEK5_0_INSTALLDIR)/tools/platform/win/h
 	#no separate debug or release versions of the lib
 	LIBS += $(MOSEK5_0_INSTALLDIR)/tools/platform/win/dll/mosek5_0.lib
+}
+
+qpOASES {
+        error("qpOASES not available under Windows. Disable the qpOASES option in graspit.pro")
 }
 
 cgal_qp {

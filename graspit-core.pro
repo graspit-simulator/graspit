@@ -403,6 +403,12 @@ mosek {
 	HEADERS += src/math/mosek_qp.h
 }
 
+qpOASES {
+        DEFINES += OASES_QP
+	SOURCES += src/math/qpoases.cpp
+	HEADERS += src/math/qpoases.h
+}
+
 #-------------------------------------- Eigengrids ---------------------
 
 eigengrids {

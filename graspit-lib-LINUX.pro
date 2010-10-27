@@ -46,6 +46,14 @@ mosek {
 	LIBS += -L$(MOSEK6_0_INSTALLDIR)/tools/platform/linux32x86/bin/ -lmoseknoomp -lc -ldl -lm
 }
 
+qpOASES {
+        !exists($(QPOASES_DIR)) {
+                 error("qpOASES not installed or QPOASES_DIR environment variable not set")
+        }
+        INCLUDEPATH += $(QPOASES_DIR)/INCLUDE
+        LIBS += -L$(QPOASES_DIR)/SRC -lqpOASES
+}
+
 cgal_qp {
 	error("CGAL linking only tested under Windows")
 }

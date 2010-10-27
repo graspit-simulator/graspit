@@ -17,10 +17,15 @@ COLLISION = graspit_collision
 LAPACK = mkl
 
 #build and use interface with Columbia Grasp Database
-#CONFIG += cgdb
+CONFIG += cgdb
+#and use the ros database manager
+CONFIG += graspit_ros
 
 #link against Mosek QP solver (must be installed separately)
 #CONFIG += mosek
+
+#link against the qpOASES solver (must be installed separately)
+#CONFIG += qpOASES
 
 #enable the CGAL QP solver (must be installed separately)
 #also needs boost

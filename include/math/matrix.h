@@ -440,8 +440,10 @@ MatrixType Matrix::BLOCKCOLUMN(std::list<Matrix*> *blocks)
 template <class MatrixType>
 MatrixType Matrix::BLOCKCOLUMN(const Matrix &M1, const Matrix &M2)
 {
-	assert(M1.cols() == M2.cols());
-	MatrixType M(M1.rows() + M2.rows(), M1.cols());
+        if ( M1.rows() && M2.rows() ) {
+	         assert(M1.cols() == M2.cols());
+        }
+	MatrixType M(M1.rows() + M2.rows(), std::max(M1.cols(), M2.cols()));
 	M.copySubMatrix(0, 0, M1);
 	M.copySubMatrix(M1.rows(), 0, M2);
 	return M;
