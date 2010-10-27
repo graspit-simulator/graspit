@@ -162,7 +162,7 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
 			if ( lowerBounds.elem(i,0) > upperBounds.elem(i,0) ) {
 				assert(0);
 			}
-			if (lowerBounds.elem(i,0) == std::numeric_limits<double>::min()) {
+			if (lowerBounds.elem(i,0) == -std::numeric_limits<double>::max()) {
 				assert(0);
 			}
 			if (upperBounds.elem(i,0) == std::numeric_limits<double>::max()) {
@@ -172,7 +172,7 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
 			DBGP(i << ": fixed " << lowerBounds.elem(i,0)/scale);
 			MSK_putbound(task, MSK_ACC_VAR, i, MSK_BK_FX, 
 						 lowerBounds.elem(i,0)/scale, upperBounds.elem(i,0)/scale );
-		} else if ( lowerBounds.elem(i,0) != std::numeric_limits<double>::min() ) {
+		} else if ( lowerBounds.elem(i,0) != -std::numeric_limits<double>::max() ) {
 			//finite lower bound
 			if ( upperBounds.elem(i,0) != std::numeric_limits<double>::max() ) {
 				//two finite bounds
