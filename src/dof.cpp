@@ -850,6 +850,13 @@ CompliantDOF::computeStaticJointTorques(double *jointTorques, double dofForce)
 		pj = (*j);
 		count++;
 	}
+        /*
+        std::cerr << "before max torque:\n";
+	for(j=jointList.begin(); j!=jointList.end(); j++) {
+          std::cerr << jointTorques[ (*j)->getNum() ] << " ";
+        }
+        std::cerr << "\n";
+        */
 	//what is the max torque that the dof must balance at any joint
 	for(j=jointList.begin(); j!=jointList.end(); j++) {
 		double springTorque = - jointTorques[(*j)->getNum()];
@@ -887,8 +894,19 @@ CompliantDOF::computeStaticJointTorques(double *jointTorques, double dofForce)
 			//now that spring torques are also propagated back, this is no longer an error
 			//retVal = false;
 		}
+                //try to fix numerical errors at least for 0, since it is a special case
+                if ( fabs(jointTorques[(*j)->getNum()]) < 1.0e-5) {
+                  jointTorques[ (*j)->getNum() ] = 0.0;
+                }
 		DBGP(jointTorques[ (*j)->getNum() ]);
 	}
+        /*
+        std::cerr << "after max torque:\n";
+	for(j=jointList.begin(); j!=jointList.end(); j++) {
+          std::cerr << jointTorques[ (*j)->getNum() ] << " ";
+        }
+        std::cerr << "\n";
+        */
 	return retVal;
 }
 
