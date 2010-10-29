@@ -94,6 +94,21 @@ Matrix::Matrix(const double *M, int m, int n, bool colMajor)
 	}
 }
 
+Matrix::~Matrix()
+{
+	if (mRows) {
+		delete [] mData;
+	}
+}
+
+void Matrix::resize(int m, int n)
+{
+  if (mRows) {
+    delete [] mData;
+  }
+  initialize(m,n);
+}
+
 SparseMatrix::SparseMatrix(const SparseMatrix &SM) : Matrix(0,0)
 {
 	mRows = SM.mRows;
@@ -103,11 +118,11 @@ SparseMatrix::SparseMatrix(const SparseMatrix &SM) : Matrix(0,0)
 	mSparseData = SM.mSparseData;
 }
 
-Matrix::~Matrix()
+void SparseMatrix::resize(int m, int n)
 {
-	if (mRows) {
-		delete [] mData;
-	}
+  mRows = m;
+  mCols = n;
+  mSparseData.clear();
 }
 
 double&

@@ -100,6 +100,9 @@ public:
 
 	virtual ~Matrix();
 
+        //! Resizes the matrix. All current data is lost.
+        virtual void resize(int m, int n);
+
 	virtual Type getType() const {return DENSE;}
 	//! Not inlined as it is overloaded in SparseMatrix
 	virtual double& elem(int m, int n);
@@ -276,6 +279,9 @@ public:
 		//so that the super destructor does not delete mData
 		mRows = 0;
 	}
+
+        //! Resizes the matrix. All current data is lost.
+        virtual void resize(int m, int n);
 
 	virtual Type getType() const {return SPARSE;}
 	//! Returns the default value for the elements of this matrix. 
