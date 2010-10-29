@@ -187,7 +187,7 @@ EigenTorqueComputer::processGrasp()
 	int result;
 	if (!mHand->isA("McGrip")) {
 		Matrix tau(Matrix::ZEROES<Matrix>(mHand->getNumJoints(),1));
-		result = mHand->getGrasp()->computeQuasistaticForcesAndTorques(&tau);
+		result = mHand->getGrasp()->computeQuasistaticForcesAndTorques(&tau, Grasp::GRASP_FORCE_EXISTENCE);
 		if (!result) {
 			mOptimalTorques.push_back(tau);
 		}

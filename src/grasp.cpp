@@ -72,6 +72,12 @@
 	so that we don't have to give any caller access to GWS.
 */
 const std::vector<int> Grasp::ALL_DIMENSIONS = std::vector<int>(6, 1);
+
+const int Grasp::CONTACT_FORCE_EXISTENCE = 0;
+const int Grasp::CONTACT_FORCE_OPTIMIZATION = 1;
+const int Grasp::GRASP_FORCE_EXISTENCE = 2;
+const int Grasp::GRASP_FORCE_OPTIMIZATION = 3;
+
  
 /*!
   Initialize grasp object variables.  A grasp should only be created by a
@@ -800,13 +806,7 @@ Grasp::computeQuasistaticForces(const Matrix &robotTau)
 	//bounds: all variables greater than 0
 	Matrix lowerBounds(Matrix::ZEROES<Matrix>(D.cols(),1));
 	Matrix upperBounds(Matrix::MAX_VECTOR(D.cols()));
-	/*
-	//test for sparse matrices
-	SparseMatrix JTDSparse(JTD.rows(), JTD.cols());
-	JTDSparse.copyMatrix(JTD);
-	DBGA("Dense matrix: \n" << JTD << "size: " << JTD.rows()*JTD.cols());
-	DBGA("Sparse matrix: \n" << JTDSparse << "size: " << JTDSparse.numElements() << "\n\n");
-	*/
+
 	//solve QP
 	double objVal;
 	int result = factorizedQPSolver(G, JTD, tau, F, zeroes, lowerBounds, upperBounds, 
@@ -899,9 +899,9 @@ graspForceExistence(Matrix &JTD, Matrix &D, Matrix &F, Matrix &G,
 	//right-hand side of equality constraint
 	Matrix right_hand( JTD.rows() + 1, 1);
 	right_hand.setAllElements(0.0);
-	//actually, we use 1.0e8 here as units are in N * 1.0e-6 * mm
-	//so we want a total joint torque of 100 N mm
-	right_hand.elem( right_hand.rows()-1, 0) = 1.0e8;
+	//actually, we use 1.0e9 here as units are in N * 1.0e-6 * mm
+	//so we want a total joint torque of 1000 N mm
+	right_hand.elem( right_hand.rows()-1, 0) = 1.0e10;
 
 	//left-hand side of equality constraint
 	Matrix LeftHand( JTD.rows() + 1, D.cols() + numJoints);
@@ -1075,41 +1075,41 @@ contactForceOptimization(Matrix &F, Matrix &N, Matrix &Q, Matrix &beta, double *
 	functions in the Grasp class.
 */
 int
-graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &Q, 
-					   Matrix &beta, Matrix &tau, double *objVal)
+graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &G, 
+                       Matrix &beta, Matrix &tau, double *objVal)
 {
 	// exact problem formulation
 	// unknowns: [beta tau]            (contact forces and joint forces)
 	// minimize [sum] [F 0] [beta tau] (sort of as far inside the friction cone as possible, not ideal)
 	// subject to:
 	// [JTD -I] * [beta tau] = 0       (contact forces balance joint forces)
-	// [Q 0]* [beta tau] = 0           (0 resultant object wrench)
+	// [G 0]* [beta tau] = 0           (0 resultant object wrench)
 	// [0 sum] * [beta tau] = 1        (we are applying some joint forces)
 	// [F 0] [beta tau] <= 0		   (all forces inside friction cones)
 	// [beta tau] >= 0	  		       (all forces must be positive)
 	// overall equality constraint:
 	// | JTD -I |  | beta |   |0|
-	// | Q    0 |  | tau  | = |0|
+	// | G    0 |  | tau  | = |0|
 	// | 0   sum|		      |1|
 
 	Matrix beta_tau(beta.rows() + tau.rows(), 1);
 	int numJoints = tau.rows();
 
 	//right-hand side of equality constraint
-	Matrix right_hand( JTD.rows() + Q.rows() + 1, 1);
+	Matrix right_hand( JTD.rows() + G.rows() + 1, 1);
 	right_hand.setAllElements(0.0);
-	//actually, we use 1.0e7 here as units are in N * 1.0e-6 * mm
-	//so we want a total joint torque of 10 N mm
-	right_hand.elem( right_hand.rows()-1, 0) = 1.0e7;
+	//actually, we use 1.0e8 here as units are in N * 1.0e-6 * mm
+	//so we want a total joint torque of 100 N mm
+	right_hand.elem( right_hand.rows()-1, 0) = 1.0e10;
 
 	//left-hand side of equality constraint
-	Matrix LeftHand( JTD.rows() + Q.rows() + 1, D.cols() + numJoints);
+	Matrix LeftHand( JTD.rows() + G.rows() + 1, D.cols() + numJoints);
 	LeftHand.setAllElements(0.0);
 	LeftHand.copySubMatrix(0, 0, JTD);
 	LeftHand.copySubMatrix(0, D.cols(), Matrix::NEGEYE(numJoints, numJoints) );
-	LeftHand.copySubMatrix(JTD.rows(), 0, Q);
+	LeftHand.copySubMatrix(JTD.rows(), 0, G);
 	for (int i=0; i<numJoints; i++) {
-		LeftHand.elem( JTD.rows() + Q.rows(), D.cols() + i) = 1.0;
+		LeftHand.elem( JTD.rows() + G.rows(), D.cols() + i) = 1.0;
 	}
 
 	//objective matrix
@@ -1132,7 +1132,7 @@ graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &Q,
 	Matrix inEqZeroes(FO.rows(), 1);
 	inEqZeroes.setAllElements(0.0);
 
-	/*
+	
 	FILE *fp = fopen("gfo.txt","w");
 	fprintf(fp,"left hand:\n");
 	LeftHand.print(fp);
@@ -1143,7 +1143,7 @@ graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &Q,
 	fprintf(fp,"Objective:\n");
 	FObj.print(fp);
 	fclose(fp);
-	*/
+	
 
 	// assembled system:
 	// minimize FObj * beta_tau subject to:
@@ -1158,29 +1158,52 @@ graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &Q,
 	return result;
 }
 
+/*! Retrieve all the joints of the robot, but only if their chains have contacts on
+  them. Joints on chains with no contact have a trivial 0 solution so they only
+  make the problem larger for no good reason.
+  we could go even further and only keep the joints that come *before* the contacts
+  in the chain.
+*/
+std::list<Joint*> Grasp::getJointsOnContactChains()
+{
+	std::list<Joint*> joints;
+	for (int c=0; c<hand->getNumChains(); c++) {
+		if (hand->getChain(c)->getNumContacts(object) != 0) {
+			std::list<Joint*> chainJoints = hand->getChain(c)->getJoints();
+			joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
+		}
+	}
+        return joints;
+}
+
 /*! This function is the equivalent of the Grasp Force Optimization, but done with
-	the quasi-static formulation cast as a Quadratic Program.
-
-	It will attempt to compute both the feasible contact forces and joint torques
-	that produce a 0 resultant wrench on the object, and keep the contact forces
-	as far as possible from the boundaries of the friction cones. This implicitly
-	assumes that the grasp has form-closure, in other words, some combination of 
-	legal contact forces exists that produces 0 wrench on the object.
-
-	There might exist cases of grasps that are reported as form-closed where this
-	function fails, as this function also asks that the contact forces that balance
-	the object must be possible to apply from actuated DOF's.
-
-	For now, this function displays the computed contact forces on the contacts, 
-	rather than returning them. It also copies the computed joint forces in the
-	matrix \a robotTau which is assumed to be large enough for all the joints of
-	the robot and use the robot's numbering scheme.
-
-	Return codes: 0 is success, >0 means problem is unfeasible, no equilibrium forces
-	exist; <0 means error in computation 
+  the quasi-static formulation cast as a Quadratic Program.
+  
+  It can perform four types of computation:
+  - contact force existence: are there contact forces that balance out on the object
+  - contact force optimization: what are the optimal contact forces (as far as possible
+    from the edges of the friction cones) that balance out on the object
+  - grasp force existence: are there joint forces which produce contact forces which 
+    balance out on the object
+  - grasp force optimization: what are the optimal joint forces, producing contact
+    forces that are as far as possible from the edges of the friction cones and 
+    balance out on the object.
+   See individual computation routines for more details.
+  
+  There might exist cases of grasps that are reported as form-closed where grasp force
+  existence fails, as this function also asks that the contact forces that balance
+  the object must be possible to apply from actuated DOF's.
+  
+  For now, this function displays the computed contact forces on the contacts, 
+  rather than returning them. It also copies the computed joint forces in the
+  matrix \a robotTau which is assumed to be large enough for all the joints of
+  the robot and use the robot's numbering scheme.
+  
+  Return codes: 0 is success, >0 means problem is unfeasible, no equilibrium forces
+  exist; <0 means error in computation 
 */
 int 
-Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau)
+Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau, int computation)
 {
 	//use the pre-set list of contacts. This includes contacts on the palm, but
 	//not contacts with other objects or obstacles
@@ -1189,18 +1212,8 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau)
 	//if there are no contacts we are done
 	if (contacts.empty()) return 0;
 
-	//retrieve all the joints of the robot, but only if their chains have contacts on
-	//them. Joints on chains with no contact have a trivial 0 solution so they only
-	//make the problem larger for no good reason.
-	//we could go even further and only keep the joints that come *before* the contacts
-	//in the chain
-	std::list<Joint*> joints;
-	for (int c=0; c<hand->getNumChains(); c++) {
-		if (hand->getChain(c)->getNumContacts(object) != 0) {
-			std::list<Joint*> chainJoints = hand->getChain(c)->getJoints();
-			joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
-		}
-	}
+        //get only the joints on chains that make contact;
+	std::list<Joint*> joints = getJointsOnContactChains();
 
 	//build the Jacobian and the other matrices that are needed.
 	//this is the same as in the equilibrium function above.
@@ -1227,17 +1240,29 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau)
 	/* This is the core computation. There are many ways of combining the 
 	   optimization criterion and the constraints. Four of them are presented 
 	   here, each encapsulated in its own helper function.
-   */
+        */
 
-	//int result = graspForceExistence(JTD, D, F, G, beta, tau, &objVal);
-
-	//int result = graspForceOptimization(JTD, D, F, G, beta, tau, &objVal);
-
-	//int result = contactForceExistence(F, N, G, beta, &objVal);
-	//matrixMultiply(JTD, beta, tau);
-
-	int result = contactForceOptimization(F, N, G, beta, &objVal);
-	matrixMultiply(JTD, beta, tau);
+        int result;
+        switch(computation)
+        {
+        case GRASP_FORCE_EXISTENCE:
+          result = graspForceExistence(JTD, D, F, G, beta, tau, &objVal);
+          break;
+        case GRASP_FORCE_OPTIMIZATION:
+          result = graspForceOptimization(JTD, D, F, G, beta, tau, &objVal);
+          break;
+        case CONTACT_FORCE_EXISTENCE:
+          result = contactForceExistence(F, N, G, beta, &objVal);
+          matrixMultiply(JTD, beta, tau);
+          break;
+        case CONTACT_FORCE_OPTIMIZATION:
+          result = contactForceOptimization(F, N, G, beta, &objVal);
+          matrixMultiply(JTD, beta, tau);
+          break;
+        default:
+          DBGA("Unknown computation type requested");
+          return -1;
+        }
 
 	if (result) {
 		if( result > 0) {
@@ -1247,7 +1272,7 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau)
 		}
 		return result;
 	}
-	DBGP("Optimization solved; objective: " << objVal);
+	DBGA("Optimization solved; objective: " << objVal);
 
 	DBGP("beta:\n" << beta);
 	DBGP("tau:\n" << tau);

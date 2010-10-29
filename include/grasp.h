@@ -232,10 +232,19 @@ public:
 
   //------------------- Grasp Force Optimization (GFO) routines --------------------------
 
+  static const int CONTACT_FORCE_EXISTENCE;
+  static const int CONTACT_FORCE_OPTIMIZATION;
+  static const int GRASP_FORCE_EXISTENCE;
+  static const int GRASP_FORCE_OPTIMIZATION;
+
   //! Computes the contact forces and joint torques that give the most robust equilibrium
-  int computeQuasistaticForcesAndTorques(Matrix *robotTau);
+  int computeQuasistaticForcesAndTorques(Matrix *robotTau, int computation);
+
   //! Given a vector of joint torques, computes the contact forces that balance the system
   int computeQuasistaticForces(const Matrix &robotTau);
+
+  //! Gets a list with only the joints on chains that have contacts on them
+  std::list<Joint*> getJointsOnContactChains();
 
   //! A version of the contact grasp Jacobian, used for GFO routines
   Matrix contactJacobian(const std::list<Joint*> &joints, 

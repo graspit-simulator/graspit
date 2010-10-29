@@ -43,7 +43,10 @@ GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : mMainWindow(mw), mHan
 {
 	setupUi(this);
 	statusLabel->setText("Status: optimization off");
-	optimizationTypeBox->insertItem("Grasp force");
+	optimizationTypeBox->insertItem("Contact force existence");
+	optimizationTypeBox->insertItem("Contact force optimization");
+	optimizationTypeBox->insertItem("Grasp force existence");
+	optimizationTypeBox->insertItem("Grasp force optimization");
 	optimizationTypeBox->insertItem("Compliant joint equilibrium");
 	optimizationTypeBox->insertItem("DOF force equilibrium");
 	if (mHand->isA("McGrip")) {
@@ -90,8 +93,14 @@ GFODlg::runOptimization()
 		mHand->getGrasp()->getObject()->resetExtWrenchAcc();	
 	}
 
-	if (optimizationTypeBox->currentText()=="Grasp force") {
-		graspForceOptimization();
+	if (optimizationTypeBox->currentText()=="Grasp force existence") {
+          graspForceOptimization(Grasp::GRASP_FORCE_EXISTENCE);
+	} else if (optimizationTypeBox->currentText()=="Grasp force optimization") {
+          graspForceOptimization(Grasp::GRASP_FORCE_OPTIMIZATION);
+	} else if (optimizationTypeBox->currentText()=="Contact force existence") {
+          graspForceOptimization(Grasp::CONTACT_FORCE_EXISTENCE);
+	} else if (optimizationTypeBox->currentText()=="Contact force optimization") {
+          graspForceOptimization(Grasp::CONTACT_FORCE_OPTIMIZATION);
 	} else if (optimizationTypeBox->currentText()=="Compliant joint equilibrium") {
 		compliantEquilibriumOptimization(false);
 	} else if (optimizationTypeBox->currentText()=="DOF force equilibrium") {
@@ -173,10 +182,10 @@ GFODlg::compliantEquilibriumOptimization(bool useDynamicDofForce)
 }
 
 void
-GFODlg::graspForceOptimization()
+GFODlg::graspForceOptimization(int computation)
 {
 	Matrix tau(Matrix::ZEROES<Matrix>(mHand->getNumJoints(),1));
-	int result = mHand->getGrasp()->computeQuasistaticForcesAndTorques(&tau);
+	int result = mHand->getGrasp()->computeQuasistaticForcesAndTorques(&tau, computation);
 	if (!result) {
 		DBGA("Optimal joint torques:\n" << tau);
 	}

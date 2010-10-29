@@ -56,7 +56,7 @@ private:
 	//! A pointer to the main window used to ask for an update of the contact list
 	MainWindow *mMainWindow;
 	//! Calls the GFO routine that computes both contact wrenches and joint torques
-	void graspForceOptimization();
+	void graspForceOptimization(int computation);
 	//! Calls the routine that computes contact forces that balance compliant joints
 	void compliantEquilibriumOptimization(bool useDynamicForce);
 	//! Calls the tendon route optimization specific to the McGrip hand
