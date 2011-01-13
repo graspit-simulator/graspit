@@ -79,8 +79,6 @@ closestPtBbox(const BoundingBox &bbox, const position &p)
 void 
 BoundingBox::applyTransform(const transf &t)
 {
-	DBGP("\noriginal: " << tran);
-	DBGP("modifier: " << t);
 	mTran = mTran * t;
 	mTranInv = mTran.inverse();
 }
@@ -89,9 +87,6 @@ bool
 bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2To1)
 {
 	int i, k;
-
-	DBGP("Box1 transform:\n" << bb1.getTran());
-	DBGP("Box2 transform:\n" << bb2.getTran());
 
 	transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
 	mat3 RMat;
@@ -106,7 +101,6 @@ bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2T
 
 	//translation between box centers
 	vec3 T = BtoA.translation();
-	DBGP("T: \n" << T);
 
 	vec3 a = bb1.halfSize;
 	vec3 b = bb2.halfSize;

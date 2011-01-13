@@ -29,8 +29,7 @@
 #include "matvec3D.h"
 #include "mytools.h"
 
-//#define GRASPIT_DBG
-#include "debug.h"
+#include <iostream>
 
 /*! A bounding box. Transform holds the translation to the center of the box and 
 	the rotation to make the box axes align with coordinate axes. HalfSize is the extents
