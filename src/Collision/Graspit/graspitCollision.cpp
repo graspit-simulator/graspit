@@ -34,7 +34,7 @@
 #include "collisionModel.h"
 #include "collisionAlgorithms.h"
 
-#define PROF_ENABLED
+//#define PROF_ENABLED
 #include "profiling.h"
 
 using namespace Collision;

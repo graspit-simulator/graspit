@@ -163,6 +163,7 @@ void RecursionCallback::printStatistics()
 }
 
 void CollisionCallback::printStatistics() {
+	DBGA("Collision callback");
 	RecursionCallback::printStatistics();
 	DBGA("     Collision: " << mCollision << "\n" );
 }
