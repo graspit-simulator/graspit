@@ -53,3 +53,7 @@ win32 {
 #------------------GraspIt! core files---------------------
 
 include(graspit-core.pro)
+
+#-----------------------applications-----------------------
+
+#include (applications/ros_interface/ros_interface.pro)
