@@ -12,6 +12,9 @@ Separator {
 		diffuseColor 0.55 0.45 0.25
 		shininess 1.0
 	}
+	Rotation {
+		 rotation 0 1 0 3.14159
+	}
 	Translation {
 		translation 10 0 0
 	}

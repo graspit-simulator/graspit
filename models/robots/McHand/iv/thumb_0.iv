@@ -13,7 +13,7 @@ Separator {
 	      shininess 1.0
 	}
 	Translation {
-		translation 10 0 0
+		translation -10 0 0
 	}
 	Cube {width 20 height 10 depth 40}
 }
