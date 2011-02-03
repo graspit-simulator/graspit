@@ -8,9 +8,13 @@ QT +=  qt3support
 
 CONFIG += qt warn_on exceptions assistant
 
-INCLUDEPATH += $(QTDIR)/include $(COINDIR)/include qhull
+INCLUDEPATH += $(QTDIR)/include $(COINDIR)/include qhull $$ADDITIONAL_INCLUDE_DIR
 
-DESTDIR = bin
+!isEmpty(EXT_DESTDIR) {
+        DESTDIR = $$EXT_DESTDIR        
+} else {
+        DESTDIR = bin
+}
 
 UI_DIR = ui
 
@@ -319,9 +323,6 @@ cgdb{
 	}
 	!exists(src/DBase/DBPlanner) {
 		error("DBPlanner code not found")
-	}
-	!exists($(CGDB_MODEL_ROOT)) {
-		error("CGDB_MODEL_ROOT not set, or directory not found")
 	}
 
 	QT += sql

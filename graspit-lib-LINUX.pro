@@ -1,5 +1,7 @@
 # Linux-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
 
+LIBS += $$ADDITIONAL_LINK_FLAGS
+
 # ---------------------- Blas and Lapack ----------------------------------
 
 LIBS += -lblas -llapack 
@@ -14,7 +16,7 @@ HEADERS += include/lapack_wrappers.h
 LIBS	+= qhull/libqhull.a 
 #LIBS	+= -Lqhull -lqhull 
 
-LIBS	+= -L$(COINDIR)/lib -lSoQt -lCoin -lGL -lpthread
+LIBS	+= -lSoQt -lCoin -lGL -lpthread
 
 MOC_DIR = .moc
 OBJECTS_DIR = .obj
