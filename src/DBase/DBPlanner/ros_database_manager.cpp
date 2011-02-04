@@ -248,6 +248,7 @@ bool RosDatabaseManager::SaveGrasp(const Grasp* grasp) const
   db_grasp.table_clearance_.get() = grasp->TableClearance();
   db_grasp.compliant_copy_.get() = grasp->CompliantCopy();
   db_grasp.compliant_original_id_.get() = grasp->CompliantOriginalId();
+  db_grasp.scaled_quality_.data() = std::max(0.0, 1.0 - std::max(0.0, grasp->Energy()) / 68.6);
 
   std::stringstream str;
   str << grasp->GetPregraspJoints();
