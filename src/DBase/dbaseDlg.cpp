@@ -268,6 +268,7 @@ void DBaseDlg::loadModelButton_clicked(){
 	mCurrentLoadedModel = model;
 	//model->getGraspableBody()->showAxes(false);
 	model->getGraspableBody()->setTransparency(0.0);
+        model->getGraspableBody()->setTran(transf::IDENTITY);
 	graspsGroup->setEnabled(FALSE);
 
 	//delete the previously loaded grasps
