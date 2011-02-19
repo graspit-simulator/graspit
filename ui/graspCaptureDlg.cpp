@@ -104,7 +104,8 @@ GraspCaptureDlg::captureButtonClicked()
 	}
 	mWorld->findAllContacts();
 	mWorld->updateGrasps();
-	if (mQualEpsilon->evaluate() < 0.0) {
+        double quality = mQualEpsilon->evaluate();
+        if (!allowNonFCBox->isChecked() && quality < 0.0) {
 		DBGA("NON FORCE CLOSURE");
 		return;
 	}
@@ -113,8 +114,8 @@ GraspCaptureDlg::captureButtonClicked()
 	GraspableBody *body = mCurrentHand->getGrasp()->getObject();
 	newState->setRefTran(body->getTran());
 	newState->setObject(body);
-	newState->setEpsilonQuality( std::max(0.0, mQualEpsilon->evaluate()) );
-	newState->setVolume( std::max(0.0, mQualVolume->evaluate()) );
+	newState->setEpsilonQuality( std::max(0.0, quality) );
+	newState->setVolume( std::max(0.0, quality) );
 	newState->saveCurrentHandState();
 	for (int i=0; i<mCurrentHand->getGrasp()->getNumContacts(); i++) {
 		newState->getContacts()->push_back( mCurrentHand->getGrasp()->getContact(i)->getPosition() );
