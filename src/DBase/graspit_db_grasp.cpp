@@ -201,6 +201,10 @@ QString GraspitDBGrasp::getHandDBName(Hand* h)
 		hand_db_name = QString("WILLOW_GRIPPER_2010");
 	}else if(handName == QString("McGrip") || handName == QString("McGrip_optim")){
 		hand_db_name = QString("MC_GRIP");
+	}else if(handName == QString("McHand")){
+		hand_db_name = QString("GRIPPER_DESIGN_1");
+	}else if(handName == QString("gripper_design_4")){
+		hand_db_name = QString("GRIPPER_DESIGN_4");
 	}else {
 		std::cout << "Wrong hand name detected: " << handName.latin1() << 
  		             ".  Acceptable GRASPIT_hand_names are: Barrett, HumanHand20DOF, pr2_gripper" <<
