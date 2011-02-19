@@ -52,8 +52,8 @@ int
 McGrip::loadFromXml(const TiXmlElement* root,QString rootPath)
 {
 	int result = HumanHand::loadFromXml(root, rootPath);
-	for (int i=0; i<(int)tendonVec.size(); i++) {
-		tendonVec[i]->setApplyPassiveForce(false);
+	for (size_t i=0; i<(int)mTendonVec.size(); i++) {
+		mTendonVec[i]->setApplyPassiveForce(false);
 	}
 	return result;
 }
@@ -261,14 +261,14 @@ McGrip::jointTorqueEquilibrium()
 	matrixAdd(tau, *a, tau);
 
 	//multiply by tendon force
-	assert(tendonVec.size()==2);
-	assert(tendonVec[0]->getName()=="Finger 0");
-	assert(tendonVec[1]->getName()=="Finger 1");
-	double f = tendonVec[0]->getActiveForce();
+	assert(mTendonVec.size()==2);
+	assert(mTendonVec[0]->getName()=="Finger 0");
+	assert(mTendonVec[1]->getName()=="Finger 1");
+	double f = mTendonVec[0]->getActiveForce();
 	for (int j=0; j<3; j++) {
 		tau.elem(j,0) *= f;
 	}
-	f = tendonVec[1]->getActiveForce();
+	f = mTendonVec[1]->getActiveForce();
 	for (int j=0; j<3; j++) {
 		tau.elem(3+j,0) *= f;
 	}
