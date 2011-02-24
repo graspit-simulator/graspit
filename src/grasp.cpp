@@ -616,98 +616,113 @@ Grasp::getLinkJacobian(int f, int l)
 }
 
 /*! Computes the contact jacobian J. J relates joint angle motion to 
-	contact motion. Its transpose, JT, relates contact forces to joint
-	forces.
-
-	The joints and the contacts must both be passed in. Their order in 
-	the incoming vectors will determine their indices in the Jacobian.
-	This function will make sure that only the right joints affect each
-	contact: joints that come before the link in contact, on the same
-	chain.
-
-	The Jacobian is ALWAYS computed in the local coordinate system of each
-	contact. When multiplied by joint torques, it will thus yield contact
-	forces and torques in the local contact coordinate system of each contact.
-	It is easy to do computations in world coordinates too, but then it
-	is impossible to discards rows that correspond to directions that the
-	contact can not apply force or torque in.
+  contact motion. Its transpose, JT, relates contact forces to joint
+  forces.
+  
+  The joints and the contacts must both be passed in. Their order in 
+  the incoming vectors will determine their indices in the Jacobian.
+  This function will make sure that only the right joints affect each
+  contact: joints that come before the link in contact, on the same
+  chain.
+  
+  The Jacobian is ALWAYS computed in the local coordinate system of each
+  contact. When multiplied by joint torques, it will thus yield contact
+  forces and torques in the local contact coordinate system of each contact.
+  It is easy to do computations in world coordinates too, but then it
+  is impossible to discards rows that correspond to directions that the
+  contact can not apply force or torque in.
 */
 Matrix 
 Grasp::contactJacobian(const std::list<Joint*> &joints, 
-  					   const std::list<Contact*> &contacts)
+                       const std::list< std::pair<transf, Link*> > &contact_locations)
 {
-	//compute the world locations of all the joints of the robot
-	//this is overkill, as we might not need all of them
-	std::vector< std::vector<transf> > jointTransf(hand->getNumChains());
-	for (int c=0; c<hand->getNumChains(); c++) {
-		jointTransf[c].resize(hand->getChain(c)->getNumJoints(), transf::IDENTITY);
-		hand->getChain(c)->getJointLocations(NULL, jointTransf[c]);
-	}
+  //compute the world locations of all the joints of the robot
+  //this is overkill, as we might not need all of them
+  std::vector< std::vector<transf> > jointTransf(hand->getNumChains());
+  for (int c=0; c<hand->getNumChains(); c++) {
+    jointTransf[c].resize(hand->getChain(c)->getNumJoints(), transf::IDENTITY);
+    hand->getChain(c)->getJointLocations(NULL, jointTransf[c]);
+  }
+  
+  Matrix J( Matrix::ZEROES<Matrix>(int(contact_locations.size()) * 6, (int)joints.size()) );
+  std::list<Joint*>::const_iterator joint_it;
+  int joint_count = 0;
+  int numRows = 0;
+  for (joint_it=joints.begin(); joint_it!=joints.end(); joint_it++) {
+    std::list< std::pair<transf, Link*> >::const_iterator contact_it;
+    numRows = 0;
+    for(contact_it=contact_locations.begin(); contact_it!=contact_locations.end(); contact_it++, numRows+=6) {
+      Link *link = contact_it->second;
+      //check if the contact is on the same chain that this joint belongs too
+      if ( (*joint_it)->getChainNum() != link->getChainNum() ) {
+        continue;
+      }
+      KinematicChain *chain = hand->getChain( link->getChainNum() );
+      //check that the joint comes before the contact in the chain
+      int last_joint = chain->getLastJoint( link->getLinkNum() );
+      //remember that the index of a joint in a chain is different from
+      //the index of a joint in a robot
+      int jointNumInChain = (*joint_it)->getNum() - chain->getFirstJointNum();
+      assert(jointNumInChain >= 0);
+      if ( jointNumInChain > last_joint) continue;
+      //compute the individual jacobian
+      transf joint_tran = jointTransf.at(link->getChainNum()).at(jointNumInChain);
+      transf contact_tran = contact_it->first * link->getTran();
+      //always get the individual jacobian in local coordinates
+      Matrix indJ(Joint::jacobian(*joint_it, joint_tran, contact_tran, false));
+      //place it at the correct spot in the global jacobian
+      J.copySubMatrix(numRows, joint_count, indJ);
+    }
+    joint_count++;
+  }
+  return J;
+}
 
-	Matrix J( Matrix::ZEROES<Matrix>(int(contacts.size()) * 6, (int)joints.size()) );
-	std::list<Joint*>::const_iterator joint_it;
-	int joint_count = 0;
-	int numRows = 0;
-	for (joint_it=joints.begin(); joint_it!=joints.end(); joint_it++) {
-		std::list<Contact*>::const_iterator contact_it;
-		numRows = 0;
-		for(contact_it=contacts.begin(); contact_it!=contacts.end(); contact_it++, numRows+=6) {
-			if ((*contact_it)->getBody1()->getOwner() != hand) {
-				DBGA("Grasp jacobian: contact not on hand");
-				continue;
-			}
-			Link *link = static_cast<Link*>((*contact_it)->getBody1());
-			//check if the contact is on the same chain that this joint belongs too
-			if ( (*joint_it)->getChainNum() != link->getChainNum() ) {
-				continue;
-			}
-			KinematicChain *chain = hand->getChain( link->getChainNum() );
-			//check that the joint comes before the contact in the chain
-			int last_joint = chain->getLastJoint( link->getLinkNum() );
-			//remember that the index of a joint in a chain is different from
-			//the index of a joint in a robot
-			int jointNumInChain = (*joint_it)->getNum() - chain->getFirstJointNum();
-			assert(jointNumInChain >= 0);
-			if ( jointNumInChain > last_joint) continue;
-			//compute the individual jacobian
-			transf joint_tran = jointTransf.at(link->getChainNum()).at(jointNumInChain);
-			transf contact_tran = (*contact_it)->getContactFrame() * link->getTran();
-			//always get the individual jacobian in local coordinates
-			Matrix indJ(Joint::jacobian(*joint_it, joint_tran, contact_tran, false));
-			//place it at the correct spot in the global jacobian
-			J.copySubMatrix(numRows, joint_count, indJ);
-		}
-		joint_count++;
-	}
-	return J;
+/*! Simply gets the locations of all the contacts in the list and calls the
+  more general version that takes in std::list< std::pair<transf, Link*> > &contact_locations */
+Matrix 
+Grasp::contactJacobian(const std::list<Joint*> &joints, 
+                       const std::list<Contact*> &contacts)
+{
+  std::list< std::pair<transf, Link*> > contact_locations;
+  std::list<Contact*>::const_iterator contact_it;
+  for(contact_it=contacts.begin(); contact_it!=contacts.end(); contact_it++) {
+    if ((*contact_it)->getBody1()->getOwner() != hand) {
+      DBGA("Grasp jacobian: contact not on hand");
+      continue;
+    }
+    Link *link = static_cast<Link*>((*contact_it)->getBody1());
+    contact_locations.push_back( std::pair<transf, Link*>((*contact_it)->getContactFrame(), link) );
+  }
+  return contactJacobian(joints, contact_locations);
 }
 
 /*! Computes the grasp map G. D is the matrix that relates friction edge
-	amplitudes to contact force and R is the matrix that transorms contact
-	forces to world coordinate system. We then need to sum all of them up
-	by multiplication with a summation matrix to get the grasp map
-
-	G = S R D
-
-	G related friction edge amplitudes from all contacts to resultatnt 
-	object wrench.
+  amplitudes to contact force and R is the matrix that transorms contact
+  forces to world coordinate system. We then need to sum all of them up
+  by multiplication with a summation matrix to get the grasp map
+  
+  G = S R D
+  
+  G relates friction edge amplitudes from all contacts to resultant 
+  object wrench.
 */
 Matrix 
 Grasp::graspMapMatrix(const Matrix &R, const Matrix &D)
 {
-	int numContacts = R.rows() / 6;
-	assert(6 * numContacts == R.rows());
-	//summation matrix that adds full 6D object wrenches
-	Matrix S(6, 6*numContacts);
-	for(int i=0; i<numContacts; i++) {
-		S.copySubMatrix(0, 6*i, Matrix::EYE(6,6));
-	}
-
-	Matrix SR(S.rows(), R.cols());
-	matrixMultiply(S, R, SR);
-	Matrix G(S.rows(), D.cols());
-	matrixMultiply(SR, D, G);
-	return G;
+  int numContacts = R.rows() / 6;
+  assert(6 * numContacts == R.rows());
+  //summation matrix that adds full 6D object wrenches
+  Matrix S(6, 6*numContacts);
+  for(int i=0; i<numContacts; i++) {
+    S.copySubMatrix(0, 6*i, Matrix::EYE(6,6));
+  }
+  
+  Matrix SR(S.rows(), R.cols());
+  matrixMultiply(S, R, SR);
+  Matrix G(S.rows(), D.cols());
+  matrixMultiply(SR, D, G);
+  return G;
 }
 
 
