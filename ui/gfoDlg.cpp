@@ -32,10 +32,10 @@
 #include "body.h"
 #include "matrix.h"
 #include "mainWindow.h"
-#include "mcGrip.h"
 
-// for McGrip-specific optimizations, might be temporary
+// for hand-specific optimizations, might be temporary
 #include "mcGrip.h"
+#include "humanHand.h"
 
 #include "debug.h"
 
@@ -43,6 +43,9 @@ GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : mMainWindow(mw), mHan
 {
 	setupUi(this);
 	statusLabel->setText("Status: optimization off");
+	if (mHand->isA("HumanHand")) {
+		optimizationTypeBox->insertItem("Tendon equilibrium");
+        }
 	optimizationTypeBox->insertItem("Contact force existence");
 	optimizationTypeBox->insertItem("Contact force optimization");
 	optimizationTypeBox->insertItem("Grasp force existence");
@@ -109,6 +112,8 @@ GFODlg::runOptimization()
 		tendonRouteOptimization();
 	} else if (optimizationTypeBox->currentText()=="McGrip joint equilibrium") {
 		mcgripEquilibrium();
+	} else if (optimizationTypeBox->currentText()=="Tendon equilibrium") {
+		tendonEquilibrium();
 	} else {
 		DBGA("Unkown option selected in optimization box");
 	}
@@ -171,6 +176,17 @@ GFODlg::tendonRouteOptimization()
 	delete a;
 	delete B;
 	*/
+}
+
+void
+GFODlg::tendonEquilibrium()
+{
+  if (!mHand->isA("HumanHand")) {
+    DBGA("Hand is not a Human Hand!");
+    return;
+  }
+  int result = static_cast<HumanHand*>(mHand)->tendonEquilibrium();
+  displayResults(result);  
 }
 
 void
