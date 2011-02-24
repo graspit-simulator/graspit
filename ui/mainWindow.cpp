@@ -95,87 +95,87 @@
 
 MainWindow::MainWindow(QWidget *parent) 
 {
-	mWindow = new Q3MainWindow(parent);
-	//mWindow = new QMainWindow(parent);
-	mUI = new Ui::MainWindowUI;
-	mUI->setupUi(mWindow);
-	init();
-	// -- file menu
-	QObject::connect(mUI->fileNewAction, SIGNAL(triggered()), this, SLOT(fileNew()));
-	QObject::connect(mUI->fileOpenAction, SIGNAL(triggered()), this, SLOT(fileOpen()));
-	QObject::connect(mUI->fileSaveAction, SIGNAL(triggered()), this, SLOT(fileSave()));
-	QObject::connect(mUI->fileSaveAsAction, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
-	QObject::connect(mUI->fileImportRobotAction, SIGNAL(triggered()), this, SLOT(fileImportRobot()));
-	QObject::connect(mUI->fileImportObstacleAction, SIGNAL(triggered()), this, SLOT(fileImportObstacle()));
-	QObject::connect(mUI->fileImportObjectAction, SIGNAL(triggered()), this, SLOT(fileImportObject()));
-	QObject::connect(mUI->fileEditSettingsAction, SIGNAL(triggered()), this, SLOT(fileEditSettings()));
-	QObject::connect(mUI->fileSaveImageAction, SIGNAL(triggered()), this, SLOT(fileSaveImage()));
-	QObject::connect(mUI->fileExitAction, SIGNAL(triggered()), this, SLOT(fileExit()));
-	// -- help menu
-	QObject::connect(mUI->helpManualAction, SIGNAL(triggered()), this, SLOT(helpManual()));
-	QObject::connect(mUI->helpAboutAction, SIGNAL(triggered()), this, SLOT(helpAbout()));
-	QObject::connect(mUI->helpAboutQTAction, SIGNAL(triggered()), this, SLOT(helpAboutQT()));
-	// -- body meny
-	QObject::connect(mUI->elementGroup, SIGNAL(selected(QAction*)), this, SLOT(setTool(QAction*)));
-	QObject::connect(mUI->elementCollisionToggleAction, SIGNAL(activated()),
-					 this, SLOT(elementTurnOffCollisions()));
-	QObject::connect(mUI->elementCollisionToggleAction, SIGNAL(toggled(bool)),
-					 this, SLOT(updateCollisionAction(bool)));
-	QObject::connect(mUI->elementBodyPropertiesAction, SIGNAL(activated()),
-					 this, SLOT(elementBodyProperties()));
-	// -- grasp menu, part I
-	QObject::connect(mUI->graspAutoGraspAction, SIGNAL(triggered()), this, SLOT(graspAutoGrasp()));
-	QObject::connect(mUI->graspAuto_OpenAction, SIGNAL(triggered()), this, SLOT(graspAutoOpen()));
-	QObject::connect(mUI->graspQualityMeasuresAction, SIGNAL(triggered()), this, SLOT(graspQualityMeasures()));
-	QObject::connect(mUI->graspCreateProjectionAction, SIGNAL(triggered()), this, SLOT(graspCreateProjection()));
-	QObject::connect(mUI->graspPlannerAction, SIGNAL(triggered()), this, SLOT(graspPlanner()));
-	QObject::connect(mUI->graspGFOAction, SIGNAL(triggered()), this, SLOT(graspForceOptimization()));
-	// -- grasp menu, part I
-	QObject::connect(mUI->graspEigenGrasp_InterfaceAction, SIGNAL(triggered()), 
-					 this, SLOT(eigenGraspActivated()));
-	QObject::connect(mUI->graspContact_ExaminerAction, SIGNAL(triggered()),
-					 this, SLOT(graspContactExaminer_activated()));
-	QObject::connect(mUI->graspEigenGrasp_PlannerAction, SIGNAL(triggered()),
-					 this, SLOT(eigenGraspPlannerActivated()));
-	// -- dbase menu
-	QObject::connect(mUI->dbaseGUIAction, SIGNAL(triggered()), 
-					 this, SLOT(dbaseGUIAction_activated()));
-	QObject::connect(mUI->dbasePlannerAction, SIGNAL(triggered()), 
-					 this, SLOT(dbasePlannerAction_activated()));
-	QObject::connect(mUI->dbaseGraspCaptureAction, SIGNAL(triggered()),
-					 this, SLOT(graspCapture()));
-	// -- sensors menu
-	QObject::connect(mUI->sensorsSensor_InputAction, SIGNAL(triggered()), 
-					 this, SLOT(sensorsSensor_InputAction_activated()));
-	QObject::connect(mUI->sensorsBarrett_HandAction, SIGNAL(triggered()),
-					 this, SLOT(sensorsBarrettHandAction()));
-	// -- stereo menu
-	QObject::connect(mUI->stereoOnAction, SIGNAL(triggered()), this, SLOT(stereoOn()));
-	QObject::connect(mUI->stereoOffAction, SIGNAL(triggered()), this, SLOT(stereoOff()));
-	QObject::connect(mUI->stereoFlip_leftrightAction, SIGNAL(triggered()), this, SLOT(stereoFlip()));
-	// -- misc menu
-	QObject::connect(mUI->dynamicsArch_BuilderAction, SIGNAL(triggered()), this, SLOT(archBuilder()));
-	QObject::connect(mUI->miscOptimizerAction, SIGNAL(triggered()), this, SLOT(miscOptimizer()));
-	QObject::connect(mUI->actionArizona_Project, SIGNAL(triggered()), 
-					 this, SLOT(miscArizonaProjectDlg_activated()));
-	QObject::connect(mUI->staubliControl, SIGNAL(triggered()), 
-					 this, SLOT(misStaubliControlDlg()));
-	QObject::connect(mUI->miscEigengridsAction, SIGNAL(triggered()), this, SLOT(miscEigengridsAction_activated()));
-	// -- contacts
-	QObject::connect(mUI->contactsListBox, SIGNAL(highlighted(int)), this, SLOT(contactSelected(int)));
-	// -- dynamics
-	QObject::connect(mUI->dynamicsPlayAction, SIGNAL(activated()), this, SLOT(toggleDynamics()));
-	QObject::connect(mUI->dynamicsPopAction, SIGNAL(activated()), this, SLOT(dynamicsPopState()));
-	QObject::connect(mUI->dynamicsPushAction, SIGNAL(activated()), this, SLOT(dynamicsPushState()));
-	// -- toolbars
-	QObject::connect(mUI->materialComboBox, SIGNAL(activated(int)), this, SLOT(materialSelected(int)));
-	QObject::connect(mUI->graspedBodyBox, SIGNAL(activated(int)), this, SLOT(selectGraspedBody(int)));
-	QObject::connect(mUI->handSelectionBox, SIGNAL(activated(int)), this, SLOT(setCurrentHand(int)));
-	// -- tendon toolbar
-	QObject::connect(mUI->TendonForceInput, SIGNAL(valueChanged(int)), this, SLOT(TendonForceInput_valueChanged(int)));
-	QObject::connect(mUI->tendonNamesBox, SIGNAL(activated(int)), this, SLOT(tendonNamesBoxActivated(int)));
-	QObject::connect(mUI->tendonVisibleCheckBox, SIGNAL(toggled(bool)), this, SLOT(tendonVisibleCheckBox_toggled(bool)));
-}
+  mWindow = new Q3MainWindow(parent);
+  //mWindow = new QMainWindow(parent);
+  mUI = new Ui::MainWindowUI;
+  mUI->setupUi(mWindow);
+  init();
+  // -- file menu
+  QObject::connect(mUI->fileNewAction, SIGNAL(triggered()), this, SLOT(fileNew()));
+  QObject::connect(mUI->fileOpenAction, SIGNAL(triggered()), this, SLOT(fileOpen()));
+  QObject::connect(mUI->fileSaveAction, SIGNAL(triggered()), this, SLOT(fileSave()));
+  QObject::connect(mUI->fileSaveAsAction, SIGNAL(triggered()), this, SLOT(fileSaveAs()));
+  QObject::connect(mUI->fileImportRobotAction, SIGNAL(triggered()), this, SLOT(fileImportRobot()));
+  QObject::connect(mUI->fileImportObstacleAction, SIGNAL(triggered()), this, SLOT(fileImportObstacle()));
+  QObject::connect(mUI->fileImportObjectAction, SIGNAL(triggered()), this, SLOT(fileImportObject()));
+  QObject::connect(mUI->fileEditSettingsAction, SIGNAL(triggered()), this, SLOT(fileEditSettings()));
+  QObject::connect(mUI->fileSaveImageAction, SIGNAL(triggered()), this, SLOT(fileSaveImage()));
+  QObject::connect(mUI->fileExitAction, SIGNAL(triggered()), this, SLOT(fileExit()));
+  // -- help menu
+  QObject::connect(mUI->helpManualAction, SIGNAL(triggered()), this, SLOT(helpManual()));
+  QObject::connect(mUI->helpAboutAction, SIGNAL(triggered()), this, SLOT(helpAbout()));
+  QObject::connect(mUI->helpAboutQTAction, SIGNAL(triggered()), this, SLOT(helpAboutQT()));
+  // -- body meny
+  QObject::connect(mUI->elementGroup, SIGNAL(selected(QAction*)), this, SLOT(setTool(QAction*)));
+  QObject::connect(mUI->elementCollisionToggleAction, SIGNAL(activated()),
+                   this, SLOT(elementTurnOffCollisions()));
+  QObject::connect(mUI->elementCollisionToggleAction, SIGNAL(toggled(bool)),
+                   this, SLOT(updateCollisionAction(bool)));
+  QObject::connect(mUI->elementBodyPropertiesAction, SIGNAL(activated()),
+                   this, SLOT(elementBodyProperties()));
+  // -- grasp menu, part I
+  QObject::connect(mUI->graspAutoGraspAction, SIGNAL(triggered()), this, SLOT(graspAutoGrasp()));
+  QObject::connect(mUI->graspAuto_OpenAction, SIGNAL(triggered()), this, SLOT(graspAutoOpen()));
+  QObject::connect(mUI->graspQualityMeasuresAction, SIGNAL(triggered()), this, SLOT(graspQualityMeasures()));
+  QObject::connect(mUI->graspCreateProjectionAction, SIGNAL(triggered()), this, SLOT(graspCreateProjection()));
+  QObject::connect(mUI->graspPlannerAction, SIGNAL(triggered()), this, SLOT(graspPlanner()));
+  QObject::connect(mUI->graspGFOAction, SIGNAL(triggered()), this, SLOT(graspForceOptimization()));
+  // -- grasp menu, part I
+  QObject::connect(mUI->graspEigenGrasp_InterfaceAction, SIGNAL(triggered()), 
+                   this, SLOT(eigenGraspActivated()));
+  QObject::connect(mUI->graspContact_ExaminerAction, SIGNAL(triggered()),
+                   this, SLOT(graspContactExaminer_activated()));
+  QObject::connect(mUI->graspEigenGrasp_PlannerAction, SIGNAL(triggered()),
+                   this, SLOT(eigenGraspPlannerActivated()));
+  // -- dbase menu
+  QObject::connect(mUI->dbaseGUIAction, SIGNAL(triggered()), 
+                   this, SLOT(dbaseGUIAction_activated()));
+  QObject::connect(mUI->dbasePlannerAction, SIGNAL(triggered()), 
+                   this, SLOT(dbasePlannerAction_activated()));
+  QObject::connect(mUI->dbaseGraspCaptureAction, SIGNAL(triggered()),
+                   this, SLOT(graspCapture()));
+  // -- sensors menu
+  QObject::connect(mUI->sensorsSensor_InputAction, SIGNAL(triggered()), 
+                   this, SLOT(sensorsSensor_InputAction_activated()));
+  QObject::connect(mUI->sensorsBarrett_HandAction, SIGNAL(triggered()),
+                   this, SLOT(sensorsBarrettHandAction()));
+  // -- stereo menu
+  QObject::connect(mUI->stereoOnAction, SIGNAL(triggered()), this, SLOT(stereoOn()));
+  QObject::connect(mUI->stereoOffAction, SIGNAL(triggered()), this, SLOT(stereoOff()));
+  QObject::connect(mUI->stereoFlip_leftrightAction, SIGNAL(triggered()), this, SLOT(stereoFlip()));
+  // -- misc menu
+  QObject::connect(mUI->dynamicsArch_BuilderAction, SIGNAL(triggered()), this, SLOT(archBuilder()));
+  QObject::connect(mUI->miscOptimizerAction, SIGNAL(triggered()), this, SLOT(miscOptimizer()));
+  QObject::connect(mUI->actionArizona_Project, SIGNAL(triggered()), 
+                   this, SLOT(miscArizonaProjectDlg_activated()));
+  QObject::connect(mUI->staubliControl, SIGNAL(triggered()), 
+                   this, SLOT(misStaubliControlDlg()));
+  QObject::connect(mUI->miscEigengridsAction, SIGNAL(triggered()), this, SLOT(miscEigengridsAction_activated()));
+  // -- contacts
+  QObject::connect(mUI->contactsListBox, SIGNAL(highlighted(int)), this, SLOT(contactSelected(int)));
+  // -- dynamics
+  QObject::connect(mUI->dynamicsPlayAction, SIGNAL(activated()), this, SLOT(toggleDynamics()));
+  QObject::connect(mUI->dynamicsPopAction, SIGNAL(activated()), this, SLOT(dynamicsPopState()));
+  QObject::connect(mUI->dynamicsPushAction, SIGNAL(activated()), this, SLOT(dynamicsPushState()));
+  // -- toolbars
+  QObject::connect(mUI->materialComboBox, SIGNAL(activated(int)), this, SLOT(materialSelected(int)));
+  QObject::connect(mUI->graspedBodyBox, SIGNAL(activated(int)), this, SLOT(selectGraspedBody(int)));
+  QObject::connect(mUI->handSelectionBox, SIGNAL(activated(int)), this, SLOT(setCurrentHand(int)));
+  // -- tendon toolbar
+  QObject::connect(mUI->TendonForceInput, SIGNAL(valueChanged(int)), this, SLOT(TendonForceInput_valueChanged(int)));
+  QObject::connect(mUI->tendonNamesBox, SIGNAL(activated(int)), this, SLOT(tendonNamesBoxActivated(int)));
+  QObject::connect(mUI->tendonVisibleCheckBox, SIGNAL(toggled(bool)), this, SLOT(tendonVisibleCheckBox_toggled(bool)));
+  QObject::connect(mUI->forcesVisibleCheckBox, SIGNAL(toggled(bool)), this, SLOT(forcesVisibleCheckBox_toggled(bool)));}
 
 /*!
   UI constructor.  Zeros the time readout, sets the correct states for the
@@ -286,20 +286,20 @@ void MainWindow::fileNew()
 */
 void MainWindow::fileOpen()
 {
-	if ( !saveAndContinue( "Open" ) ) {
-		return;
-	}
-	QString fn( QFileDialog::getOpenFileName(mWindow, QString(), QString(getenv("GRASPIT"))+QString("/worlds"),
-											 "GraspIt World Files (*.xml)") );
-    if ( fn.isEmpty() ) {
-		return;
-	}
-	fileName = fn;
-    mUI->worldBox->setTitle(fileName);
-    graspItGUI->getIVmgr()->emptyWorld();
-    graspItGUI->getIVmgr()->getWorld()->load(fileName);
-    //graspItGUI->getIVmgr()->getViewer()->viewAll();
-    setMainWorld(graspItGUI->getIVmgr()->getWorld());
+  if ( !saveAndContinue( "Open" ) ) {
+    return;
+  }
+  QString fn( QFileDialog::getOpenFileName(mWindow, QString(), QString(getenv("GRASPIT"))+QString("/worlds"),
+                                           "GraspIt World Files (*.xml)") );
+  if ( fn.isEmpty() ) {
+    return;
+  }
+  fileName = fn;
+  mUI->worldBox->setTitle(fileName);
+  graspItGUI->getIVmgr()->emptyWorld();
+  graspItGUI->getIVmgr()->getWorld()->load(fileName);
+  //graspItGUI->getIVmgr()->getViewer()->viewAll();
+  setMainWorld(graspItGUI->getIVmgr()->getWorld());
 }
 
 /*!
@@ -308,11 +308,11 @@ void MainWindow::fileOpen()
 */
 void MainWindow::fileSave()
 {
-	if ( fileName.isEmpty() ) {
-		fileSaveAs();
-	} else {
-		graspItGUI->getIVmgr()->getWorld()->save(fileName);
-	}
+  if ( fileName.isEmpty() ) {
+    fileSaveAs();
+  } else {
+    graspItGUI->getIVmgr()->getWorld()->save(fileName);
+  }
 }
 
 /*!
@@ -322,16 +322,16 @@ void MainWindow::fileSave()
 */
 void MainWindow::fileSaveAs()
 {
-	QString fn = QFileDialog::getSaveFileName(mWindow, QString(), QString(getenv("GRASPIT"))+QString("/worlds"),
-											  "GraspIt World Files (*.xml)" );
-	if ( !fn.isEmpty() ) {
-		fileName = fn;
-		if (fileName.section('.',1).isEmpty()) {
-			fileName.append(".xml");
-		}
-		fileSave();
-		mUI->worldBox->setTitle(fileName);
-	}
+  QString fn = QFileDialog::getSaveFileName(mWindow, QString(), QString(getenv("GRASPIT"))+QString("/worlds"),
+                                            "GraspIt World Files (*.xml)" );
+  if ( !fn.isEmpty() ) {
+    fileName = fn;
+    if (fileName.section('.',1).isEmpty()) {
+      fileName.append(".xml");
+    }
+    fileSave();
+    mUI->worldBox->setTitle(fileName);
+  }
 }
 
 /*!
@@ -341,11 +341,11 @@ void MainWindow::fileSaveAs()
 */
 void MainWindow::fileImportRobot()
 {
-	QString dir = QString(getenv("GRASPIT"))+QString("/models/robots");
-	QString fn( QFileDialog::getOpenFileName(mWindow, QString(), dir, "XML GraspIt Robot Files (*.xml)") );
-	if ( !fn.isEmpty() ) {
-		world->importRobot(fn);
-	}
+  QString dir = QString(getenv("GRASPIT"))+QString("/models/robots");
+  QString fn( QFileDialog::getOpenFileName(mWindow, QString(), dir, "XML GraspIt Robot Files (*.xml)") );
+  if ( !fn.isEmpty() ) {
+    world->importRobot(fn);
+  }
 }
 
 /*!
@@ -358,12 +358,9 @@ void MainWindow::fileImportRobot()
 void MainWindow::fileImportObstacle()
 {
   QString fn( QFileDialog::getOpenFileName(mWindow, QString(),
-			  QString(getenv("GRASPIT"))+QString("/models/obstacles"),
-			  "Graspit XML Files (*.xml*);;IV files (*.iv);;WRL files (*.wrl);;OFF files (*.off);;PLY files (*.ply)" ) );
-
-  if ( !fn.isEmpty() ) {
-    world->importBody("Body",fn);
-  }
+                                           QString(getenv("GRASPIT"))+QString("/models/obstacles"),
+	    "Graspit XML Files (*.xml*);;IV files (*.iv);;WRL files (*.wrl);;OFF files (*.off);;PLY files (*.ply)" ) );
+  if ( !fn.isEmpty() ) world->importBody("Body",fn);
 }
 
 /*!
@@ -376,12 +373,10 @@ void MainWindow::fileImportObstacle()
 void MainWindow::fileImportObject()
 {
   QString fn( QFileDialog::getOpenFileName(mWindow, QString(),
-			  QString(getenv("GRASPIT"))+QString("/models/objects"),
-			  "Graspit XML Files (*.xml*);;IV files (*.iv);;WRL files (*.wrl);;OFF files (*.off);;PLY files (*.ply)" ) );
+                                           QString(getenv("GRASPIT"))+QString("/models/objects"),
+  "Graspit XML Files (*.xml*);;IV files (*.iv);;WRL files (*.wrl);;OFF files (*.off);;PLY files (*.ply)" ) );
 
-  if ( !fn.isEmpty() ) {
-    world->importBody("GraspableBody",fn);
-  }
+  if ( !fn.isEmpty() ) world->importBody("GraspableBody",fn);
 }
 
 /*!
@@ -391,9 +386,9 @@ void MainWindow::fileImportObject()
 */
 void MainWindow::fileExit()
 {
-	if ( saveAndContinue( "Exit" ) )
+  if ( saveAndContinue( "Exit" ) )
     //qApp->exit();
-	graspItGUI->exitMainLoop();
+    graspItGUI->exitMainLoop();
 }
 
 /*!
@@ -473,12 +468,12 @@ void MainWindow::fileEditSettings()
 */
 void MainWindow::fileSaveImage()
 {
-	QString fn = QFileDialog::getSaveFileName( mWindow, QString(), QString(getenv("GRASPIT"))+QString("/images"),
-												"Image Files (*.jpg)" );
-	if ( !fn.isEmpty() ) {
-		if (fn.section('.',-1)!="jpg") fn.append(".jpg");
-		graspItGUI->getIVmgr()->saveImage(fn);
-	}
+  QString fn = QFileDialog::getSaveFileName( mWindow, QString(), QString(getenv("GRASPIT"))+QString("/images"),
+                                             "Image Files (*.jpg)" );
+  if ( !fn.isEmpty() ) {
+    if (fn.section('.',-1)!="jpg") fn.append(".jpg");
+    graspItGUI->getIVmgr()->saveImage(fn);
+  }
 }
 
 //----------------------------------------- Help menu --------------------------------------
@@ -498,12 +493,12 @@ void MainWindow::helpManual()
 */
 void MainWindow::helpAbout()
 {
-	Ui::AboutDlg dlgUI;
-	QDialog dlgImpl(mWindow);
-	dlgUI.setupUi(&dlgImpl);
-    QString versionText("Version ");
-    dlgUI.versionLabel->setText( versionText + GRASPIT_VERSION);
-	dlgImpl.exec();
+  Ui::AboutDlg dlgUI;
+  QDialog dlgImpl(mWindow);
+  dlgUI.setupUi(&dlgImpl);
+  QString versionText("Version ");
+  dlgUI.versionLabel->setText( versionText + GRASPIT_VERSION);
+  dlgImpl.exec();
 }
 
 void MainWindow::helpAboutQT()
@@ -528,7 +523,7 @@ void MainWindow::setTool( QAction *a )
 */
 void MainWindow::elementTurnOffCollisions()
 {
-	world->toggleAllCollisions(!mUI->elementCollisionToggleAction->isOn());
+  world->toggleAllCollisions(!mUI->elementCollisionToggleAction->isOn());
 }
 
 /*!
@@ -538,24 +533,24 @@ void MainWindow::elementTurnOffCollisions()
 */
 void MainWindow::elementBodyProperties()
 {	
-	BodyPropDlg *dlg = new BodyPropDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, true);
-	if ( dlg->exec() == QDialog::Accepted) {
-		world->updateGrasps();
-	}
-	delete dlg;
+  BodyPropDlg *dlg = new BodyPropDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, true);
+  if ( dlg->exec() == QDialog::Accepted) {
+    world->updateGrasps();
+  }
+  delete dlg;
 }
 
 void MainWindow::elementPrimitives()
 {
 #ifdef GEOMETRY_LIB
-	//needs upgrade to Qt4
-	/*
-	GeometryLibDlg *dlg = new GeometryLibDlg(this,QString::null,FALSE);
-	assert( world->getNumSelectedBodies() > 0 );
-	dlg->setBody( world->getSelectedBody(0) );
-	dlg->show();
-	*/
+  //needs upgrade to Qt4
+  /*
+    GeometryLibDlg *dlg = new GeometryLibDlg(this,QString::null,FALSE);
+    assert( world->getNumSelectedBodies() > 0 );
+    dlg->setBody( world->getSelectedBody(0) );
+    dlg->show();
+  */
 #endif
 }
 
@@ -609,33 +604,33 @@ void MainWindow::updateElementMenu()
 void MainWindow::updateGraspMenu()
 {
     bool handFound = (world->getCurrentHand() !=NULL);
-	bool bodyFound = (world->getNumBodies() != 0);
+    bool bodyFound = (world->getNumBodies() != 0);
     mUI->graspAutoGraspAction->setEnabled(handFound);
     mUI->graspAuto_OpenAction->setEnabled(handFound);
     mUI->graspCreateProjectionAction->setEnabled(handFound);
     mUI->graspQualityMeasuresAction->setEnabled(handFound);
     mUI->graspPlannerAction->setEnabled(handFound);
     mUI->graspGFOAction->setEnabled(handFound);
-	mUI->graspEigenGrasp_InterfaceAction->setEnabled(handFound);
-	mUI->graspContact_ExaminerAction->setEnabled(bodyFound);
-	mUI->graspEigenGrasp_PlannerAction->setEnabled(handFound);
+    mUI->graspEigenGrasp_InterfaceAction->setEnabled(handFound);
+    mUI->graspContact_ExaminerAction->setEnabled(bodyFound);
+    mUI->graspEigenGrasp_PlannerAction->setEnabled(handFound);
     mUI->graspCompliantPlannerAction->setEnabled(handFound);
 #ifdef CGDB_ENABLED
-	mUI->dbaseGUIAction->setEnabled(handFound);
-	mUI->dbasePlannerAction->setEnabled(handFound);
+    mUI->dbaseGUIAction->setEnabled(handFound);
+    mUI->dbasePlannerAction->setEnabled(handFound);
 #else
-	mUI->dbaseGUIAction->setEnabled(false);
-	mUI->dbasePlannerAction->setEnabled(false);
+    mUI->dbaseGUIAction->setEnabled(false);
+    mUI->dbasePlannerAction->setEnabled(false);
 #endif
-
+    
 #ifdef ARIZONA_PROJECT_ENABLED
-	mUI->actionArizona_Project->setEnabled(true);
+    mUI->actionArizona_Project->setEnabled(true);
 #else
-	mUI->actionArizona_Project->setEnabled(false);
+    mUI->actionArizona_Project->setEnabled(false);
 #endif
-
-	mUI->dbaseGraspCaptureAction->setEnabled(handFound);
-	mUI->sensorsBarrett_HandAction->setEnabled(handFound);
+    
+    mUI->dbaseGraspCaptureAction->setEnabled(handFound);
+    mUI->sensorsBarrett_HandAction->setEnabled(handFound);
 }
 
 /*!
@@ -646,27 +641,27 @@ void MainWindow::updateGraspMenu()
 */
 void MainWindow::graspCreateProjection(Grasp *g)
 {
-	GWSProjDlg *dlg = new GWSProjDlg(mWindow);
-	if ( dlg->exec() == QDialog::Accepted ) {
-		Grasp *grasp;
-		if(!g)
-			grasp = world->getCurrentHand()->getGrasp();
-		else
-			grasp = g;
-		GWS *gws = grasp->addGWS(dlg->gwsTypeComboBox->currentText().latin1());
-
-		double w[6];
-		w[0] = dlg->fxCoord->text().toDouble();
-		w[1] = dlg->fyCoord->text().toDouble();
-		w[2] = dlg->fzCoord->text().toDouble();
-		w[3] = dlg->txCoord->text().toDouble();
-		w[4] = dlg->tyCoord->text().toDouble();
-		w[5] = dlg->tzCoord->text().toDouble();
+  GWSProjDlg *dlg = new GWSProjDlg(mWindow);
+  if ( dlg->exec() == QDialog::Accepted ) {
+    Grasp *grasp;
+    if(!g)
+      grasp = world->getCurrentHand()->getGrasp();
+    else
+      grasp = g;
+    GWS *gws = grasp->addGWS(dlg->gwsTypeComboBox->currentText().latin1());
     
-		GWSprojection *gp = new GWSprojection(graspItGUI->getIVmgr()->getViewer(),gws,w,dlg->whichFixed);  
-		grasp->addProjection(gp);
-	}    
-	delete dlg;
+    double w[6];
+    w[0] = dlg->fxCoord->text().toDouble();
+    w[1] = dlg->fyCoord->text().toDouble();
+    w[2] = dlg->fzCoord->text().toDouble();
+    w[3] = dlg->txCoord->text().toDouble();
+    w[4] = dlg->tyCoord->text().toDouble();
+    w[5] = dlg->tzCoord->text().toDouble();
+    
+    GWSprojection *gp = new GWSprojection(graspItGUI->getIVmgr()->getViewer(),gws,w,dlg->whichFixed);  
+    grasp->addProjection(gp);
+  }    
+  delete dlg;
 }
 
 /*!
@@ -676,19 +671,19 @@ void MainWindow::graspCreateProjection(Grasp *g)
 */
 void MainWindow::graspQualityMeasures()
 {
-	QMDlg *dlg = new QMDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, true);
-	if ( dlg->exec() == QDialog::Accepted ) {
-		Grasp *g = world->getCurrentHand()->getGrasp();
-		if (g->getNumQM()) {
-			connect(g,SIGNAL(graspUpdated()),this,SLOT(updateQualityList()));
-		} else {
-			disconnect(g,SIGNAL(graspUpdated()),this,SLOT(updateQualityList()));
-		}    
-	}
-	world->getCurrentHand()->setContactsChanged();
-	world->updateGrasps();
-	delete dlg;
+  QMDlg *dlg = new QMDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, true);
+  if ( dlg->exec() == QDialog::Accepted ) {
+    Grasp *g = world->getCurrentHand()->getGrasp();
+    if (g->getNumQM()) {
+      connect(g,SIGNAL(graspUpdated()),this,SLOT(updateQualityList()));
+    } else {
+      disconnect(g,SIGNAL(graspUpdated()),this,SLOT(updateQualityList()));
+    }    
+  }
+  world->getCurrentHand()->setContactsChanged();
+  world->updateGrasps();
+  delete dlg;
 }
 
 /*!
@@ -699,29 +694,29 @@ void MainWindow::graspQualityMeasures()
 */
 void MainWindow::graspPlanner()
 {
-	if (!world->getCurrentHand()->getName().contains("Barrett")) {
-		QMessageBox::warning(NULL,"GraspIt!",
-							"The planner currently only works with the Barrett hand.",
-							QMessageBox::Ok, Qt::NoButton,Qt::NoButton);
-		return;
-	}
-	PlannerDlg *dlg =new PlannerDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();  
+  if (!world->getCurrentHand()->getName().contains("Barrett")) {
+    QMessageBox::warning(NULL,"GraspIt!",
+                         "The planner currently only works with the Barrett hand.",
+                         QMessageBox::Ok, Qt::NoButton,Qt::NoButton);
+    return;
+  }
+  PlannerDlg *dlg =new PlannerDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();  
 }
 
 void
 MainWindow::graspForceOptimization()
 {
-	if (!world->getCurrentHand()) {
-		DBGA("No hand selected");
-		return;
-	}
-	GFODlg *dlg = new GFODlg(this, world->getCurrentHand(), mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();  
+  if (!world->getCurrentHand()) {
+    DBGA("No hand selected");
+    return;
+  }
+  GFODlg *dlg = new GFODlg(this, world->getCurrentHand(), mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();  
 }
 
 /*! This fires up a window for grasp planning with compliant hands. In the future
@@ -730,16 +725,16 @@ MainWindow::graspForceOptimization()
 */
 void MainWindow::graspCompliantPlanner()
 {	
-	int gb = mUI->graspedBodyBox->currentItem();
-	if ( gb < 0 || world->getNumGB() < gb+1 ) {
-		fprintf(stderr,"No object selected\n");
-		return;
-	}
-	CompliantPlannerDlg *dlg =new CompliantPlannerDlg(world->getCurrentHand(),
-		world->getGB(gb), mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();  
+  int gb = mUI->graspedBodyBox->currentItem();
+  if ( gb < 0 || world->getNumGB() < gb+1 ) {
+    fprintf(stderr,"No object selected\n");
+    return;
+  }
+  CompliantPlannerDlg *dlg =new CompliantPlannerDlg(world->getCurrentHand(),
+                                                    world->getGB(gb), mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();  
 }
 /*!
   Starts an autograsp for the current hand and updated all grasps when it
@@ -763,83 +758,83 @@ void MainWindow::graspAutoOpen()
 
 void MainWindow::eigenGraspActivated()
 { 
-	EigenGraspDlg *dlg = new EigenGraspDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-
-	if (!dlg->setWorld(world) ) {
-		delete dlg;
-		return;
-	} 
-
-	QObject::connect(world->getCurrentHand(), SIGNAL(configurationChanged()),
-					 dlg, SLOT(handConfigurationChanged()) );
-	dlg->show();
+  EigenGraspDlg *dlg = new EigenGraspDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  
+  if (!dlg->setWorld(world) ) {
+    delete dlg;
+    return;
+  } 
+  
+  QObject::connect(world->getCurrentHand(), SIGNAL(configurationChanged()),
+                   dlg, SLOT(handConfigurationChanged()) );
+  dlg->show();
 }
 
 void MainWindow::graspContactExaminer_activated()
 {
-	ContactExaminerDlg *dlg = new ContactExaminerDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  ContactExaminerDlg *dlg = new ContactExaminerDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 }
 
 void MainWindow::eigenGraspPlannerActivated()
 {
-	assert(world->getCurrentHand());	
-	if (world->getCurrentHand()->getEigenGrasps() == NULL) {
-		fprintf(stderr,"Current hand has no EigenGrasp information!\n");
-		return;
-	}
-	int gb = mUI->graspedBodyBox->currentItem();
-	if ( gb < 0 || world->getNumGB() < gb+1 ) {
-		fprintf(stderr,"No object selected\n");
-		return;
-	}
-
-	EigenGraspPlannerDlg *dlg = new EigenGraspPlannerDlg(mWindow);
-	dlg->setMembers(world->getCurrentHand(), world->getGB(gb));
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  assert(world->getCurrentHand());	
+  if (world->getCurrentHand()->getEigenGrasps() == NULL) {
+    fprintf(stderr,"Current hand has no EigenGrasp information!\n");
+    return;
+  }
+  int gb = mUI->graspedBodyBox->currentItem();
+  if ( gb < 0 || world->getNumGB() < gb+1 ) {
+    fprintf(stderr,"No object selected\n");
+    return;
+  }
+  
+  EigenGraspPlannerDlg *dlg = new EigenGraspPlannerDlg(mWindow);
+  dlg->setMembers(world->getCurrentHand(), world->getGB(gb));
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 }
 
 void MainWindow::dbaseGUIAction_activated()
 {
 #ifdef CGDB_ENABLED
-	DBaseDlg *dlg = new DBaseDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  DBaseDlg *dlg = new DBaseDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 #endif
 }
 
 void MainWindow::dbasePlannerAction_activated()
 {
 #ifdef CGDB_ENABLED
-	if (!world->getCurrentHand()) {
-		QTWARNING("No hand selected");
-		return;
-	}
-	int gb = mUI->graspedBodyBox->currentItem();
-	if ( gb < 0 || world->getNumGB() < gb+1 ) {
-		QTWARNING("No object selected");
-		return;
-	}
-	if (!graspItGUI->getIVmgr()->getDBMgr()) {
-		QTWARNING("Connection to database not established. Connect to database first.");
-		return;
-	}
-	if (!world->getGB(gb)->getDBModel()) {
-		QTWARNING("DBase Planner currently works only with models loaded from the database");
-		return;
-	}
-	DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspItGUI->getIVmgr()->getDBMgr(), 
-		world->getGB(gb)->getDBModel(), world->getCurrentHand());
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  if (!world->getCurrentHand()) {
+    QTWARNING("No hand selected");
+    return;
+  }
+  int gb = mUI->graspedBodyBox->currentItem();
+  if ( gb < 0 || world->getNumGB() < gb+1 ) {
+    QTWARNING("No object selected");
+    return;
+  }
+  if (!graspItGUI->getIVmgr()->getDBMgr()) {
+    QTWARNING("Connection to database not established. Connect to database first.");
+    return;
+  }
+  if (!world->getGB(gb)->getDBModel()) {
+    QTWARNING("DBase Planner currently works only with models loaded from the database");
+    return;
+  }
+  DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspItGUI->getIVmgr()->getDBMgr(), 
+                                             world->getGB(gb)->getDBModel(), world->getCurrentHand());
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 #endif
 }
 
@@ -847,20 +842,20 @@ void MainWindow::dbasePlannerAction_activated()
 void MainWindow::miscArizonaProjectDlg_activated()
 {
 #ifdef ARIZONA_PROJECT_ENABLED
-	ArizonaProjectDlg *dlg = new ArizonaProjectDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  ArizonaProjectDlg *dlg = new ArizonaProjectDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 #endif
 }
 
 void MainWindow::misStaubliControlDlg()
 {
 #ifdef STAUBLI_CONTROL_ENABLED
-	StaubliControlDlg *dlg = new StaubliControlDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  StaubliControlDlg *dlg = new StaubliControlDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 #endif
 }
 //--------------------------------------- Sensors menu -------------------------------
@@ -868,35 +863,35 @@ void MainWindow::misStaubliControlDlg()
 void MainWindow::sensorsSensor_InputAction_activated()
 {
 #ifdef HARDWARE_LIB
-	SensorInputDlg *dlg = new SensorInputDlg(world, mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();
+  SensorInputDlg *dlg = new SensorInputDlg(world, mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
 #endif
 }
 
 void MainWindow::graspCapture()
 {
-	GraspCaptureDlg *dlg = new GraspCaptureDlg(world,mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	//QObject::connect(world, SIGNAL(graspsUpdated()),dlg, SLOT(updateGraspQuality())); 
-	dlg->show(); 
+  GraspCaptureDlg *dlg = new GraspCaptureDlg(world,mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  //QObject::connect(world, SIGNAL(graspsUpdated()),dlg, SLOT(updateGraspQuality())); 
+  dlg->show(); 
 }
 
 void MainWindow::sensorsBarrettHandAction()
 {
 	
 #ifdef HARDWARE_LIB
-	BarrettHandDlg *dlg = new BarrettHandDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	if (dlg->setWorld(world)) {
-		dlg->show();
-	} else {
-		delete dlg;
-		return;
-	}
+  BarrettHandDlg *dlg = new BarrettHandDlg(mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  if (dlg->setWorld(world)) {
+    dlg->show();
+  } else {
+    delete dlg;
+    return;
+  }
 #endif
  
 }
@@ -1229,9 +1224,9 @@ void MainWindow::handleHandSelectionChange()
 */
 void MainWindow::selectGraspedBody(int sb)
 {
-	GraspableBody *b = world->getGB(sb);
-	world->getHand(mUI->handSelectionBox->currentItem())->getGrasp()->setObject(b);
-	updateQualityList();
+  GraspableBody *b = world->getGB(sb);
+  world->getHand(mUI->handSelectionBox->currentItem())->getGrasp()->setObject(b);
+  updateQualityList();
 }
 
 /*!
@@ -1261,103 +1256,125 @@ if (state)
 
 void MainWindow::handleTendonSelectionArea()
 {
-	if (!world->queryTendonSelected()) {
-		mUI->tendonActiveForceLabel->setEnabled(false);
-		mUI->TendonForceInput->setEnabled(false);
-		mUI->tendonPassiveForceLabel->setEnabled(false);
-		mUI->tendonPassiveForceEdit->setEnabled(false);
-		mUI->tendonExcursionLabel->setEnabled(false);
-		mUI->tendonExcursionEdit->setEnabled(false);
-		mUI->tendonVisibleLabel->setEnabled(false);
-		mUI->tendonVisibleCheckBox->setEnabled(false);
-		if (mUI->tendonNamesBox->isEnabled() ) {
-			mUI->tendonNamesBox->setCurrentItem ( mUI->tendonNamesBox->count() - 1 ); /* "none selected" */
-		}
-	 } else {
-		mUI->tendonActiveForceLabel->setEnabled(true);
-		mUI->TendonForceInput->setEnabled(true);
-		mUI->tendonPassiveForceLabel->setEnabled(true);
-		mUI->tendonPassiveForceEdit->setEnabled(true);
-		mUI->tendonExcursionLabel->setEnabled(true);
-		mUI->tendonExcursionEdit->setEnabled(true);
-		mUI->tendonVisibleLabel->setEnabled(true);
-		mUI->tendonVisibleCheckBox->setEnabled(true);
-		//there's got to be a better way to do this...
-		for (int i=0; i<mUI->tendonNamesBox->count(); i++) {
-			if ( mUI->tendonNamesBox->text(i)==world->getSelectedTendon()->getName() ) {
-				mUI->tendonNamesBox->setCurrentItem(i);
-				break;
-			}
-		}
-
-		// this also triggers "valueChanged" so it sets the same value back to the tendon.
-		// a bit strange, but should do no harm 
-		// careful with conversion - reconversion from int though
-		float getForce = world->getSelectedTendon()->getActiveForce();
-		//the spin box works in Newtons; convert from graspit units
-		mUI->TendonForceInput->setValue( int(getForce*1.0e-6) ); 
-
-		handleTendonDetailsArea();
-	 }
+  if (!world->queryTendonSelected()) {
+    mUI->tendonActiveForceLabel->setEnabled(false);
+    mUI->TendonForceInput->setEnabled(false);
+    mUI->tendonPassiveForceLabel->setEnabled(false);
+    mUI->tendonPassiveForceEdit->setEnabled(false);
+    mUI->tendonExcursionLabel->setEnabled(false);
+    mUI->tendonExcursionEdit->setEnabled(false);
+    mUI->tendonVisibleLabel->setEnabled(false);
+    mUI->tendonVisibleCheckBox->setEnabled(false);
+    mUI->forcesVisibleLabel->setEnabled(false);
+    mUI->forcesVisibleCheckBox->setEnabled(false);
+    if (mUI->tendonNamesBox->isEnabled() ) {
+      mUI->tendonNamesBox->setCurrentItem ( mUI->tendonNamesBox->count() - 1 ); /* "none selected" */
+    }
+  } else {
+    mUI->tendonActiveForceLabel->setEnabled(true);
+    mUI->TendonForceInput->setEnabled(true);
+    mUI->tendonPassiveForceLabel->setEnabled(true);
+    mUI->tendonPassiveForceEdit->setEnabled(true);
+    mUI->tendonExcursionLabel->setEnabled(true);
+    mUI->tendonExcursionEdit->setEnabled(true);
+    mUI->tendonVisibleLabel->setEnabled(true);
+    mUI->tendonVisibleCheckBox->setEnabled(true);
+    if (mUI->tendonVisibleCheckBox->isChecked()) {
+      mUI->forcesVisibleLabel->setEnabled(true);
+      mUI->forcesVisibleCheckBox->setEnabled(true);
+    } else {
+      mUI->forcesVisibleLabel->setEnabled(false);
+      mUI->forcesVisibleCheckBox->setEnabled(false);
+    }
+    //there's got to be a better way to do this...
+    for (int i=0; i<mUI->tendonNamesBox->count(); i++) {
+      if ( mUI->tendonNamesBox->text(i)==world->getSelectedTendon()->getName() ) {
+        mUI->tendonNamesBox->setCurrentItem(i);
+        break;
+      }
+    }
+    
+    // this also triggers "valueChanged" so it sets the same value back to the tendon.
+    // a bit strange, but should do no harm 
+    // careful with conversion - reconversion from int though
+    float getForce = world->getSelectedTendon()->getActiveForce();
+    //the spin box works in Newtons; convert from graspit units
+    mUI->TendonForceInput->setValue( int(getForce*1.0e-6) ); 
+    
+    handleTendonDetailsArea();
+  }
 }
 
 void MainWindow::handleTendonDetailsArea()
 {
-	/*this synchronizes info on tendon on the GUI bar with actual valuea from selected tendon*/
-	if (!world->queryTendonSelected())
-		return;
-
-	QString exc;
-	exc.setNum( world->getSelectedTendon()->getExcursion() , 'f' , 1);
-	mUI->tendonExcursionEdit->setText( exc );
-
-	QString psf;
-	float getForce = world->getSelectedTendon()->getPassiveForce() * 1.0e-6; //convert to Newtons
-	psf.setNum( getForce , 'f' , 2);
-	mUI->tendonPassiveForceEdit->setText( psf );
-
-	mUI->tendonVisibleCheckBox->setChecked( world->getSelectedTendon()->isVisible() );
+  /*this synchronizes info on tendon on the GUI bar with actual valuea from selected tendon*/
+  if (!world->queryTendonSelected())
+    return;
+  
+  QString exc;
+  exc.setNum( world->getSelectedTendon()->getExcursion() , 'f' , 1);
+  mUI->tendonExcursionEdit->setText( exc );
+  
+  QString psf;
+  float getForce = world->getSelectedTendon()->getPassiveForce() * 1.0e-6; //convert to Newtons
+  psf.setNum( getForce , 'f' , 2);
+  mUI->tendonPassiveForceEdit->setText( psf );
+  
+  mUI->tendonVisibleCheckBox->setChecked( world->getSelectedTendon()->isVisible() );
+  mUI->forcesVisibleCheckBox->setChecked( world->getSelectedTendon()->forcesVisible() );
 }
 
 void MainWindow::TendonForceInput_valueChanged( int f)
 {
-	float newForce = (float)f * 1.0e6; //the spin box works in Newtons; convert to graspit units
-	world->getSelectedTendon()->setActiveForce( newForce );
+  float newForce = (float)f * 1.0e6; //the spin box works in Newtons; convert to graspit units
+  world->getSelectedTendon()->setActiveForce( newForce );
 }
 
 void MainWindow::tendonNamesBoxActivated( int i)
 {
-	if ( i<mUI->tendonNamesBox->count()-1) {
-		//the last element in the list is "nothing selected"
-		world->selectTendon(i);
-	} else {
-	world->deselectTendon();
-	}
-	//both of these automatically emit tendonSelectionChanged
+  if ( i<mUI->tendonNamesBox->count()-1) {
+    //the last element in the list is "nothing selected"
+    world->selectTendon(i);
+  } else {
+    world->deselectTendon();
+  }
+  //both of these automatically emit tendonSelectionChanged
 }
 
 
 void MainWindow::tendonVisibleCheckBox_toggled( bool vis)
 {
-	world->getSelectedTendon()->setVisible( vis );
+  world->getSelectedTendon()->setVisible( vis );
+  if (vis) {
+    mUI->forcesVisibleLabel->setEnabled(true);
+    mUI->forcesVisibleCheckBox->setEnabled(true);
+  } else {
+    mUI->forcesVisibleLabel->setEnabled(false);
+    mUI->forcesVisibleCheckBox->setEnabled(false);
+  }
+}
+
+void MainWindow::forcesVisibleCheckBox_toggled( bool vis)
+{
+  world->getSelectedTendon()->setForcesVisible( vis );
 }
 
 /*this populates tendon names box according to selected hand*/
 void MainWindow::updateTendonNamesBox()
 {
-	int i, nrTendons = world->getCurrentHandNumberTendons();
-	if (nrTendons==0) {
-		mUI->tendonNamesBox->clear();
-		mUI->Tendon_force_label->setEnabled(false);
-		mUI->tendonNamesBox->setEnabled(false);
-		return;
-	}
-
-	mUI->Tendon_force_label->setEnabled(true);
-	mUI->tendonNamesBox->setEnabled(true); 
-	mUI->tendonNamesBox->clear();
-	for (i=0; i<nrTendons; i++) {
-		mUI->tendonNamesBox->insertItem( world->getSelectedHandTendonName(i) );
-	}
-	mUI->tendonNamesBox->insertItem( QString("--none selected--") );
+  int i, nrTendons = world->getCurrentHandNumberTendons();
+  if (nrTendons==0) {
+    mUI->tendonNamesBox->clear();
+    mUI->Tendon_force_label->setEnabled(false);
+    mUI->tendonNamesBox->setEnabled(false);
+    return;
+  }
+  
+  mUI->Tendon_force_label->setEnabled(true);
+  mUI->tendonNamesBox->setEnabled(true); 
+  mUI->tendonNamesBox->clear();
+  for (i=0; i<nrTendons; i++) {
+    mUI->tendonNamesBox->insertItem( world->getSelectedHandTendonName(i) );
+  }
+  mUI->tendonNamesBox->insertItem( QString("--none selected--") );
 }

@@ -360,6 +360,22 @@
           <string/>
         </property>
       </widget>
+      <widget class="QLabel" name="forcesVisibleLabel" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Show forces:</string>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QCheckBox" name="forcesVisibleCheckBox" >
+        <property name="text" >
+          <string/>
+        </property>
+      </widget>
       <addaction name="Tendon_force_label" />
       <addaction name="tendonNamesBox" />
       <addaction name="tendonActiveForceLabel" />
@@ -370,6 +386,8 @@
       <addaction name="tendonExcursionEdit" />
       <addaction name="tendonVisibleLabel" />
       <addaction name="tendonVisibleCheckBox" />
+      <addaction name="forcesVisibleLabel" />
+      <addaction name="forcesVisibleCheckBox" />
     </widget>
     <widget class="QMenuBar" name="menubar" >
       <widget class="QMenu" name="fileMenu" >
