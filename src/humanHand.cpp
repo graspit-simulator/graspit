@@ -33,8 +33,14 @@
 #include <Inventor/nodes/SoCylinder.h>
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoDrawStyle.h>
+
+#include "SoArrow.h"
+
+#include "grasp.h"
+#include "matrix.h"
 #include "tinyxml.h"
 #include "debug.h"
+
 #define WRAPPER_TOLERANCE 0.98
  
 /*! Given two line segments, P1-P2 and P3-P4, returns the line segment 
@@ -192,12 +198,24 @@ Tendon::Tendon(Robot *myOwner)
   mIVRoot->addChild(mIVVisibleToggle);
   mTendonName = "unnamed";
   mVisible = true;
+  mForcesVisible = false;
   mSelected = false;
   mRestLength = 0;
   mCurrentLength = 0;
   mApplyPassiveForce = true;
   mPassiveForce = 0;
   mK = 0.0;
+
+  mIVForceIndRoot = new SoSeparator;
+  mIVRoot->addChild(mIVForceIndRoot);
+  mIVForceIndToggle = new SoDrawStyle; 
+  mIVForceIndToggle->style = SoDrawStyle::INVISIBLE;
+  mIVForceIndRoot->addChild(mIVForceIndToggle);
+  mIVForceIndMaterial = new SoMaterial;
+  mIVForceIndMaterial->diffuseColor.setValue(0.2 , 0.4 , 0.4);
+  mIVForceIndRoot->addChild(mIVForceIndMaterial);
+  mIVForceIndicators = new SoSeparator;
+  mIVForceIndRoot->addChild(mIVForceIndicators);
 }
 
 void Tendon::setActiveForce(float f)
@@ -205,12 +223,14 @@ void Tendon::setActiveForce(float f)
   if (f>=0) mActiveForce = f;
   else mActiveForce = 0;
   updateInsertionForces();
+  updateForceIndicators();
 }
 void Tendon::setPassiveForce(float f)
 {
   if (f>=0) mPassiveForce = f;
   else mPassiveForce = 0;
   updateInsertionForces();
+  updateForceIndicators();
 }
 
 void Tendon::removeWrapperIntersections()
@@ -394,6 +414,62 @@ void Tendon::updateGeometry()
   /*after geometry has been updated, go ahead and update forces*/
   computeSimplePassiveForces();
   updateInsertionForces();
+  updateForceIndicators();
+}
+
+void Tendon::updateForceIndicators()
+{
+  mIVForceIndicators->removeAllChildren();
+  std::vector<transf> insPointTrans;
+  std::vector<double> insPointMagn;
+  getInsertionPointTransforms(insPointTrans);
+  getInsertionPointForceMagnitudes(insPointMagn);
+  if (insPointTrans.size() != insPointMagn.size())
+  {
+    DBGA("Error: number of ins point trans does not match number of ins point magn");
+    return;
+  }
+  for (size_t i=0; i<insPointTrans.size(); i++)
+  {
+    SoTransform* forceTrans = new SoTransform;
+    insPointTrans[i].toSoTransform(forceTrans);
+    SoTransform* neg90x = new SoTransform();
+    neg90x->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-1.5707f);
+    forceTrans->combineLeft(neg90x);
+    SoArrow *arrow = new SoArrow;
+    arrow->height = 10.0 * 1.0e-6 * insPointMagn[i] * getTotalForce();    
+    arrow->cylRadius = 0.25;
+    arrow->coneRadius = 0.5;
+    if (arrow->height.getValue() < arrow->coneHeight.getValue()) {
+      arrow->coneHeight = arrow->height.getValue() / 2.0;
+    }     
+    SoSeparator* forceIndSep = new SoSeparator;
+    forceIndSep->addChild(forceTrans);
+    forceIndSep->addChild(arrow);
+    mIVForceIndicators->addChild(forceIndSep);
+    DBGP("Active force: " << mActiveForce << "; Passive force: " << mPassiveForce);
+    DBGP("Added indicator of length" << 10.0 * 1.0e-6 * insPointMagn[i] * getTotalForce());
+  }
+}
+
+transf Tendon::getInsertionPointWorldTransform(std::list<TendonInsertionPoint*>::iterator insPt)
+{
+  SbVec3f pCur = (*insPt)->getWorldPosition();
+  std::list<TendonInsertionPoint*>::iterator prevInsPt = insPt; prevInsPt--;
+  std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt; nextInsPt++;
+  vec3 dPrev(0,0,0), dNext(0,0,0);
+  
+  if (insPt != mInsPointList.begin()) dPrev = normalise(vec3((*prevInsPt)->getWorldPosition()) - vec3(pCur));
+  if (nextInsPt != mInsPointList.end()) dNext = normalise(vec3((*nextInsPt)->getWorldPosition()) - vec3(pCur));
+  
+  SoTransform* tran = new SoTransform;
+  tran->pointAt(pCur,(vec3(pCur)+dPrev + dNext).toSbVec3f());
+  /*
+    SoTransform* x180 = new SoTransform();
+    x180->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-3.14159f);
+    tran->combineLeft(x180);
+  */
+  return transf(tran);
 }
 
 void Tendon::getInsertionPointTransforms(std::vector<transf> &insPointTrans)
@@ -405,26 +481,12 @@ void Tendon::getInsertionPointTransforms(std::vector<transf> &insPointTrans)
   std::list<TendonInsertionPoint*>::iterator insPt;  
   for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
-    SbVec3f pCur = (*insPt)->getWorldPosition();
-    std::list<TendonInsertionPoint*>::iterator prevInsPt = insPt; prevInsPt--;
-    std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt; nextInsPt++;
-    vec3 dPrev(0,0,0), dNext(0,0,0);
-
-    if (insPt != mInsPointList.begin()) dPrev = vec3(pCur) - vec3((*prevInsPt)->getWorldPosition());
-    if (nextInsPt == mInsPointList.end()) dNext = vec3(pCur) - vec3((*nextInsPt)->getWorldPosition());
-
-    SoTransform* tran = new SoTransform;
-    tran->pointAt(pCur,(dPrev + dNext).toSbVec3f());
-    /*
-    SoTransform* x180 = new SoTransform();
-    x180->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-3.14159f);
-    tran->combineLeft(x180);
-    */
-    insPointTrans.push_back(transf(tran));
+    insPointTrans.push_back( getInsertionPointWorldTransform(insPt) );
   }
 }
 
-void Tendon::getInsertionPointsAsContacts(std::list<Contact*> contacts)
+/*! The result of this function can be fed directly into the Grasp::Jacobian computation */
+void Tendon::getInsertionPointLinkTransforms(std::list< std::pair<transf, Link*> > &insPointLinkTrans)
 {
   if (mInsPointList.size() <= 1) {
     DBGA("Insertion point transforms ill-defined, not enough insertion points");
@@ -433,26 +495,9 @@ void Tendon::getInsertionPointsAsContacts(std::list<Contact*> contacts)
   std::list<TendonInsertionPoint*>::iterator insPt;  
   for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
-    SbVec3f pCur = (*insPt)->getWorldPosition();
-    std::list<TendonInsertionPoint*>::iterator prevInsPt = insPt; prevInsPt--;
-    std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt; nextInsPt++;
-    vec3 dPrev(0,0,0), dNext(0,0,0);
-
-    if (insPt != mInsPointList.begin()) dPrev = vec3(pCur) - vec3((*prevInsPt)->getWorldPosition());
-    if (nextInsPt == mInsPointList.end()) dNext = vec3(pCur) - vec3((*nextInsPt)->getWorldPosition());
-
-    SoTransform* tran = new SoTransform;
-    tran->pointAt(pCur,(dPrev + dNext).toSbVec3f());
-    /*
-    SoTransform* x180 = new SoTransform();
-    x180->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-3.14159f);
-    tran->combineLeft(x180);
-    */
-    // we got the transform of the contact in world coordinates
-    transf worldContactTran(tran);
-    //convert it to link coordinates
-    transf linkContactTran = worldContactTran * (*insPt)->getAttachedLink()->getTran().inverse();
-    //create the contact    
+    //make the transform relative to the link and insert it in list
+    transf linkTrans =  getInsertionPointWorldTransform(insPt) * (*insPt)->getAttachedLink()->getTran().inverse();   
+    insPointLinkTrans.push_back( std::pair<transf, Link*>(linkTrans, (*insPt)->getAttachedLink()) );
   }
 }
 
@@ -471,7 +516,7 @@ void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes)
     vec3 dPrev(0,0,0), dNext(0,0,0);
 
     if (insPt != mInsPointList.begin()) dPrev = normalise( vec3(pCur) - vec3((*prevInsPt)->getWorldPosition()) );
-    if (nextInsPt == mInsPointList.end()) dNext = normalise( vec3(pCur) - vec3((*nextInsPt)->getWorldPosition()) );
+    if (nextInsPt != mInsPointList.end()) dNext = normalise( vec3(pCur) - vec3((*nextInsPt)->getWorldPosition()) );
     magnitudes.push_back( vec3(dPrev + dNext).len() );
   }
 }
@@ -567,47 +612,45 @@ void Tendon::setRestPosition()
     printf("WARNING: setRestPosition called on tendon, but mCurrentLength is zero!\n");
   mRestLength = mCurrentLength;
   mPassiveForce = 0;
+  updateInsertionForces();
+  updateForceIndicators();
+
 }
 
 void Tendon::select()
 {
-  SoMaterial *mat;
-  std::list<TendonInsertionPoint*>::iterator insPt, prevInsPt, nextInsPt;
-  mSelected = true;
+  std::list<TendonInsertionPoint*>::iterator insPt;
   for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
-    mat = (*insPt)->getIVInsertionMaterial();
-    if ( (*insPt)->isPermanent() )
-      mat->diffuseColor.setValue(1.0f,0.7f,0.7f);
-    else
-      mat->diffuseColor.setValue(1.0f,0.5f,0.5f);
-    
+    SoMaterial* mat = (*insPt)->getIVInsertionMaterial();
+    if ( (*insPt)->isPermanent() ) mat->diffuseColor.setValue(1.0f,0.7f,0.7f);
+    else mat->diffuseColor.setValue(1.0f,0.5f,0.5f);    
     if (insPt!=mInsPointList.begin())
     {
       mat = (*insPt)->getIVConnectorMaterial();
       mat->diffuseColor.setValue(1.0f,0.5f,0.5f);
     }
   }
+  mIVForceIndMaterial->diffuseColor.setValue(0.5 , 0.8 , 0.8);
+  mSelected = true;
 }
 
 void Tendon::deselect()
 {
-  SoMaterial *mat;
-  std::list<TendonInsertionPoint*>::iterator insPt, prevInsPt, nextInsPt;
-  mSelected = false;
+  std::list<TendonInsertionPoint*>::iterator insPt;
   for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
-    mat = (*insPt)->getIVInsertionMaterial();
-    if ((*insPt)->isPermanent())
-      mat->diffuseColor.setValue(0.7f,0.2f,0.2f);
-    else
-      mat->diffuseColor.setValue(0.5f,0.5f,0.5f);
+    SoMaterial* mat = (*insPt)->getIVInsertionMaterial();
+    if ((*insPt)->isPermanent()) mat->diffuseColor.setValue(0.7f,0.2f,0.2f);
+    else mat->diffuseColor.setValue(0.5f,0.5f,0.5f);
     if (insPt!=mInsPointList.begin())
     {
       mat = (*insPt)->getIVConnectorMaterial();
       mat->diffuseColor.setValue(0.5f,0.5f,0.5f);
     }
   }
+  mIVForceIndMaterial->diffuseColor.setValue(0.2 , 0.4 , 0.4);
+  mSelected = false;
 }
 
 void Tendon::setVisible(bool v)
@@ -616,8 +659,21 @@ void Tendon::setVisible(bool v)
   mVisible = v;
   if (v) {
     mIVVisibleToggle->style  = SoDrawStyle::FILLED;
+    if (mForcesVisible) mIVForceIndToggle->style = SoDrawStyle::FILLED;
   } else {
     mIVVisibleToggle->style = SoDrawStyle::INVISIBLE;
+    mIVForceIndToggle->style = SoDrawStyle::INVISIBLE;
+  }
+}
+
+void Tendon::setForcesVisible(bool v)
+{
+  if (v && !mVisible) return;
+  mForcesVisible = v;
+  if (v) {
+    mIVForceIndToggle->style = SoDrawStyle::FILLED;
+  } else {
+    mIVForceIndToggle->style = SoDrawStyle::INVISIBLE;
   }
 }
 
@@ -893,10 +949,99 @@ void HumanHand::DOFController(double)
   applyTendonForces();
 }
 
+/*! Creates the individual force matrices for the "fake contacts" at tendon location
+  insertion points, which are only allowed to apply force in the normal direction 
+  (along local z). This should be integrated with the matrices that do the same thing 
+  for real contacts.
+*/
+Matrix insPtForceBlockMatrix(unsigned int numInsPoints)
+{
+  if (!numInsPoints) return Matrix(0,0);
+  Matrix D(Matrix::ZEROES<Matrix>(6*numInsPoints, numInsPoints));
+  for(unsigned int i=0; i<numInsPoints; i++)
+  {
+    D.elem(6*i + 2, i) = 1.0;
+  }
+  return D;
+}
+
+
 int HumanHand::tendonEquilibrium()
 {
-  for (size_t i=0; i<mTendonVec.size(); i++)
+  std::list<Joint*> joints;
+  for(int c=0; c<getNumChains(); c++) 
   {
+    std::list<Joint*> chainJoints = getChain(c)->getJoints();
+    joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
   }
+
+  if (mTendonVec.size() != 2) 
+  {
+    DBGA("Hand not suited for hard-coded analysis");
+    return -1;
+  }  
+  std::list<int> activeTendons;
+  activeTendons.push_back(0);
+  std::list<int> passiveTendons;
+  passiveTendons.push_back(1);
+
+  if (activeTendons.empty() || passiveTendons.empty()) 
+  {
+    DBGA("Need both active and passive tendons for analysis");
+    return -1;
+  }
+  
+  Matrix LeftHand(joints.size(), activeTendons.size());
+  std::list<int>::iterator it;
+  int i;
+  for (it=activeTendons.begin(), i=0; it!=activeTendons.end(); it++, i++)
+  {    
+    std::list< std::pair<transf, Link*> > insPointLinkTrans;
+    mTendonVec[*it]->getInsertionPointLinkTransforms(insPointLinkTrans);
+    Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    mTendonVec[*it]->getInsertionPointForceMagnitudes(magnitudes);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+
+    assert( JTDM.rows() == LeftHand.rows());
+    assert( JTDM.cols() == 1);
+    LeftHand.copySubMatrix(0, i, JTDM);
+  }
+
+  Matrix RightHand(joints.size(), 1);
+  for (it=passiveTendons.begin(); it!=passiveTendons.end(); it++)
+  {    
+    std::list< std::pair<transf, Link*> > insPointLinkTrans;
+    mTendonVec[*it]->getInsertionPointLinkTransforms(insPointLinkTrans);
+    Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    mTendonVec[*it]->getInsertionPointForceMagnitudes(magnitudes);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+    JTDM.multiply( mTendonVec[i]->getPassiveForce() );
+    matrixAdd(RightHand, JTDM, RightHand);
+  }
+  RightHand.multiply(-1.0);
+
+  DBGA("Left Hand:");
+  LeftHand.print();
+  DBGA("Right Hand:");
+  RightHand.print();
+
   return 0;
 }

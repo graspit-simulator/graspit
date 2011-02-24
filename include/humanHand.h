@@ -105,7 +105,7 @@ public:
   
   //! Use this function to get the link the insertion point is attached to.
   /*! Handles the case where tendon is attached to base correctly*/
-  Link *getAttachedLink();
+  Link* getAttachedLink();
   
   SoSeparator* getIVInsertion(){return mIVInsertion;}
   SoSphere* getIVInsertionGeom(){return mIVInsertionGeom;}
@@ -156,7 +156,19 @@ private:
   
   //! Used to toggle wether the tendon is visible or not; is inserted as first child of the root.
   SoDrawStyle* mIVVisibleToggle;
+
+  //! Root for holding all related to force indicators rendering
+  SoSeparator* mIVForceIndRoot;
+
+  //! Used to toggle wether force indicators are visible or not
+  SoDrawStyle* mIVForceIndToggle;
+
+  //! Material for force indicators
+  SoMaterial *mIVForceIndMaterial;
   
+  //! Root for the arrows themselves showing forces at insertion points
+  SoSeparator *mIVForceIndicators;
+
   //! Force applied as a result of voluntary muscle contraction
   float mActiveForce;
   
@@ -177,6 +189,8 @@ private:
 
   bool mVisible;
 
+  bool mForcesVisible;
+
   bool mSelected;
   
   //! The length of the tendon at the resting position
@@ -186,6 +200,8 @@ private:
   float mCurrentLength;
 
   int mNrInsPoints;
+
+  void updateForceIndicators();
 
 public:
   
@@ -246,6 +262,10 @@ public:
   void setVisible(bool v);
 
   bool isVisible(){return mVisible;}
+
+  void setForcesVisible(bool v);
+
+  bool forcesVisible() {return mForcesVisible;}
   
   //! Applies previously computed forces at links that have insertion points. 
   /*! Forces MUST have been updated by updateGeometry() and updateInsertionForces()*/
@@ -263,6 +283,8 @@ public:
 
   bool loadFromXml(const TiXmlElement *root);
 
+  transf getInsertionPointWorldTransform(std::list<TendonInsertionPoint*>::iterator insPt);
+
   //! Returns the locations of all insertion points in world coordinates
   /*! The transform is such that the resultant tendon force, if any, points along the z axis
     of the local insertion point coordinate frame.
@@ -271,9 +293,10 @@ public:
   
   //! Returns the magnitudes of the forces at each insertion point, assuming a total tendon force of 1.0
   void getInsertionPointForceMagnitudes(std::vector<double> &magnitudes);
+
+  //! Returns pairs of insertion points and their links, with ins. pt. transforms relative to their links
+  void getInsertionPointLinkTransforms(std::list< std::pair<transf, Link*> > &insPointLinkTrans);
   
-  //! Returns the insertion points as fake contacts, able to apply only force in the right direction
-  void getInsertionPointsAsContacts(std::list<Contact*> contacts);
 };
 
 //! A hand with tendon information
