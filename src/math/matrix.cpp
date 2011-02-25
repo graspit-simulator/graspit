@@ -192,6 +192,13 @@ SparseMatrix::getData(std::vector<double> *data) const
 	}
 }
 
+double* 
+SparseMatrix::getDataPointer()
+{
+  assert(0);
+  return NULL;
+}
+
 Matrix
 Matrix::EYE(int m, int n)
 {
@@ -325,6 +332,11 @@ Matrix::getData(std::vector<double> *data) const
 {
 	data->resize(mRows * mCols, 0.0);
 	memcpy( &((*data)[0]), mData, mRows*mCols*sizeof(double) );
+}
+
+double* Matrix::getDataPointer()
+{
+  return mData;
 }
 
 int
@@ -706,16 +718,21 @@ triangularSolve(Matrix &A, Matrix &B)
 	assert(A.rows() == B.rows());
 	int info;
 	int *ipiv = new int[A.rows()];
+        //make a copy of A as we don't want to change it
 	std::auto_ptr<double> Adata = A.getDataCopy();
-	std::auto_ptr<double> Bdata = B.getDataCopy();
 	dgesv(A.rows(), B.cols(), Adata.get(), A.rows(),ipiv, 
-		  Bdata.get(), B.rows(), &info);
+		  B.getDataPointer(), B.rows(), &info);
 	delete [] ipiv;
 	return info;
 }
 
+/*! Note that solving with the MP pseudo-inverse is brittle, behaves poorly
+  for ill-conditioned matrices. It will return the least squares solution 
+  (minimum error norm) for overdetermined systems, but NOT guaranteed to 
+  return the minimum norm solution for underdetermined systems.
+*/
 int 
-underDeterminedSolveMPInv(Matrix &A, Matrix &B, Matrix &X)
+linearSolveMPInv(Matrix &A, Matrix &B, Matrix &X)
 {
 	assert( X.rows() == A.cols() );
 	assert( X.cols() == B.cols() );
@@ -742,165 +759,160 @@ underDeterminedSolveMPInv(Matrix &A, Matrix &B, Matrix &X)
 	return info;
 }
 
+/*! SVD decomposition is more stable than the MP pseudo-inverse. I thikn it will 
+  return the least squares solution (minimum error norm) for full-rank overdetermined 
+  systems, and the minimum norm solution for full-rank underdetermined systems.
+  NOT sure what it does for non-full rank A.
+ */
 int 
-underDeterminedSolveSVD(Matrix &A, Matrix &B, Matrix &X)
+linearSolveSVD(Matrix &A, Matrix &B, Matrix &X)
 {
-	assert( X.rows() == A.cols() );
-	assert( X.cols() == B.cols() );
-
-	//for now. Is this general enough to handle all cases?
-	assert(A.rows() < A.cols());
-
-	int info;
-	/*
-	//factorization - LAPACK doesn't seem to want to use for solving as well
-	int *ipiv = new int[std::min(A.rows(), A.cols())];
-	dgetrf(A.rows(), A.cols(), &data[0], A.rows(), ipiv, &info);
-	delete [] ipiv;
-	*/
-
-	//use SVD - as in Golub & Van Loan, Matrix Computations, 1st ed., Sec. 6.7
-	int minSize = std::min(A.rows(), A.cols());
-	int maxSize = std::max(A.rows(), A.cols());
-	Matrix S(minSize, 1);
-	Matrix U(A.rows(), A.cols());
-	Matrix VT(A.cols(), A.cols());
-	int lwork = 5 * maxSize;
-	double *work = new double[lwork];
-	dgesvd("A", "A", A.rows(), A.cols(), A.getDataCopy().get(), A.rows(), S.getDataCopy().get(), 
-		   U.getDataCopy().get(), A.rows(), VT.getDataCopy().get(), A.cols(), 
-		   work, lwork, &info);
-	delete [] work;
-
-	if (info) {
-		DBGA("SVD decomposition failed with code " << info);
-		return info;
-	}
-
-	//accumulate solutions
-	int result = 0;
-	for (int c=0; c<B.cols(); c++) {
-		Matrix x(Matrix::ZEROES<Matrix>(A.cols(),1));
-		for (int r=0; r<minSize; r++) {
-			Matrix utb(1,1);
-			matrixMultiply( U.getColumn(r).transposed(), B.getColumn(c), utb );
-			if (S.elem(r,0) < Matrix::EPS) {
-				DBGA("Rank deficient matrix in underDeterminedSolve:");
-				if (fabs(utb.elem(0,0)) > Matrix::EPS) {
-					DBGA("... system has no solution " << utb.elem(0,0));
-					if (!result) result = r;
-					continue;
-				} else {
-					//I *think* in this case we are no longer returning min norm solution!!
-					DBGA("...but system still has solution.");
-				}
-			}
-			utb.multiply( 1.0 / S.elem(r,0) );
-			Matrix utbv(1, A.cols());
-			//VT is transposed, so it's r-th row is the r-th singular vector
-			matrixMultiply( utb, VT.getRow(r), utbv);
-			matrixAdd(x, utbv.transposed(), x);
-		}
-		X.copySubMatrix(0, c, x);
-	}
-	return result;
+  assert( X.rows() == A.cols() );
+  assert( X.cols() == B.cols() );
+    
+  //use SVD - as in Golub & Van Loan, Matrix Computations, 1st ed., Sec. 6.7
+  int minSize = std::min(A.rows(), A.cols());
+  int maxSize = std::max(A.rows(), A.cols());
+  Matrix S(minSize, 1);
+  Matrix U(A.rows(), A.rows());
+  Matrix VT(A.cols(), A.cols());
+  int lwork = 5 * maxSize;
+  double *work = new double[lwork];
+  int info;
+  dgesvd("A", "A", A.rows(), A.cols(), A.getDataCopy().get(), A.rows(), S.getDataPointer(), 
+         U.getDataPointer(), A.rows(), VT.getDataPointer(), A.cols(), 
+         work, lwork, &info);
+  delete [] work;
+  
+  if (info) {
+    DBGA("SVD decomposition failed with code " << info);
+    return info;
+  }
+  
+  //accumulate solutions
+  int result = 0;
+  for (int c=0; c<B.cols(); c++) {
+    Matrix x(Matrix::ZEROES<Matrix>(A.cols(),1));
+    for (int r=0; r<minSize; r++) {
+      Matrix utb(1,1);
+      matrixMultiply( U.getColumn(r).transposed(), B.getColumn(c), utb );
+      if (S.elem(r,0) < Matrix::EPS) {
+        DBGA("Rank deficient matrix in underDeterminedSolve:");
+        if (fabs(utb.elem(0,0)) > Matrix::EPS) {
+          DBGA("... system has no solution " << utb.elem(0,0));
+          if (!result) result = r;
+          continue;
+        } else {
+          //I *think* in this case we are no longer returning min norm solution!!
+          DBGA("...but system still has solution.");
+        }
+      }
+      utb.multiply( 1.0 / S.elem(r,0) );
+      Matrix utbv(1, A.cols());
+      //VT is transposed, so it's r-th row is the r-th singular vector
+      matrixMultiply( utb, VT.getRow(r), utbv);
+      matrixAdd(x, utbv.transposed(), x);
+    }
+    X.copySubMatrix(0, c, x);
+  }
+  return result;
 }
 
 int underDeterminedSolveQR(Matrix &A, Matrix &B, Matrix &X)
 {
-	//use QR factorization - as in Golub & Van Loan, Matrix Computations 1st ed., Sec. 6.7
-
-	assert( X.rows() == A.cols() );
-	assert( X.cols() == B.cols() );
-	//for now we can not handle overdetermined systems (due at least to dorgqr)
-//	assert( A.rows() <= A.cols() );
-	if (A.rows() > A.cols()) {
-		DBGA("Undet QR: system is overdetermined");
-		return -1;
-	}
-
-	//start by transposing the input
-	Matrix ATran(A.transposed());
-
-	int info;
-	std::vector<double> data;
-	ATran.getData(&data);
-	int minSize = ATran.cols();
-	std::vector<int> jpvt(ATran.cols(), 0);
-	std::vector<double> tau(minSize, 0.0);
-	int lwork = (ATran.cols() + 1) * 15;
-	std::vector<double> work(lwork, 0.0);
-
-	dgeqp3(ATran.rows(), ATran.cols(), &(data[0]), ATran.rows(), 
-		   &jpvt[0], &tau[0], &work[0], lwork, &info);
-	if (info) {
-		DBGA("QR Factorization failed, info " << info);
-		return -1;
-	}
-
-	//build permutation matrix
-	Matrix P(Matrix::PERMUTATION(ATran.cols(), &jpvt[0]).transposed());
-
-	//build upper triangular R matrix
-	//as we are enforcing ATran.cols() <= ATran.rows(), this is actually square
-	Matrix R(Matrix::ZEROES<Matrix>(minSize, ATran.cols()));
-	for (int col=0; col<ATran.cols(); col++) {
-		for (int row=0; row<std::min(minSize, col+1); row++) {
-			//column major
-			R.elem(row,col) = data[col*ATran.rows() + row];
-		}
-	}
-	//anything below R.elem(rank,rank) should be zero
-	int rank = ATran.rank();
-	if (rank < minSize) {
-		double fn = R.getSubMatrix(rank, rank, minSize - rank, ATran.cols() - rank).fnorm();
-		if (fn > Matrix::EPS) {
-			DBGA("Column pivoting fails to produce full rank R11");
-			return -1;
-		}
-	}
-	DBGP("Rank: " << rank);
-	//prepare and solve triangular system
-	Matrix R11T(R.getSubMatrix(0,0,rank,rank).transposed());
-	Matrix PB(B);
-	matrixMultiply(P.transposed(), B, PB);
-	Matrix Z( PB.getSubMatrix(0, 0, rank, PB.cols()) );
-	std::vector<double> R11Tdata; R11T.getData(&R11Tdata);
-	std::vector<double> Zdata; Z.getData(&Zdata);
-	dtrtrs("L", "N", "N", rank, Z.cols(), &(R11Tdata[0]), rank, 
-		   &(Zdata[0]), Z.rows(), &info);
-	if (info) {
-		DBGA("Triangular solve failed in QR solve, info " << info);
-		return -1;
-	}
-	//if the matrix is rank-deficient we need to check if the solution works
-	bool success = true;
-	if (rank < minSize) {
-		Matrix R22T( R.getSubMatrix(0, rank, rank, R.cols()-rank).transposed() );
-		Matrix PB22( PB.getSubMatrix(rank, 0, PB.rows() - rank, PB.cols()) );
-		Matrix PBtest( PB.rows() - rank, PB.cols() );
-		matrixMultiply( R22T, Z, PBtest);
-		if (!matrixEqual(PBtest, PB22)) {
-			DBGA("System has no solution in QR solve");
-			success = false;
-		}
-	}
-
-	//build Q matrix
-	dorgqr(ATran.rows(), ATran.cols(), rank, &data[0], ATran.rows(), 
-		   &tau[0], &work[0], lwork, &info);
-	if (info) {
-		DBGA("Building matrix Q failed, info " << info);
-		return -1;
-	}
-	Matrix Q(&data[0], ATran.rows(), ATran.cols(), true);
-
-	//build complete solution
-	Matrix Q1( Q.getSubMatrix(0,0,ATran.rows(), rank) );
-	matrixMultiply(Q1, Z, X);
-	DBGP("X: " << X);
-	if (!success) return 1;
-	return 0;
+  //use QR factorization - as in Golub & Van Loan, Matrix Computations 1st ed., Sec. 6.7
+  
+  assert( X.rows() == A.cols() );
+  assert( X.cols() == B.cols() );
+  //for now we can not handle overdetermined systems (due at least to dorgqr)
+  //	assert( A.rows() <= A.cols() );
+  if (A.rows() > A.cols()) {
+    DBGA("Undet QR: system is overdetermined");
+    return -1;
+  }
+  
+  //start by transposing the input
+  Matrix ATran(A.transposed());
+  
+  int info;
+  std::vector<double> data;
+  ATran.getData(&data);
+  int minSize = ATran.cols();
+  std::vector<int> jpvt(ATran.cols(), 0);
+  std::vector<double> tau(minSize, 0.0);
+  int lwork = (ATran.cols() + 1) * 15;
+  std::vector<double> work(lwork, 0.0);
+  
+  dgeqp3(ATran.rows(), ATran.cols(), &(data[0]), ATran.rows(), 
+         &jpvt[0], &tau[0], &work[0], lwork, &info);
+  if (info) {
+    DBGA("QR Factorization failed, info " << info);
+    return -1;
+  }
+  
+  //build permutation matrix
+  Matrix P(Matrix::PERMUTATION(ATran.cols(), &jpvt[0]).transposed());
+  
+  //build upper triangular R matrix
+  //as we are enforcing ATran.cols() <= ATran.rows(), this is actually square
+  Matrix R(Matrix::ZEROES<Matrix>(minSize, ATran.cols()));
+  for (int col=0; col<ATran.cols(); col++) {
+    for (int row=0; row<std::min(minSize, col+1); row++) {
+      //column major
+      R.elem(row,col) = data[col*ATran.rows() + row];
+    }
+  }
+  //anything below R.elem(rank,rank) should be zero
+  int rank = ATran.rank();
+  if (rank < minSize) {
+    double fn = R.getSubMatrix(rank, rank, minSize - rank, ATran.cols() - rank).fnorm();
+    if (fn > Matrix::EPS) {
+      DBGA("Column pivoting fails to produce full rank R11");
+      return -1;
+    }
+  }
+  DBGP("Rank: " << rank);
+  //prepare and solve triangular system
+  Matrix R11T(R.getSubMatrix(0,0,rank,rank).transposed());
+  Matrix PB(B);
+  matrixMultiply(P.transposed(), B, PB);
+  Matrix Z( PB.getSubMatrix(0, 0, rank, PB.cols()) );
+  std::vector<double> R11Tdata; R11T.getData(&R11Tdata);
+  std::vector<double> Zdata; Z.getData(&Zdata);
+  dtrtrs("L", "N", "N", rank, Z.cols(), &(R11Tdata[0]), rank, 
+         &(Zdata[0]), Z.rows(), &info);
+  if (info) {
+    DBGA("Triangular solve failed in QR solve, info " << info);
+    return -1;
+  }
+  //if the matrix is rank-deficient we need to check if the solution works
+  bool success = true;
+  if (rank < minSize) {
+    Matrix R22T( R.getSubMatrix(0, rank, rank, R.cols()-rank).transposed() );
+    Matrix PB22( PB.getSubMatrix(rank, 0, PB.rows() - rank, PB.cols()) );
+    Matrix PBtest( PB.rows() - rank, PB.cols() );
+    matrixMultiply( R22T, Z, PBtest);
+    if (!matrixEqual(PBtest, PB22)) {
+      DBGA("System has no solution in QR solve");
+      success = false;
+    }
+  }
+  
+  //build Q matrix
+  dorgqr(ATran.rows(), ATran.cols(), rank, &data[0], ATran.rows(), 
+         &tau[0], &work[0], lwork, &info);
+  if (info) {
+    DBGA("Building matrix Q failed, info " << info);
+    return -1;
+  }
+  Matrix Q(&data[0], ATran.rows(), ATran.cols(), true);
+  
+  //build complete solution
+  Matrix Q1( Q.getSubMatrix(0,0,ATran.rows(), rank) );
+  matrixMultiply(Q1, Z, X);
+  DBGP("X: " << X);
+  if (!success) return 1;
+  return 0;
 }
 
 /*! Inverse is computed with factorization, then triangular solving, both

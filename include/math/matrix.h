@@ -112,7 +112,9 @@ public:
 	virtual std::auto_ptr<double> getDataCopy() const;
 	//! Returns a copy of the data as a column major vector of doubles
 	virtual void getData(std::vector<double> *data) const;
-
+        //! Returns the actual data pointer for this matrix
+        virtual double* getDataPointer();
+  
 	//! The number of rows of this matrix
 	int rows() const {return mRows;}
 	//! The number of columns of this matrix
@@ -296,6 +298,8 @@ public:
 	virtual const double& elem(int m, int n) const;
 	virtual std::auto_ptr<double> getDataCopy() const;
 	virtual void getData(std::vector<double> *data) const;
+        //! There is no data pointer for a sparse matrix, just dies
+        virtual double* getDataPointer();
 	virtual void transpose();
 
 	//! Copies a block of the matrix \a m (dense or sparse) into a block of this matrix
@@ -326,12 +330,12 @@ void matrixAdd(const Matrix &L, const Matrix &R, Matrix &M);
 bool matrixEqual(const Matrix &R, const Matrix &L);
 //! Solves the system A*X=B with square A. X is overwritten on B. 
 int triangularSolve(Matrix &A, Matrix &B);
-//! Computes minimum norm solution of underdetermined system A*X=B with full-rank A.
-int underDeterminedSolveSVD(Matrix &A, Matrix &B, Matrix &X);
+//! Computes a solution of a non-square system A*X = B using Moore-Penrose pseudo-inverse
+int linearSolveMPInv(Matrix &A, Matrix &B, Matrix &X);
+//! Computes a solution of a non-square system A*X = B using SVD decomposition
+int linearSolveSVD(Matrix &A, Matrix &B, Matrix &X);
 //! Computes minimum norm solution of underdetermined system A*X=B even for rank-deficient A
 int underDeterminedSolveQR(Matrix &A, Matrix &B, Matrix &X);
-//! Computes a solution of an underdetermined system A*X = B using Moore-Penrose pseudo-inverse
-int underDeterminedSolveMPInv(Matrix &A, Matrix &B, Matrix &X);
 //! Computes the inverse of a square matrix
 int matrixInverse(const Matrix &A, Matrix &AInv);
 //! Solves a Quadratic Program

@@ -40,6 +40,7 @@
 #include "matrix.h"
 #include "tinyxml.h"
 #include "debug.h"
+#include "world.h"
 
 #define WRAPPER_TOLERANCE 0.98
  
@@ -433,9 +434,9 @@ void Tendon::updateForceIndicators()
   {
     SoTransform* forceTrans = new SoTransform;
     insPointTrans[i].toSoTransform(forceTrans);
-    SoTransform* neg90x = new SoTransform();
-    neg90x->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-1.5707f);
-    forceTrans->combineLeft(neg90x);
+    SoTransform* pos90x = new SoTransform();
+    pos90x->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),1.5707f);
+    forceTrans->combineLeft(pos90x);
     SoArrow *arrow = new SoArrow;
     arrow->height = 10.0 * 1.0e-6 * insPointMagn[i] * getTotalForce();    
     arrow->cylRadius = 0.25;
@@ -464,11 +465,11 @@ transf Tendon::getInsertionPointWorldTransform(std::list<TendonInsertionPoint*>:
   
   SoTransform* tran = new SoTransform;
   tran->pointAt(pCur,(vec3(pCur)+dPrev + dNext).toSbVec3f());
-  /*
-    SoTransform* x180 = new SoTransform();
-    x180->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-3.14159f);
-    tran->combineLeft(x180);
-  */
+  
+  SoTransform* x180 = new SoTransform();
+  x180->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-3.14159f);
+  tran->combineLeft(x180);
+  
   return transf(tran);
 }
 
@@ -980,10 +981,10 @@ int HumanHand::tendonEquilibrium()
     DBGA("Hand not suited for hard-coded analysis");
     return -1;
   }  
-  std::list<int> activeTendons;
-  activeTendons.push_back(0);
-  std::list<int> passiveTendons;
-  passiveTendons.push_back(1);
+  std::set<size_t> activeTendons;
+  activeTendons.insert(0);
+  std::set<size_t> passiveTendons;
+  passiveTendons.insert(1);
 
   if (activeTendons.empty() || passiveTendons.empty()) 
   {
@@ -992,35 +993,11 @@ int HumanHand::tendonEquilibrium()
   }
   
   Matrix LeftHand(joints.size(), activeTendons.size());
-  std::list<int>::iterator it;
-  int i;
-  for (it=activeTendons.begin(), i=0; it!=activeTendons.end(); it++, i++)
-  {    
-    std::list< std::pair<transf, Link*> > insPointLinkTrans;
-    mTendonVec[*it]->getInsertionPointLinkTransforms(insPointLinkTrans);
-    Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
-    Matrix JTran( J.transposed() );
-    Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
-    Matrix JTD( JTran.rows(), D.cols() );
-    matrixMultiply( JTran, D, JTD );
-
-    std::vector<double> magnitudes;
-    mTendonVec[*it]->getInsertionPointForceMagnitudes(magnitudes);
-    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
-    assert(M.rows() == JTD.cols());
-    Matrix JTDM( JTD.rows(), M.cols());
-    matrixMultiply( JTD, M, JTDM);
-
-    assert( JTDM.rows() == LeftHand.rows());
-    assert( JTDM.cols() == 1);
-    LeftHand.copySubMatrix(0, i, JTDM);
-  }
-
   Matrix RightHand(joints.size(), 1);
-  for (it=passiveTendons.begin(); it!=passiveTendons.end(); it++)
+  for (size_t i=0; i<mTendonVec.size(); i++)
   {    
     std::list< std::pair<transf, Link*> > insPointLinkTrans;
-    mTendonVec[*it]->getInsertionPointLinkTransforms(insPointLinkTrans);
+    mTendonVec[i]->getInsertionPointLinkTransforms(insPointLinkTrans);
     Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
     Matrix JTran( J.transposed() );
     Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
@@ -1028,20 +1005,66 @@ int HumanHand::tendonEquilibrium()
     matrixMultiply( JTran, D, JTD );
 
     std::vector<double> magnitudes;
-    mTendonVec[*it]->getInsertionPointForceMagnitudes(magnitudes);
+    mTendonVec[i]->getInsertionPointForceMagnitudes(magnitudes);
     Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
     assert(M.rows() == JTD.cols());
     Matrix JTDM( JTD.rows(), M.cols());
     matrixMultiply( JTD, M, JTDM);
-    JTDM.multiply( mTendonVec[i]->getPassiveForce() );
-    matrixAdd(RightHand, JTDM, RightHand);
+
+    if (activeTendons.find(i) != activeTendons.end())
+    {
+      assert( JTDM.rows() == LeftHand.rows());
+      assert( JTDM.cols() == 1);
+      LeftHand.copySubMatrix(0, i, JTDM);
+    }
+    else if (passiveTendons.find(i) != passiveTendons.end())
+    {
+      JTDM.multiply( mTendonVec[i]->getPassiveForce() );
+      matrixAdd(RightHand, JTDM, RightHand);
+    }
+    else
+    {
+      DBGA("Warning: tendon " << i << " is not active or passive");
+    }
   }
+  //scale down right hand for numerical reasons
+  double scale = RightHand.absMax();
+  if (scale < 1.0e2)
+  {
+    //no passive forces, system is at equilibrium with trivial solution
+    DBGA("Equilibrium with no forces");
+    return 0;
+  }
+  RightHand.multiply(1.0/scale);
   RightHand.multiply(-1.0);
+  
+  Matrix x(LeftHand.cols(), 1);
+  if ( linearSolveSVD(LeftHand, RightHand, x) != 0 )
+  {
+    DBGA("SVD decomposition solving failed");
+    return -1;
+  }
+  //compute the residual joint torques
+  Matrix tau(LeftHand.rows(), 1);
+  matrixMultiply(LeftHand, x, tau);
+  RightHand.multiply(-1.0);
+  matrixAdd(tau, RightHand, tau);
+  DBGA("Residual joint torques:");
+  tau.print();
+  DBGA("Error norm: " << tau.fnorm());
 
-  DBGA("Left Hand:");
-  LeftHand.print();
-  DBGA("Right Hand:");
-  RightHand.print();
-
+  //scale result back up
+  x.multiply(scale);
+  //set the active force to the tendon
+  int t=0;
+  for (size_t i=0; i<mTendonVec.size(); i++)
+  {    
+    if (activeTendons.find(i) != activeTendons.end())
+    {
+      mTendonVec[i]->setActiveForce(x.elem(t,0));
+      t++;
+    }
+  }
+  myWorld->tendonChange();
   return 0;
 }
