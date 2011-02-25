@@ -322,7 +322,7 @@ Grasp::update(std::vector<int> useDimensions)
 		collectVirtualContactsOnObject();
 	}
 
-	DBGA("numContacts: " << numContacts);
+	DBGP("numContacts: " << numContacts);
 	updateWrenchSpaces(useDimensions);
 }
 
