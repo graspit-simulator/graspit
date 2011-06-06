@@ -128,7 +128,8 @@ class SqlDatabaseManager : public DatabaseManager {
   // Functionality not implemented in this manager:
   virtual bool DeleteGrasp(Grasp* /*grasp*/) const  {return false;}
   virtual bool AcquireNextTask(TaskRecord* /*rec*/){return false;}
-  virtual bool SetTaskStatus(const TaskRecord& /*rec*/, const string& /*status*/){return false;}
+  virtual bool SetTaskStatus(int /*task_id*/, const string& /*status*/){return false;}
+  virtual bool GetPlanningTaskRecord(int task_id, PlanningTaskRecord* /*rec*/){return false;}
   virtual bool SetGraspClusterRep(Grasp* /*grasp*/, bool /*rep*/) const {return false;}
   virtual bool InsertGraspPair(const Grasp* /*grasp1*/, const Grasp* /*grasp2*/) const {return false;}
   virtual bool SetGraspTableClearance(Grasp* /*grasp*/, double /*clearance*/) const { return false;}

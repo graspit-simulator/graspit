@@ -31,21 +31,9 @@
 #include "matvec3D.h"
 #include "world.h"
 #include "mytools.h"
-#include "robot.h"
-#include "humanHand.h"
-#include "robonaut.h"
-#include "pr2Gripper.h"
-#include "m7.h"
-#include "m7tool.h"
-#include "barrett.h"
-#include "shadow.h"
-#include "puma560.h"
-#include "body.h"
 #include "contact.h"
+#include "body.h"
 #include "collisionInterface.h"
-#include "mcGrip.h"
-
-//#include "harvardHand.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -95,119 +83,118 @@ WorldElement::~WorldElement()
 }
 
 /*! Given a start position which is expected to be collision-free, and a
-	new position which which causes inter-penetration, it interpolates
-	between the two to find the exact moment of contact. Returns false if
-	the interpolation fails (usually because the starting point is also in
-	collision).
-	
-	Only looks at possible collisions in \a colReport, which the caller must
-	determine before calling this.
+  new position which which causes inter-penetration, it interpolates
+  between the two to find the exact moment of contact. Returns false if
+  the interpolation fails (usually because the starting point is also in
+  collision).
+  
+  Only looks at possible collisions in \a colReport, which the caller must
+  determine before calling this.
 */
 bool 
 WorldElement::interpolateTo(transf lastTran, transf newTran, const CollisionReport &colReport)
 {
-	vec3 nextTranslation;
-	Quaternion nextRotation;
-	transf nextTran;
-	int numCols = colReport.size();
-
-	//this causes the interpolation to first check the original transform
-	//since in many cases the original position is actually the one in contact, this can save a lot of computation
-	//as well as machine precision problems
-	//technically, it allows t to become negative, but in practice this should never happen as long as the initial position
-	//is collision free
-	double t = 0.0, deltat = 1.0, minDist;
-	bool done = false;
- 
-	while (!done && deltat > 1.0e-20 && t >= 0) {
-		DBGP("move interpolation cycle")
-		deltat /= 2.0;
-   
-		nextTranslation = (1.0-t)*lastTran.translation() + t*newTran.translation();
-		nextRotation = Quaternion::Slerp(t,lastTran.rotation(),newTran.rotation());
-		nextTran = transf(nextRotation,nextTranslation);
-		DBGP("moving to time : " << t);
-		if (setTran(nextTran) == FAILURE) {
-			deltat = 0;
-			break;
-		}
-   
-		minDist = myWorld->getDist(colReport[0].first,colReport[0].second);
-		for (int i=1; i<numCols; i++) {
-			double dist = myWorld->getDist(colReport[i].first,colReport[i].second);
+  vec3 nextTranslation;
+  Quaternion nextRotation;
+  transf nextTran;
+  int numCols = colReport.size();
+  
+  //this causes the interpolation to first check the original transform
+  //since in many cases the original position is actually the one in contact, this can save a lot of computation
+  //as well as machine precision problems
+  //technically, it allows t to become negative, but in practice this should never happen as long as the initial position
+  //is collision free
+  double t = 0.0, deltat = 1.0, minDist;
+  bool done = false;
+  
+  while (!done && deltat > 1.0e-20 && t >= 0) {
+    DBGP("move interpolation cycle")
+      deltat /= 2.0;
+    
+    nextTranslation = (1.0-t)*lastTran.translation() + t*newTran.translation();
+    nextRotation = Quaternion::Slerp(t,lastTran.rotation(),newTran.rotation());
+    nextTran = transf(nextRotation,nextTranslation);
+    DBGP("moving to time : " << t);
+    if (setTran(nextTran) == FAILURE) {
+      deltat = 0;
+      break;
+    }
+    
+    minDist = myWorld->getDist(colReport[0].first,colReport[0].second);
+    for (int i=1; i<numCols; i++) {
+      double dist = myWorld->getDist(colReport[i].first,colReport[i].second);
 			minDist = MIN(minDist,dist);
-		}
-		DBGP("minDist: " << minDist);
-		if (minDist > 0) {
-			if (minDist < Contact::THRESHOLD * 0.5)
-				break;
-			t += deltat;
-		}
-		else
-			t -= deltat;
-		
-		 //debug code
-		if ( deltat <= 1.0e-20 || t < 0) {
-			for (int i=0; i<numCols; i++) {
-				double dist = myWorld->getDist(colReport[i].first,colReport[i].second);
-				DBGA(colReport[i].first->getName().latin1() << " -- " <<
-					colReport[i].second->getName().latin1() << " is " << dist);			
-			}
-		}
-		
-	}
-	if (deltat < 1.0e-20 || t < 0) {
-		DBGP("deltat failsafe or negative t hit; interpolate failure");
-		fprintf(stdout,"WorldElement interpolation error!\n");
-		return false;
-	} else {
-		DBGP("deltat: " << deltat << "; minDist: " << minDist <<"; interpolate success.");
-		return true;
-	}
-
+    }
+    DBGP("minDist: " << minDist);
+    if (minDist > 0) {
+      if (minDist < Contact::THRESHOLD * 0.5)
+        break;
+      t += deltat;
+    }
+    else
+      t -= deltat;
+    
+    //debug code
+    if ( deltat <= 1.0e-20 || t < 0) {
+      for (int i=0; i<numCols; i++) {
+        double dist = myWorld->getDist(colReport[i].first,colReport[i].second);
+        DBGA(colReport[i].first->getName().latin1() << " -- " <<
+             colReport[i].second->getName().latin1() << " is " << dist);			
+      }
+    }
+    
+  }
+  if (deltat < 1.0e-20 || t < 0) {
+    DBGP("deltat failsafe or negative t hit; interpolate failure");
+    fprintf(stdout,"WorldElement interpolation error!\n");
+    return false;
+  } else {
+    DBGP("deltat: " << deltat << "; minDist: " << minDist <<"; interpolate success.");
+    return true;
+  }  
 }
 
 /*! Attempts to move the element from its current pose to the new pose
-	in \a newTran in a single step. If the final pose if collision-free
-	it is done. If not, it interpolates to find the exact moment of contact.
-	Returns \a false if the interpolation fails.
+  in \a newTran in a single step. If the final pose if collision-free
+  it is done. If not, it interpolates to find the exact moment of contact.
+  Returns \a false if the interpolation fails.
 */
 bool WorldElement::jumpTo(transf newTran, CollisionReport *contactReport)
 {
-	int i, numCols;
-	bool success;
-	CollisionReport colReport;
-	transf lastTran = getTran();
-	if ( setTran(newTran) == FAILURE) return false;
-	//we are only interested in collisions involving this body
-	std::vector<Body*> interestList;
-	//a robot will place all of its links in here
-	getBodyList(&interestList);
-	contactReport->clear();
-	while (1) {
-		numCols = myWorld->getCollisionReport(&colReport, &interestList);
-		if (!numCols) {
-			return true;
-		}
-
+  int i, numCols;
+  bool success;
+  CollisionReport colReport;
+  transf lastTran = getTran();
+  if ( setTran(newTran) == FAILURE) return false;
+  //we are only interested in collisions involving this body
+  std::vector<Body*> interestList;
+  //a robot will place all of its links in here
+  getBodyList(&interestList);
+  contactReport->clear();
+  while (1) {
+    numCols = myWorld->getCollisionReport(&colReport, &interestList);
+    if (!numCols) {
+      return true;
+    }
+    
 #ifdef GRASPITDBG
-		for (i=0; i<numCols; i++) {
-			std::cerr << colReport[i].first->getName().latin1()<<" -- " 
-				<< colReport[i].second->getName().latin1() << std::endl;
-		}
-		DBGP("I am " << myName.latin1() );
+    for (i=0; i<numCols; i++) {
+      std::cerr << colReport[i].first->getName().latin1()<<" -- " 
+                << colReport[i].second->getName().latin1() << std::endl;
+    }
+    DBGP("I am " << myName.latin1() );
 #endif
-
-		success = interpolateTo(lastTran, getTran(), colReport );
-		if (!success) {
-			return false;
-		}
-		contactReport->clear();
-		for (i=0;i<numCols;i++) {
-			if (myWorld->getDist(colReport[i].first,colReport[i].second) < Contact::THRESHOLD)
-				contactReport->push_back(colReport[i]);
-		}
-	}
+    
+    success = interpolateTo(lastTran, getTran(), colReport );
+    if (!success) {
+      return false;
+    }
+    contactReport->clear();
+    for (i=0;i<numCols;i++) {
+      if (myWorld->getDist(colReport[i].first,colReport[i].second) < Contact::THRESHOLD)
+        contactReport->push_back(colReport[i]);
+    }
+  }
 }
 
 /*! 
@@ -225,133 +212,93 @@ bool WorldElement::jumpTo(transf newTran, CollisionReport *contactReport)
 bool
 WorldElement::moveTo(transf &newTran,double translStepSize, double rotStepSize)
 {
-	bool moveFinished = false;
-	transf origTran,nextTran,motion;
-	Quaternion nextRotation;
-	vec3 nextTranslation;
-	double percentComplete,moveIncrement,translationLength;
-	double angle;
-	vec3 axis;
-	bool success;
+  bool moveFinished = false;
+  transf origTran,nextTran,motion;
+  Quaternion nextRotation;
+  vec3 nextTranslation;
+  double percentComplete,moveIncrement,translationLength;
+  double angle;
+  vec3 axis;
+  bool success;
   
-	CollisionReport contactReport;
-
-    //DBGP("moveTo called");
-
-	origTran = getTran();
-/*
-	std::cout << "WorldElement origTran: " << origTran.translation().x() << " " <<
-		origTran.translation().y() << " " <<
-		origTran.translation().z() << " " <<
-		origTran.rotation().w << " " <<
-		origTran.rotation().x << " " <<
-		origTran.rotation().y << " " <<
-		origTran.rotation().z << " " << "\n";
-*/
-	//calculate the difference
-	translationLength = (newTran.translation() - origTran.translation()).len();
-	nextRotation = newTran.rotation() * origTran.rotation().inverse();
-	nextRotation.ToAngleAxis(angle,axis);
-
-	moveIncrement = 1.0;
-	if (translationLength != 0.0) {
-		if (translStepSize == ONE_STEP) 
-			moveIncrement = 1.0;
-		else
-			moveIncrement = MIN(moveIncrement, translStepSize / translationLength);
-	}
-	if (angle != 0.0) {
-		if (rotStepSize == ONE_STEP)
-			moveIncrement = MIN(moveIncrement, 1.0);
-		else
-			moveIncrement = MIN(moveIncrement, rotStepSize / angle);
-	}
-
-	// check contacts
-	nextTranslation = (1.0-moveIncrement)*origTran.translation() + moveIncrement*newTran.translation();
-	nextRotation = Quaternion::Slerp(moveIncrement,origTran.rotation(), newTran.rotation());
-	nextTran = transf(nextRotation,nextTranslation);
-	motion = nextTran * getTran().inverse();
-
-	if (contactsPreventMotion(motion)) {
-	    DBGP("contacts prevent motion")
-		return false;
-	}
-
-	percentComplete = 0.0;
-	while (!moveFinished) {
-		percentComplete += moveIncrement;
-		if (percentComplete >= 1.0) {
-			percentComplete = 1.0;
-			moveFinished = true;
-		}
-
-		nextTranslation = (1.0-percentComplete)*origTran.translation() + percentComplete*newTran.translation();
-		nextRotation = Quaternion::Slerp(percentComplete,origTran.rotation(), newTran.rotation());
-		nextTran = transf(nextRotation,nextTranslation);
-/*
-		std::cout << "moveTo NextTran: " << nextTran.translation().x() << " " <<
-			nextTran.translation().y() << " " <<
-			nextTran.translation().z() << " " <<
-			nextTran.rotation().w << " " <<
-			nextTran.rotation().x << " " <<
-			nextTran.rotation().y << " " <<
-			nextTran.rotation().z << " " << "\n";
-*/
-		success = jumpTo(nextTran, &contactReport);
-		if (!success || contactReport.size() != 0) {
-			moveFinished = true;
-		}
-	}
-
-	if (!success) {
-		DBGA("JumpTo error, stopping execution. Object " << myName.latin1() << " in thread " 
-			<< getWorld()->getCollisionInterface()->getThreadId());
-	} else {
-		myWorld->findContacts(contactReport);
-	}
-
-	if (contactReport.size() != 0) return false;
-	return true;
-}
-
-/*!
-  This is a static helper function which will create and return an
-  instance of the named subclass.  This is useful when reading in the
-  world configuration file and populating the world.
-*/
-WorldElement *
-WorldElement::createInstance(const QString &className,
-			     World *parent,const char *name)
-{
-  if (className == "Body")
-    return new Body(parent,name);
-  else if (className == "GraspableBody")
-    return new GraspableBody(parent,name);
-  else if (className == "Robot")
-    return new Robot(parent,name);
-  else if (className == "Puma560")
-    return new Puma560(parent,name);
-  else if (className == "Hand")
-    return new Hand(parent,name);
-  else if (className == "Barrett")
-    return new Barrett(parent,name);
-  else if (className == "Robonaut")
-    return new Robonaut(parent,name);
-  else if (className == "Pr2Gripper")
-    return new Pr2Gripper(parent,name);
-  else if (className == "Pr2Gripper2010")
-    return new Pr2Gripper2010(parent,name);
-  else if (className == "M7")
-    return new M7(parent,name);
-  else if (className == "M7Tool")
-    return new M7Tool(parent,name);
-  else if (className == "HumanHand")
-	return new HumanHand(parent,name);
-  else if (className == "Shadow")
-	return new Shadow(parent,name);
-  else if (className == "McGrip")
-	return new McGrip(parent,name);
-  else return NULL;
+  CollisionReport contactReport;
+  
+  //DBGP("moveTo called");
+  
+  origTran = getTran();
+  /*
+    std::cout << "WorldElement origTran: " << origTran.translation().x() << " " <<
+    origTran.translation().y() << " " <<
+    origTran.translation().z() << " " <<
+    origTran.rotation().w << " " <<
+    origTran.rotation().x << " " <<
+    origTran.rotation().y << " " <<
+    origTran.rotation().z << " " << "\n";
+  */
+  //calculate the difference
+  translationLength = (newTran.translation() - origTran.translation()).len();
+  nextRotation = newTran.rotation() * origTran.rotation().inverse();
+  nextRotation.ToAngleAxis(angle,axis);
+  
+  moveIncrement = 1.0;
+  if (translationLength != 0.0) {
+    if (translStepSize == ONE_STEP) 
+      moveIncrement = 1.0;
+    else
+      moveIncrement = MIN(moveIncrement, translStepSize / translationLength);
+  }
+  if (angle != 0.0) {
+    if (rotStepSize == ONE_STEP)
+      moveIncrement = MIN(moveIncrement, 1.0);
+    else
+      moveIncrement = MIN(moveIncrement, rotStepSize / angle);
+  }
+  
+  // check contacts
+  nextTranslation = (1.0-moveIncrement)*origTran.translation() + moveIncrement*newTran.translation();
+  nextRotation = Quaternion::Slerp(moveIncrement,origTran.rotation(), newTran.rotation());
+  nextTran = transf(nextRotation,nextTranslation);
+  motion = nextTran * getTran().inverse();
+  
+  if (contactsPreventMotion(motion)) {
+    DBGP("contacts prevent motion")
+      return false;
+  }
+  
+  percentComplete = 0.0;
+  while (!moveFinished) {
+    percentComplete += moveIncrement;
+    if (percentComplete >= 1.0) {
+      percentComplete = 1.0;
+      moveFinished = true;
+    }
+    
+    nextTranslation = (1.0-percentComplete)*origTran.translation() + percentComplete*newTran.translation();
+    nextRotation = Quaternion::Slerp(percentComplete,origTran.rotation(), newTran.rotation());
+    nextTran = transf(nextRotation,nextTranslation);
+    /*
+      std::cout << "moveTo NextTran: " << nextTran.translation().x() << " " <<
+      nextTran.translation().y() << " " <<
+      nextTran.translation().z() << " " <<
+      nextTran.rotation().w << " " <<
+      nextTran.rotation().x << " " <<
+      nextTran.rotation().y << " " <<
+      nextTran.rotation().z << " " << "\n";
+    */
+    success = jumpTo(nextTran, &contactReport);
+    if (!success || contactReport.size() != 0) {
+      moveFinished = true;
+    }
+  }
+  
+  if (!success) {
+    DBGA("JumpTo error, stopping execution. Object " << myName.latin1() << " in thread " 
+         << getWorld()->getCollisionInterface()->getThreadId());
+  } else {
+    myWorld->findContacts(contactReport);
+  }
+  
+  if (contactReport.size() != 0) return false;
+  return true;
 }
 

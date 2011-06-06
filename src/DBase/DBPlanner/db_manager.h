@@ -126,7 +126,15 @@ class DatabaseManager {
    another process.*/
   virtual bool AcquireNextTask(TaskRecord *rec) = 0;
   //! Change the status of a task in the database (e.g. mark it as COMPLETED)
-  virtual bool SetTaskStatus(const TaskRecord &rec, const string &status) = 0;
+  virtual bool SetTaskStatus(int task_id, const string &status) = 0;
+  //! Fills in the details for a planning task based on the task id
+  virtual bool GetPlanningTaskRecord(int task_id, PlanningTaskRecord *rec) = 0;
+  //! Fills in the details for an optimzation task based on the task id
+  virtual bool GetOptimizationTaskRecord(int /*task_id*/, OptimizationTaskRecord* /*rec*/) {return false;}
+  //! Saves the results of an optimization in the database
+  virtual bool SaveOptimizationResults(const OptimizationTaskRecord& /*rec*/,
+                                       const std::vector<double>& /*parameters*/,
+                                       const std::vector<double>& /*results*/) {return false;}
 
   //! Save a grasp into the database
   virtual bool SaveGrasp(const Grasp*) const = 0;

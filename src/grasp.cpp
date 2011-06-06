@@ -697,6 +697,25 @@ Grasp::contactJacobian(const std::list<Joint*> &joints,
   return contactJacobian(joints, contact_locations);
 }
 
+/*! Simply gets the locations of all the contacts in the list and calls the
+  more general version that takes in std::list< std::pair<transf, Link*> > &contact_locations */
+Matrix 
+Grasp::contactJacobian(const std::list<Joint*> &joints, 
+                       const std::list<VirtualContact*> &contacts)
+{
+  std::list< std::pair<transf, Link*> > contact_locations;
+  std::list<VirtualContact*>::const_iterator contact_it;
+  for(contact_it=contacts.begin(); contact_it!=contacts.end(); contact_it++) {
+    if ((*contact_it)->getBody1()->getOwner() != hand) {
+      DBGA("Grasp jacobian: contact not on hand");
+      continue;
+    }
+    Link *link = static_cast<Link*>((*contact_it)->getBody1());
+    contact_locations.push_back( std::pair<transf, Link*>((*contact_it)->getContactFrame(), link) );
+  }
+  return contactJacobian(joints, contact_locations);
+}
+
 /*! Computes the grasp map G. D is the matrix that relates friction edge
   amplitudes to contact force and R is the matrix that transorms contact
   forces to world coordinate system. We then need to sum all of them up

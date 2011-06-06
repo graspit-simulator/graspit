@@ -43,6 +43,9 @@ class TableCheckTask : public PreGraspCheckTask {
   //! The table we are using
   Body *mTable;
 
+  //! The record of the actual planning task
+  db_planner::PlanningTaskRecord mPlanningTask;
+
   //! Checks and sets validity for a grasp; returns false if an error is encountered
   bool checkSetGrasp(db_planner::Grasp *grasp);
 

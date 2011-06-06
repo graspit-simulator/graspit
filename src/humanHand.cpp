@@ -42,8 +42,17 @@
 #include "debug.h"
 #include "world.h"
 
-#define WRAPPER_TOLERANCE 0.98
- 
+#define WRAPPER_TOLERANCE 0.995
+
+//#define PROF_ENABLED
+#include "profiling.h"
+
+const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 1.5;
+const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.8;
+
+//const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 0.45;
+//const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.24;
+
 /*! Given two line segments, P1-P2 and P3-P4, returns the line segment 
 	Pa-Pb that is the shortest route between them. Calculates also the 
 	values of \a mua and \a mub where
@@ -52,8 +61,10 @@
    Returns FALSE if no solution exists.
    adapted from http://astronomy.swin.edu.au/~pbourke/geometry/lineline3d/
 */
+PROF_DECLARE(LINE_LINE_INTERSECT);
 int LineLineIntersect(vec3 p1,vec3 p2,vec3 p3,vec3 p4,vec3 *pa,vec3 *pb,double *mua, double *mub)
 {
+  PROF_TIMER_FUNC(LINE_LINE_INTERSECT);
    vec3 p13,p43,p21;
    double d1343,d4321,d1321,d4343,d2121;
    double numer,denom;
@@ -98,15 +109,43 @@ int LineLineIntersect(vec3 p1,vec3 p2,vec3 p3,vec3 p4,vec3 *pa,vec3 *pb,double *
    return true;
 }
 
+/*! Returns the distance between an infinite line defined by l1 and l2 and a point p0.
+  Modified from http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+*/
+double pointLineDistance(vec3 p0, vec3 l1, vec3 l2)
+{
+  vec3 x01 = p0 - l1;
+  vec3 x02 = p0 - l2;
+  vec3 x21 = l2 - l1;
+  return (x01 * x02).len() / x21.len();
+}
+
+PROF_DECLARE(ROTATE_SO_TRANSFORM);
+void rotateSoTransform(SoTransform *tran, vec3 axis, double angle)
+{
+  PROF_TIMER_FUNC(ROTATE_SO_TRANSFORM);
+  transf tr(tran);
+  Quaternion quat(angle, axis);
+  transf rot(quat, vec3(0,0,0));
+  tr = rot * tr;
+  tr.toSoTransform(tran);
+}
+
 TendonInsertionPoint::TendonInsertionPoint(Tendon *myOwner, int chain, int link, vec3 point, bool isPerm) : 
+  mAttachPoint(point),
   mPermanent(isPerm),
   mAttachChainNr(chain),
   mAttachLinkNr(link),
-  mOwner(myOwner),
-  mAttachPoint(point)
+  mOwner(myOwner)
 {
   createInsertionGeometry();
   createConnectorGeometry();
+}
+
+void TendonInsertionPoint::setAttachPoint(vec3 attachPoint)
+{
+  mAttachPoint = attachPoint;
+  mIVInsertionTran->translation.setValue(mAttachPoint.x() , mAttachPoint.y() , mAttachPoint.z() );
 }
 	
 /*! Use this function to get the link the insertion point is 
@@ -124,8 +163,10 @@ Link* TendonInsertionPoint::getAttachedLink()
   }
 }
 
+//PROF_DECLARE(TIP_GET_WORLD_POSITION);
 SbVec3f TendonInsertionPoint::getWorldPosition()
 {
+  //PROF_TIMER_FUNC(TIP_GET_WORLD_POSITION);
   position worldPos;
   worldPos = position(mAttachPoint.toSbVec3f()) * ( getAttachedLink()->getTran() );
   return worldPos.toSbVec3f();
@@ -151,7 +192,7 @@ void TendonInsertionPoint::createInsertionGeometry()
   if ( isPermanent() )
   {
     mIVInsertionMaterial->diffuseColor.setValue( (float)0.7 , (float)0.2 , (float)0.2);
-    mIVInsertionGeom->radius=(float)1.5;
+    mIVInsertionGeom->radius=(float)INSERTION_POINT_RADIUS;
   }
   else
   {
@@ -159,7 +200,7 @@ void TendonInsertionPoint::createInsertionGeometry()
       mIVInsertionMaterial->diffuseColor.setValue( (float)1.0 , (float)0.5 , (float)0.5);
     else
       mIVInsertionMaterial->diffuseColor.setValue( (float)0.5 , (float)0.5 , (float)0.5);
-    mIVInsertionGeom->radius=(float)0.8;
+    mIVInsertionGeom->radius=(float)CONNECTOR_RADIUS;
   }
   mIVInsertion->addChild(mIVInsertionMaterial);
   mIVInsertion->addChild(mIVInsertionGeom);
@@ -190,7 +231,6 @@ void TendonInsertionPoint::removeAllGeometry()
 
 Tendon::Tendon(Robot *myOwner)
 {
-  mNrInsPoints=0;
   mOwner = myOwner;
   mActiveForce = 0;
   mIVRoot = new SoSeparator;
@@ -203,6 +243,8 @@ Tendon::Tendon(Robot *myOwner)
   mSelected = false;
   mRestLength = 0;
   mCurrentLength = 0;
+  mDefaultRestLength = -1;
+  mPreTensionLength = -1;
   mApplyPassiveForce = true;
   mPassiveForce = 0;
   mK = 0.0;
@@ -224,18 +266,32 @@ void Tendon::setActiveForce(float f)
   if (f>=0) mActiveForce = f;
   else mActiveForce = 0;
   updateInsertionForces();
-  updateForceIndicators();
+  if (mVisible && mForcesVisible) updateForceIndicators();
 }
 void Tendon::setPassiveForce(float f)
 {
   if (f>=0) mPassiveForce = f;
   else mPassiveForce = 0;
   updateInsertionForces();
-  updateForceIndicators();
+  if (mVisible && mForcesVisible) updateForceIndicators();
 }
 
+PROF_DECLARE(TENDON_REMOVE_TEMP_INSERTION_POINTS);
+void Tendon::removeTemporaryInsertionPoints()
+{
+  PROF_TIMER_FUNC(TENDON_REMOVE_TEMP_INSERTION_POINTS);
+  std::list<TendonInsertionPoint*>::iterator it = mInsPointList.begin();
+  while (it != mInsPointList.end())
+  {
+    if ( (*it)->isPermanent() ) it++;
+    else it = removeInsertionPoint(it);
+  }
+}
+
+PROF_DECLARE(TENDON_REMOVE_INTERSECTIONS);
 void Tendon::removeWrapperIntersections()
 {
+  PROF_TIMER_FUNC(TENDON_REMOVE_INTERSECTIONS);
   int j;
   SbVec3f pPrev,pCur,pNext;
   position tmpPos;
@@ -263,6 +319,7 @@ void Tendon::removeWrapperIntersections()
       needed = false;
       for (j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++)
       {
+        if ( ((HumanHand*)getRobot())->getTendonWrapper(j)->isExempt(mTendonName) ) continue;
         //two points along axis of tendon wrapper
         P3 = ((HumanHand*)getRobot())->getTendonWrapper(j)->location;
         P4 = P3 + ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
@@ -293,6 +350,61 @@ void Tendon::removeWrapperIntersections()
   }
 }
 
+bool Tendon::insPointInsideWrapper()
+{
+  int i=0;
+  for (std::list<TendonInsertionPoint*>::iterator insPt = mInsPointList.begin();
+       insPt != mInsPointList.end();
+       insPt++)
+  {
+    if (!(*insPt)->isPermanent()) continue;
+    vec3 p0((*insPt)->getWorldPosition());
+    for (int j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++) 
+    {
+      if ( ((HumanHand*)getRobot())->getTendonWrapper(j)->isExempt(mTendonName) ) continue;
+      TendonWrapper *wrapper = ((HumanHand*)getRobot())->getTendonWrapper(j);
+      //two points along axis of tendon wrapper
+      vec3 l1 = wrapper->location;
+      vec3 l2 = l1 + wrapper->orientation;
+      //convert them to world coordinates 
+      Link* link = wrapper->getAttachedLink();
+      position tmpPos = position (l1.toSbVec3f()) * ( link->getTran());
+      l1 = vec3 ( tmpPos.toSbVec3f() );
+      tmpPos = position (l2.toSbVec3f()) * ( link->getTran());
+      l2 = vec3 ( tmpPos.toSbVec3f() );
+
+      double d = pointLineDistance(p0, l1, l2);
+      if (d < wrapper->radius)
+      {
+        //std::cerr << "Ins point " << i << "  inside wrapper " << j;
+        return true;
+      }
+    }
+    i++;
+  }
+  return false;
+}
+
+double Tendon::minInsPointDistance()
+{
+  double minDist = std::numeric_limits<double>::max();
+  for (std::list<TendonInsertionPoint*>::iterator thisInsPt = mInsPointList.begin();
+       thisInsPt != mInsPointList.end();
+       thisInsPt++)
+  {
+    if (!(*thisInsPt)->isPermanent()) continue;
+
+    std::list<TendonInsertionPoint*>::iterator nextInsPt = thisInsPt;
+    nextInsPt++;
+    while( nextInsPt!=mInsPointList.end() && !(*nextInsPt)->isPermanent() ) nextInsPt++;
+    if (nextInsPt == mInsPointList.end()) continue;
+
+    minDist = std::min( minDist, ( vec3((*thisInsPt)->getWorldPosition()) - 
+                                   vec3((*nextInsPt)->getWorldPosition()) ).len() );
+  }
+ return minDist;
+}
+
 /*! Checks if a connector penetrates a cylindrical wrapper by more than the 
 	tolerance value. If so, it adds a temporary insertion point on the edge 
 	of the cylider.	Problems:
@@ -302,35 +414,35 @@ void Tendon::removeWrapperIntersections()
 	  for dynamics' numerical integration
 	- does not allow for lateral "sliding" of the tendon on the wrapper
 */
+PROF_DECLARE(TENDON_CHECK_INTERSECTIONS);
 void Tendon::checkWrapperIntersections()
 {
-  int j;
-  int chainNr,linkNr;
-  SbVec3f pCur,pNext;
-  position tmpPos;
-  vec3 dPrev,dRes,P3,P4,Pa,Pb;
-  double mua,mub;
-  Link *link;
-  
-  std::list<TendonInsertionPoint*>::iterator prevInsPt, insPt, nextInsPt, newInsPt;
-  
-  for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++) {
-    nextInsPt = insPt;
+  PROF_TIMER_FUNC(TENDON_CHECK_INTERSECTIONS);
+  std::list<TendonInsertionPoint*>::iterator insPt = mInsPointList.begin();  
+  int num_insertions = 0;
+  while (insPt!=mInsPointList.end()) 
+  {
+    bool new_insertion = false;
+    std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt;
     nextInsPt ++;
-    pCur = (*insPt)->getWorldPosition();
     if (nextInsPt != mInsPointList.end() ) {
-      pNext = (*nextInsPt)->getWorldPosition();
-      for (j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++) {
+      SbVec3f pCur = (*insPt)->getWorldPosition();
+      SbVec3f pNext = (*nextInsPt)->getWorldPosition();
+      for (int j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++) 
+      {
+        if ( ((HumanHand*)getRobot())->getTendonWrapper(j)->isExempt(mTendonName)) continue;
         //two points along axis of tendon wrapper
-        P3 = ((HumanHand*)getRobot())->getTendonWrapper(j)->location;
-        P4 = P3 + ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
+        vec3 P3 = ((HumanHand*)getRobot())->getTendonWrapper(j)->location;
+        vec3 P4 = P3 + ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
         //convert them to world coordinates 
-        link = ((HumanHand*)getRobot())->getTendonWrapper(j)->getAttachedLink();
-        tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
+        Link* link = ((HumanHand*)getRobot())->getTendonWrapper(j)->getAttachedLink();
+        position tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
         P3 = vec3 ( tmpPos.toSbVec3f() );
         tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
         P4 = vec3 ( tmpPos.toSbVec3f() );
-        
+
+        vec3 Pa, Pb;
+        double mua, mub;
         LineLineIntersect( vec3(pCur) , vec3(pNext) , P3,P4 , &Pa, &Pb, &mua, &mub);
         
         // check two things:
@@ -339,24 +451,34 @@ void Tendon::checkWrapperIntersections()
         //  (wrappers extends to infinity, we don't check that)
         //- WE SHOULD IN THE FUTURE! don't want one finger's tendon to wrap around another finger's wrapper
         //
-        dPrev = Pa - Pb;
+        vec3 dPrev = Pa - Pb;
         if (dPrev.len() < WRAPPER_TOLERANCE * ((HumanHand*)getRobot())->getTendonWrapper(j)->radius 
             && mua>0 && mua<1)
         {
-          /* compute location of new insertion point - on cylinder edge */
+          // compute location of new insertion point - on cylinder edge 
           dPrev = normalise(dPrev);
-          dRes = Pb + ( ((HumanHand*)getRobot())->getTendonWrapper(j)->radius ) * dPrev;
-          /* transform it to coordinate system of wrapper */
-          
+          vec3 dRes = Pb + ( ((HumanHand*)getRobot())->getTendonWrapper(j)->radius ) * dPrev;
+          // transform it to coordinate system of wrapper */          
           tmpPos = position ( dRes.toSbVec3f() ) * ( link->getTran().inverse() );
           
-          chainNr = ((HumanHand*)getRobot())->getTendonWrapper(j)->getChainNr();
-          linkNr = ((HumanHand*)getRobot())->getTendonWrapper(j)->getLinkNr();
+          int chainNr = ((HumanHand*)getRobot())->getTendonWrapper(j)->getChainNr();
+          int linkNr = ((HumanHand*)getRobot())->getTendonWrapper(j)->getLinkNr();
           
-          /*create new insertion point*/
-          newInsPt = insertInsertionPoint( nextInsPt, chainNr, linkNr, vec3(tmpPos.toSbVec3f()), false );
+          //create new insertion point
+          insertInsertionPoint( nextInsPt, chainNr, linkNr, vec3(tmpPos.toSbVec3f()), false );
+          new_insertion = true;
         }
       }
+    }
+    if (new_insertion && num_insertions++ > 10) 
+    {
+      DBGA("More than 10 new tendon insertions in a single point; loop might be stuck, forcing continuation.");
+      new_insertion = false;
+    }
+    if (!new_insertion) 
+    {
+      insPt++;
+      num_insertions = 0;
     }
   }
 }
@@ -367,8 +489,11 @@ void Tendon::checkWrapperIntersections()
 	we do for the geometry of the insertion points).Rather, this geometry 
 	needs to be recomputed after every change in link status.
 */
+PROF_DECLARE(TENDON_UPDATE_GEOMETRY);
+PROF_DECLARE(TENDON_COMPUTE_GEOMETRY_CORE);
 void Tendon::updateGeometry()
 {
+  PROF_TIMER_FUNC(TENDON_UPDATE_GEOMETRY);
   /*first we wrap tendon around wrappers*/
   checkWrapperIntersections();
   
@@ -378,6 +503,7 @@ void Tendon::updateGeometry()
   /* we also compute the length of the tendon as the sum of connector lengths*/
   mCurrentLength = 0;
   
+  PROF_START_TIMER(TENDON_COMPUTE_GEOMETRY_CORE);
   std::list<TendonInsertionPoint*>::iterator insPt, prevInsPt, newInsPt;  
   for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
@@ -387,39 +513,47 @@ void Tendon::updateGeometry()
       prevInsPt--;
       SbVec3f pPrev = (*prevInsPt)->getWorldPosition();
       SbVec3f pCur = (*insPt)->getWorldPosition();
-      
       vec3 dPrev = vec3(pCur) - vec3(pPrev);
-      /* distance between the two */
+      // distance between the two
       float m = dPrev.len();
-      /* add it to tendon length */
+      // add it to tendon length
       mCurrentLength += m;
-      
-      /* midpoint between the two */
-      vec3 c = vec3(pPrev) + dPrev*0.5;
-      SoTransform* tran = (*insPt)->getIVConnectorTran();
-      SoCylinder* geom = (*insPt)->getIVConnectorGeom();
-      geom->radius=(float)0.8;
-      geom->height = m;
-      tran->pointAt(c.toSbVec3f(),pPrev);
-      SoTransform* neg90x = new SoTransform();
-      neg90x->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-1.5707f);
-      tran->combineLeft(neg90x);
-    } else {
-      /* make the cylinder tiny so that it is not visible */
+
+      //updates to IV geometry are made only if tendon is visible
+      //this should be consolidated in the future
+      if (mVisible)
+      {
+        // midpoint between the two 
+        vec3 c = vec3(pPrev) + dPrev*0.5;
+        SoTransform* tran = (*insPt)->getIVConnectorTran();
+        SoCylinder* geom = (*insPt)->getIVConnectorGeom();
+        geom->radius=(float)TendonInsertionPoint::CONNECTOR_RADIUS;
+        geom->height = m;
+        tran->pointAt(c.toSbVec3f(),pPrev);
+        //neg 90 x
+        rotateSoTransform(tran, vec3(1.0, 0.0, 0.0), -1.5707);
+      }
+    } 
+    else if (mVisible)
+    {
+      // make the cylinder tiny so that it is not visible
       SoCylinder* geom = (*insPt)->getIVConnectorGeom();
       geom->radius=(float)0.1;
       geom->height = 0.1;
     }
   }
+  PROF_STOP_TIMER(TENDON_COMPUTE_GEOMETRY_CORE);
   
   /*after geometry has been updated, go ahead and update forces*/
   computeSimplePassiveForces();
   updateInsertionForces();
-  updateForceIndicators();
+  if (mVisible && mForcesVisible) updateForceIndicators();
 }
 
+PROF_DECLARE(TENDON_UPDATE_FORCE_INDICATORS);
 void Tendon::updateForceIndicators()
 {
+  PROF_TIMER_FUNC(TENDON_UPDATE_FORCE_INDICATORS);
   mIVForceIndicators->removeAllChildren();
   std::vector<transf> insPointTrans;
   std::vector<double> insPointMagn;
@@ -434,9 +568,8 @@ void Tendon::updateForceIndicators()
   {
     SoTransform* forceTrans = new SoTransform;
     insPointTrans[i].toSoTransform(forceTrans);
-    SoTransform* pos90x = new SoTransform();
-    pos90x->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),1.5707f);
-    forceTrans->combineLeft(pos90x);
+    //pos 90 x
+    rotateSoTransform(forceTrans, vec3(1.0, 0.0, 0.0), 1.5707);
     SoArrow *arrow = new SoArrow;
     arrow->height = 10.0 * 1.0e-6 * insPointMagn[i] * getTotalForce();    
     arrow->cylRadius = 0.25;
@@ -465,16 +598,18 @@ transf Tendon::getInsertionPointWorldTransform(std::list<TendonInsertionPoint*>:
   
   SoTransform* tran = new SoTransform;
   tran->pointAt(pCur,(vec3(pCur)+dPrev + dNext).toSbVec3f());
-  
-  SoTransform* x180 = new SoTransform();
-  x180->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-3.14159f);
-  tran->combineLeft(x180);
-  
-  return transf(tran);
+  //neg 180 x
+  rotateSoTransform(tran, vec3(1.0, 0.0, 0.0), -3.14159);
+  transf tr(tran);
+  tran->ref();
+  tran->unref();
+  return tr;
 }
 
+PROF_DECLARE(TENDON_GET_INS_POINT_TRANSFORMS);
 void Tendon::getInsertionPointTransforms(std::vector<transf> &insPointTrans)
 {
+  PROF_TIMER_FUNC(TENDON_GET_INS_POINT_TRANSFORMS);
   if (mInsPointList.size() <= 1) {
     DBGA("Insertion point transforms ill-defined, not enough insertion points");
     return;
@@ -502,8 +637,10 @@ void Tendon::getInsertionPointLinkTransforms(std::list< std::pair<transf, Link*>
   }
 }
 
+PROF_DECLARE(TENDON_GET_INS_POINT_FORCE_MAGNITUDES);
 void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes)
 {
+  PROF_TIMER_FUNC(TENDON_GET_INS_POINT_FORCE_MAGNITUDES);
   if (mInsPointList.size() <= 1) {
     DBGA("Insertion point transforms ill-defined, not enough insertion points");
     return;
@@ -531,8 +668,10 @@ void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes)
   - use formula from Hill-type model (Tsang et al.) for computing 
   muscle force
 */
+//PROF_DECLARE(TENDON_COMPUTE_PASSIVE_FORCES);
 void Tendon::computeSimplePassiveForces()
 {
+  //PROF_TIMER_FUNC(TENDON_COMPUTE_PASSIVE_FORCES);
   //only apply passive force if tendon is elongated
   if ( getExcursion() < 0 ) {
     mPassiveForce = 0;
@@ -555,8 +694,10 @@ void Tendon::computeSimplePassiveForces()
   what DIRECTION.	Geometry needs to be up-to-date 
   (use updateGeometry() ).
 */
+PROF_DECLARE(TENDON_UPDATE_INSERTION_FORCES);
 void Tendon::updateInsertionForces()
 {
+  PROF_TIMER_FUNC(TENDON_UPDATE_INSERTION_FORCES);
   SbVec3f pPrev,pCur,pNext;
   position tmpPos;
   vec3 dPrev,dNext,dRes,c;
@@ -583,8 +724,11 @@ void Tendon::updateInsertionForces()
     /*compute resultant force on insertion point*/
     if (insPt == mInsPointList.begin())
     {
-      /*first insertion point: no force at the moment*/
-      (*insPt)->mInsertionForce=vec3(0,0,0);
+      /*first insertion point: force is applied in direction to pNext*/
+      dNext = vec3(pNext) - vec3(pCur);
+      dNext = ( (float)1 / dNext.len() ) * dNext;
+      dRes = getTotalForce() * dNext;
+      (*insPt)->mInsertionForce = dRes;
     }
     else if ( nextInsPt != mInsPointList.end() )
     {
@@ -607,15 +751,13 @@ void Tendon::updateInsertionForces()
   }
 }
 
-void Tendon::setRestPosition()
+void Tendon::setRestLength(double length)
 {
-  if (mCurrentLength==0)
-    printf("WARNING: setRestPosition called on tendon, but mCurrentLength is zero!\n");
-  mRestLength = mCurrentLength;
-  mPassiveForce = 0;
+  if (length==0) DBGA("WARNING: length 0 set on tendon");
+  mRestLength = length;
+  computeSimplePassiveForces();
   updateInsertionForces();
-  updateForceIndicators();
-
+  if (mVisible && mForcesVisible) updateForceIndicators();
 }
 
 void Tendon::select()
@@ -659,6 +801,7 @@ void Tendon::setVisible(bool v)
   /*one small issue: tendon will still intercept mouse clicks even it it's not visible on the screen*/
   mVisible = v;
   if (v) {
+    updateGeometry();
     mIVVisibleToggle->style  = SoDrawStyle::FILLED;
     if (mForcesVisible) mIVForceIndToggle->style = SoDrawStyle::FILLED;
   } else {
@@ -672,6 +815,7 @@ void Tendon::setForcesVisible(bool v)
   if (v && !mVisible) return;
   mForcesVisible = v;
   if (v) {
+    updateForceIndicators();
     mIVForceIndToggle->style = SoDrawStyle::FILLED;
   } else {
     mIVForceIndToggle->style = SoDrawStyle::INVISIBLE;
@@ -689,43 +833,64 @@ Tendon::insertInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos,
 {
   std::list<TendonInsertionPoint*>::iterator newInsPt;
   newInsPt = mInsPointList.insert( itPos, new TendonInsertionPoint(this,chain,link,point,isPerm) );
-  mNrInsPoints++;
   mIVRoot->addChild( (*newInsPt)->getIVInsertion() );
   mIVRoot->addChild( (*newInsPt)->getIVConnector() );
   return newInsPt;
 }
 
-void Tendon::removeInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos)
+int Tendon::getNumPermInsPoints() const
 {
-	(*itPos)->removeAllGeometry();
-	mIVRoot->removeChild( (*itPos)->getIVConnector() );
-	mIVRoot->removeChild( (*itPos)->getIVInsertion() );
-	if ( (*itPos)->isPermanent() )
-		printf("WARNING: removing a permanent insertion point!\n");
-	mInsPointList.erase( itPos );
-	/*should check if we are actually removing the first insertion point, because it would mean 
-		there is a connector to remove also (the one of the "new" first insertion point */
+  std::list<TendonInsertionPoint*>::const_iterator it;
+  int num = 0;
+  for (it=mInsPointList.begin(); it!=mInsPointList.end(); it++)
+  {
+    if ((*it)->isPermanent()) num++;
+  }
+  return num;
+}
+
+TendonInsertionPoint* Tendon::getPermInsPoint(int n)
+{
+  std::list<TendonInsertionPoint*>::const_iterator it;
+  int num = 0;
+  for (it=mInsPointList.begin(); it!=mInsPointList.end(); it++)
+  {
+    if ((*it)->isPermanent() && num++ == n) return *it;
+  }
+  DBGA("Requested tendon insertion point not found");
+  return NULL;
+}
+
+PROF_DECLARE(TENDON_REMOVE_INS_POINT);
+std::list<TendonInsertionPoint*>::iterator 
+Tendon::removeInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos)
+{
+  PROF_TIMER_FUNC(TENDON_REMOVE_INS_POINT);
+  (*itPos)->removeAllGeometry();
+  mIVRoot->removeChild( (*itPos)->getIVConnector() );
+  mIVRoot->removeChild( (*itPos)->getIVInsertion() );
+  if ( (*itPos)->isPermanent() ) DBGA("WARNING: removing a permanent insertion point!");
+  delete *itPos;
+  std::list<TendonInsertionPoint*>::iterator newIt = mInsPointList.erase( itPos );
+  return newIt;
+  /*should check if we are actually removing the first insertion point, because it would mean 
+    there is a connector to remove also (the one of the "new" first insertion point */
 }
 void Tendon::applyForces()
 {
-	Link *link;
-	vec3 force;
-	position pos;
-	SbVec3f tmp;
-	std::list<TendonInsertionPoint*>::iterator insPt;
-
-	if (getTotalForce() > 0)
-		for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
-		{
-			link = (*insPt)->getAttachedLink();	
-			/*convert insertion point location to world coordinates*/
-			tmp = ( (*insPt)->mAttachPoint ).toSbVec3f();
-			pos = position(tmp) * ( link->getTran() );
-
-			/*insertion point force is already stored in world coordinates*/
-			force = (*insPt)->mInsertionForce; 
-			link->addForceAtPos( force , pos );
-		}
+  if (getTotalForce() <= 0) return;
+  std::list<TendonInsertionPoint*>::iterator insPt;
+  for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
+  {
+    Link* link = (*insPt)->getAttachedLink();	
+    /*convert insertion point location to world coordinates*/
+    SbVec3f tmp = ( (*insPt)->getAttachPoint() ).toSbVec3f();
+    position pos = position(tmp) * ( link->getTran() );
+    
+    /*insertion point force is already stored in world coordinates*/
+    vec3 force = (*insPt)->mInsertionForce; 
+    link->addForceAtPos( force , pos );
+  }
 }
 
 bool Tendon::loadFromXml(const TiXmlElement *root)
@@ -740,7 +905,15 @@ bool Tendon::loadFromXml(const TiXmlElement *root)
   double stiffness;
   if (!getDouble(root, "stiffness", stiffness)) stiffness = 0.0;
   setStiffness(stiffness * 1.0e6);
-  
+
+  double defaultRestLength;
+  if (!getDouble(root, "restLength", defaultRestLength)) mDefaultRestLength = -1.0;
+  else mDefaultRestLength = defaultRestLength;
+
+  double preTensionLength;
+  if (!getDouble(root, "preTensionLength", preTensionLength)) mPreTensionLength = -1.0;
+  else mPreTensionLength = preTensionLength;
+    
   int nrInsPoints=countXmlElements(root, "insertionPoint");
   if (nrInsPoints<2){
     DBGA("Incorrect number of Ins Points");
@@ -776,9 +949,9 @@ bool Tendon::loadFromXml(const TiXmlElement *root)
   return true;
 }
 
-TendonWrapper::TendonWrapper(Robot *myOwner)
+TendonWrapper::TendonWrapper(Robot *myOwner) : 
+  owner(myOwner)
 {
-  owner = myOwner;
 }
 
 /*! Use this function to get the link the tendon wrapper is attached 
@@ -797,11 +970,6 @@ Link* TendonWrapper::getAttachedLink()
 
 void TendonWrapper::createGeometry()
 {
-  SoTransform *linkIVTran;
-  float geomHeight = 10;
-  SoTransform *neg90x = new SoTransform();
-  neg90x->rotation.setValue(SbVec3f(1.0f,0.0f,0.0f),-1.5707f);
-  
   IVWrapper = new SoSeparator;
   IVWrapperMaterial = new SoMaterial;
   IVWrapperTran = new SoTransform;
@@ -816,20 +984,42 @@ void TendonWrapper::createGeometry()
   /*insert a pointer to the transform of the link this wrapper is attached to
     like this, we don't have to worry about updating anything.
     One problem: cleanup. This reference might prevent link's tranform IV node from being deleted when it should be*/
-  linkIVTran = getAttachedLink()->getIVTran();
-  IVWrapper->addChild(linkIVTran);
+  IVWrapper->addChild( getAttachedLink()->getIVTran() );
   
   /* insertion point's location relative to link's origin and align axis with wrapper orientation*/
   IVWrapper->addChild(IVWrapperTran);
-  IVWrapperTran->pointAt(location.toSbVec3f(),location.toSbVec3f() + orientation.toSbVec3f());
-  IVWrapperTran->combineLeft(neg90x);
   
   /*could share material between all wrappers, and not declare it locally*/
   IVWrapper->addChild(IVWrapperMaterial);
   IVWrapper->addChild(IVWrapperGeom);
   IVWrapperMaterial->diffuseColor.setValue(0.7f , 0.1f , 0.1f);
+  IVWrapperGeom->height=10;  
+}
+
+void TendonWrapper::updateGeometry()
+{
+  IVWrapperTran->pointAt(location.toSbVec3f(),location.toSbVec3f() + orientation.toSbVec3f());
+  //neg 90 x
+  rotateSoTransform(IVWrapperTran, vec3(1.0, 0.0, 0.0), -1.5707);
   IVWrapperGeom->radius=radius;
-  IVWrapperGeom->height=geomHeight;  
+}
+
+void TendonWrapper::setLocation(vec3 loc)
+{
+  location = loc;
+  updateGeometry();
+}
+
+void TendonWrapper::setOrientation(vec3 orient)
+{
+  orientation = orient;
+  updateGeometry();
+}
+
+void TendonWrapper::setRadius(double r)
+{
+  radius = r;
+  updateGeometry();
 }
 
 bool TendonWrapper::loadFromXml(const TiXmlElement* root)
@@ -874,7 +1064,28 @@ bool TendonWrapper::loadFromXml(const TiXmlElement* root)
   location = loc;
   orientation = ort;
   radius = rad;
+
+  //read list of exempt tendons
+  std::list<const TiXmlElement*> elementList = findAllXmlElements(root,"exemption");
+  std::list<const TiXmlElement*>::iterator p;
+  for (p = elementList.begin(); p != elementList.end(); p++) {
+    QString name = (*p)->Attribute("tendon");
+    if(name.isNull()){
+      DBGA("Warning: tendon name undefined for wrapper exemption");
+      continue;
+    }
+    mExemptList.push_back(name);
+  }
+
   return true;
+}
+
+bool TendonWrapper::isExempt(QString name)
+{
+  for (std::list<QString>::iterator it=mExemptList.begin(); it!=mExemptList.end(); it++) {
+    if ( *it == name ) return true;
+  }
+  return false;
 }
 
 HumanHand::HumanHand(World *w,const char *name) : Hand(w,name)
@@ -913,20 +1124,18 @@ int HumanHand::loadFromXml(const TiXmlElement* root, QString rootPath)
       DBGA("Failed to load tendon wrapper " << i);
       delete newTW;
     } else {
+      newTW->createGeometry();
+      IVRoot->addChild( newTW->getIVRoot() );	
+      newTW->updateGeometry();
+      DBGA("TendonWrapper " << i << " geometry added");
       mTendonWrapperVec.push_back(newTW);
     }
-  }
-  for (size_t t=0; t<mTendonWrapperVec.size(); t++)
-  {
-    mTendonWrapperVec[t]->createGeometry();
-    IVRoot->addChild( mTendonWrapperVec[t]->getIVRoot() );	
-    DBGA("TendonWrapper "<<t<<" geometry added");
   }
   for (size_t t=0; t<mTendonVec.size(); t++)
   {
     mTendonVec[t]->updateGeometry();
-    mTendonVec[t]->setRestPosition();
   }
+  setRestPosition();
   return SUCCESS;
 }
 
@@ -966,9 +1175,16 @@ Matrix insPtForceBlockMatrix(unsigned int numInsPoints)
   return D;
 }
 
-
-int HumanHand::tendonEquilibrium()
+PROF_DECLARE(HH_TENDON_EQUILIBRIUM);
+int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
+                                 const std::set<size_t> &passiveTendons,
+                                 bool compute_tendon_forces,
+                                 std::vector<double> &activeTendonForces,
+                                 std::vector<double> &jointResiduals,
+                                 double& unbalanced_magnitude,
+                                 bool useJointSprings)
 {
+  PROF_TIMER_FUNC(HH_TENDON_EQUILIBRIUM);
   std::list<Joint*> joints;
   for(int c=0; c<getNumChains(); c++) 
   {
@@ -976,24 +1192,14 @@ int HumanHand::tendonEquilibrium()
     joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
   }
 
-  if (mTendonVec.size() != 2) 
+  if (activeTendons.empty() && passiveTendons.empty()) 
   {
-    DBGA("Hand not suited for hard-coded analysis");
-    return -1;
-  }  
-  std::set<size_t> activeTendons;
-  activeTendons.insert(0);
-  std::set<size_t> passiveTendons;
-  passiveTendons.insert(1);
-
-  if (activeTendons.empty() || passiveTendons.empty()) 
-  {
-    DBGA("Need both active and passive tendons for analysis");
+    DBGA("Need either active or passive tendons (or both) for analysis");
     return -1;
   }
   
-  Matrix LeftHand(joints.size(), activeTendons.size());
-  Matrix RightHand(joints.size(), 1);
+  Matrix LeftHand(Matrix::ZEROES<Matrix>(joints.size(), activeTendons.size()));
+  Matrix RightHand(Matrix::ZEROES<Matrix>(joints.size(), 1));
   for (size_t i=0; i<mTendonVec.size(); i++)
   {    
     std::list< std::pair<transf, Link*> > insPointLinkTrans;
@@ -1024,47 +1230,362 @@ int HumanHand::tendonEquilibrium()
     }
     else
     {
-      DBGA("Warning: tendon " << i << " is not active or passive");
+      DBGP("Warning: tendon " << i << " is not active or passive");
     }
   }
-  //scale down right hand for numerical reasons
-  double scale = RightHand.absMax();
-  if (scale < 1.0e2)
+
+  //add the contribution of the joint springs
+  if (useJointSprings)
   {
-    //no passive forces, system is at equilibrium with trivial solution
-    DBGA("Equilibrium with no forces");
-    return 0;
+    std::list<Joint*>::iterator jit;
+    size_t j_num;
+    for (jit=joints.begin(),j_num=0; jit!=joints.end(); jit++,j_num++)
+    {
+      RightHand.elem(j_num,0) = RightHand.elem(j_num,0) - (*jit)->getSpringForce();
+    }
   }
-  RightHand.multiply(1.0/scale);
+
+  Matrix x(LeftHand.cols(), 1);
+
+  if (compute_tendon_forces)
+  {
+    //compute optimal tendon forces
+    //scale down right hand for numerical reasons
+    double scale = std::max(1.0, RightHand.absMax());
+    RightHand.multiply(1.0/scale);
+    RightHand.multiply(-1.0);  
+    if ( linearSolveSVD(LeftHand, RightHand, x) != 0 )
+    {
+      DBGA("SVD decomposition solving failed");
+      return -1;
+    }
+    x.multiply(scale);
+    RightHand.multiply(-1.0);
+    RightHand.multiply(scale);
+  }
+  else
+  {
+    //use passed in tendon forces
+    if ((int)activeTendonForces.size() != x.rows())
+    {
+      DBGA("Incorrect active tendon forces passed in");
+      return -1;
+    }
+    int t=0;
+    for (size_t i=0; i<mTendonVec.size(); i++)
+    {    
+      if (activeTendons.find(i) != activeTendons.end())
+      {
+        x.elem(t,0) = activeTendonForces.at(t);
+        t++;
+      }
+    }
+  }
+
+  //compute the residual joint torques
+  Matrix tau(LeftHand.rows(), 1);
+  matrixMultiply(LeftHand, x, tau);
+  matrixAdd(tau, RightHand, tau);
+  tau.getData(&jointResiduals);  
+  unbalanced_magnitude = tau.fnorm();
+  
+  //pass back the active forces on the tendons
+  if (compute_tendon_forces)
+  {
+    activeTendonForces.resize( activeTendons.size(), 0.0 );
+    int t=0;
+    for (size_t i=0; i<mTendonVec.size(); i++)
+    {    
+      if (activeTendons.find(i) != activeTendons.end())
+      {
+        activeTendonForces.at(t) = x.elem(t,0);
+        t++;
+      }
+    }
+  }
+
+  return 0;
+}
+
+int HumanHand::contactTorques(std::list<Contact*> contacts,
+                              std::vector<double> &jointTorques)
+{
+  std::list<Joint*> joints;
+  for(int c=0; c<getNumChains(); c++) 
+  {
+    std::list<Joint*> chainJoints = getChain(c)->getJoints();
+    joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
+  }
+  Matrix RightHand(joints.size(), 1);
+  {
+    Matrix J( grasp->contactJacobian(joints, contacts) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( contacts.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    //for now, all contacts apply equal force
+    //virtual contact normal points outwards, so use negative magnitude
+    magnitudes.resize(contacts.size(), -1.0);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+
+    RightHand.copyMatrix(JTDM);    
+  }
+  //assume we were using newtons to begin with
+  double scale = 1.0e6;
+  RightHand.multiply(-1.0);
+  jointTorques.resize(RightHand.rows());
+  for (size_t i=0; i<jointTorques.size(); i++)
+  {
+    jointTorques[i] = RightHand.elem(i,0) * scale;
+  }
+  return 0;
+}
+
+PROF_DECLARE(HH_CONTACT_EQUILIBRIUM);
+int HumanHand::contactEquilibrium(std::list<Contact*> contacts,
+                                  const std::set<size_t> &activeTendons,
+                                  std::vector<double> &activeTendonForces,
+                                  double &unbalanced_magnitude)
+{
+  PROF_TIMER_FUNC(HH_CONTACT_EQUILIBRIUM);
+  std::list<Joint*> joints;
+  for(int c=0; c<getNumChains(); c++) 
+  {
+    std::list<Joint*> chainJoints = getChain(c)->getJoints();
+    joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
+  }
+
+  activeTendonForces.resize( activeTendons.size(), 0.0 );
+  if (activeTendons.empty()) 
+  {
+    DBGA("Need active tendons for analysis");
+    return -1;
+  }
+  if (contacts.empty())
+  {
+    DBGA("Contact list empty for contact equilibrium");
+    return -1;
+  }
+  
+  Matrix LeftHand(joints.size(), activeTendons.size());
+  for (size_t i=0; i<mTendonVec.size(); i++)
+  {    
+    if (activeTendons.find(i) == activeTendons.end()) continue;
+
+    std::list< std::pair<transf, Link*> > insPointLinkTrans;
+    mTendonVec[i]->getInsertionPointLinkTransforms(insPointLinkTrans);
+    Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    mTendonVec[i]->getInsertionPointForceMagnitudes(magnitudes);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+
+    assert( JTDM.rows() == LeftHand.rows());
+    assert( JTDM.cols() == 1);
+    LeftHand.copySubMatrix(0, i, JTDM);
+  }
+
+  Matrix RightHand(joints.size(), 1);
+  {
+    Matrix J( grasp->contactJacobian(joints, contacts) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( contacts.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    //for now, all contacts apply equal force
+    //virtual contact normal points outwards, so use negative magnitude
+    magnitudes.resize(contacts.size(), -1.0);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+
+    RightHand.copyMatrix(JTDM);    
+  }
+  //assume we were using newtons to begin with
+  double scale = 1.0e6;
   RightHand.multiply(-1.0);
   
+  DBGA("Joint torques: " << RightHand.elem(0,0) << " " << RightHand.elem(1,0));
+
   Matrix x(LeftHand.cols(), 1);
   if ( linearSolveSVD(LeftHand, RightHand, x) != 0 )
   {
     DBGA("SVD decomposition solving failed");
     return -1;
   }
+  
   //compute the residual joint torques
   Matrix tau(LeftHand.rows(), 1);
   matrixMultiply(LeftHand, x, tau);
   RightHand.multiply(-1.0);
   matrixAdd(tau, RightHand, tau);
-  DBGA("Residual joint torques:");
-  tau.print();
-  DBGA("Error norm: " << tau.fnorm());
+  //DBGA("Residual joint torques:");
+  //tau.print();
+  unbalanced_magnitude = tau.fnorm()*scale;
 
-  //scale result back up
+  //scale result back 
   x.multiply(scale);
-  //set the active force to the tendon
+  //compute the active forces on the tendon
   int t=0;
   for (size_t i=0; i<mTendonVec.size(); i++)
   {    
     if (activeTendons.find(i) != activeTendons.end())
     {
-      mTendonVec[i]->setActiveForce(x.elem(t,0));
+      //DBGA("Tendon active force: " << x.elem(t,0) );
+      activeTendonForces.at(t) = x.elem(t,0);
       t++;
     }
   }
-  myWorld->tendonChange();
+
+  //DBGA("Unbalanced magnitude: " << unbalanced_magnitude);
   return 0;
 }
+
+int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
+                                             std::vector<double> &contactForces,
+                                             const std::set<size_t> &activeTendons,
+                                             const std::vector<double> &activeTendonForces)
+{
+  std::list<Joint*> joints;
+  for(int c=0; c<getNumChains(); c++) 
+  {
+    std::list<Joint*> chainJoints = getChain(c)->getJoints();
+    joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
+  }
+
+  if (activeTendons.empty()) 
+  {
+    DBGA("Need active tendons for analysis");
+    return -1;
+  }
+  if (contacts.empty())
+  {
+    DBGA("Contact list empty for contact equilibrium");
+    return -1;
+  }
+  
+  Matrix LeftHand(joints.size(), activeTendons.size());
+  for (size_t i=0; i<mTendonVec.size(); i++)
+  {    
+    if (activeTendons.find(i) == activeTendons.end()) continue;
+
+    std::list< std::pair<transf, Link*> > insPointLinkTrans;
+    mTendonVec[i]->getInsertionPointLinkTransforms(insPointLinkTrans);
+    Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    mTendonVec[i]->getInsertionPointForceMagnitudes(magnitudes);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+
+    assert( JTDM.rows() == LeftHand.rows());
+    assert( JTDM.cols() == 1);
+    LeftHand.copySubMatrix(0, i, JTDM);
+  }
+
+  //use passed in tendon forces
+  Matrix x(LeftHand.cols(), 1);
+  if ((int)activeTendonForces.size() != x.rows())
+  {
+    DBGA("Incorrect active tendon forces passed in");
+    return -1;
+  }
+  int t=0;
+  for (size_t i=0; i<mTendonVec.size(); i++)
+  {    
+    if (activeTendons.find(i) != activeTendons.end())
+    {
+      x.elem(t,0) = activeTendonForces.at(t);
+      t++;
+    }
+  }
+  //compute the joint torques
+  Matrix tau(LeftHand.rows(), 1);
+  matrixMultiply(LeftHand, x, tau);
+  DBGA("Joint torques: " << tau.elem(0,0) << " " << tau.elem(1,0));
+
+  Matrix RightHand(joints.size(), contacts.size());
+  {
+    Matrix J( grasp->contactJacobian(joints, contacts) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( contacts.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+    RightHand.copyMatrix(JTD);    
+  }
+
+  DBGA("Contact jac:\n" << RightHand.elem(0,0) << " " << RightHand.elem(0,1) << "\n" << 
+       RightHand.elem(1,0) << " " << RightHand.elem(1,1));
+
+  double scale = std::max(1.0, tau.absMax());
+  tau.multiply(1.0/scale);
+
+  DBGP("Joint torques scaled: " << tau.elem(0,0) << " " << tau.elem(1,0));
+
+  Matrix c(RightHand.cols(), 1);
+  if ( linearSolveSVD(RightHand, tau, c) != 0 )
+  {
+    DBGA("SVD decomposition solving failed");
+    return -1;
+  }
+  
+  /*
+  Matrix c(tau);
+  if ( triangularSolve(RightHand, c) != 0 )
+  {
+    DBGA("Triangular solving failed");
+    return -1;
+  }
+  */
+
+  DBGP("Contact forces computed for " << contacts.size() << "contacts");
+  Matrix test(RightHand.rows(),1);
+  matrixMultiply(RightHand, c, test);
+  test.multiply(-1);
+  matrixAdd(test, tau, test);
+  if (test.fnorm() > 1.0e-5) {DBGA("Warning: norm of error " << test.fnorm());}
+
+  c.multiply(scale);
+  contactForces.resize( contacts.size() );
+  for (size_t i=0; i<contacts.size(); i++)
+  {
+    contactForces[i] = c.elem(i,0);
+  }
+  
+  return 0;
+}
+
+bool HumanHand::insPointInsideWrapper()
+{
+  for(size_t i=0; i<mTendonVec.size(); i++)
+  {
+    if (mTendonVec[i]->insPointInsideWrapper()) 
+    {
+      //std::cerr << " on tendon " << i << "\n";
+      return true;
+    }
+  }
+  return false;
+}
+

@@ -46,6 +46,7 @@ class position;
 class Hand;
 class GraspableBody;
 class Contact;
+class VirtualContact;
 class Link;
 class GWS;
 class QualityMeasure;
@@ -254,6 +255,10 @@ public:
   //! A convenience version of the Jacobian function that takes in a list of contacts
   Matrix contactJacobian(const std::list<Joint*> &joints, 
                          const std::list<Contact*> &contacts);
+
+  //! A convenience version of the Jacobian function that takes in a list of virtual contacts
+  Matrix contactJacobian(const std::list<Joint*> &joints, 
+                         const std::list<VirtualContact*> &contacts);
 
   //! Computes the grasp map matrix G from friction and normal force matrices R and D
   static Matrix graspMapMatrix(const Matrix &R, const Matrix &D);

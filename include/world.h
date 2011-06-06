@@ -362,7 +362,7 @@ public:
   void addLink(Link *newLink);
 
   //! Called when the user selects a new hand from the drop down menu.
-  void setCurrentHand(Hand *hand) {currentHand = hand;}
+  void setCurrentHand(Hand *hand) {currentHand = hand; emit handSelectionChanged();}
 
   //! Creates a robot, loads it from a file and adds it to the world
   Robot *importRobot(QString filename);

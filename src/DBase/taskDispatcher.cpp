@@ -117,8 +117,9 @@ void TaskDispatcher::startNewTask()
 	mStatus = ERROR;
 	return;
     }
+    DBGA("Task id: " << rec.taskId);
     //task type 0 is reserved for no task to do
-    if (!rec.taskType) {
+    if (!rec.taskType.empty()) {
         DBGA("Dispatcher: no tasks to be executed");
 	mStatus = NO_TASK;
 	return;
@@ -170,7 +171,7 @@ void TaskDispatcher::checkCurrentTask()
         case Task::ERROR:
 	    mStatus = READY;
 	    //mark the task as error in the database
-	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord(),"ERROR")) {
+	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord().taskId, "ERROR")) {
 	        DBGA("Dispatcher: error marking completed task");
 		mStatus = ERROR;
 	    }
@@ -180,7 +181,7 @@ void TaskDispatcher::checkCurrentTask()
 	    mStatus = READY;
 	    mCompletedTasks++;
 	    //mark the task as completed in the database
-	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord(),"COMPLETED")) {
+	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord().taskId, "COMPLETED")) {
 	        DBGA("Dispatcher: error marking completed task");
 		mStatus = ERROR;
 	    }
@@ -234,26 +235,15 @@ void TaskDispatcher::sensorCB(void *data, SoSensor*)
 Task* TaskFactory::getTask(TaskDispatcher *op, db_planner::DatabaseManager *mgr, 
 			   db_planner::TaskRecord rec)
 {
-	switch(rec.taskType) {
-	case 1:
-		return new EmptyTask(op, mgr, rec);	  
-	case 2:
-		return new EmptyOneShotTask(op, mgr, rec);	  
-	case 3:
-		return new GraspPlanningTask(op, mgr, rec);
-	case 4:
-		return new PreGraspCheckTask(op, mgr, rec);
-	case 5:
-		return new GraspClusteringTask(op, mgr, rec);
-	case 6:
-		return new GraspTransferCheckTask(op, mgr, rec);
-	case 7:
-		return new TableCheckTask(op, mgr, rec);
-	case 8:
-		return new CompliantGraspCopyTask(op, mgr, rec);
-	default:
-		return NULL;
-	}
+  if (rec.taskType == "EMPTY") return new EmptyTask(op, mgr, rec);	  
+  else if (rec.taskType == "EMPTY_ONE_SHOT") return new EmptyOneShotTask(op, mgr, rec);	  
+  else if (rec.taskType == "GRASP_PLANNING") return new GraspPlanningTask(op, mgr, rec);
+  else if (rec.taskType == "PREGRASP_CHECK") return new PreGraspCheckTask(op, mgr, rec);
+  else if (rec.taskType == "GRASP_CLUSTERING") return new GraspClusteringTask(op, mgr, rec);
+  else if (rec.taskType == "GRASP_TRANSFER") return new GraspTransferCheckTask(op, mgr, rec);
+  else if (rec.taskType == "TABLE_CHECK") return new TableCheckTask(op, mgr, rec);
+  else if (rec.taskType == "COMPLIANT_COPY")return new CompliantGraspCopyTask(op, mgr, rec);
+  else return NULL;
 }
 
 void EmptyTask::start()

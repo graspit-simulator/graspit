@@ -152,13 +152,10 @@ public:
   //! Moves this element to a new location in small steps and resolves collisions along the way
   virtual bool moveTo(transf &tr,double translStepSize,double rotStepSize);
 
-  //! Helper function to initialize classes based on class names usually read from files.
-  static WorldElement *createInstance(const QString &className,
-				      World *parent,const char *name);
-
   //! Needed so that when processing the glove and flock we can access interpolateTo
   friend class SensorInputDlg;
 };
+
 
 #define WORLD_ELEMENT_H
 #endif

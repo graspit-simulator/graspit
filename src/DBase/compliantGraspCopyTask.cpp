@@ -45,6 +45,13 @@ CompliantGraspCopyTask::CompliantGraspCopyTask(TaskDispatcher *disp, db_planner:
 
 void CompliantGraspCopyTask::start()
 {
+  //get the details of the planning task itself
+  if (!mDBMgr->GetPlanningTaskRecord(mPlanningTask.taskId, &mPlanningTask)) {
+    DBGA("Failed to get planning record for task");
+    mStatus = ERROR;
+    return;
+  }
+
   loadHand();
   if (mStatus == ERROR) return;
 
@@ -60,7 +67,7 @@ void CompliantGraspCopyTask::start()
 
   //load all the grasps
   std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mRecord.model), mRecord.handName, &graspList)){
+  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
     DBGA("Load grasps failed");
     mStatus = ERROR;
     emptyGraspList(graspList);

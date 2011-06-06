@@ -131,8 +131,6 @@ Joint::cloneFrom(const Joint *original)
 	worldAxis = original->worldAxis;
 	DH = new DHTransform(original->DH);
 	DH->getTran().toSoTransform(IVTran);
-	mK = original->mK;
-	mRestVal = original->mRestVal;
 }
 
 int
@@ -154,7 +152,7 @@ Joint::applyPassiveInternalWrenches()
 	applyInternalWrench(-f);
 }
 
-/*! Assumes a linear spring with the rest value at the joint minimum */
+/*! Assumes a linear spring with the rest value specified*/
 double
 Joint::getSpringForce() const 
 {
@@ -213,25 +211,15 @@ PrismaticJoint::initJointFromXml(const TiXmlElement* root, int jnum)
 	} else {
 		return FAILURE;
 	}
-	if(!getDouble(root,"theta", theta)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"a", a)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"alpha", alpha)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"minValue", minVal)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"maxValue", maxVal)){
-		return FAILURE;
-	}
-	getDouble(root,"viscousFriction", f1);
-	getDouble(root,"CoulombFriction", f0);
-	getDouble(root,"springStiffness", mK);
-	getDouble(root,"restValue", mRestVal);
+	if(!getDouble(root,"theta", theta)) return FAILURE;
+	if(!getDouble(root,"a", a)) return FAILURE;
+	if(!getDouble(root,"alpha", alpha)) return FAILURE;
+	if(!getDouble(root,"minValue", minVal)) return FAILURE;
+	if(!getDouble(root,"maxValue", maxVal))	return FAILURE;
+	if (!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
+	if (!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
+	if (!getDouble(root,"springStiffness", mK)) mK = 0.0;
+	if (!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
 
 	DBGP("thStr: " << theta << " d: " << dStr << " a: " << a << " alpha: " 
 		<< alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: " 
@@ -314,25 +302,15 @@ RevoluteJoint::initJointFromXml(const TiXmlElement* root, int jnum)
 	}
 	else
 		return FAILURE;
-	if(!getDouble(root,"d", d)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"a", a)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"alpha", alpha)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"minValue", minVal)){
-		return FAILURE;
-	}
-	if(!getDouble(root,"maxValue", maxVal)){
-		return FAILURE;
-	}
-	getDouble(root,"viscousFriction", f1);
-	getDouble(root,"CoulombFriction", f0);
-	getDouble(root,"springStiffness", mK);
-	getDouble(root,"restValue", mRestVal);
+	if(!getDouble(root,"d", d)) return FAILURE;
+	if(!getDouble(root,"a", a)) return FAILURE;
+	if(!getDouble(root,"alpha", alpha)) return FAILURE;
+	if(!getDouble(root,"minValue", minVal)) return FAILURE;
+	if(!getDouble(root,"maxValue", maxVal)) return FAILURE;
+	if(!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
+	if(!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
+	if(!getDouble(root,"springStiffness", mK)) mK = 0.0;
+	if(!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
 
 	DBGP("thStr: " << thStr << " d: " << d << " a: " << a << " alpha: " 
 		<< alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: " 
@@ -341,12 +319,8 @@ RevoluteJoint::initJointFromXml(const TiXmlElement* root, int jnum)
 	if (mK < 0) {
 		DBGA("Negative spring stiffness");
 		return FAILURE;
-	} else if (mK>0) {
-		if (mRestVal < minVal || mRestVal > maxVal) {
-			DBGA("Joint spring rest value is not within legal range");
-			return FAILURE;
-		}
 	}
+
 	//convert to graspit units which for now seem to be the
 	//rather strange Nmm * 1.0e6
 	mK *= 1.0e6; 

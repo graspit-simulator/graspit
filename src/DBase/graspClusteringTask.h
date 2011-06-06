@@ -44,6 +44,9 @@ class GraspitDBGrasp;
  */
 class GraspClusteringTask : public Task {
  private:
+  //! The record of the actual planning task
+  db_planner::PlanningTaskRecord mPlanningTask;
+
   //! Returns true if two grasps are close enough to be clustered together
   bool clusterGrasps(const GraspitDBGrasp *g1, const GraspitDBGrasp *g2);
  public:

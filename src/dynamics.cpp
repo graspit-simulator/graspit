@@ -550,9 +550,9 @@ iterateDynamics(std::vector<Robot *> robotVec,
 
     // compute external wrench
     // fext = [ 0 0 -9810.0*mass -[ang_vel_N x (Jcg_N * ang_vel_N)] ]
-	//based on this, it would appear that graspit force units are N*1.0e6
-	fext[6*bn+2] = -9810.0 * bodyVec[bn]->getMass() * dp->gravityMultiplier;  // force of gravity
-	// fext[6*bn+2] = 0;  // NO force of gravity
+    //based on this, it would appear that graspit force units are N*1.0e6
+    //fext[6*bn+2] = -9810.0 * bodyVec[bn]->getMass() * dp->gravityMultiplier;  // force of gravity
+    fext[6*bn+2] = 0;  // NO force of gravity
 
     dgemv("N",3,3,1.0,Jcg_N,3,&vl[6*bn+3],1,0.0,tmp3,1);  // inertial moments
     fext[6*bn+3] = - (vl[6*bn+4]*tmp3[2] - vl[6*bn+5]*tmp3[1]);

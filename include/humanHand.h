@@ -44,6 +44,9 @@
 */
 
 #include <vector>
+#include <limits>
+#include <set>
+
 #include <Inventor/SoType.h>
 #include "robot.h"
 
@@ -64,11 +67,14 @@ class Tendon;
 */
 class TendonInsertionPoint {
 private:
+  //! The location of the insertion point, in link coordinates.
+  vec3 mAttachPoint;
+  
   //! This tells wether the insertion point is permanent, or dynamic
   /*! Dynamic insertion points are those created when a tendon wraps 
     around a wrapper.*/
   bool mPermanent;
-  
+
   //! Robot chain nnumber that tendon is attached to
   /*! -1 means insertion point is on the base of the robot*/
   int mAttachChainNr;
@@ -86,22 +92,29 @@ private:
   SoCylinder *mIVConnectorGeom;
   
   Tendon* mOwner;
+
+  void createInsertionGeometry();
+  void createConnectorGeometry();
 public:
-  
-  //! The location of the insertion point, in link coordinates.
-  vec3 mAttachPoint;
+
   //! The force applied by the tendon at this insertion point, in world coordinates.
   vec3 mInsertionForce;
   
   TendonInsertionPoint(Tendon* myOwner,int chain,int link,vec3 point,bool isPerm=true);
-  
-  void createInsertionGeometry();
-  void createConnectorGeometry();
+
   void removeAllGeometry();
+  
   Tendon* getTendon(){return mOwner;}
+
   void setPermanent(bool p){mPermanent=p;}
-  bool isPermanent(){return mPermanent;}
+
+  bool isPermanent() const {return mPermanent;}
+
   SbVec3f getWorldPosition();
+
+  vec3 getAttachPoint() const {return mAttachPoint;}
+
+  void setAttachPoint(vec3 attachPoint);
   
   //! Use this function to get the link the insertion point is attached to.
   /*! Handles the case where tendon is attached to base correctly*/
@@ -115,6 +128,9 @@ public:
   SoMaterial* getIVConnectorMaterial(){return mIVConnectorMaterial;}
   SoTransform* getIVConnectorTran(){return mIVConnectorTran;}
   SoCylinder* getIVConnectorGeom(){return mIVConnectorGeom;}
+
+  static const double INSERTION_POINT_RADIUS;
+  static const double CONNECTOR_RADIUS;
 };
 
 /*! The TendonWrapper is a cylindrical shape that a tendon is not alowed 
@@ -131,20 +147,35 @@ private:
   SoMaterial *IVWrapperMaterial;
   SoTransform *IVWrapperTran;
   SoCylinder *IVWrapperGeom;
+
+  //! A list of tendons (by name) that are exempt from wrapping around this wrapper
+  std::list<QString> mExemptList;
   
 public:
-  vec3 location,orientation;
+  vec3 location, orientation;
   double radius;
   
   TendonWrapper(Robot* myOwner);
   Link* getAttachedLink();
   Robot* getRobot(){return owner;}
   
+  void setLocation(vec3 loc);
+  vec3 getLocation() const {return location;}
+
+  void setOrientation(vec3 orient);
+  vec3 getOrientation() const {return orientation;}
+
+  void setRadius(double r);
+  double getRadius() const {return radius;}
+
   void createGeometry();
+  void updateGeometry();
   SoSeparator* getIVRoot(){return IVWrapper;}
   int getChainNr(){return attachChainNr;}
   int getLinkNr(){return attachLinkNr;}
   bool loadFromXml(const TiXmlElement* root);
+  //! Check if the tendon with the given name is exempt from intersection with this tendon
+  bool isExempt(QString name);
 };
 
 //! Defines a tendon geometry by listing its insertion points
@@ -193,13 +224,18 @@ private:
 
   bool mSelected;
   
-  //! The length of the tendon at the resting position
-  float mRestLength;
-  
   //! The current length of the tendon
   float mCurrentLength;
 
-  int mNrInsPoints;
+  //! The currently used length of the tendon at the resting position
+  float mRestLength;
+
+  //! pre tensioning subtracted from rest length, of -1 if no pre-tensioning is used
+  //! used only if mDefaultRestLength (absolute default rest length is specified)
+  float mPreTensionLength;
+  
+  //! The default rest length, or -1 if no default has been specified
+  float mDefaultRestLength;
 
   void updateForceIndicators();
 
@@ -220,7 +256,8 @@ public:
                        int chain, int link, vec3 point, bool isPerm);
   
   //! Removes the insertion point pointed to by the given iterator
-  void removeInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos);
+  std::list<TendonInsertionPoint*>::iterator 
+  removeInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos);
   
   //! Updates connector geometry based on movement of links that tendon inserts into
   void updateGeometry();
@@ -236,7 +273,22 @@ public:
   
   //! Removes wrapper intersections if they are no longer needed
   void removeWrapperIntersections();
+
+  //! Returns the total number of insertion points
+  int getNumInsPoints() const {return mInsPointList.size();}
   
+  //! Returns the number of permanent insertion points
+  int getNumPermInsPoints() const;
+
+  //! Returns the n-th permanent insertion point
+  TendonInsertionPoint* getPermInsPoint(int n);
+
+  //! Removes all temporary insertion points
+  void removeTemporaryInsertionPoints();
+
+  //! Returns the minimum distance between two consecutive permanent insertion points
+  double minInsPointDistance();
+
   void select();
   void deselect();
   bool isSelected(){return mSelected;}
@@ -254,7 +306,15 @@ public:
   void setStiffness(double k){mK = k;}
 
   double getStiffness() {return mK;}
+
+  float getDefaultRestLength(){return mDefaultRestLength;}
+
+  void setDefaultRestLength(double l){mDefaultRestLength = l;}
   
+  float getPreTensionLength(){return mPreTensionLength;}
+
+  void setPreTensionLength(double l){mPreTensionLength = l;}
+
   void setName(QString name){mTendonName=name;}
 
   QString getName(){return mTendonName;}
@@ -273,13 +333,16 @@ public:
 
   void setApplyPassiveForce(bool b){mApplyPassiveForce=b;}
   
-  /*sets the current state of the tendon as rest state*/
-  void setRestPosition();
+  /*sets the state of the tendon as rest state*/
+  void setRestLength(double length);
   
   //! Returns the excursion of the end of the tendon compared to its rest position.
   /*! For the moment we consider that tendon elongation is actually 
     excursion, as if the origin was free to move. */
   float getExcursion(){return mCurrentLength - mRestLength;}
+
+  //! Gets the current length of the tendon. Assumes updateGeometry() has been called.
+  float getCurrentLength(){return mCurrentLength;}
 
   bool loadFromXml(const TiXmlElement *root);
 
@@ -297,6 +360,8 @@ public:
   //! Returns pairs of insertion points and their links, with ins. pt. transforms relative to their links
   void getInsertionPointLinkTransforms(std::list< std::pair<transf, Link*> > &insPointLinkTrans);
   
+  //! Returns true if any of the permanent insertion points is inside a wrapper
+  bool insPointInsideWrapper();
 };
 
 //! A hand with tendon information
@@ -318,6 +383,7 @@ protected:
 
 public:
   HumanHand(World*,const char*);
+  virtual ~HumanHand() {}
 
   virtual int loadFromXml(const TiXmlElement* root,QString rootPath);
 
@@ -339,7 +405,80 @@ public:
   virtual void DOFController(double timeStep);
 
   //! Computes if tendon forces are self-balanced around all joints of the hand
-  int tendonEquilibrium();
+  /*! Tries to find force values for all the tendons in the active set so that the joint 
+    torques resulting from passive forces on the tendons in the passive set are minimized. */
+  int tendonEquilibrium(const std::set<size_t> &activeTendons,
+                        const std::set<size_t> &passiveTendons,
+                        bool compute_tendon_forces,
+                        std::vector<double> &activeTendonForces,
+                        std::vector<double> &jointResiduals,
+                        double& unbalanced_magnitude,
+                        bool useJointSprings = true);
+
+  int contactEquilibrium(std::list<Contact*> contacts,
+                         const std::set<size_t> &activeTendons,
+                         std::vector<double> &activeTendonForces,
+                         double &unbalanced_magnitude);
+
+  int contactForcesFromTendonForces(std::list<Contact*> contacts,
+                                    std::vector<double> &contactForces,
+                                    const std::set<size_t> &activeTendons,
+                                    const std::vector<double> &activeTendonForces);
+
+  //! Returns the joint torques created by the given contacts applying 1N of force along
+  //! their normals. Does not care about tendons.
+  int contactTorques(std::list<Contact*> contacts,
+                     std::vector<double> &jointTorques);
+
+  //! Returns true if any of the tendons has a permanent insertion point inside a wrapper
+  bool insPointInsideWrapper();
+
+  //! Sets the rest position of all tendons to their default values, or, if they don't have one,
+  //! to their current value.
+  void setRestPosition()
+  {
+    for(size_t i=0; i<mTendonVec.size(); i++)
+    {
+      if (mTendonVec[i]->getDefaultRestLength() < 0.0)
+      {
+        if (mTendonVec[i]->getPreTensionLength() < 0.0)
+        {
+          mTendonVec[i]->setRestLength( mTendonVec[i]->getCurrentLength() );
+        }
+        else
+        {
+          mTendonVec[i]->setRestLength( mTendonVec[i]->getCurrentLength() - 
+                                        mTendonVec[i]->getPreTensionLength() );
+        }
+      }
+      else
+      {
+        mTendonVec[i]->setRestLength( mTendonVec[i]->getDefaultRestLength() );
+      }
+    }
+  }
+
+  //! Removes temporary insertion points for all tendons
+  void removeTemporaryInsertionPoints()
+  {
+    for(size_t i=0; i<mTendonVec.size(); i++)
+    {
+      mTendonVec[i]->removeTemporaryInsertionPoints();
+    }
+  }
+
+  //! Returns the minimum distance between consecutive permanent insertion points for all tendons
+  //! Does not look at distances accross tendons
+  double minInsPointDistance()
+  {
+    double minDist = std::numeric_limits<double>::max();
+    for(size_t i=0; i<mTendonVec.size(); i++)
+    {
+      minDist = std::min(minDist, mTendonVec[i]->minInsPointDistance());
+    }
+    return minDist;
+  }
+
 };
 
 #endif

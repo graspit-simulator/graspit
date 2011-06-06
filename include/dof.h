@@ -156,6 +156,9 @@ public:
   virtual ~DOF() {}
   //! Initializes a DOF based on a list of joints it controls
   virtual void initDOF(Robot *myRobot,const std::list<Joint *>& jList);
+  //! Sets the max and min vals of the DOF from the smallest range of the joint limits.
+  void updateMinMax();
+
   //! Returns the type of this DOF
   virtual Type getType() const = 0;
   //! Resets the DOF. This is a fairly abstract concept, see implementations for details.
@@ -192,12 +195,12 @@ public:
   virtual int getNumLimitConstraints() = 0;
   //! Computes the dynamic constraints that prevent this DOF from exceeding its range 
   virtual void buildDynamicLimitConstraints(std::map<Body*,int> &islandIndices, int numBodies, 
-											double* H, double *g, int &hcn) = 0;
+                                            double* H, double *g, int &hcn) = 0;
   //! Returns the number of dynamic coupling constraints this DOF needs
   virtual int getNumCouplingConstraints() = 0;
   //! Computes the dynamic constraints that ensure that the coupling of this DOF is respected
   virtual void buildDynamicCouplingConstraints(std::map<Body*,int> &islandIndices, int numBodies, 
-											   double* Nu, double *eps, int &ncn) = 0;
+                                               double* Nu, double *eps, int &ncn) = 0;
   /*! Sets the motor force applied on this DOF */
   virtual void setForce(double f) = 0;
 
@@ -295,12 +298,12 @@ public:
 	virtual int getNumLimitConstraints();
 	//! Only one, applied to first joint in the DOF
 	virtual void buildDynamicLimitConstraints(std::map<Body*,int> &islandIndices, int numBodies, 
-	   										  double* H, double *g, int &hcn);
+                                                  double* H, double *g, int &hcn);
 	//! Rigid coupling constraints ensure all joints move together
 	virtual int getNumCouplingConstraints(){return jointList.size() - 1;}
 	//! Rigid coupling constraints ensure all joints move together
 	virtual void buildDynamicCouplingConstraints(std::map<Body*,int> &islandIndices, int numBodies, 
-											     double* Nu, double *eps, int &ncn);
+                                                     double* Nu, double *eps, int &ncn);
 	//! Only sets force to first joint, coupling constraints should take care of rest
 	virtual void setForce(double f);
 };
@@ -336,8 +339,8 @@ public:
 	Type getType()const {return BREAKAWAY;}
 	BreakAwayDOF() : RigidDOF(), mInBreakAway(NULL), mBreakAwayValues(NULL),mBreakAwayTorque(0.0) {}
 	BreakAwayDOF(BreakAwayDOF *original) : RigidDOF(original), mInBreakAway(NULL), 
-										   mBreakAwayValues(NULL), 
-										   mBreakAwayTorque(original->mBreakAwayTorque) {}
+                                               mBreakAwayValues(NULL), 
+                                               mBreakAwayTorque(original->mBreakAwayTorque) {}
 	~BreakAwayDOF();
 
 	//! Initializes breakaway flags
@@ -409,7 +412,7 @@ public:
 	virtual int getNumLimitConstraints();
 	//! Computes one constraint for each joint that exceeds it range
 	virtual void buildDynamicLimitConstraints(std::map<Body*,int> &islandIndices, int numBodies, 
-											  double* H, double *g, int &hcn);
+                                                  double* H, double *g, int &hcn);
 	//! Explicitly sets force to all joints in the DOF
 	virtual void setForce(double f);
 	//! A simple stub for now, always applying max force

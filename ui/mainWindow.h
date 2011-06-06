@@ -76,6 +76,7 @@ public:
 		delete mUI;
 	}
 	void setMainWorld( World *w );
+        World* getMainWorld(){return world;}                                     
 
 public slots:
 	//-------------

@@ -30,10 +30,8 @@
 #ifndef DB_PLANNER_TASK_H
 #define DB_PLANNER_TASK_H
 
+#include <vector>
 #include <string>
-#include <set>
-using std::string;
-using std::set;
 
 namespace db_planner {
 
@@ -41,11 +39,21 @@ class Model;
 
 //! For now, a task does something of a type with a hand to a model
 struct TaskRecord {
-	Model *model;
-	string handName;
-	int taskType;
-	int taskId;
-	int taskTime;
+  std::string taskType;
+  int taskId;
+};
+
+struct PlanningTaskRecord {
+  int taskId;
+  Model *model;
+  std::string handName;
+  int taskTime;
+};
+
+struct OptimizationTaskRecord {
+  int taskId;
+  std::vector<double> parameters;
+  std::string hand_name;
 };
 
 }

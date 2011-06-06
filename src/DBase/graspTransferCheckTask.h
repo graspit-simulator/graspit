@@ -41,6 +41,8 @@ class GraspTransferCheckTask : public Task {
   Hand  *mHand1, *mHand2;
   //! The object we are planning on
   GraspableBody *mObject;
+  //! The record of the actual planning task
+  db_planner::PlanningTaskRecord mPlanningTask;
   
   //! Checks if a pair of grasps is compatible and writes it to the database
   bool checkGraspCombo(db_planner::Grasp* grasp1, db_planner::Grasp* grasp2);

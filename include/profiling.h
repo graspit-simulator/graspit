@@ -19,7 +19,7 @@
 //
 // Author(s): Matei T. Ciocarlie
 //
-// $Id: profiling.h,v 1.9 2009/12/01 18:44:23 cmatei Exp $
+// $Id: profiling.cpp,v 1.6.4.1 2009/07/23 21:18:02 cmatei Exp $
 //
 //######################################################################
 
@@ -161,155 +161,122 @@ namespace Profiling {
 
 #endif
 
-/*! These functions read system time. Should have at least microsecond
-	precision. They are different for Linux and Windows.
-
-	We also need to convert the resulting time to a common unit, which
-	we have chosen to be microseconds. Conversion is separate from read
-	time, since we don't want to do it every time we read time, but only
-	when we need to return it.
-*/
-
-#ifdef WIN32
-
-#define NOMINMAX
-#include <windows.h>
-#undef NOMINMAX
-
-#define UINT64 unsigned __int64
-
-// Gets time in the highest resolution available to the CPU, about a nanosecond
-#define PROF_GET_TIME(STR) LARGE_INTEGER tmp;			  \
-  QueryPerformanceCounter(&tmp);				  \
-  STR = tmp.QuadPart; 
-#define PROF_CONVERT_TO_MICROS(RAW,MICROS) MICROS = 1.0e6 * ((double)RAW) / getProfiler().getCountsPerSec();
-/*
-// Gets time in units of 100 nanoseconds as 2 4-byte words
-#define PROF_GET_TIME(STR)  FILETIME tmp;					\
-  GetSystemTimeAsFileTime(&tmp);					\
-  STR = (static_cast<unsigned __int64>(tmp.dwHighDateTime) << 32) | tmp.dwLowDateTime;
-#define PROF_CONVERT_TO_MICROS(RAW,MICROS) MICROS = 0.1 * RAW;
-*/
-#else
-/*
-//this version seems to have a bug; occasionally it reports 
-//a huge value. Maybe a bug in gettimeofday
-#include <sys/time.h>
-#include <sys/types.h>
-#define UINT64 u_int64_t
-#define PROF_GET_TIME(STR) struct timeval tmp; \
-  if (gettimeofday(&tmp, NULL) < 0) {	       \
-    std::cerr << "gettimeofday() failed \n";   \
-  }					       \
-  STR = tmp.tv_sec * 1000000 + tmp.tv_usec;
-#define PROF_CONVERT_TO_MICROS(RAW,MICROS) MICROS = RAW;
-*/
-
-//version WITH ONLY ONE SECOND RESOLUTION
-#include <ctime>
-#include <sys/types.h>
-#define UINT64 u_int64_t
-#define PROF_GET_TIME(STR) STR = time(NULL);
-#define PROF_CONVERT_TO_MICROS(RAW,MICROS) MICROS = 1.0e6 * RAW;
-#endif
+//contains all the low-level calls for getting and processing system time
+#include "timer_calls.h"
 
 namespace Profiling {
 
-class ProfileInstance {
+class ProfileInstance 
+{
 private:
-	int mCount;
-	bool mRunning;
-	std::string mName;
-	//! The units here might be different depending on the operating system
-	/*! use getTotalTimeMicroseconds() to get total timer time in microseconds. */
-	UINT64 mStartTime, mElapsedTime;
+  int mCount;
+  bool mRunning;
+  std::string mName;
+  //! The units here might be different depending on the operating system
+  /*! use getTotalTimeMicroseconds() to get total timer time in microseconds. */
+  PROF_TIME_UNIT mStartTime;
+  PROF_DURATION_UNIT mElapsedTime;
 public:
-	ProfileInstance();
-	void setName(char *name){mName = name;}
+  ProfileInstance();
+  void setName(const char *name){mName = name;}
 
-	void count(){mCount++;}
-	int getCount(){return mCount;}
-	void reset(){
-		mCount=0;
-		mElapsedTime = 0;
-		if (mRunning) {
-			PROF_GET_TIME(mStartTime);
-		}
-	}
-	void startTimer(){
-		if (!mRunning) {
-			PROF_GET_TIME(mStartTime);
-			mRunning = true;
-		} else {
-			std::cerr << "Timer " << mName << " already running.\n";
-		}
-	}
-	void stopTimer(){
-		if (mRunning) {
-		    UINT64 currentTime;
-			PROF_GET_TIME(currentTime);
-			mElapsedTime += currentTime - mStartTime;    
-			mRunning = false;
-		} else {
-			std::cerr << "Timer " << mName << " is not running.\n";
-		}
-	}
-	/*! This returns the elapsed time. It does whatever conversion is necessary,
-		depending on the OS, to convert to microseconds. If the timer is running
-		at the moment when this is called, is also adds the currently ellapsed 
-		time.
-
-		This call is slower than start or stop timer, so don't abuse it.
-	*/
-	double getTotalTimeMicroseconds();
-	void print();
+  void count(){mCount++;}
+  int getCount(){return mCount;}
+  void reset()
+  {
+    mCount=0;
+    PROF_RESET_DURATION(mElapsedTime);
+    if (mRunning) 
+    {
+      PROF_GET_TIME(mStartTime);
+    }
+  }
+  void startTimer()
+  {
+    if (!mRunning) 
+    {
+      PROF_GET_TIME(mStartTime);
+      mRunning = true;
+    } 
+    else 
+    {
+      std::cerr << "Timer " << mName << " already running.\n";
+    }
+  }
+  void stopTimer()
+  {
+    if (mRunning) 
+    {
+      PROF_TIME_UNIT currentTime;
+      PROF_GET_TIME(currentTime);
+      PROF_ADD_DURATION( mElapsedTime, mStartTime, currentTime);
+      mRunning = false;
+    } 
+    else 
+    {
+      std::cerr << "Timer " << mName << " is not running.\n";
+    }
+  }
+  /*! This returns the elapsed time. It does whatever conversion is necessary,
+    depending on the OS, to convert to microseconds. If the timer is running
+    at the moment when this is called, is also adds the currently ellapsed 
+    time.
+    
+    This call is slower than start or stop timer, so don't abuse it.
+  */
+  double getTotalTimeMicroseconds();
+  void print();
 };
 
-class Profiler {
+class Profiler 
+{
 private:
-	int mNextIndex;
-	int mSize;
-	std::vector<ProfileInstance> mPI;
+  int mNextIndex;
+  int mSize;
+  std::vector<ProfileInstance> mPI;
 #ifdef WIN32
-    UINT64 COUNTS_PER_SEC;
+  UINT64 COUNTS_PER_SEC;
 #endif
 public:
-	Profiler();
-	~Profiler();
+  Profiler();
+  ~Profiler();
+  
+  void resize(int size);
+  int getNewIndex(const char *name);
 
-	void resize(int size);
-	int getNewIndex(char *name);
-
-	void count(int index){mPI[index].count();}
-	int getCount(int index){return mPI[index].getCount();}
-	void reset(int index){mPI[index].reset();}
-	void startTimer(int index){mPI[index].startTimer();}
-	void stopTimer(int index){mPI[index].stopTimer();}
-	void print(int index){mPI[index].print();}
-
-	void resetAll();
-	void printAll();
+  void count(int index){mPI[index].count();}
+  int getCount(int index){return mPI[index].getCount();}
+  void reset(int index){mPI[index].reset();}
+  void startTimer(int index){mPI[index].startTimer();}
+  void stopTimer(int index){mPI[index].stopTimer();}
+  void print(int index){mPI[index].print();}
+  
+  void resetAll();
+  void printAll();
 #ifdef WIN32
-	UINT64 getCountsPerSec(){return COUNTS_PER_SEC;}
+  UINT64 getCountsPerSec(){return COUNTS_PER_SEC;}
 #endif
 };
 
-Profiler& getProfiler(){
-	//the one and only instance of the profiler
-	static Profiler profInstance;
-	return profInstance;
-}
+Profiler& getProfiler()
+{
+  //the one and only instance of the profiler
+  static Profiler profInstance;
+  return profInstance;
+ }
 
-class FunctionTimer {
+class FunctionTimer 
+{
 private:
-	Profiler &mProfiler;
-	int mIndex;
+  Profiler &mProfiler;
+  int mIndex;
 public:
-	FunctionTimer(Profiler &prof, int index) : mProfiler(prof), mIndex(index) {
-		mProfiler.count(mIndex);
-		mProfiler.startTimer(mIndex);
-	}
-	~FunctionTimer(){mProfiler.stopTimer(mIndex);}
+ FunctionTimer(Profiler &prof, int index) : mProfiler(prof), mIndex(index) 
+ {
+   mProfiler.count(mIndex);
+   mProfiler.startTimer(mIndex);
+ }
+  ~FunctionTimer(){mProfiler.stopTimer(mIndex);}
 };
 
 }

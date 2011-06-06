@@ -51,7 +51,7 @@ PreGraspCheckTask::~PreGraspCheckTask()
   mObject->getWorld()->destroyElement(mObject, false);
   //clean up the loaded geometry
   //the model itself is left around. we don't have a good solution for that yet
-  static_cast<GraspitDBModel*>(mRecord.model)->unload();
+  static_cast<GraspitDBModel*>(mPlanningTask.model)->unload();
 }
 
 void PreGraspCheckTask::emptyGraspList(std::vector<db_planner::Grasp*> &graspList)
@@ -69,11 +69,11 @@ void PreGraspCheckTask::loadHand()
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand we need
   if (world->getCurrentHand() && 
-      GraspitDBGrasp::getHandDBName(world->getCurrentHand()) == QString(mRecord.handName.c_str())) {
+      GraspitDBGrasp::getHandDBName(world->getCurrentHand()) == QString(mPlanningTask.handName.c_str())) {
     DBGA("Grasp Planning Task: using currently loaded hand");
     mHand = world->getCurrentHand();
   } else {
-    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mRecord.handName.c_str()));
+    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
     DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());	      
     mHand = static_cast<Hand*>(world->importRobot(handPath));
@@ -97,7 +97,7 @@ void PreGraspCheckTask::loadObject()
 {
   World *world = graspItGUI->getIVmgr()->getWorld();
 
-  GraspitDBModel *model = static_cast<GraspitDBModel*>(mRecord.model);
+  GraspitDBModel *model = static_cast<GraspitDBModel*>(mPlanningTask.model);
   if (model->load(world) != SUCCESS) {
     DBGA("Grasp Planning Task: failed to load model");
     mStatus = ERROR;
@@ -110,6 +110,13 @@ void PreGraspCheckTask::loadObject()
 
 void PreGraspCheckTask::start()
 {
+  //get the details of the planning task itself
+  if (!mDBMgr->GetPlanningTaskRecord(mRecord.taskId, &mPlanningTask)) {
+    DBGA("Failed to get planning record for task id ");
+    mStatus = ERROR;
+    return;
+  }
+
   loadHand();
   if (mStatus == ERROR) return;
 
@@ -118,7 +125,7 @@ void PreGraspCheckTask::start()
 
   //load all the grasps
   std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mRecord.model), mRecord.handName, &graspList)){
+  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
     DBGA("Load grasps failed");
     mStatus = ERROR;
     emptyGraspList(graspList);

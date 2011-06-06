@@ -24,8 +24,7 @@ INCLUDEPATH += src src/Collision include include/math include/Planner include/EG
 
 DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner
 
-HEADERS	+= include/application.h \
-        include/barrett.h \
+HEADERS	+= include/barrett.h \
 	include/body.h \
 	include/bbox.h \
 	include/bbox_inl.h \
@@ -55,6 +54,7 @@ HEADERS	+= include/application.h \
 	include/puma560.h \
 	include/qhull_mutex.h \
 	include/quality.h \
+        include/plugin.h \
 	include/pr2Gripper.h \
 	include/m7.h \
 	include/m7tool.h \
@@ -65,9 +65,11 @@ HEADERS	+= include/application.h \
 	include/SoComplexShape.h \
 	include/SoTorquePointer.h \
 	include/scanSimulator.h \
+	include/timer_calls.h \
 	include/triangle_inl.h \
 	include/triangle.h \
 	include/worldElement.h \
+	include/worldElementFactory.h \
 	include/world.h \
 	include/graspitGUI.h \
 	include/graspitServer.h \
@@ -103,8 +105,7 @@ HEADERS	+= include/application.h \
 	include/FitParabola.h \
 	include/shadow.h 
 
-SOURCES	+= src/application.cpp \
-        src/arch.cpp \
+SOURCES	+= src/arch.cpp \
 	src/barrett.cpp \
 	src/bbox.cpp \
 	src/body.cpp \
@@ -139,6 +140,7 @@ SOURCES	+= src/application.cpp \
 	src/pr2Gripper.cpp \
 	src/m7.cpp \
 	src/m7tool.cpp \
+        src/plugin.cpp \
 	src/puma560.cpp \
 	src/quality.cpp \
 	src/robonaut.cpp \
@@ -151,6 +153,7 @@ SOURCES	+= src/application.cpp \
 	src/triangle.cpp \
 	src/world.cpp \
 	src/worldElement.cpp \
+	src/worldElementFactory.cpp \
 	src/math/matrix.cpp \
 	src/Collision/collisionInterface.cpp \
 	src/Planner/grasp_visualization.cpp \

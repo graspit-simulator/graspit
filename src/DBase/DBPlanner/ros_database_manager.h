@@ -108,8 +108,15 @@ class RosDatabaseManager : public DatabaseManager
    another process.*/
   virtual bool AcquireNextTask(TaskRecord *rec);
   //! Change the status of a task in the database (e.g. mark it as COMPLETED)
-  virtual bool SetTaskStatus(const TaskRecord &rec, const string &status);
-
+  virtual bool SetTaskStatus(int task_id, const string &status);
+  //! Fills in the details for a planning task based on the task id
+  virtual bool GetPlanningTaskRecord(int task_id, PlanningTaskRecord *rec);
+  //! Fills in the details for an optimzation task based on the task id
+  virtual bool GetOptimizationTaskRecord(int task_id, OptimizationTaskRecord *rec);
+  //! Saves the results of an optimization in the database
+  virtual bool SaveOptimizationResults(const OptimizationTaskRecord &rec,
+                                       const std::vector<double>& parameters,
+                                       const std::vector<double>& results);
   //! Get a list of grasp types available in the database
   virtual bool GraspTypeList(vector<string>* type_list) const;
   //! Get a list of the Grasps for a Model.

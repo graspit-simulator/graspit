@@ -766,9 +766,6 @@ void MainWindow::eigenGraspActivated()
     delete dlg;
     return;
   } 
-  
-  QObject::connect(world->getCurrentHand(), SIGNAL(configurationChanged()),
-                   dlg, SLOT(handConfigurationChanged()) );
   dlg->show();
 }
 

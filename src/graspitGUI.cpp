@@ -27,7 +27,6 @@
   \brief Implements the graspit user interface.  Responsible for creating both MainWindow and IVmgr.
 */
 
-#include <QString>
 #include <Q3GroupBox>
 #include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
@@ -46,7 +45,7 @@
 #include "SoComplexShape.h"
 #include "SoArrow.h"
 #include "SoTorquePointer.h"
-#include "application.h"
+#include "plugin.h"
 #include "debug.h"
 
 #ifdef CGDB_ENABLED
@@ -117,6 +116,13 @@ GraspItGUI::~GraspItGUI()
 //  mainWindow->destroyChildren();
 //  fprintf(stderr,"Delete ivmgr\n");
   //if a dispatcher was being used, set exit code based on its result
+
+  //clean up plugins and creators
+  stopAllPlugins();
+  for (size_t i=0; i<mPluginCreators.size(); i++) {
+    delete mPluginCreators[i];
+  }
+
 #ifdef CGDB_ENABLED
   if (mDispatch) {
     delete mDispatch;
@@ -144,28 +150,26 @@ GraspItGUI::processArgs(int argc, char** argv)
     return FAILURE;
   }
 
-  //look for application requests of the form app:name in the arguments
+  //look for plugins of the form plugin:name in the arguments
   for (int i=1; i<argc; i++) {
     QString arg(argv[i]);
-    if (arg.section(':',0,0)=="app") {
-      QString appName = arg.section(':',1,1);
-      Application *app = Application::createApplication(appName.toStdString());
-      if (app) {
-        if (app->init(argc,argv) == SUCCESS) {
-          DBGA("Initialized application of type " << argv[i]);       
-          mApplications.push_back(app);
-        } else {
-          DBGA("Failed to initialize application of type " << argv[i]);
-        }
-      } else{
-        DBGA("Failed to create application of type "  << argv[i]);
+    if (arg.section(':',0,0)=="plugin") {
+      QString libName = arg.section(':',1,1);
+      PluginCreator* creator = PluginCreator::loadFromLibrary(libName.toStdString());
+      if (creator) {
+        mPluginCreators.push_back(creator);
+      } else {
+        DBGA("Failed to load plugin: " << libName.latin1());
       }
     }
   }
 
-  if (!mApplications.empty()) {
-    mAppSensor = new SoIdleSensor(sensorCB, NULL);
-    mAppSensor->schedule();
+  //start any plugins with auto start enabled
+  mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void*)this);
+  for (size_t i=0; i<mPluginCreators.size(); i++) {
+    if (mPluginCreators[i]->autoStart()) {
+      startPlugin(mPluginCreators[i], mPluginCreators[i]->defaultArgs());
+    }    
   }
   
   if(argc > 1){
@@ -253,32 +257,64 @@ void
 GraspItGUI::exitMainLoop()
 {
   SoQt::exitMainLoop();
-#ifdef CGDB_ENABLED
-  if (mDispatch) {
-	  //exitCode = mDispatch->getStatus();
-  }
-#endif
 }
 
 bool
 GraspItGUI::terminalFailure() const
 {
-	return initResult == TERMINAL_FAILURE;
+  return initResult == TERMINAL_FAILURE;
 }
 
 void
 GraspItGUI::sensorCB(void*, SoSensor*)
 {
-  graspItGUI->processApplications();
+  graspItGUI->processPlugins();
 }
 
-void
-GraspItGUI::processApplications()
+void 
+GraspItGUI::startPlugin(PluginCreator* creator, std::string args)
 {
-  if (mApplications.empty()) return;
-  static size_t app=0;
-  if (app >= mApplications.size()) app=0;
-  mApplications.at(app)->mainLoop();
-  app++;
-  mAppSensor->schedule();
+  Plugin *plugin = creator->createPlugin(args);
+  if (plugin) mActivePlugins.push_back( std::pair<Plugin*, std::string>(plugin, creator->type()) );
+  if (!mActivePlugins.empty()) {
+    mPluginSensor->schedule();
+  }  
+}
+
+void GraspItGUI::processPlugins()
+{
+  std::list< std::pair<Plugin*, std::string> >::iterator it = mActivePlugins.begin();
+  while (it != mActivePlugins.end()) {
+    if (it->first->mainLoop() == SUCCESS) {
+      it++;
+    } else{
+      delete it->first;
+      it = mActivePlugins.erase(it);
+    }
+  }
+  if (!mActivePlugins.empty()) {
+    mPluginSensor->schedule();
+  }
+}
+
+void GraspItGUI::stopPlugin(Plugin *plugin)
+{
+  std::list< std::pair<Plugin*, std::string> >::iterator it;
+  for (it = mActivePlugins.begin(); it!=mActivePlugins.end(); it++) {
+    if (it->first == plugin) {
+      delete it->first;
+      mActivePlugins.erase(it);
+      return;
+    }
+  }
+  DBGA("Stop plugin: plugin not found");
+}
+
+void GraspItGUI::stopAllPlugins()
+{
+  std::list< std::pair<Plugin*, std::string> >::iterator it = mActivePlugins.begin();
+  while (it != mActivePlugins.end()) {
+    delete it->first;
+    it = mActivePlugins.erase(it);
+  }
 }

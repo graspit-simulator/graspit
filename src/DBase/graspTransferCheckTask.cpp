@@ -53,7 +53,7 @@ GraspTransferCheckTask::~GraspTransferCheckTask()
   mObject->getWorld()->destroyElement(mObject, false);
   //clean up the loaded geometry
   //the model itself is left around. we don't have a good solution for that yet
-  static_cast<GraspitDBModel*>(mRecord.model)->unload();
+  static_cast<GraspitDBModel*>(mPlanningTask.model)->unload();
 }
 
 void emptyGraspListHack(std::vector<db_planner::Grasp*> &graspList)
@@ -66,10 +66,17 @@ void emptyGraspListHack(std::vector<db_planner::Grasp*> &graspList)
 
 void GraspTransferCheckTask::start()
 {
+  //get the details of the planning task itself
+  if (!mDBMgr->GetPlanningTaskRecord(mPlanningTask.taskId, &mPlanningTask)) {
+    DBGA("Failed to get planning record for task");
+    mStatus = ERROR;
+    return;
+  }
+
   World *world = graspItGUI->getIVmgr()->getWorld();
 
   if ( !world->getNumHands()) {
-    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mRecord.handName.c_str()));
+    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
     DBGA("Grasp transfer task: loading hands from " << handPath.latin1());	      
     mHand1 = static_cast<Hand*>(world->importRobot(handPath));
@@ -80,8 +87,8 @@ void GraspTransferCheckTask::start()
       return;
     }
   } else if ( world->getNumHands()==2 &&
-	      GraspitDBGrasp::getHandDBName(world->getHand(0)) == QString(mRecord.handName.c_str()) &&
-	      GraspitDBGrasp::getHandDBName(world->getHand(1)) == QString(mRecord.handName.c_str()) ) {
+	      GraspitDBGrasp::getHandDBName(world->getHand(0)) == QString(mPlanningTask.handName.c_str()) &&
+	      GraspitDBGrasp::getHandDBName(world->getHand(1)) == QString(mPlanningTask.handName.c_str()) ) {
     mHand1 = world->getHand(0);
     mHand2 = world->getHand(1);
   } else {
@@ -91,7 +98,7 @@ void GraspTransferCheckTask::start()
   }
    
   //load the object
-  GraspitDBModel *model = static_cast<GraspitDBModel*>(mRecord.model);
+  GraspitDBModel *model = static_cast<GraspitDBModel*>(mPlanningTask.model);
   if (model->load(world) != SUCCESS) {
     DBGA("Grasp Planning Task: failed to load model");
     mStatus = ERROR;
@@ -104,7 +111,7 @@ void GraspTransferCheckTask::start()
   //load all the grasps for hand 1
   mDBMgr->SetGraspAllocator(new GraspitDBGraspAllocator(mHand1));
   std::vector<db_planner::Grasp*> graspList1;
-  if(!mDBMgr->GetGrasps(*(mRecord.model), mRecord.handName, &graspList1)){
+  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList1)){
     DBGA("Load grasps failed for hand 1");
     mStatus = ERROR;
     emptyGraspListHack(graspList1);
@@ -113,7 +120,7 @@ void GraspTransferCheckTask::start()
   //load all the grasps for hand 1
   mDBMgr->SetGraspAllocator(new GraspitDBGraspAllocator(mHand2));
   std::vector<db_planner::Grasp*> graspList2;
-  if(!mDBMgr->GetGrasps(*(mRecord.model), mRecord.handName, &graspList2)){
+  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList2)){
     DBGA("Load grasps failed for hand 2");
     mStatus = ERROR;
     emptyGraspListHack(graspList2);

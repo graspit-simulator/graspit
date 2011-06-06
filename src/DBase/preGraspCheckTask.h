@@ -52,6 +52,8 @@ class PreGraspCheckTask : public Task {
   Hand *mHand;
   //! The object we are planning on
   GraspableBody *mObject;
+  //! The record of the actual planning task
+  db_planner::PlanningTaskRecord mPlanningTask;
 
   //! Checks and sets the pre-grasp for a given grasp; returns false if an error is encountered
   bool checkSetGrasp(db_planner::Grasp *grasp);

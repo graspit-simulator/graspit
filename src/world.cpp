@@ -59,6 +59,7 @@
 #include "bBox.h"
 #include "collisionInterface.h"
 #include "tinyxml.h"
+#include "worldElementFactory.h"
 
 //#undef PQP_COLLISION
 //#undef GRASPIT_COLLISION
@@ -143,6 +144,10 @@ World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,nam
 
 	idleSensor = NULL;
 	dynamicsOn = false;
+
+        // This has to happen at runtime, so it's placed here
+        // maybe we can find a better solution at some point.
+        WorldElementFactory::registerBuiltinCreators();
 }
 
 /*! Saves the global settings and parameters and deletes the world
@@ -846,12 +851,12 @@ scene graph.
 Body *
 World::importBody(QString bodyType,QString filename)
 { 
-	Body *newBody = (Body *) WorldElement::createInstance(bodyType,this,NULL);
-	if (!newBody) return NULL;
-	if (newBody->load(filename)==FAILURE) return NULL;
-	newBody->addToIvc();
-	addBody(newBody);
-	return newBody;
+  Body *newBody = (Body *) getWorldElementFactory().createElement(bodyType.toStdString(), this, NULL);
+  if (!newBody) return NULL;
+  if (newBody->load(filename)==FAILURE) return NULL;
+  newBody->addToIvc();
+  addBody(newBody);
+  return newBody;
 }
 
 /*! Imports a body which is loaded from a xml file. \bodyType must be a class name 
@@ -862,13 +867,13 @@ XML element, initialized, and added to the collision detection and scene graph.
 Body *
 World::importBodyFromXml(QString bodyType, const TiXmlElement* child, QString rootPath)
 { 
-	Body *newBody = (Body *) WorldElement::createInstance(bodyType,this,NULL);
-	if (!newBody) return NULL;
-	if (newBody->loadFromXml(child, rootPath)==FAILURE) return NULL;
-	newBody->addIVMat();
-	newBody->addToIvc();
-	addBody(newBody);
-	return newBody;
+  Body *newBody = (Body *) getWorldElementFactory().createElement(bodyType.toStdString(), this, NULL);
+  if (!newBody) return NULL;
+  if (newBody->loadFromXml(child, rootPath)==FAILURE) return NULL;
+  newBody->addIVMat();
+  newBody->addToIvc();
+  addBody(newBody);
+  return newBody;
 }
 
 /*! Adds to this world a body that is already created, initialized and somehow
@@ -918,42 +923,43 @@ World::addLink(Link *newLink)
 Robot *
 World::importRobot(QString filename)
 {
-	TiXmlDocument doc(filename);
-	if(doc.LoadFile()==false){
-		QTWARNING("Could not open " + filename);
-		return NULL;
-	}
-
-	const TiXmlElement* root = doc.RootElement();
-	if(root==NULL){
-		QTWARNING("Empty XML");
-		return NULL;	
-	}
-
-	QString line = root->Attribute("type");
-	if(line.isNull()){
-		QTWARNING("Class Type not found");
-		return NULL;
-	}
-	line = line.stripWhiteSpace();
-
-	Robot *robot = (Robot *)WorldElement::createInstance(line,this,NULL);
-	if (!robot) {
-		QTWARNING("Unable to create robot of class " + line);
-		return NULL;
-	}
-
-	QString rootPath = filename.section('/',0,-2,QString::SectionIncludeTrailingSep);
-	robot->setName(filename.section('/',-1).section('.',0,0));
-	QString myFilename = relativePath(filename,getenv("GRASPIT"));
-	robot->setFilename(myFilename);
-	if (robot->loadFromXml(root,rootPath) == FAILURE) {
-		QTWARNING("Failed to load robot from file");
-		delete robot;
-		return NULL;
-	}
-	addRobot(robot);
-	return robot;
+  TiXmlDocument doc(filename);
+  if(doc.LoadFile()==false){
+    QTWARNING("Could not open " + filename);
+    return NULL;
+  }
+  
+  const TiXmlElement* root = doc.RootElement();
+  if(root==NULL){
+    QTWARNING("Empty XML");
+    return NULL;	
+  }
+  
+  QString line = root->Attribute("type");
+  if(line.isNull()){
+    QTWARNING("Class Type not found");
+    return NULL;
+  }
+  line = line.stripWhiteSpace();
+  
+  Robot *robot = (Robot *) getWorldElementFactory().createElement(line.toStdString(), this, NULL);
+  
+  if (!robot) {
+    QTWARNING("Unable to create robot of class " + line);
+    return NULL;
+  }
+  
+  QString rootPath = filename.section('/',0,-2,QString::SectionIncludeTrailingSep);
+  robot->setName(filename.section('/',-1).section('.',0,0));
+  QString myFilename = relativePath(filename,getenv("GRASPIT"));
+  robot->setFilename(myFilename);
+  if (robot->loadFromXml(root,rootPath) == FAILURE) {
+    QTWARNING("Failed to load robot from file");
+    delete robot;
+    return NULL;
+  }
+  addRobot(robot);
+  return robot;
 }
 
 /*! Adds to this world a robot that is already created, initialized and somehow
@@ -1950,8 +1956,8 @@ World::moveDynamicBodies(double timeStep)
 		findAllContacts();
 
 	for (i=0; i<numRobots; i++){
-		if ( robotVec[i]->inherits("HumanHand") )
-			((HumanHand*)robotVec[i])->updateTendonGeometry();
+          if ( robotVec[i]->inherits("HumanHand") ) ((HumanHand*)robotVec[i])->updateTendonGeometry();
+          robotVec[i]->emitConfigChange();
 	}
 	emit tendonDetailsChanged();
 
@@ -2173,11 +2179,7 @@ void World::selectTendon(Tendon *t)
 
 	//we need to change selected hand to the hand that owns currently selected tendon
 	//so we can populate the drop-down tendon list in the GUI
-	if ( getCurrentHand() != (Hand*)selectedTendon->getRobot() )
-	{
-		setCurrentHand( (Hand*)t->getRobot() );
-		emit handSelectionChanged();
-	}
+	if ( getCurrentHand() != (Hand*)selectedTendon->getRobot() ) setCurrentHand( (Hand*)t->getRobot() );
 
 	emit tendonSelectionChanged();
 }

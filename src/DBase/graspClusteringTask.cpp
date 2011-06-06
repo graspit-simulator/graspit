@@ -50,17 +50,24 @@ GraspClusteringTask::GraspClusteringTask(TaskDispatcher *disp, db_planner::Datab
 */
 void GraspClusteringTask::start()
 {
+  //get the details of the planning task itself
+  if (!mDBMgr->GetPlanningTaskRecord(mRecord.taskId, &mPlanningTask)) {
+    DBGA("Failed to get planning record for task");
+    mStatus = ERROR;
+    return;
+  }
+
   World *world = graspItGUI->getIVmgr()->getWorld();
   Hand *hand;
  
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand
   if (world->getCurrentHand() && 
-      GraspitDBGrasp::getHandDBName(world->getCurrentHand()) == QString(mRecord.handName.c_str())) {
+      GraspitDBGrasp::getHandDBName(world->getCurrentHand()) == QString(mPlanningTask.handName.c_str())) {
     DBGA("Grasp Planning Task: using currently loaded hand");
     hand = world->getCurrentHand();
   } else {
-    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mRecord.handName.c_str()));
+    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
     DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());	      
     hand = static_cast<Hand*>(world->importRobot(handPath));
@@ -74,7 +81,7 @@ void GraspClusteringTask::start()
 
   //load all the grasps
   std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mRecord.model), mRecord.handName, &graspList)){
+  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
     DBGA("Load grasps failed");
     mStatus = ERROR;
     while (!graspList.empty()) {

@@ -51,33 +51,35 @@ class GraspPlanningState;
     
  */
 class GraspPlanningTask : public QObject, public Task {
-	Q_OBJECT
+  Q_OBJECT
  private:
-	//! The hand we are planning with
-	Hand *mHand;
-	//! The object we are planning on
-	GraspableBody *mObject;
-	//! The planner that we are using
-	EGPlanner *mPlanner;
-	//! The index of the last solution that was already saved in the database
-	int mLastSolution;
-
-	//! Saves a solution grasp to the database
-	bool saveGrasp(const GraspPlanningState *gps);
-
- public:
-	//! Just a stub for now
-	GraspPlanningTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-			  db_planner::TaskRecord rec);
-	//! Removes the object that has been used from the sim world, but not the hand
-	~GraspPlanningTask();
-	//! Loads the hand and the object, initializes and starts a loop planner
-	virtual void start();
- public slots:
-	//! Connected to the loopUpdate() signal of the planner
-	void plannerLoopUpdate();
-	//! Connected to the complete() signal of the planner
-	void plannerComplete();
+  //! The hand we are planning with
+  Hand *mHand;
+  //! The object we are planning on
+  GraspableBody *mObject;
+  //! The planner that we are using
+  EGPlanner *mPlanner;
+  //! The index of the last solution that was already saved in the database
+  int mLastSolution;
+  //! The record of the actual planning task
+  db_planner::PlanningTaskRecord mPlanningTask;
+  
+  //! Saves a solution grasp to the database
+  bool saveGrasp(const GraspPlanningState *gps);
+  
+public:
+  //! Just a stub for now
+  GraspPlanningTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
+                    db_planner::TaskRecord rec);
+  //! Removes the object that has been used from the sim world, but not the hand
+  ~GraspPlanningTask();
+  //! Loads the hand and the object, initializes and starts a loop planner
+  virtual void start();
+public slots:
+  //! Connected to the loopUpdate() signal of the planner
+  void plannerLoopUpdate();
+  //! Connected to the complete() signal of the planner
+  void plannerComplete();
 };
 
 #endif

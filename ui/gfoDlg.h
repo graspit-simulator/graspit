@@ -63,8 +63,6 @@ private:
   void tendonRouteOptimization();
   //! Checks if analytical tendon model correctly predicts equilibrium for McGrip
   void mcgripEquilibrium();
-  //! Checks if the hand is in equilibrium with just tendon forces, no contacts
-  void tendonEquilibrium();
 
   //! Calls the ivmgr to display the forces and wrenched set by the optimization
   void displayResults(int result);

@@ -367,46 +367,39 @@ Robot::loadEigenData(QString filename)
 int 
 Robot::loadContactData(QString filename)
 {
-	FILE *fp = fopen(filename.latin1(), "r");
-	if (!fp) {
-		DBGA("Could not open contact file " << filename.latin1());
-		return FAILURE;
-	}
-
-	char robotName[500];
-	fscanf(fp,"%s",robotName); //yes, I know, can seg fault...
-
-	if (getName() != robotName) {
-		DBGA("Virtual Grasp defined for another robot!");
-		fclose(fp);
-		return FAILURE;
-	}
-	int numContacts;
-	VirtualContact *newContact;
-	fscanf(fp,"%d",&numContacts);
-	for (int i=0; i<numContacts; i++) {
-		newContact = new VirtualContact();
-		newContact->readFromFile(fp);
-
-		int f = newContact->getFingerNum();
-		int l = newContact->getLinkNum();
-		if ( f >= 0) {
-			newContact->setBody( getChain(f)->getLink(l) );
-			getChain(f)->getLink(l)->addVirtualContact( newContact );
-		}
-		else if (f == -1) {
-			newContact->setBody( getBase() );
-			getBase()->addVirtualContact(newContact);
-		}
-		else {
-			fprintf(stderr,"Wrong finger number on contact!!!\n");
-			delete newContact;
-			continue;
-		}
-		newContact->computeWrenches(false,false);
-	}
-	fclose(fp);
-	return SUCCESS;
+  FILE *fp = fopen(filename.latin1(), "r");
+  if (!fp) {
+    DBGA("Could not open contact file " << filename.latin1());
+    return FAILURE;
+  }
+  
+  char robotName[500];
+  fscanf(fp,"%s",robotName); //yes, I know, can seg fault...
+  
+  int numContacts;
+  fscanf(fp,"%d",&numContacts);
+  for (int i=0; i<numContacts; i++) {
+    VirtualContact* newContact = new VirtualContact();
+    newContact->readFromFile(fp);    
+    int f = newContact->getFingerNum();
+    int l = newContact->getLinkNum();
+    if ( f >= 0) {
+      if ( f>=getNumChains() || l>=getChain(f)->getNumLinks()) {
+        DBGA("Virtual contact error, chain " << f << " link " << l << " does not exist");
+        delete newContact;
+        continue;
+      }
+      newContact->setBody( getChain(f)->getLink(l) );
+      getChain(f)->getLink(l)->addVirtualContact( newContact );
+    }
+    else {
+      newContact->setBody( getBase() );
+      getBase()->addVirtualContact(newContact);
+    }
+    newContact->computeWrenches(false,false);
+  }
+  fclose(fp);
+  return SUCCESS;
 }
 
 /*! This robot becomes a "clone" of another robot, specified in \a original.
@@ -414,7 +407,7 @@ This means that the new robot has its own kinematic structure, DOF's, etc
 but its links share the geometry of the original robot. See the clone 
 function in the Body class for details on how that works.
 
-This is generally used for multi-threading, if you want to do spred the 
+This is generally used for multi-threading, if you want to do spread the 
 computations done on a robot to multiple cores. You then create multiple
 clones of your robot and pass one to each thread. See the threading 
 documentation in the collision detection classes for details.

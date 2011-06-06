@@ -62,6 +62,7 @@ int EigenGraspDlg::setWorld( World *w )
 	resetSlave();
 	adjustSliders();
 	handConfigurationChanged();
+        QObject::connect(mHand, SIGNAL(configurationChanged()), this, SLOT(handConfigurationChanged()) );
 	return 1;
 }
 
@@ -113,6 +114,9 @@ void EigenGraspDlg::eigenGraspChanged()
 #endif
 
 	mHand->forceDOFVals(dof);
+        QObject::disconnect(mHand, SIGNAL(configurationChanged()), this, SLOT(handConfigurationChanged()) );
+        mHand->emitConfigChange();
+        QObject::connect(mHand, SIGNAL(configurationChanged()), this, SLOT(handConfigurationChanged()) );
 	mEigenGrasps->setMinMax();
 
 	delete [] amplitudes;

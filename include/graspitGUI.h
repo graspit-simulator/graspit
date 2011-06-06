@@ -29,12 +29,16 @@
 
 #ifndef GRASPITGUI_HXX
 
+#include <string>
 #include <vector>
+#include <list>
 
 class MainWindow;
 class IVmgr;
 class TaskDispatcher;
 class Application;
+class Plugin;
+class PluginCreator;
 class SoIdleSensor;
 class SoSensor;
 
@@ -68,11 +72,14 @@ class GraspItGUI
   //! Holds the exit code of the UI execution
   int mExitCode;
   
-  //! Applications initialized as part of GraspIt's event loop
-  std::vector<Application*> mApplications;
+  //! Plugins currently running
+  std::list< std::pair<Plugin*,std::string> > mActivePlugins;
 
-  //! Idle sensor for calling the applications from GraspIt's event loop
-  SoIdleSensor *mAppSensor;
+  //! Available plugin creators
+  std::vector<PluginCreator*> mPluginCreators;
+
+  //! Idle sensor for calling the plugins from GraspIt's event loop
+  SoIdleSensor *mPluginSensor;
 
  protected:
   int processArgs(int argc, char **argv);
@@ -93,11 +100,20 @@ class GraspItGUI
   /*! Returns a pointer to the IVmgr. */
   IVmgr *getIVmgr() const {return ivmgr;}
 
-  //! Static sensor callback, just calls processApplications()
+  //! Static sensor callback, just calls processPlugins()
   static void sensorCB(void *data, SoSensor*);
   
-  //! Calls the main processing routine of all active applications
-  void processApplications();
+  //! Calls the main processing routine of all active plugins
+  void processPlugins();
+
+  //! Starts a plugin from the given creator
+  void startPlugin(PluginCreator* creator, std::string args);
+
+  //! Stops and deletes the specified plugin
+  void stopPlugin(Plugin *plugin);
+
+  //! Stops and deletes all currently active plugins
+  void stopAllPlugins();
 
   void startMainLoop();
   void exitMainLoop();

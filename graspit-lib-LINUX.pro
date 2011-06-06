@@ -21,6 +21,9 @@ LIBS	+= -lSoQt -lCoin -lGL -lpthread
 MOC_DIR = .moc
 OBJECTS_DIR = .obj
 
+#needed for plugins to find symbols in the main program
+QMAKE_LFLAGS += -rdynamic
+
 #------------------------------------ add-ons --------------------------------------------
 
 cgdb {

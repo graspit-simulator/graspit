@@ -76,30 +76,37 @@ DOF::DOF(const DOF *original)
 
 /*!
   Initializes a DOF by giving it the owning robot \a myRobot, and the list
-  of joints connected to this DOF, \a jList.  It sets the max and min vals
+  of joints connected to this DOF, \a jList.  Also sets the max and min vals
   of the DOF from the smallest range of the joint limits.
 */
 void
 DOF::initDOF(Robot *myRobot,const std::list<Joint *>& jList)
 {
-	std::list<Joint *>::iterator j;
-	double testMin, testMax;
-	owner = myRobot;
+  owner = myRobot;  
+  jointList = jList; // copy jList
+  updateMinMax();
+}
 
-	jointList = jList; // copy jList
-
-	maxq = (*jointList.begin())->getMax()/getStaticRatio(*jointList.begin());
-	minq = (*jointList.begin())->getMin()/getStaticRatio(*jointList.begin());
-	if (maxq < minq) std::swap(maxq, minq);
-
-	for(j=++jointList.begin();j!=jointList.end();j++) {
-		testMax = (*j)->getMax()/getStaticRatio(*j);
-		testMin = (*j)->getMin()/getStaticRatio(*j);
-		//can happen if ratio is negative
-		if (testMax < testMin) std::swap(testMin, testMax);
-		maxq = ( testMax < maxq ? testMax : maxq);
-		minq = ( testMin > minq ? testMin : minq);
-	}
+/*! Sets the max and min vals of the DOF from the smallest range of the joint 
+  limits. */
+void DOF::updateMinMax()
+{
+  maxq = (*jointList.begin())->getMax()/getStaticRatio(*jointList.begin());
+  minq = (*jointList.begin())->getMin()/getStaticRatio(*jointList.begin());
+  if (maxq < minq) std::swap(maxq, minq);  
+  std::list<Joint *>::iterator j;
+  double testMin, testMax;
+  int num = 0;
+  for(j=++jointList.begin();j!=jointList.end();j++) {
+    testMax = (*j)->getMax()/getStaticRatio(*j);
+    testMin = (*j)->getMin()/getStaticRatio(*j);
+    //can happen if ratio is negative
+    if (testMax < testMin) std::swap(testMin, testMax);
+    DBGP("Joint " << num++ << " min "  << testMin << " max " << testMax);
+    maxq = ( testMax < maxq ? testMax : maxq);
+    minq = ( testMin > minq ? testMin : minq);
+    DBGP("maxq " << maxq << " minq " << minq);
+  }
 }
 
 /*!

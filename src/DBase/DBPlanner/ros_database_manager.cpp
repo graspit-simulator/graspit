@@ -130,19 +130,42 @@ bool RosDatabaseManager::AcquireNextTask(TaskRecord *rec)
   if (db_task.empty()) 
   {
     //no task to be run
-    rec->taskType = 0;
+    rec->taskType = "";
     return true;    
   }
   //populate the entry
-  rec->taskType = db_task[0]->type_.get();
-  rec->taskId = db_task[0]->id_.get();
-  rec->taskTime = db_task[0]->time_.get();
-  rec->handName = db_task[0]->hand_name_.get();
-  std::cout << "Task type " << rec->taskType << " on scaled model " << db_task[0]->scaled_model_id_.get() << "\n";
+  rec->taskType = db_task[0]->type_.data();
+  rec->taskId = db_task[0]->id_.data();
+  return true;
+}
+
+bool RosDatabaseManager::SetTaskStatus(int task_id, const string &status)
+{
+  household_objects_database::DatabaseTask db_task;
+  db_task.id_.data() = task_id;
+  db_task.outcome_name_.data() = status;
+  if ( !database_->saveToDatabase(&(db_task.outcome_name_)) ) return false;
+  return true;
+}
+
+bool RosDatabaseManager::GetPlanningTaskRecord(int task_id, PlanningTaskRecord *rec)
+{
+  household_objects_database::DatabasePlanningTask planningTask;
+  planningTask.id_.data() = task_id;
+  if ( !database_->loadFromDatabase(&(planningTask.scaled_model_id_)) ||
+       !database_->loadFromDatabase(&(planningTask.hand_name_)) ||
+       !database_->loadFromDatabase(&(planningTask.time_)) )
+  {
+    std::cout << "Failed to load planning task for task id " << task_id << "\n";
+    return false;
+  }
+  rec->taskId = task_id;
+  rec->taskTime = planningTask.time_.data();
+  rec->handName = planningTask.hand_name_.data();
   //load the actual model
   //a fairly hacky way to do it for now, field-by-field
   household_objects_database::DatabaseScaledModel db_model;
-  db_model.id_.get() = db_task[0]->scaled_model_id_.get();
+  db_model.id_.data() = planningTask.scaled_model_id_.data();
   //first we need to read the original model id so we can then read the rest
   if ( !database_->loadFromDatabase(&(db_model.original_model_id_)) ) return false;
   if ( !database_->loadFromDatabase(&(db_model.scale_)) ||
@@ -158,12 +181,36 @@ bool RosDatabaseManager::AcquireNextTask(TaskRecord *rec)
   return true;
 }
 
-bool RosDatabaseManager::SetTaskStatus(const TaskRecord &rec, const string &status)
+bool RosDatabaseManager::GetOptimizationTaskRecord(int task_id, OptimizationTaskRecord *rec)
 {
-  household_objects_database::DatabaseTask db_task;
-  db_task.id_.get() = rec.taskId;
-  db_task.outcome_name_.get() = status;
-  if ( !database_->saveToDatabase(&(db_task.outcome_name_)) ) return false;
+  household_objects_database::DatabaseOptimizationTask optTask;
+  optTask.dbase_task_id_.data() = task_id;
+  if ( !database_->loadFromDatabase(&(optTask.parameters_)) || 
+       !database_->loadFromDatabase(&(optTask.hand_name_)) )
+  {
+    std::cout << "Failed to load optimization task for task id " << task_id << "\n";
+    return false;
+  }
+  rec->taskId = task_id;
+  rec->parameters = optTask.parameters_.data();
+  rec->hand_name = optTask.hand_name_.data();
+  return true;
+}
+
+bool RosDatabaseManager::SaveOptimizationResults(const OptimizationTaskRecord &rec,
+                                                 const std::vector<double>& parameters,
+                                                 const std::vector<double>& results)
+{
+  household_objects_database::DatabaseOptimizationResult optResult;
+  optResult.dbase_task_id_.data() = rec.taskId;
+  optResult.parameters_.data() = parameters;
+  optResult.hand_name_.data() = rec.hand_name;
+  optResult.results_.data() = results;
+  if (!database_->insertIntoDatabase(&optResult))
+  {
+    std::cout << "Failed to save optimization results for task id " << rec.taskId << "\n";
+    return false;
+  }
   return true;
 }
 

@@ -164,7 +164,8 @@ protected:
   //! Coulomb friction value (constant offset)
   double f0;
 
-  //! Joint spring stiffness. 0 if this joint has no spring.
+  //! Joint spring stiffness, in N * 1.0e6 mm / rad for torque or N * 1.0e6 / mm for force. 
+  //! 0 if this joint has no spring.
   double mK;
 
   //! The rest value of the joint spring
@@ -203,6 +204,12 @@ public:
   /*! This sets the joint value */
   virtual int setVal(double q)=0;
 
+  /*! Sets the minimum joint limit */
+  void setMin(double min) {minVal = min;}
+
+  /*! Set the maximum joint limit. */
+  void setMax(double max) {maxVal = max;}
+
   /*! This applies an internal wrench to this joint*/
   virtual void applyInternalWrench(double magnitude)=0;
 
@@ -221,6 +228,12 @@ public:
 
   /*! Updates \a draggerAttached when a dragger is added or removed from this joint.*/
   void setDraggerAttached(bool b) {draggerAttached = b;}
+
+  //! Sets the linear stiffness coefficient of this joint spring
+  void setSpringStiffness(double k) {mK = k;}
+
+  //! Sets the rest value of the attached joint spring
+  void setRestValue(double r){mRestVal = r;}
 
   //Accessors:
 
@@ -276,7 +289,8 @@ public:
   }
 
   /*! Returns the spring force acting on this joint. This assumes a linear
-      spring model, with constant stifness \a mK */
+    spring model, with constant stifness \a mK. Units are N*1.0e6 mm for torque
+    or N*1.0e6 for force. */
   double getSpringForce() const;
 
   /*! Returns the current joint value as computed from the IK during dyanmic

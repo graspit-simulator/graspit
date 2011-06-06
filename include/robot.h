@@ -271,7 +271,7 @@ protected:
   bool dynamicAutograspComplete();
 
   //! Computes the joint angles after a dynamic step has been completed
-  void updateJointValuesFromDynamics();
+  virtual void updateJointValuesFromDynamics();
 
   //! Applies internal joint forces (if any), such as friction or joint springs
   void applyJointPassiveInternalWrenches();
