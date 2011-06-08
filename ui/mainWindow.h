@@ -50,14 +50,12 @@
 
 class World;
 class QAction;
-class QAssistantClient;
 class Grasp;
 
 class MainWindow : public QObject
 {
 	Q_OBJECT
 private:
-	QAssistantClient *assistantClient;
     World *world;
     QString fileName;
     int selectedContact;

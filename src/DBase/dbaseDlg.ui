@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="text" >
-     <string>localhost</string>
+     <string>wgs36</string>
     </property>
    </widget>
    <widget class="QLabel" name="hostLabel" >
@@ -99,7 +99,7 @@
      </rect>
     </property>
     <property name="text" >
-     <string>grasps</string>
+     <string>household_objects</string>
     </property>
    </widget>
    <widget class="QLabel" name="usernameLabel" >
@@ -125,7 +125,7 @@
      </rect>
     </property>
     <property name="text" >
-     <string></string>
+     <string>willow</string>
     </property>
    </widget>
    <widget class="QLabel" name="passwordLabel" >
@@ -151,7 +151,7 @@
      </rect>
     </property>
     <property name="text" >
-     <string></string>
+     <string>willow</string>
     </property>
     <property name="echoMode" >
      <enum>QLineEdit::Password</enum>

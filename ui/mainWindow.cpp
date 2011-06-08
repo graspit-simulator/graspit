@@ -35,7 +35,6 @@
 #include <QStatusBar>
 #include <QTime>
 #include <QFileDialog>
-#include <QAssistantClient>
 
 #include <list>
 
@@ -193,14 +192,6 @@ void MainWindow::init()
   QIcon collisionIconSet = mUI->elementCollisionToggleAction->iconSet();
   collisionIconSet.setPixmap(load_pixmap("nocollide.xpm"),QIcon::Automatic,QIcon::Normal,QIcon::On);
   mUI->elementCollisionToggleAction->setIconSet(collisionIconSet);
-
-  QStringList argList;
-  argList << QString("-profile") << QString(getenv("GRASPIT"))+QDir::separator()+
-	QString("doc")+ QDir::separator() + QString("html")+QDir::separator() + QString("user") +QDir::separator() +
-	QString("graspit.adp");
-
-  assistantClient = new QAssistantClient("",this);
-  assistantClient->setArguments(argList);
 }
 
 /*!
@@ -208,7 +199,6 @@ void MainWindow::init()
 */
 void MainWindow::destroy()
 {
-   delete assistantClient;
 }
 
 void MainWindow::destroyChildren()
@@ -479,12 +469,13 @@ void MainWindow::fileSaveImage()
 //----------------------------------------- Help menu --------------------------------------
 
 /*! 
-  Brings up the QT Assistant with the graspit user pages.
+  Brings up a dialog saying where the manual can be found.
 */
 void MainWindow::helpManual()
 {
-  QString docsPath = QString(getenv("GRASPIT"))+"/doc/html";
-  assistantClient->showPage(QString("%1/user/index.html").arg(docsPath));
+  QMessageBox::warning(NULL,"GraspIt!","You can find the GraspIt! User Manual in $GRASPIT/doc, " \
+                       "or online at http://www.cs.columbia.edu/~cmatei/graspit/",
+                       QMessageBox::Ok, Qt::NoButton,Qt::NoButton);
 }
 
 /*!
