@@ -75,7 +75,7 @@ WorldElementFactory::registerBuiltinCreators()
   REGISTER_CREATOR("Barrett",Barrett);
   REGISTER_CREATOR("Robonaut",Robonaut);
   REGISTER_CREATOR("Pr2Gripper",Pr2Gripper);
-  REGISTER_CREATOR("Pr2Gripp2010",Pr2Gripper2010);
+  REGISTER_CREATOR("Pr2Gripper2010",Pr2Gripper2010);
   REGISTER_CREATOR("M7",M7);
   REGISTER_CREATOR("M7Tool",M7Tool);
   REGISTER_CREATOR("HumanHand",HumanHand);
