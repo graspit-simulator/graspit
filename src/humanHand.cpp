@@ -47,11 +47,11 @@
 //#define PROF_ENABLED
 #include "profiling.h"
 
-const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 1.5;
-const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.8;
+//const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 1.5;
+//const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.8;
 
-//const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 0.45;
-//const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.24;
+const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 0.45;
+const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.24;
 
 /*! Given two line segments, P1-P2 and P3-P4, returns the line segment 
 	Pa-Pb that is the shortest route between them. Calculates also the 
@@ -1480,6 +1480,7 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
   }
   
   Matrix LeftHand(joints.size(), activeTendons.size());
+  int t=0;
   for (size_t i=0; i<mTendonVec.size(); i++)
   {    
     if (activeTendons.find(i) == activeTendons.end()) continue;
@@ -1501,7 +1502,8 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
 
     assert( JTDM.rows() == LeftHand.rows());
     assert( JTDM.cols() == 1);
-    LeftHand.copySubMatrix(0, i, JTDM);
+    LeftHand.copySubMatrix(0, t, JTDM);
+    t++;
   }
 
   //use passed in tendon forces
@@ -1511,7 +1513,7 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
     DBGA("Incorrect active tendon forces passed in");
     return -1;
   }
-  int t=0;
+  t=0;
   for (size_t i=0; i<mTendonVec.size(); i++)
   {    
     if (activeTendons.find(i) != activeTendons.end())
@@ -1523,7 +1525,7 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
   //compute the joint torques
   Matrix tau(LeftHand.rows(), 1);
   matrixMultiply(LeftHand, x, tau);
-  DBGA("Joint torques: " << tau.elem(0,0) << " " << tau.elem(1,0));
+  DBGP("Joint torques: " << tau.elem(0,0) << " " << tau.elem(1,0));
 
   Matrix RightHand(joints.size(), contacts.size());
   {
@@ -1535,8 +1537,9 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
     RightHand.copyMatrix(JTD);    
   }
 
-  DBGA("Contact jac:\n" << RightHand.elem(0,0) << " " << RightHand.elem(0,1) << "\n" << 
-       RightHand.elem(1,0) << " " << RightHand.elem(1,1));
+  //DBGP("Contact jac:\n" << RightHand.elem(0,0) << "\n" <<  RightHand.elem(1,0) );
+  //DBGP("Contact jac:\n" << RightHand.elem(0,0) << " " << RightHand.elem(0,1) << "\n" << 
+  //     RightHand.elem(1,0) << " " << RightHand.elem(1,1));
 
   double scale = std::max(1.0, tau.absMax());
   tau.multiply(1.0/scale);
