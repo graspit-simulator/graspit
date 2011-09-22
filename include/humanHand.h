@@ -153,7 +153,7 @@ private:
   
 public:
   vec3 location, orientation;
-  double radius;
+  double radius, length;
   
   TendonWrapper(Robot* myOwner);
   Link* getAttachedLink();
@@ -289,6 +289,9 @@ public:
   //! Returns the minimum distance between two consecutive permanent insertion points
   double minInsPointDistance();
 
+  //! Returns the minimum distance between this tendon and the central axis of a wrapper
+  double wrapperAxisDistance(TendonWrapper *wrapper);
+
   void select();
   void deselect();
   bool isSelected(){return mSelected;}
@@ -407,13 +410,13 @@ public:
   //! Computes if tendon forces are self-balanced around all joints of the hand
   /*! Tries to find force values for all the tendons in the active set so that the joint 
     torques resulting from passive forces on the tendons in the passive set are minimized. */
-  int tendonEquilibrium(const std::set<size_t> &activeTendons,
-                        const std::set<size_t> &passiveTendons,
-                        bool compute_tendon_forces,
-                        std::vector<double> &activeTendonForces,
-                        std::vector<double> &jointResiduals,
-                        double& unbalanced_magnitude,
-                        bool useJointSprings = true);
+  virtual int tendonEquilibrium(const std::set<size_t> &activeTendons,
+                                const std::set<size_t> &passiveTendons,
+                                bool compute_tendon_forces,
+                                std::vector<double> &activeTendonForces,
+                                std::vector<double> &jointResiduals,
+                                double& unbalanced_magnitude,
+                                bool useJointSprings = true);
 
   int contactEquilibrium(std::list<Contact*> contacts,
                          const std::set<size_t> &activeTendons,

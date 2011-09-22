@@ -53,62 +53,6 @@
 const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 0.45;
 const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.24;
 
-/*! Given two line segments, P1-P2 and P3-P4, returns the line segment 
-	Pa-Pb that is the shortest route between them. Calculates also the 
-	values of \a mua and \a mub where
-      Pa = P1 + mua (P2 - P1)
-      Pb = P3 + mub (P4 - P3)
-   Returns FALSE if no solution exists.
-   adapted from http://astronomy.swin.edu.au/~pbourke/geometry/lineline3d/
-*/
-PROF_DECLARE(LINE_LINE_INTERSECT);
-int LineLineIntersect(vec3 p1,vec3 p2,vec3 p3,vec3 p4,vec3 *pa,vec3 *pb,double *mua, double *mub)
-{
-  PROF_TIMER_FUNC(LINE_LINE_INTERSECT);
-   vec3 p13,p43,p21;
-   double d1343,d4321,d1321,d4343,d2121;
-   double numer,denom;
-   double EPS = 1.0e-5;
-
-   p13.x() = p1.x() - p3.x();
-   p13.y() = p1.y() - p3.y();
-   p13.z() = p1.z() - p3.z();
-   p43.x() = p4.x() - p3.x();
-   p43.y() = p4.y() - p3.y();
-   p43.z() = p4.z() - p3.z();
-   if ( fabs(p43.x())  < EPS && fabs(p43.y())  < EPS && fabs(p43.z())  < EPS )
-      return false;
-
-   p21.x() = p2.x() - p1.x();
-   p21.y() = p2.y() - p1.y();
-   p21.z() = p2.z() - p1.z();
-   if ( fabs(p21.x())  < EPS && fabs(p21.y())  < EPS && fabs(p21.z())  < EPS )
-      return false;
-
-   d1343 = p13.x() * p43.x() + p13.y() * p43.y() + p13.z() * p43.z();
-   d4321 = p43.x() * p21.x() + p43.y() * p21.y() + p43.z() * p21.z();
-   d1321 = p13.x() * p21.x() + p13.y() * p21.y() + p13.z() * p21.z();
-   d4343 = p43.x() * p43.x() + p43.y() * p43.y() + p43.z() * p43.z();
-   d2121 = p21.x() * p21.x() + p21.y() * p21.y() + p21.z() * p21.z();
-
-   denom = d2121 * d4343 - d4321 * d4321;
-   if ( fabs(denom) < EPS )
-      return false;
-   numer = d1343 * d4321 - d1321 * d4343;
-
-   *mua = numer / denom;
-   *mub = (d1343 + d4321 * (*mua)) / d4343;
-
-   pa->x() = p1.x() + (*mua) * p21.x();
-   pa->y() = p1.y() + (*mua) * p21.y();
-   pa->z() = p1.z() + (*mua) * p21.z();
-   pb->x() = p3.x() + (*mub) * p43.x();
-   pb->y() = p3.y() + (*mub) * p43.y();
-   pb->z() = p3.z() + (*mub) * p43.z();
-
-   return true;
-}
-
 /*! Returns the distance between an infinite line defined by l1 and l2 and a point p0.
   Modified from http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 */
@@ -405,6 +349,42 @@ double Tendon::minInsPointDistance()
  return minDist;
 }
 
+double Tendon::wrapperAxisDistance(TendonWrapper *wrapper)
+{
+  double minDist = std::numeric_limits<double>::max();
+  std::list<TendonInsertionPoint*>::iterator insPt = mInsPointList.begin();  
+  while (insPt!=mInsPointList.end()) 
+  {
+    std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt;
+    nextInsPt ++;
+    if (nextInsPt != mInsPointList.end() ) 
+    {
+      SbVec3f pCur = (*insPt)->getWorldPosition();
+      SbVec3f pNext = (*nextInsPt)->getWorldPosition();
+      //two points at the two ends of the tendon wrapper
+      vec3 P3 = wrapper->location;
+      vec3 P4 = P3 + 0.5 * wrapper->length * wrapper->orientation;
+      P3 = P3 - 0.5 * wrapper->length * wrapper->orientation;
+      //convert them to world coordinates 
+      Link* link = wrapper->getAttachedLink();
+      position tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
+      P3 = vec3 ( tmpPos.toSbVec3f() );
+      tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
+      P4 = vec3 ( tmpPos.toSbVec3f() );
+      vec3 Pa, Pb;
+      double mua, mub;      
+      LineLineIntersect( vec3(pCur) , vec3(pNext) , P3,P4 , &Pa, &Pb, &mua, &mub);
+      if (mua>0 && mua<1 && mub>0 && mub<1)
+      {
+        vec3 dPrev = Pa - Pb;
+        minDist = std::min(minDist, dPrev.len());
+      }
+    }
+    insPt++;      
+  }
+  return minDist;
+ }
+
 /*! Checks if a connector penetrates a cylindrical wrapper by more than the 
 	tolerance value. If so, it adds a temporary insertion point on the edge 
 	of the cylider.	Problems:
@@ -431,9 +411,12 @@ void Tendon::checkWrapperIntersections()
       for (int j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++) 
       {
         if ( ((HumanHand*)getRobot())->getTendonWrapper(j)->isExempt(mTendonName)) continue;
-        //two points along axis of tendon wrapper
+        //two points at the two ends of the tendon wrapper
         vec3 P3 = ((HumanHand*)getRobot())->getTendonWrapper(j)->location;
-        vec3 P4 = P3 + ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
+        vec3 P4 = P3 + 0.5 * ((HumanHand*)getRobot())->getTendonWrapper(j)->length * 
+          ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
+        P3 = P3 - 0.5 * ((HumanHand*)getRobot())->getTendonWrapper(j)->length * 
+          ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
         //convert them to world coordinates 
         Link* link = ((HumanHand*)getRobot())->getTendonWrapper(j)->getAttachedLink();
         position tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
@@ -445,15 +428,13 @@ void Tendon::checkWrapperIntersections()
         double mua, mub;
         LineLineIntersect( vec3(pCur) , vec3(pNext) , P3,P4 , &Pa, &Pb, &mua, &mub);
         
-        // check two things:
+        // check three things:
         //- if tendon is too close to wrapper
         //- if closest point actually falls between insertion points 
-        //  (wrappers extends to infinity, we don't check that)
-        //- WE SHOULD IN THE FUTURE! don't want one finger's tendon to wrap around another finger's wrapper
-        //
+        //- if closest point falls between the edges of the wrapper
         vec3 dPrev = Pa - Pb;
         if (dPrev.len() < WRAPPER_TOLERANCE * ((HumanHand*)getRobot())->getTendonWrapper(j)->radius 
-            && mua>0 && mua<1)
+            && mua>0 && mua<1 && mub>0 && mub<1)
         {
           // compute location of new insertion point - on cylinder edge 
           dPrev = normalise(dPrev);
@@ -993,7 +974,6 @@ void TendonWrapper::createGeometry()
   IVWrapper->addChild(IVWrapperMaterial);
   IVWrapper->addChild(IVWrapperGeom);
   IVWrapperMaterial->diffuseColor.setValue(0.7f , 0.1f , 0.1f);
-  IVWrapperGeom->height=10;  
 }
 
 void TendonWrapper::updateGeometry()
@@ -1002,6 +982,7 @@ void TendonWrapper::updateGeometry()
   //neg 90 x
   rotateSoTransform(IVWrapperTran, vec3(1.0, 0.0, 0.0), -1.5707);
   IVWrapperGeom->radius=radius;
+  IVWrapperGeom->height=length;  
 }
 
 void TendonWrapper::setLocation(vec3 loc)
@@ -1059,11 +1040,17 @@ bool TendonWrapper::loadFromXml(const TiXmlElement* root)
     DBGA("Failed to read radius on tendon wrapper");
     return false;
   }
+  double len;
+  if(!getDouble(root,"length",len)){
+    DBGA("Tendon wrapper with no specified length, using default");
+    len = 10.0;
+  }
   attachChainNr = chain;
   attachLinkNr = link;
   location = loc;
   orientation = ort;
   radius = rad;
+  length = len;
 
   //read list of exempt tendons
   std::list<const TiXmlElement*> elementList = findAllXmlElements(root,"exemption");
