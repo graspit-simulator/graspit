@@ -75,11 +75,12 @@ void rotateSoTransform(SoTransform *tran, vec3 axis, double angle)
   tr.toSoTransform(tran);
 }
 
-TendonInsertionPoint::TendonInsertionPoint(Tendon *myOwner, int chain, int link, vec3 point, bool isPerm) : 
+TendonInsertionPoint::TendonInsertionPoint(Tendon *myOwner, int chain, int link, vec3 point, double mu, bool isPerm) : 
   mAttachPoint(point),
   mPermanent(isPerm),
   mAttachChainNr(chain),
   mAttachLinkNr(link),
+  mMu(mu),
   mOwner(myOwner)
 {
   createInsertionGeometry();
@@ -232,68 +233,6 @@ void Tendon::removeTemporaryInsertionPoints()
   }
 }
 
-PROF_DECLARE(TENDON_REMOVE_INTERSECTIONS);
-void Tendon::removeWrapperIntersections()
-{
-  PROF_TIMER_FUNC(TENDON_REMOVE_INTERSECTIONS);
-  int j;
-  SbVec3f pPrev,pCur,pNext;
-  position tmpPos;
-  vec3 dPrev,dRes,P3,P4,Pa,Pb;
-  double mua,mub;
-  Link *link;
-  bool needed;
-  
-  std::list<TendonInsertionPoint*>::iterator prevInsPt, insPt, nextInsPt;
-  
-  for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
-  {
-    nextInsPt = insPt;
-    prevInsPt = insPt;
-    nextInsPt ++;
-    
-    if ( !(*insPt)->isPermanent() && insPt!=mInsPointList.begin() && nextInsPt!=mInsPointList.end() )
-    {
-      prevInsPt--;
-      
-      pPrev = (*prevInsPt)->getWorldPosition();
-      pCur = (*insPt)->getWorldPosition();
-      pNext = (*nextInsPt)->getWorldPosition();
-      
-      needed = false;
-      for (j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++)
-      {
-        if ( ((HumanHand*)getRobot())->getTendonWrapper(j)->isExempt(mTendonName) ) continue;
-        //two points along axis of tendon wrapper
-        P3 = ((HumanHand*)getRobot())->getTendonWrapper(j)->location;
-        P4 = P3 + ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
-        //convert them to world coordinates 
-        link = ((HumanHand*)getRobot())->getTendonWrapper(j)->getAttachedLink();
-        tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
-        P3 = vec3 ( tmpPos.toSbVec3f() );
-        tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
-        P4 = vec3 ( tmpPos.toSbVec3f() );
-        
-        LineLineIntersect( vec3(pPrev) , vec3(pNext) , P3,P4 , &Pa, &Pb, &mua, &mub);
-        dPrev = Pa - Pb;
-        /*careful: here we are using the exact radius, not a slightly smaller value*/
-        /*changed my mind: we are*/
-        if (dPrev.len() <  WRAPPER_TOLERANCE * ((HumanHand*)getRobot())->getTendonWrapper(j)->radius && 
-            mua>0 && mua<1)
-        {
-          needed = true;
-          break;
-        }
-      }
-      if (!needed)
-      {
-        removeInsertionPoint(insPt);
-        insPt = prevInsPt;
-      }
-    }
-  }
-}
-
 bool Tendon::insPointInsideWrapper()
 {
   int i=0;
@@ -349,41 +288,100 @@ double Tendon::minInsPointDistance()
  return minDist;
 }
 
-double Tendon::wrapperAxisDistance(TendonWrapper *wrapper)
+inline bool wrapperIntersection(TendonWrapper *wrapper, QString tendonName, 
+                                vec3 pPrev, vec3 pNext, position &newInsPtPos)
 {
-  double minDist = std::numeric_limits<double>::max();
-  std::list<TendonInsertionPoint*>::iterator insPt = mInsPointList.begin();  
-  while (insPt!=mInsPointList.end()) 
+  if ( wrapper->isExempt(tendonName) ) return false;
+  //two points at the two ends of the tendon wrapper
+  vec3 P3 = wrapper->location;
+  vec3 P4 = P3 + 0.5 * wrapper->length * wrapper->orientation;
+  P3 = P3 - 0.5 * wrapper->length * wrapper->orientation;
+  //convert them to world coordinates 
+  Link* link = wrapper->getAttachedLink();
+  position tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
+  P3 = vec3 ( tmpPos.toSbVec3f() );
+  tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
+  P4 = vec3 ( tmpPos.toSbVec3f() );
+  
+  vec3 Pa, Pb;
+  double mua, mub;
+  LineLineIntersect( pPrev , pNext , P3,P4 , &Pa, &Pb, &mua, &mub);
+
+  // if closest point is not between wrapper edges we are done
+  if (mub<0 || mub>1) return false;
+
+  // if  closest point is not between insertion point we are done
+  // this also exits if one of the insertion points is closest, which warrants a closer look
+  if (mua<=0 || mua>=1) return false;
+  
+  /*
+  //check if tendon is on wrong side of wrapper
+  vec3 wrapping_direction;
+  if (wrapper->wrappingSide(tendonName, wrapping_direction))
+  {
+    //convert closest points to link coordinates
+    position Pa_link = position(Pa.toSbVec3f()) * ( link->getTran().inverse());
+    position Pb_link = position(Pb.toSbVec3f()) * ( link->getTran().inverse());
+    vec3 dPrevLink = Pa_link - Pb_link;
+    double length = dPrevLink.len();
+    dPrevLink = normalise(dPrevLink);
+    //DBGA("Tendon " << tendonName.latin1() << " has wrapping side; direction is " << dPrevLink);
+    if ( dPrevLink % wrapping_direction < 0 ) {
+      DBGA("Tendon " << tendonName.latin1() << " on the wrong side of a wrapper at mua " << mua);
+      //new insertion point is in opposite direction
+      vec3 dRes = vec3(Pb_link.toSbVec3f() ) - ( wrapper->radius) * dPrevLink;
+      newInsPtPos = position ( dRes.toSbVec3f() );
+      return true;
+    }    
+  }
+  */
+  // check if tendon is too close to wrapper
+  vec3 dPrev = Pa - Pb;
+  if (dPrev.len() < WRAPPER_TOLERANCE * wrapper->radius)
+  {
+    // compute location of new insertion point - on cylinder edge 
+    dPrev = normalise(dPrev);
+    vec3 dRes = Pb + ( wrapper->radius ) * dPrev;
+    // transform it to coordinate system of wrapper */          
+    newInsPtPos = position ( dRes.toSbVec3f() ) * ( link->getTran().inverse() );
+    return true;
+  }
+  return false;
+}
+
+PROF_DECLARE(TENDON_REMOVE_INTERSECTIONS);
+void Tendon::removeWrapperIntersections()
+{
+  PROF_TIMER_FUNC(TENDON_REMOVE_INTERSECTIONS);  
+  for (std::list<TendonInsertionPoint*>::iterator insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
     std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt;
     nextInsPt ++;
-    if (nextInsPt != mInsPointList.end() ) 
+    if ( !(*insPt)->isPermanent() && insPt!=mInsPointList.begin() && nextInsPt!=mInsPointList.end() )
     {
-      SbVec3f pCur = (*insPt)->getWorldPosition();
-      SbVec3f pNext = (*nextInsPt)->getWorldPosition();
-      //two points at the two ends of the tendon wrapper
-      vec3 P3 = wrapper->location;
-      vec3 P4 = P3 + 0.5 * wrapper->length * wrapper->orientation;
-      P3 = P3 - 0.5 * wrapper->length * wrapper->orientation;
-      //convert them to world coordinates 
-      Link* link = wrapper->getAttachedLink();
-      position tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
-      P3 = vec3 ( tmpPos.toSbVec3f() );
-      tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
-      P4 = vec3 ( tmpPos.toSbVec3f() );
-      vec3 Pa, Pb;
-      double mua, mub;      
-      LineLineIntersect( vec3(pCur) , vec3(pNext) , P3,P4 , &Pa, &Pb, &mua, &mub);
-      if (mua>0 && mua<1 && mub>0 && mub<1)
+      std::list<TendonInsertionPoint*>::iterator prevInsPt = insPt;    
+      prevInsPt--;      
+      vec3 pPrev = vec3( (*prevInsPt)->getWorldPosition() );
+      vec3 pNext = vec3( (*nextInsPt)->getWorldPosition() );
+      bool needed = false;
+      for (int j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++)
       {
-        vec3 dPrev = Pa - Pb;
-        minDist = std::min(minDist, dPrev.len());
+        TendonWrapper *wrapper = ((HumanHand*)getRobot())->getTendonWrapper(j);
+        position foo;
+        if (wrapperIntersection(wrapper, mTendonName, pPrev, pNext, foo))
+        {
+          needed = true;
+          break;
+        }        
+      }
+      if (!needed)
+      {
+        removeInsertionPoint(insPt);
+        insPt = prevInsPt;
       }
     }
-    insPt++;      
   }
-  return minDist;
- }
+}
 
 /*! Checks if a connector penetrates a cylindrical wrapper by more than the 
 	tolerance value. If so, it adds a temporary insertion point on the edge 
@@ -406,47 +404,17 @@ void Tendon::checkWrapperIntersections()
     std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt;
     nextInsPt ++;
     if (nextInsPt != mInsPointList.end() ) {
-      SbVec3f pCur = (*insPt)->getWorldPosition();
-      SbVec3f pNext = (*nextInsPt)->getWorldPosition();
+      vec3 pCur = vec3( (*insPt)->getWorldPosition() );
+      vec3 pNext = vec3 ( (*nextInsPt)->getWorldPosition() );  
       for (int j=0; j< ((HumanHand*)getRobot())->getNumTendonWrappers(); j++) 
       {
-        if ( ((HumanHand*)getRobot())->getTendonWrapper(j)->isExempt(mTendonName)) continue;
-        //two points at the two ends of the tendon wrapper
-        vec3 P3 = ((HumanHand*)getRobot())->getTendonWrapper(j)->location;
-        vec3 P4 = P3 + 0.5 * ((HumanHand*)getRobot())->getTendonWrapper(j)->length * 
-          ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
-        P3 = P3 - 0.5 * ((HumanHand*)getRobot())->getTendonWrapper(j)->length * 
-          ((HumanHand*)getRobot())->getTendonWrapper(j)->orientation;
-        //convert them to world coordinates 
-        Link* link = ((HumanHand*)getRobot())->getTendonWrapper(j)->getAttachedLink();
-        position tmpPos = position (P3.toSbVec3f()) * ( link->getTran());
-        P3 = vec3 ( tmpPos.toSbVec3f() );
-        tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
-        P4 = vec3 ( tmpPos.toSbVec3f() );
-
-        vec3 Pa, Pb;
-        double mua, mub;
-        LineLineIntersect( vec3(pCur) , vec3(pNext) , P3,P4 , &Pa, &Pb, &mua, &mub);
-        
-        // check three things:
-        //- if tendon is too close to wrapper
-        //- if closest point actually falls between insertion points 
-        //- if closest point falls between the edges of the wrapper
-        vec3 dPrev = Pa - Pb;
-        if (dPrev.len() < WRAPPER_TOLERANCE * ((HumanHand*)getRobot())->getTendonWrapper(j)->radius 
-            && mua>0 && mua<1 && mub>0 && mub<1)
-        {
-          // compute location of new insertion point - on cylinder edge 
-          dPrev = normalise(dPrev);
-          vec3 dRes = Pb + ( ((HumanHand*)getRobot())->getTendonWrapper(j)->radius ) * dPrev;
-          // transform it to coordinate system of wrapper */          
-          tmpPos = position ( dRes.toSbVec3f() ) * ( link->getTran().inverse() );
-          
-          int chainNr = ((HumanHand*)getRobot())->getTendonWrapper(j)->getChainNr();
-          int linkNr = ((HumanHand*)getRobot())->getTendonWrapper(j)->getLinkNr();
-          
-          //create new insertion point
-          insertInsertionPoint( nextInsPt, chainNr, linkNr, vec3(tmpPos.toSbVec3f()), false );
+        TendonWrapper *wrapper = ((HumanHand*)getRobot())->getTendonWrapper(j);
+        if ( wrapper->isExempt(mTendonName)) continue;
+        position newInsPtPos;
+        if ( wrapperIntersection(wrapper, mTendonName, pCur, pNext, newInsPtPos) ) {          
+          int chainNr = wrapper->getChainNr();
+          int linkNr = wrapper->getLinkNr();          
+          insertInsertionPoint( nextInsPt, chainNr, linkNr, vec3(newInsPtPos.toSbVec3f()), wrapper->getMu(), false );
           new_insertion = true;
         }
       }
@@ -540,6 +508,30 @@ void Tendon::updateForceIndicators()
   std::vector<double> insPointMagn;
   getInsertionPointTransforms(insPointTrans);
   getInsertionPointForceMagnitudes(insPointMagn);
+
+  /*
+  if (mInsPointList.size() != insPointTrans.size()) DBGA("Error 1");
+  size_t i=0;
+  std::list<TendonInsertionPoint*>::iterator insPt;
+  for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
+  {
+    Link* link = (*insPt)->getAttachedLink();	
+    SbVec3f tmp = ( (*insPt)->getAttachPoint() ).toSbVec3f();
+    position pos = position(tmp) * ( link->getTran() );
+    
+    vec3 force = (*insPt)->mInsertionForce; 
+
+    DBGA("Transform:\n" << insPointTrans[i]);
+    mat3 mat(insPointTrans[i].rotation());
+    DBGA("Rotation:\n " << mat);
+    DBGA("Position: " << pos);
+    DBGA("Magnitudes, from arrows: " << insPointMagn[i]* getTotalForce() << " and from forces: " << force.len());
+    DBGA("Force direction: " << normalise(force));
+    DBGA("\n-----------------------------------\n");
+    i++;
+  }
+*/
+
   if (insPointTrans.size() != insPointMagn.size())
   {
     DBGA("Error: number of ins point trans does not match number of ins point magn");
@@ -640,6 +632,39 @@ void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes)
   }
 }
 
+double Tendon::getTotalFrictionCoefficient()
+{
+  return getFrictionCoefficientBetweenPermInsPoints(0, getNumPermInsPoints() - 1, true);
+}
+
+
+double Tendon::getFrictionCoefficientBetweenPermInsPoints(int start, int end, bool inclusive)
+{
+  if (start < 0 || end >= getNumPermInsPoints() || start > end) {
+    DBGA("Incorrect start or end for tendon friction interval");
+    return -1.0;
+  }
+  std::vector<double> magnitudes;
+  getInsertionPointForceMagnitudes(magnitudes);
+  assert(magnitudes.size() == mInsPointList.size());
+  
+  std::list<TendonInsertionPoint*>::const_iterator it;
+  int num = 0, count = 0;
+  double totalMu = 0.0;
+  for (it=mInsPointList.begin(); it!=mInsPointList.end(); it++)
+  {
+    if (inclusive && num >= start) 
+    {
+      totalMu += magnitudes.at(count) * (*it)->getMu();
+    }
+    else if (num > start && num < end) totalMu += magnitudes.at(count) * (*it)->getMu();
+    if ((*it)->isPermanent()) num++;
+    if (num > end) break;
+    count++;
+  }
+  assert(num > end);
+  return totalMu;
+}
 
 /*! Simple method for some passive force computation
   - assume inextensible tendon is attached to a muscle, 
@@ -803,17 +828,17 @@ void Tendon::setForcesVisible(bool v)
   }
 }
 
-void Tendon::addInsertionPoint(int chain, int link, vec3 point, bool isPerm)
+void Tendon::addInsertionPoint(int chain, int link, vec3 point, double mu, bool isPerm)
 {
-  insertInsertionPoint( mInsPointList.end(), chain, link, point, isPerm);
+  insertInsertionPoint( mInsPointList.end(), chain, link, point, mu, isPerm);
 }
 
 std::list<TendonInsertionPoint*>::iterator
 Tendon::insertInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos, 
-                             int chain, int link, vec3 point, bool isPerm)
+                             int chain, int link, vec3 point, double mu, bool isPerm)
 {
   std::list<TendonInsertionPoint*>::iterator newInsPt;
-  newInsPt = mInsPointList.insert( itPos, new TendonInsertionPoint(this,chain,link,point,isPerm) );
+  newInsPt = mInsPointList.insert( itPos, new TendonInsertionPoint(this,chain,link,point,mu,isPerm) );
   mIVRoot->addChild( (*newInsPt)->getIVInsertion() );
   mIVRoot->addChild( (*newInsPt)->getIVConnector() );
   return newInsPt;
@@ -925,12 +950,15 @@ bool Tendon::loadFromXml(const TiXmlElement *root)
       DBGA("Failed to read position on ins point"<<j);
       return false;      
     }
-    addInsertionPoint(chain,link,position,true);
+    double friction;
+    if (!getDouble(*p2, "friction", friction)) friction = 0.0;
+    addInsertionPoint(chain,link,position,friction,true);
   }  
   return true;
 }
 
 TendonWrapper::TendonWrapper(Robot *myOwner) : 
+  mMu(0.0),
   owner(myOwner)
 {
 }
@@ -1003,6 +1031,17 @@ void TendonWrapper::setRadius(double r)
   updateGeometry();
 }
 
+bool TendonWrapper::wrappingSide(QString tendonName, vec3 &direction)
+{
+  for (size_t i=0; i<mWrappingSideVec.size(); i++) {
+    if (mWrappingSideVec[i].mTendonName == tendonName) {
+      direction = mWrappingSideVec[i].mDirection;
+      return true;
+    }    
+  }
+  return false;
+}
+
 bool TendonWrapper::loadFromXml(const TiXmlElement* root)
 {
   int chain;
@@ -1015,6 +1054,8 @@ bool TendonWrapper::loadFromXml(const TiXmlElement* root)
     DBGA("Failed to read link on tendon wrapper");
     return false;
   }
+  double mu;
+  if (!getDouble(root, "friction", mu)) mu = 0.0;
   const TiXmlElement* element = findXmlElement(root,"position");
   if(!element){
     DBGA("Failed to read position on tendon wrapper");
@@ -1051,6 +1092,7 @@ bool TendonWrapper::loadFromXml(const TiXmlElement* root)
   orientation = ort;
   radius = rad;
   length = len;
+  mMu = mu;
 
   //read list of exempt tendons
   std::list<const TiXmlElement*> elementList = findAllXmlElements(root,"exemption");
@@ -1064,6 +1106,24 @@ bool TendonWrapper::loadFromXml(const TiXmlElement* root)
     mExemptList.push_back(name);
   }
 
+  //read list of tendon wrapping wrapping sides
+  elementList = findAllXmlElements(root,"wrapping_side");
+  for (p = elementList.begin(); p != elementList.end(); p++) {
+    QString name = (*p)->Attribute("tendon");
+    if(name.isNull()){
+      DBGA("Warning: tendon name undefined for wrapping side");
+      continue;
+    }
+    const TiXmlElement* element = findXmlElement(*p,"orientation");
+    if(!element){ DBGA("Failed to find orientation on tendon wrapper"); continue;}
+    vec3 side_dir;
+    if (!getPosition(element, side_dir)) { DBGA("Warning: incorrect wrapping side direction"); continue;}
+    WrappingSide side;
+    side.mTendonName = name;
+    side.mDirection = side_dir;
+    mWrappingSideVec.push_back(side);
+  }
+  
   return true;
 }
 

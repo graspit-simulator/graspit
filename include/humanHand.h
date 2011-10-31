@@ -81,6 +81,9 @@ private:
   //! Link number for the link that the insertion point is on
   int mAttachLinkNr;
   
+  //! The effective friction coefficient between the tendon and the insertion point
+  double mMu;
+
   SoSeparator *mIVInsertion;
   SoMaterial *mIVInsertionMaterial;
   SoTransform *mIVInsertionTran;
@@ -100,7 +103,7 @@ public:
   //! The force applied by the tendon at this insertion point, in world coordinates.
   vec3 mInsertionForce;
   
-  TendonInsertionPoint(Tendon* myOwner,int chain,int link,vec3 point,bool isPerm=true);
+  TendonInsertionPoint(Tendon* myOwner, int chain, int link, vec3 point, double mu, bool isPerm=true);
 
   void removeAllGeometry();
   
@@ -115,6 +118,10 @@ public:
   vec3 getAttachPoint() const {return mAttachPoint;}
 
   void setAttachPoint(vec3 attachPoint);
+
+  double getMu() const {return mMu;}
+
+  void setMu(double mu){mMu = mu;}
   
   //! Use this function to get the link the insertion point is attached to.
   /*! Handles the case where tendon is attached to base correctly*/
@@ -138,9 +145,17 @@ public:
   attached to a robot link, and defined in the link's coordinate system.
 */
 class TendonWrapper{
+public:
+  //! Holds info about which side of the wrapper a certain tendon must go
+  class WrappingSide {
+  public:
+    QString mTendonName;
+    vec3 mDirection;
+  };
 private:
   int attachLinkNr;
   int attachChainNr;
+  double mMu;
   Robot *owner;
 
   SoSeparator *IVWrapper;
@@ -150,6 +165,9 @@ private:
 
   //! A list of tendons (by name) that are exempt from wrapping around this wrapper
   std::list<QString> mExemptList;
+
+  //! A list of wrapping sides for tendons in the system
+  std::vector<WrappingSide> mWrappingSideVec;
   
 public:
   vec3 location, orientation;
@@ -168,6 +186,9 @@ public:
   void setRadius(double r);
   double getRadius() const {return radius;}
 
+  void setMu(double mu){mMu = mu;}
+  double getMu() const {return mMu;}
+
   void createGeometry();
   void updateGeometry();
   SoSeparator* getIVRoot(){return IVWrapper;}
@@ -176,6 +197,9 @@ public:
   bool loadFromXml(const TiXmlElement* root);
   //! Check if the tendon with the given name is exempt from intersection with this tendon
   bool isExempt(QString name);
+
+  //! Returns info on the wrapping side for the given tendon, or false if none is defined
+  bool wrappingSide(QString tendonName, vec3 &direction);
 };
 
 //! Defines a tendon geometry by listing its insertion points
@@ -248,12 +272,12 @@ public:
   SoSeparator* getIVRoot(){return mIVRoot;}
   
   //! Adds an insertion point at the end of the insPointList
-  void addInsertionPoint(int chain,int link,vec3 point, bool isPerm);
+  void addInsertionPoint(int chain,int link,vec3 point, double mu, bool isPerm);
   
   //! Inserts an insertion point at a given position in insPointList
   std::list<TendonInsertionPoint*>::iterator 
   insertInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos, 
-                       int chain, int link, vec3 point, bool isPerm);
+                       int chain, int link, vec3 point, double mu, bool isPerm);
   
   //! Removes the insertion point pointed to by the given iterator
   std::list<TendonInsertionPoint*>::iterator 
@@ -283,14 +307,17 @@ public:
   //! Returns the n-th permanent insertion point
   TendonInsertionPoint* getPermInsPoint(int n);
 
+  //! Returns total friction acting along the tendon
+  double getTotalFrictionCoefficient();
+
+  //! Returns the total friction acting between two insertion points
+  double getFrictionCoefficientBetweenPermInsPoints(int start, int end, bool inclusive);
+
   //! Removes all temporary insertion points
   void removeTemporaryInsertionPoints();
 
   //! Returns the minimum distance between two consecutive permanent insertion points
   double minInsPointDistance();
-
-  //! Returns the minimum distance between this tendon and the central axis of a wrapper
-  double wrapperAxisDistance(TendonWrapper *wrapper);
 
   void select();
   void deselect();
