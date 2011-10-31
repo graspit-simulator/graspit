@@ -56,7 +56,7 @@ class GraspitDBGrasp : public db_planner::Grasp{
 
 public:
 	GraspitDBGrasp(const GraspitDBGrasp& grasp2);
-        GraspitDBGrasp(Hand* h) : mHand(h), mPreGrasp(NULL), mFinalGrasp(NULL) {}
+        GraspitDBGrasp(Hand* h) : mPreGrasp(NULL), mFinalGrasp(NULL), mHand(h) {}
 	~GraspitDBGrasp();
 	//! Returns the pre-grasp of this GraspitDBGrasp
 	GraspPlanningState* getPreGraspPlanningState() { return mPreGrasp; }
