@@ -149,7 +149,7 @@ protected:
 	virtual void mainLoop()=0;
 
 signals:
-	//! To be emitted during the searh as a measure of progress
+	//! To be emitted during the search as a measure of progress
 	void update();
 	//! To be emitted when planner stops
 	/*! To be emitted when planner stops, either through an explicit 
