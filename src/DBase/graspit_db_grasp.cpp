@@ -205,11 +205,8 @@ QString GraspitDBGrasp::getHandDBName(Hand* h)
 		hand_db_name = QString("GRIPPER_DESIGN_1");
 	}else if(handName == QString("gripper_design_4")){
 		hand_db_name = QString("GRIPPER_DESIGN_4");
-	}else {
-		std::cout << "Wrong hand name detected: " << handName.latin1() << 
- 		             ".  Acceptable GRASPIT_hand_names are: Barrett, HumanHand20DOF, pr2_gripper" <<
-		             ", pr_gripper_2008, pr2_gripper_2010" << std::endl;
-		hand_db_name = QString::null;
+	} else {	
+                hand_db_name = handName;
 	}
 	return hand_db_name;
 }
@@ -234,9 +231,7 @@ QString GraspitDBGrasp::getHandGraspitPath(QString handDBName)
 	} else if (handDBName=="MC_GRIP") {
 		path = "/models/robots/McHand/McGrip.xml";
 	} else {
-		DBGA("Cannot convert database hand name " << handDBName.latin1() << 
-		     " to GraspIt path");
-		path = QString::null;
+                path = "/models/robots/" + handDBName + "/" + handDBName + ".xml";
 	}
 	return path;
 
