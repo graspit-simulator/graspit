@@ -932,11 +932,11 @@ int SoftContact::CalcRprimes()
 double SoftContact::CalcContact_Mattress( double nForce )
 {
 	if (r1prime < 0) {
-		DBGA("Degenerate soft contact");
+		DBGP("Degenerate soft contact");
 		r1prime = 20;
 	}
 	if (r2prime < 0) {
-		DBGA("Degenerate soft contact");
+		DBGP("Degenerate soft contact");
 		r2prime = 20;
 	}
 		
