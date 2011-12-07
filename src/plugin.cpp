@@ -23,7 +23,13 @@
 //
 //######################################################################
 
+#ifdef WIN32
+extern "C" {
+#include "dlfcn.h"
+}
+#elif
 #include <dlfcn.h>
+#endif
 
 #include <QFile>
 
