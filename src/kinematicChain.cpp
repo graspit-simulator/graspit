@@ -145,183 +145,183 @@ KinematicChain::createDynamicJoints(const std::vector<int> &dynJointTypes)
 int
 KinematicChain::initChainFromXml(const TiXmlElement* root,QString &linkDir)
 {
-	numJoints = countXmlElements(root,"joint");
-	if (numJoints < 1) {
-		DBGA("number of joints < 1");
-		return FAILURE;
-	}
-
-	numLinks = countXmlElements(root,"link");
-	if (numLinks < 1) {
-		DBGA("Number of links < 1");
-		return FAILURE;
-	}
-
-	jointVec.resize(numJoints, NULL);
-	linkVec.resize(numLinks, NULL);  
+  numJoints = countXmlElements(root,"joint");
+  if (numJoints < 1) {
+    DBGA("number of joints < 1");
+    return FAILURE;
+  }
   
-	lastJoint = new int[numLinks];
-
-	IVRoot = new SoSeparator;
-	IVTran = new SoTransform;
-	IVTran->ref();
-
-	/* read in the finger transformation */
-	const TiXmlElement* element = findXmlElement(root,"transform");
-	if(element){
-		if(!getTransform(element,tran)){
-			QTWARNING("Fail to perform transformation");
-			return FAILURE;
-		}
-	}
-	tran.toSoTransform(IVTran);
-
-	DBGA("  Creating joints");
-	numDOF = 0;
-	std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "joint");
-	std::list<const TiXmlElement*>::iterator p;
-	int j;
-	for(p = elementList.begin(), j=0; p!=elementList.end(); p++,j++){
-		DBGA("   Joint " << j);
-		QString type = (*p)->Attribute("type");
-		if(type.isNull()){
-			QTWARNING("No Joint Type Specified");
-			return FAILURE;
-		}
-		if(type == "Revolute"){
-			jointVec[j] = new RevoluteJoint(this);
-		} else if(type == "Prismatic"){
-			jointVec[j] = new PrismaticJoint (this);
-		} else {
-			DBGA("Unknown joint type requested");
-			return FAILURE;
-		}
-		if (jointVec[j]->initJointFromXml(*p, firstJointNum+j) == FAILURE) {
-			DBGA("Failed to initialize joint");
-			return FAILURE;
-		}
-	}
-
-	DBGA("  Creating links");
-	std::vector<int> dynJointTypes;
-	int lastJointNum = -1;
-	elementList = findAllXmlElements(root, "link");
-	int l;
-	for (l=0, p=elementList.begin(); p!=elementList.end(); p++,l++){
-		DBGA("   Link " << l);
-		QString jointType=(*p)->Attribute("dynamicJointType");
-		if(jointType.isNull()){
-			QTWARNING("No Dynamic Joint Type Specified");
-			return FAILURE;
-		}
-		jointType = jointType.stripWhiteSpace();
-		if (jointType == "Revolute") {
-			dynJointTypes.push_back(DynJoint::REVOLUTE);
-			lastJointNum += 1;
-		} else if (jointType == "Ball") {
-			dynJointTypes.push_back(DynJoint::BALL);
-			lastJointNum += 3;
-		} else if (jointType == "Universal") {
-			dynJointTypes.push_back(DynJoint::UNIVERSAL);
-			lastJointNum += 2;
-		} else if (jointType == "Prismatic") {
-			dynJointTypes.push_back(DynJoint::PRISMATIC);
-			lastJointNum += 1;
-		} else if (jointType == "Fixed") {
-			dynJointTypes.push_back(DynJoint::FIXED);
-		} else {
-			DBGA("Unknown joint type requested");
-			return FAILURE;
-		}
-
-		QString linkFilename = (*p)->GetText();
-		linkFilename = linkFilename.stripWhiteSpace();
-		QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
-		linkVec[l] = new Link(owner,chainNum,l,owner->getWorld(),linkName.latin1());
-		if (linkVec[l]->load(linkDir + linkFilename)==FAILURE) {
-			delete linkVec[l]; linkVec[l] = NULL;
-			DBGA("Failed to load file for link " << l);
-			return FAILURE;
-		}
-			/*Handle collision rule settings:
-			 *Common case is NULL - collisions are on except for adjacent links.
-			 *Off - turn off collisions for this link globally, do not enter this body
-			 *into the collision engine at all.
-			 *OverlappingPair - turn off collisions between two particular links
-		     */
-		QString collisionRule=(*p)->Attribute("collisionRule");
-		
-		if(!collisionRule.isNull()){
-			collisionRule = collisionRule.stripWhiteSpace();
-			if (collisionRule == "Off"){
-				linkVec[l]->addToIvc(true);
-				linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],NULL);
-				DBGA("Collisions off for link " << l);
-			}else if (collisionRule == "OverlappingPair"){
-					/*targetChain - specifies the chain of the target link to disable
-					*collisions for.  No attribute implies current chain.  
-					*Base implies robot base.
-					*targetLink - specifies link number in target chain
-					*/
-					linkVec[l]->addToIvc();
-					QString targetChain=(*p)->Attribute("targetChain");
-					targetChain = targetChain.stripWhiteSpace();
-						if (targetChain == "base")
-							linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],owner->getBase());
-						else{
-									
-							QString targetLink = (*p)->Attribute("targetLink");
-							if (!targetLink.isNull()){
-								bool ok = TRUE;
-								int linkNum = targetLink.toInt(&ok);
-								if (!ok){
-								DBGA("targetLink not a valid input");
-								return FAILURE;
-							}
-
-							if(targetChain.isNull())
-								linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],linkVec[linkNum]);
-							else{
-								int chainNum = targetChain.toInt(&ok);
-								if (!ok){
-									DBGA("targetChain not a valid input");
-									return FAILURE;
-									}
-								linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],owner->getChain(chainNum)->linkVec[linkNum]);	
-								}
-							}
-					}				
-				}
-			else{
-				DBGA("Unknown Collision Rule");
-				return FAILURE;
-			}
-		}else{
-			linkVec[l]->addToIvc();
-		}
-	
-
-		lastJoint[l] = lastJointNum;
-		if (lastJoint[l] >= numJoints) {
-			DBGA("Wrong last joint value: " << lastJoint[l]);
-			return FAILURE;
-		}
-		
-    	IVRoot->addChild(linkVec[l]->getIVRoot());
-	}
-
-	DBGA("  Creating dynamic joints");
-	if (createDynamicJoints(dynJointTypes) == FAILURE) {
-		DBGA("Failed to create dynamic joints");
+  numLinks = countXmlElements(root,"link");
+  if (numLinks < 1) {
+    DBGA("Number of links < 1");
+    return FAILURE;
+  }
+  
+  jointVec.resize(numJoints, NULL);
+  linkVec.resize(numLinks, NULL);  
+  
+  lastJoint = new int[numLinks];
+  
+  IVRoot = new SoSeparator;
+  IVTran = new SoTransform;
+  IVTran->ref();
+  
+  /* read in the finger transformation */
+  const TiXmlElement* element = findXmlElement(root,"transform");
+  if(element){
+    if(!getTransform(element,tran)){
+      QTWARNING("Fail to perform transformation");
+      return FAILURE;
+    }
+  }
+  tran.toSoTransform(IVTran);
+  
+  DBGA("  Creating joints");
+  numDOF = 0;
+  std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "joint");
+  std::list<const TiXmlElement*>::iterator p;
+  int j;
+  for(p = elementList.begin(), j=0; p!=elementList.end(); p++,j++){
+    DBGA("   Joint " << j);
+    QString type = (*p)->Attribute("type");
+    if(type.isNull()){
+      QTWARNING("No Joint Type Specified");
+      return FAILURE;
+    }
+    if(type == "Revolute"){
+      jointVec[j] = new RevoluteJoint(this);
+    } else if(type == "Prismatic"){
+      jointVec[j] = new PrismaticJoint (this);
+    } else {
+      DBGA("Unknown joint type requested");
+      return FAILURE;
+    }
+    if (jointVec[j]->initJointFromXml(*p, firstJointNum+j) == FAILURE) {
+      DBGA("Failed to initialize joint");
+      return FAILURE;
+    }
+  }
+  
+  DBGA("  Creating links");
+  std::vector<int> dynJointTypes;
+  int lastJointNum = -1;
+  elementList = findAllXmlElements(root, "link");
+  int l;
+  for (l=0, p=elementList.begin(); p!=elementList.end(); p++,l++){
+    DBGA("   Link " << l);
+    QString jointType=(*p)->Attribute("dynamicJointType");
+    if(jointType.isNull()){
+      QTWARNING("No Dynamic Joint Type Specified");
+      return FAILURE;
+    }
+    jointType = jointType.stripWhiteSpace();
+    if (jointType == "Revolute") {
+      dynJointTypes.push_back(DynJoint::REVOLUTE);
+      lastJointNum += 1;
+    } else if (jointType == "Ball") {
+      dynJointTypes.push_back(DynJoint::BALL);
+      lastJointNum += 3;
+    } else if (jointType == "Universal") {
+      dynJointTypes.push_back(DynJoint::UNIVERSAL);
+      lastJointNum += 2;
+    } else if (jointType == "Prismatic") {
+      dynJointTypes.push_back(DynJoint::PRISMATIC);
+      lastJointNum += 1;
+    } else if (jointType == "Fixed") {
+      dynJointTypes.push_back(DynJoint::FIXED);
+    } else {
+      DBGA("Unknown joint type requested");
+      return FAILURE;
+    }
+    
+    QString linkFilename = (*p)->GetText();
+    linkFilename = linkFilename.stripWhiteSpace();
+    QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
+    linkVec[l] = new Link(owner,chainNum,l,owner->getWorld(),linkName.latin1());
+    if (linkVec[l]->load(linkDir + linkFilename)==FAILURE) {
+      delete linkVec[l]; linkVec[l] = NULL;
+      DBGA("Failed to load file for link " << l);
+      return FAILURE;
+    }
+    /*Handle collision rule settings:
+     *Common case is NULL - collisions are on except for adjacent links.
+     *Off - turn off collisions for this link globally, do not enter this body
+     *into the collision engine at all.
+     *OverlappingPair - turn off collisions between two particular links
+     */
+    QString collisionRule=(*p)->Attribute("collisionRule");
+    
+    if(!collisionRule.isNull()){
+      collisionRule = collisionRule.stripWhiteSpace();
+      if (collisionRule == "Off"){
+	linkVec[l]->addToIvc(true);
+	linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],NULL);
+	DBGA("Collisions off for link " << l);
+      }else if (collisionRule == "OverlappingPair"){
+	/*targetChain - specifies the chain of the target link to disable
+	 *collisions for.  No attribute implies current chain.  
+	 *Base implies robot base.
+	 *targetLink - specifies link number in target chain
+	 */
+	linkVec[l]->addToIvc();
+	QString targetChain=(*p)->Attribute("targetChain");
+	targetChain = targetChain.stripWhiteSpace();
+	if (targetChain == "base")
+	  linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],owner->getBase());
+	else{
+	  
+	  QString targetLink = (*p)->Attribute("targetLink");
+	  if (!targetLink.isNull()){
+	    bool ok = TRUE;
+	    int linkNum = targetLink.toInt(&ok);
+	    if (!ok){
+	      DBGA("targetLink not a valid input");
+	      return FAILURE;
+	    }
+	    
+	    if(targetChain.isNull())
+	      linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],linkVec[linkNum]);
+	    else{
+	      int chainNum = targetChain.toInt(&ok);
+	      if (!ok){
+		DBGA("targetChain not a valid input");
 		return FAILURE;
-	}
-
-	jointsMoved = true;
-	updateLinkPoses();
-	owner->getWorld()->tendonChange();
-	owner->getIVRoot()->addChild(IVRoot);
-
-	return SUCCESS;
+	      }
+	      linkVec[l]->myWorld->toggleCollisions(false, linkVec[l],owner->getChain(chainNum)->linkVec[linkNum]);	
+	    }
+	  }
+	}				
+      }
+      else{
+	DBGA("Unknown Collision Rule");
+	return FAILURE;
+      }
+    }else{
+      linkVec[l]->addToIvc();
+    }
+    
+    
+    lastJoint[l] = lastJointNum;
+    if (lastJoint[l] >= numJoints) {
+      DBGA("Wrong last joint value: " << lastJoint[l]);
+      return FAILURE;
+    }
+    
+    IVRoot->addChild(linkVec[l]->getIVRoot());
+  }
+  
+  DBGA("  Creating dynamic joints");
+  if (createDynamicJoints(dynJointTypes) == FAILURE) {
+    DBGA("Failed to create dynamic joints");
+    return FAILURE;
+  }
+  
+  jointsMoved = true;
+  updateLinkPoses();
+  owner->getWorld()->tendonChange();
+  owner->getIVRoot()->addChild(IVRoot);
+  
+  return SUCCESS;
 }
 
 
