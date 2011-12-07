@@ -7,6 +7,7 @@
 	}
 HEADERS += $(DLFCN)/dlfcn.h
 SOURCES += $(DLFCN)/dlfcn.c
+INCLUDEPATH += $(DLFCN)
 
 
 # ---------------------- Blas and Lapack----------------------------------------
@@ -29,7 +30,7 @@ mkl {
 	graspitdbg {
 		LIBS += BLASd.lib lapackd.lib libf2cd.lib
 	} else {
-		LIBS += BLAS.lib clapack.lib libf2c.lib
+		LIBS += BLAS.lib lapack.lib libf2c.lib
 	}
 	INCLUDEPATH += $(CLAPACKDIR)/include
 	HEADERS += include/lapack_wrappers.h
