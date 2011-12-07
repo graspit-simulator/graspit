@@ -290,71 +290,71 @@ int
 RevoluteJoint::initJointFromXml(const TiXmlElement* root, int jnum)
 {
 
-	QString thQStr;
-	char thStr[40],num[40],*tmp;
-	double theta,d,a,alpha;
-	jointNum = jnum;
-	const TiXmlElement* element = findXmlElement(root,"theta");
-	if(element){
-		thQStr = element->GetText();
-		thQStr = thQStr.stripWhiteSpace();
-		strcpy(thStr,thQStr.toStdString().c_str());
-	}
-	else
-		return FAILURE;
-	if(!getDouble(root,"d", d)) return FAILURE;
-	if(!getDouble(root,"a", a)) return FAILURE;
-	if(!getDouble(root,"alpha", alpha)) return FAILURE;
-	if(!getDouble(root,"minValue", minVal)) return FAILURE;
-	if(!getDouble(root,"maxValue", maxVal)) return FAILURE;
-	if(!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
-	if(!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
-	if(!getDouble(root,"springStiffness", mK)) mK = 0.0;
-	if(!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
-
-	DBGP("thStr: " << thStr << " d: " << d << " a: " << a << " alpha: " 
-		<< alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: " 
-		<< f1 << " f0:" << f0 << " mK: " << mK << " mRestVal: " << mRestVal);
-
-	if (mK < 0) {
-		DBGA("Negative spring stiffness");
-		return FAILURE;
-	}
-
-	//convert to graspit units which for now seem to be the
-	//rather strange Nmm * 1.0e6
-	mK *= 1.0e6; 
-
-	alpha *= M_PI/180.0;
-	minVal *= M_PI/180.0;
-	maxVal *= M_PI/180.0;
-
-	theta = 0.0;
-	tmp = thStr+1;
-	sscanf(tmp,"%[0-9]",num);
-	DOFnum = atoi(num);
-	tmp += strlen(num);
-
-	if (DOFnum > owner->getOwner()->getNumDOF()) {
-		pr_error("DOF number is out of range\n");
-		return FAILURE;
-	}
-
-	if (*tmp=='*') {
-		tmp++;
-		sscanf(tmp,"%[0-9.-]",num);
-		tmp += strlen(num);
-		mCouplingRatio = atof(num);
-	}
-	if (*tmp=='+') {
-		tmp++;
-		sscanf(tmp,"%lf",&c);
-		c *= M_PI/180.0;
-	}
-
-	DH = new DHTransform(theta+c,d,a,alpha);  
-	DH->getTran().toSoTransform(IVTran);
-	return SUCCESS;
+  QString thQStr;
+  char thStr[40],num[40],*tmp;
+  double theta,d,a,alpha;
+  jointNum = jnum;
+  const TiXmlElement* element = findXmlElement(root,"theta");
+  if(element){
+    thQStr = element->GetText();
+    thQStr = thQStr.stripWhiteSpace();
+    strcpy(thStr,thQStr.toStdString().c_str());
+  }
+  else
+    return FAILURE;
+  if(!getDouble(root,"d", d)) return FAILURE;
+  if(!getDouble(root,"a", a)) return FAILURE;
+  if(!getDouble(root,"alpha", alpha)) return FAILURE;
+  if(!getDouble(root,"minValue", minVal)) return FAILURE;
+  if(!getDouble(root,"maxValue", maxVal)) return FAILURE;
+  if(!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
+  if(!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
+  if(!getDouble(root,"springStiffness", mK)) mK = 0.0;
+  if(!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
+  
+  DBGP("thStr: " << thStr << " d: " << d << " a: " << a << " alpha: " 
+       << alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: " 
+       << f1 << " f0:" << f0 << " mK: " << mK << " mRestVal: " << mRestVal);
+  
+  if (mK < 0) {
+    DBGA("Negative spring stiffness");
+    return FAILURE;
+  }
+  
+  //convert to graspit units which for now seem to be the
+  //rather strange Nmm * 1.0e6
+  mK *= 1.0e6; 
+  
+  alpha *= M_PI/180.0;
+  minVal *= M_PI/180.0;
+  maxVal *= M_PI/180.0;
+  
+  theta = 0.0;
+  tmp = thStr+1;
+  sscanf(tmp,"%[0-9]",num);
+  DOFnum = atoi(num);
+  tmp += strlen(num);
+  
+  if (DOFnum > owner->getOwner()->getNumDOF()) {
+    pr_error("DOF number is out of range\n");
+    return FAILURE;
+  }
+  
+  if (*tmp=='*') {
+    tmp++;
+    sscanf(tmp,"%[0-9.-]",num);
+    tmp += strlen(num);
+    mCouplingRatio = atof(num);
+  }
+  if (*tmp=='+') {
+    tmp++;
+    sscanf(tmp,"%lf",&c);
+    c *= M_PI/180.0;
+  }
+  
+  DH = new DHTransform(theta+c,d,a,alpha);  
+  DH->getTran().toSoTransform(IVTran);
+  return SUCCESS;
 }
 
 /*!
@@ -364,9 +364,9 @@ is then set to \a q + the joint offset \a c.
 int
 RevoluteJoint::setVal(double q)
 {
-	DH->setTheta(q+c);
-	DH->getTran().toSoTransform(IVTran);
-	return SUCCESS;  
+  DH->setTheta(q+c);
+  DH->getTran().toSoTransform(IVTran);
+  return SUCCESS;  
 }
 
 /*!
@@ -376,6 +376,6 @@ Applies equal and opposite torques of magnitude \a f about the axis
 void
 RevoluteJoint::applyInternalWrench(double magnitude)
 {
-	dynJoint->getPrevLink()->addTorque(-magnitude * worldAxis);
-	dynJoint->getNextLink()->addTorque(magnitude * worldAxis);
+  dynJoint->getPrevLink()->addTorque(-magnitude * worldAxis);
+  dynJoint->getNextLink()->addTorque(magnitude * worldAxis);
 }
