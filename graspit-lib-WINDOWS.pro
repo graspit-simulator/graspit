@@ -1,6 +1,14 @@
 # Windows-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
 
 
+#------- dlfcn ---------------
+!exists($(DLFCN)) {
+		error("DLFCN environment variable not set")
+	}
+HEADERS += $(DLFCN)/dlfcn.h
+SOURCES += $(DLFCN)/dlfcn.c
+
+
 # ---------------------- Blas and Lapack----------------------------------------
 
 mkl {
@@ -17,11 +25,11 @@ mkl {
 	!exists($(CLAPACKDIR)) {
 		error("Clapack not installed or CLAPACKDIR environment variable not set")
 	}
-	QMAKE_LIBDIR += $(CLAPACKDIR)/ia32/lib $(CLAPACKDIR)/LIB/Win32
+	QMAKE_LIBDIR += $(CLAPACKDIR)/lib
 	graspitdbg {
-		LIBS += BLASd.lib clapackd.lib
+		LIBS += BLASd.lib lapackd.lib libf2cd.lib
 	} else {
-		LIBS += BLAS.lib clapack.lib
+		LIBS += BLAS.lib clapack.lib libf2c.lib
 	}
 	INCLUDEPATH += $(CLAPACKDIR)/include
 	HEADERS += include/lapack_wrappers.h
@@ -34,9 +42,9 @@ mkl {
 # ---------------------- General libraries and utilities ----------------------------------
 
 graspitdbg {
-	LIBS += qhull/windows/Debug/qhull.lib $(COINDIR)/lib/Coin2d.lib $(COINDIR)/lib/SoQt1d.lib
+	LIBS += qhull/windows/Debug/qhull.lib $(COINDIR)/lib/Coin3d.lib $(COINDIR)/lib/SoQt1d.lib
 } else {
-	LIBS += qhull/windows/Release/qhull.lib $(COINDIR)/lib/Coin2.lib $(COINDIR)/lib/SoQt1.lib
+	LIBS += qhull/windows/Release/qhull.lib $(COINDIR)/lib/Coin3.lib $(COINDIR)/lib/SoQt1.lib
 }
 
 DEFINES	+= COIN_DLL SOQT_DLL WIN32
