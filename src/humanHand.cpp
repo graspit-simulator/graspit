@@ -1178,10 +1178,7 @@ int HumanHand::loadFromXml(const TiXmlElement* root, QString rootPath)
       mTendonWrapperVec.push_back(newTW);
     }
   }
-  for (size_t t=0; t<mTendonVec.size(); t++)
-  {
-    mTendonVec[t]->updateGeometry();
-  }
+  updateTendonGeometry();
   setRestPosition();
   return SUCCESS;
 }
