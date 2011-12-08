@@ -93,7 +93,9 @@ void DOF::updateMinMax()
 {
   maxq = (*jointList.begin())->getMax()/getStaticRatio(*jointList.begin());
   minq = (*jointList.begin())->getMin()/getStaticRatio(*jointList.begin());
+  DBGP("Joint 0 min "  << minq << " max " << maxq);
   if (maxq < minq) std::swap(maxq, minq);  
+  DBGP("maxq " << maxq << " minq " << minq);
   std::list<Joint *>::iterator j;
   double testMin, testMax;
   int num = 0;
