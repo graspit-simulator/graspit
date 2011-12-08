@@ -27,7 +27,7 @@
 extern "C" {
 #include "dlfcn.h"
 }
-#elif
+#else
 #include <dlfcn.h>
 #endif
 
