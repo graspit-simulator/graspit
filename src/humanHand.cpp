@@ -1351,6 +1351,11 @@ int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
   return 0;
 }
 
+/*! Computes the following:
+    JTc c = tau
+    where Jc is the Jacobian of the contacts
+    Returns tau.
+*/
 int HumanHand::contactTorques(std::list<Contact*> contacts,
                               std::vector<double> &jointTorques)
 {
@@ -1390,6 +1395,12 @@ int HumanHand::contactTorques(std::list<Contact*> contacts,
   return 0;
 }
 
+/*! Solves:
+  JTt f = JTc c
+  where Jt is the Jacobian of tendon insertion points and Jc is the Jacobian of contacts.
+  Assumes c = [1 .. 1]
+  Returns the f that minimizes error norm (unbalanced magnitude).
+ */
 PROF_DECLARE(HH_CONTACT_EQUILIBRIUM);
 int HumanHand::contactEquilibrium(std::list<Contact*> contacts,
                                   const std::set<size_t> &activeTendons,
@@ -1500,6 +1511,12 @@ int HumanHand::contactEquilibrium(std::list<Contact*> contacts,
   return 0;
 }
 
+/*! Solves:
+  JTc c = JTt f
+  where Jt is the Jacobian of tendon insertion points and Jc is the Jacobian of contacts.
+  Uses passed in tendon forces for f
+  Returns the c that minimizes error norm (unbalanced magnitude).
+ */
 int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
                                              std::vector<double> &contactForces,
                                              const std::set<size_t> &activeTendons,

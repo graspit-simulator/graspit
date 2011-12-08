@@ -434,9 +434,7 @@ public:
   //! Applies tendon forces rather than calling the PD Controller
   virtual void DOFController(double timeStep);
 
-  //! Computes if tendon forces are self-balanced around all joints of the hand
-  /*! Tries to find force values for all the tendons in the active set so that the joint 
-    torques resulting from passive forces on the tendons in the passive set are minimized. */
+  //! Computes if tendon forces (active and passive) are self-balanced around all joints of the hand
   virtual int tendonEquilibrium(const std::set<size_t> &activeTendons,
                                 const std::set<size_t> &passiveTendons,
                                 bool compute_tendon_forces,
@@ -445,11 +443,13 @@ public:
                                 double& unbalanced_magnitude,
                                 bool useJointSprings = true);
 
+  //! Computes tendon forces that attempt to balance equal 1N forces at all contacts
   int contactEquilibrium(std::list<Contact*> contacts,
                          const std::set<size_t> &activeTendons,
                          std::vector<double> &activeTendonForces,
                          double &unbalanced_magnitude);
 
+  //! Computes contact forces that attempt to balance given tendon forces
   int contactForcesFromTendonForces(std::list<Contact*> contacts,
                                     std::vector<double> &contactForces,
                                     const std::set<size_t> &activeTendons,
