@@ -87,6 +87,9 @@ class DHTransform {
   //! Rotation about x-axis in radians
   double alpha;
 
+  //! Re-computes the transform from scratch based on theta, d, a and alpha
+  void computeTran();
+
 public:
   DHTransform(double thval=0.0,double dval=0.0,double aval=0.0,
 	      double alval=0.0);
@@ -99,6 +102,18 @@ public:
 
   /*! Returns the current theta value. */
   double getTheta() const {return theta;}
+
+  /*! Returns the current a value. */
+  double getA() const {return a;}
+
+  /*! Sets the d value. */
+  void setD(double q);
+
+  /*! Sets the theta value. */
+  void setTheta(double q);
+
+  /*! Sets the a value and re-computes the transform (from scratch). */
+  void setA(double q){a=q; computeTran();}
 
   /*! Returns the current value of this transform. */
   const transf& getTran() const {return tran;}
@@ -114,8 +129,6 @@ public:
 	rotate_transf(thetaVal,vec3(0,0,1));
     }
 
-  void setD(double q);
-  void setTheta(double q);
 };
 
 //! Abstract base class for a single axis robot joint.
@@ -304,7 +317,7 @@ public:
   vec3 const& getWorldAxis() const {return worldAxis;}
 
   /*! Returns a pointer to the DHTransform associated with this joint. */
-  DHTransform *getDH() const {return DH;}
+  DHTransform *getDH() {return DH;}
 
   /*! Returns a pointer to the Inventor transform associated with this joint
     that is used in the joint dragger sub graph.*/

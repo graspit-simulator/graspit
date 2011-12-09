@@ -180,7 +180,7 @@ GraspitCollision::isActive(const Body* body1, const Body* body2)
 }
 
 bool 
-GraspitCollision::addBody(Body *body,  bool ExpectEmpty)
+GraspitCollision::addBody(Body *body,  bool)
 {
 	if (getModel(body)) {
 		DBGA("GCOL: body already present");
@@ -211,6 +211,29 @@ GraspitCollision::addBody(Body *body,  bool ExpectEmpty)
 	std::sort( mModels.begin(), mModels.end() );
 
 	return true;	
+}
+
+bool GraspitCollision::updateBodyGeometry(Body* body, bool)
+{
+  CollisionModel *model = getModel(body);
+  if (!model)
+  {
+    DBGA("GCOL: body not found for geometry update");
+    return false;
+  }
+  model->reset();
+
+  // get the triangles of the object
+  std::vector<Triangle> triangles;
+  body->getGeometryTriangles(&triangles);
+  
+  //add all the triangles
+  for (int i=0; i<(int)triangles.size(); i++) {
+    model->addTriangle(triangles[i]);
+  }
+  
+  //end the creation process
+  model->build();
 }
 
 void 

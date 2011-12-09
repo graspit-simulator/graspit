@@ -114,6 +114,8 @@ Body::Body(World *w,const char *name) : WorldElement(w,name)
 	showFC = false;
 	showVC = false;
 	IVGeomRoot = NULL; IVTran = NULL; IVMat = NULL; IVContactIndicators=NULL;
+        IVScaleTran = NULL;
+        IVOffsetTran = NULL;
 	IVBVRoot = NULL;
 #ifdef GEOMETRY_LIB
 	IVPrimitiveRoot = NULL;
@@ -284,6 +286,8 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
 	}
 	
 	//scaling of the geometry
+        IVScaleTran = new SoTransform;
+        IVScaleTran->scaleFactor.setValue(1.0, 1.0, 1.0);
 	element = findXmlElement(root,"geometryScaling");
 	if (element) {
 	  valueStr = element->GetText();
@@ -292,14 +296,15 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
 	    DBGA("Scale geometry: negative scale found");
 	    return FAILURE;
 	  }
-	  SoTransform* IVScaleTran = new SoTransform;
 	  IVScaleTran->scaleFactor.setValue(scale, scale, scale);
-	  IVGeomRoot->insertChild(IVScaleTran, 0);
 	}
+        IVGeomRoot->insertChild(IVScaleTran, 0);
 
 	//any offset to the geometry, inserted inside the geometry itself
 	//note that the offset gets added before the scale, so the offset is
 	//always expressed in graspit's units
+        IVOffsetTran = new SoTransform;
+        transf::IDENTITY.toSoTransform(IVOffsetTran);
 	element = findXmlElement(root,"geometryOffset");
 	if (element) {
 	  const TiXmlElement* transformElement = findXmlElement(element,"transform");
@@ -312,10 +317,9 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
 	    DBGA("Geometry offset field: failed to parse transform");
 	    return FAILURE;
 	  }
-	  SoTransform *IVOffsetTran = new SoTransform;
 	  offsetTran.toSoTransform(IVOffsetTran);
-	  IVGeomRoot->insertChild(IVOffsetTran, 0);
 	}
+        IVGeomRoot->insertChild(IVOffsetTran, 0);
 
 	return SUCCESS;
 }
@@ -637,6 +641,27 @@ Body::cloneToIvc(const Body *original)
 {
 	myWorld->getCollisionInterface()->cloneBody(this, original);
 	myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
+}
+
+/*! Collision geometry gets updated which could be slow.
+*/
+void Body::setGeometryScaling(double x, double y, double z)
+{
+  if (x<=0 || y<=0 || z<=0)
+  {
+    DBGA("Scale geometry: negative or zero scale found");
+    return;
+  }
+  IVScaleTran->scaleFactor.setValue(x, y, z);
+  myWorld->getCollisionInterface()->updateBodyGeometry(this);
+}
+
+/*! Collision geometry gets updated which could be slow.
+*/
+void Body::setGeometryOffset(transf tr)
+{
+  tr.toSoTransform(IVOffsetTran);
+  myWorld->getCollisionInterface()->updateBodyGeometry(this);
 }
 
 void 

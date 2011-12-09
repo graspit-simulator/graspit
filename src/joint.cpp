@@ -62,23 +62,28 @@
 DHTransform::DHTransform(double thval,double dval,double aval,double alval) :
 theta(thval),d(dval),a(aval),alpha(alval)
 {
-	transf tr3,tr4;
+  computeTran();
+}
 
-	dtrans[0] = 0.0;
-	dtrans[1] = 0.0;
-	dtrans[2] = d;
-
-	atrans[0] = a;
-	atrans[1] = 0.0;
-	atrans[2] = 0.0;
-
-	tr1 = rotate_transf(theta,vec3(0,0,1));
-	tr2 = translate_transf(dtrans);
-	tr3 = translate_transf(atrans);
-	tr4 = rotate_transf(alpha,vec3(1,0,0));
-	tr4TimesTr3 = tr4 * tr3;
-
-	tran = tr4TimesTr3 * tr2 * tr1;
+void DHTransform::computeTran()
+{
+  transf tr3,tr4;
+  
+  dtrans[0] = 0.0;
+  dtrans[1] = 0.0;
+  dtrans[2] = d;
+  
+  atrans[0] = a;
+  atrans[1] = 0.0;
+  atrans[2] = 0.0;
+  
+  tr1 = rotate_transf(theta,vec3(0,0,1));
+  tr2 = translate_transf(dtrans);
+  tr3 = translate_transf(atrans);
+  tr4 = rotate_transf(alpha,vec3(1,0,0));
+  tr4TimesTr3 = tr4 * tr3;
+  
+  tran = tr4TimesTr3 * tr2 * tr1;
 }
 
 /*!
@@ -87,11 +92,11 @@ of the transform.
 */
 void DHTransform::setD(double q)
 {
-	d = q;
-	dtrans[2] = d;
-	tr2 = translate_transf(dtrans);
-
-	tran = tr4TimesTr3 * tr2 * tr1;
+  d = q;
+  dtrans[2] = d;
+  tr2 = translate_transf(dtrans);
+  
+  tran = tr4TimesTr3 * tr2 * tr1;
 }
 
 /*!
@@ -100,10 +105,10 @@ of the transform.
 */
 void DHTransform::setTheta(double q)
 {
-	theta = q;
-	tr1 = rotate_transf(theta,vec3(0,0,1));
-
-	tran = tr4TimesTr3 * tr2 * tr1;
+  theta = q;
+  tr1 = rotate_transf(theta,vec3(0,0,1));
+  
+  tran = tr4TimesTr3 * tr2 * tr1;
 }
 
 /*!

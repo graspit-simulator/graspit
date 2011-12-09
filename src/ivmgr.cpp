@@ -1075,8 +1075,9 @@ IVmgr::makeJointDraggers(Robot *robot,KinematicChain *chain)
   DraggerInfo *dInfo;
   bool firstDragger=true;
 
- // jointDraggerSep->ref();
+  //jointDraggerSep->ref();
   jointDraggerSep->addChild(robot->getBase()->getIVTran());
+  DBGP("make draggers; value: " << chain->getIVTran()->translation.getValue()[0]);
   jointDraggerSep->addChild(chain->getIVTran());
 
   for (d=0;d<robot->getNumDOF();d++)
@@ -1091,63 +1092,62 @@ IVmgr::makeJointDraggers(Robot *robot,KinematicChain *chain)
       dInfo = new DraggerInfo;
       dInfo->selectedElement = robot;
       dInfo->dof = robot->getDOF(d);
-
+      
       // add the parent separator for all the joint draggers to the
       // first draggerInfo, because it includes not only the draggers
       // but also the transforms between them, and we'll delete them
       // all at once.
       if (firstDragger) {
-		dInfo->draggerSep = jointDraggerSep;
-		firstDragger=false;
+        dInfo->draggerSep = jointDraggerSep;
+        firstDragger=false;
       }
       else
-		dInfo->draggerSep = NULL;
-
+        dInfo->draggerSep = NULL;
+      
       //      for (l=0;l<chain->getNumLinks();l++)
       //	if (j<=chain->getLastJoint(l)) break;
 
       if (chain->getJoint(j)->getType() == REVOLUTE) {
-		SoScale *dialSize = new SoScale;
-		SoRotateDiscDragger *myDisc = new SoRotateDiscDragger;
-
-		float scale = robot->getDOFDraggerScale(d);
-		dialSize->scaleFactor.setValue(SbVec3f(scale,scale,scale));
+        SoScale *dialSize = new SoScale;
+        SoRotateDiscDragger *myDisc = new SoRotateDiscDragger;
+        
+        float scale = robot->getDOFDraggerScale(d);
+        dialSize->scaleFactor.setValue(SbVec3f(scale,scale,scale));
        	SoTranslation *dTrans = new SoTranslation;
-		dTrans->translation.setValue(0,0,chain->getJoint(j)->getDH()->getD());
-
-		//sep->addChild(dTrans);
-		sep->addChild(dialSize);
-		sep->addChild(myDisc);
-	    
-		myDisc->rotation.setValue(SbVec3f(0.0,0.0,1.0),
-				  (float) robot->getDOF(d)->getVal());
-		//dInfo->lastVal = (float) robot->getDOF(d)->getVal();
-		myDisc->addStartCallback(revoluteJointClickedCB,dInfo);
-		myDisc->addValueChangedCallback(revoluteJointChangedCB,dInfo);
-		myDisc->addFinishCallback(revoluteJointFinishedCB,dInfo);
-		dInfo->dragger = myDisc;
+        dTrans->translation.setValue(0,0,chain->getJoint(j)->getDH()->getD());
+        
+        //sep->addChild(dTrans);
+        sep->addChild(dialSize);
+        sep->addChild(myDisc);
+	
+        myDisc->rotation.setValue(SbVec3f(0.0,0.0,1.0),(float) robot->getDOF(d)->getVal());
+        //dInfo->lastVal = (float) robot->getDOF(d)->getVal();
+        myDisc->addStartCallback(revoluteJointClickedCB,dInfo);
+        myDisc->addValueChangedCallback(revoluteJointChangedCB,dInfo);
+        myDisc->addFinishCallback(revoluteJointFinishedCB,dInfo);
+        dInfo->dragger = myDisc;
       }
       else { // prismatic
-		SoTransform *arrowTran = new SoTransform;
-		SoTranslate1Dragger *myArrow = new SoTranslate1Dragger;
-		SoBaseColor *arrowBC = new SoBaseColor;
-		float scale = robot->getDOFDraggerScale(d);
-		arrowBC->rgb.setValue(1,1,1);
-		arrowTran->scaleFactor.setValue(SbVec3f(scale,scale,scale));
-		arrowTran->rotation.setValue(SbVec3f(0,1,0),(float)-M_PI/2.0f);
-		arrowTran->translation.setValue(SbVec3f(0,-scale,0));
-		sep->addChild(arrowBC);
-		sep->addChild(arrowTran);
-		sep->addChild(myArrow);
+        SoTransform *arrowTran = new SoTransform;
+        SoTranslate1Dragger *myArrow = new SoTranslate1Dragger;
+        SoBaseColor *arrowBC = new SoBaseColor;
+        float scale = robot->getDOFDraggerScale(d);
+        arrowBC->rgb.setValue(1,1,1);
+        arrowTran->scaleFactor.setValue(SbVec3f(scale,scale,scale));
+        arrowTran->rotation.setValue(SbVec3f(0,1,0),(float)-M_PI/2.0f);
+        arrowTran->translation.setValue(SbVec3f(0,-scale,0));
+        sep->addChild(arrowBC);
+        sep->addChild(arrowTran);
+        sep->addChild(myArrow);
 	
-		myArrow->translation.setValue(SbVec3f((float)robot->getDOF(d)->getVal()/scale,0,0));
-		dInfo->lastVal = (float) robot->getDOF(d)->getVal()/scale;
-		myArrow->addValueChangedCallback(prismaticJointChangedCB,dInfo);
-		dInfo->dragger = myArrow;
+        myArrow->translation.setValue(SbVec3f((float)robot->getDOF(d)->getVal()/scale,0,0));
+        dInfo->lastVal = (float) robot->getDOF(d)->getVal()/scale;
+        myArrow->addValueChangedCallback(prismaticJointChangedCB,dInfo);
+        dInfo->dragger = myArrow;
       }
       // now it will update its IVTran whenever it moves
       chain->getJoint(j)->setDraggerAttached(true);
-
+      
       jointDraggerSep->addChild(sep);
       jointDraggerSep->addChild(chain->getJoint(j)->getIVTran());
       draggerInfoList.push_back(dInfo);
@@ -1309,46 +1309,45 @@ IVmgr::handleSelection(SoPath *p)
   }
   else {
     for (r=0;r<world->getNumRobots();r++) {
-      robot = world->getRobot(r);
-            
+      robot = world->getRobot(r);      
       if (p->getTail() == robot->getIVRoot()) {
-		#ifdef GRASPITDBG
-			printf("robot selected\n");
-		#endif
+#ifdef GRASPITDBG
+        printf("robot selected\n");
+#endif
         selectionFound = true;
-	    if (currTool == ROTATE_TOOL)
-	      makeCenterball(robot,robot->getBase());
-	    else if (currTool == TRANSLATE_TOOL)
-	      makeHandleBox(robot,robot->getBase());
-	    else if (currTool == SELECT_TOOL) {
-	      world->selectElement(robot);
-	      drawWireFrame(robot->getIVRoot());
-	    }
-	  }
+        if (currTool == ROTATE_TOOL)
+          makeCenterball(robot,robot->getBase());
+        else if (currTool == TRANSLATE_TOOL)
+          makeHandleBox(robot,robot->getBase());
+        else if (currTool == SELECT_TOOL) {
+          world->selectElement(robot);
+          drawWireFrame(robot->getIVRoot());
+        }
+      }
       else {
-		for (f=0;f<robot->getNumChains();f++)
-		  if (p->getTail() == robot->getChain(f)->getIVRoot()) {
-			 selectionFound = true;
-			 makeJointDraggers(robot,robot->getChain(f));
-		  }
-	    if ( robot->inherits("HumanHand") )
-		{
-			for (f=0; f< ((HumanHand*)robot)->getNumTendons(); f++)
-				if (p->getTail() == ((HumanHand*)robot)->getTendon(f)->getIVRoot())
-				{
-					selectionFound = true;
-					world->selectTendon( ((HumanHand*)robot)->getTendon(f));
-				}
-		}
-	  }
-	}
+        for (f=0;f<robot->getNumChains();f++)
+          if (p->getTail() == robot->getChain(f)->getIVRoot()) {
+            selectionFound = true;
+            makeJointDraggers(robot,robot->getChain(f));
+          }
+        if ( robot->inherits("HumanHand") )
+        {
+          for (f=0; f< ((HumanHand*)robot)->getNumTendons(); f++)
+            if (p->getTail() == ((HumanHand*)robot)->getTendon(f)->getIVRoot())
+            {
+              selectionFound = true;
+              world->selectTendon( ((HumanHand*)robot)->getTendon(f));
+            }
+        }
+      }
+    }
     if (!selectionFound) {
       // check if one of the objects was selected
-      for (b=0;b<world->getNumBodies();b++)
+      for (b=0;b<world->getNumBodies();b++) {
 	if (p->getTail() == world->getBody(b)->getIVRoot()) {
-//#ifdef GRASPITDBG
+          //#ifdef GRASPITDBG
 	  printf("body %s selected\n",world->getBody(b)->getName().latin1());
-//#endif
+          //#endif
 	  selectionFound = true;
 	  if (currTool == ROTATE_TOOL)
 	    makeCenterball(world->getBody(b),world->getBody(b));
@@ -1360,8 +1359,8 @@ IVmgr::handleSelection(SoPath *p)
 	  }
 	  break;
 	}
-    }
-    
+      }
+    }    
   }
 }
 

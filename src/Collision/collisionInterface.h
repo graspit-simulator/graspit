@@ -100,6 +100,9 @@ public:
 
 	//! Add a new body to the collision detection system
 	virtual bool addBody(Body *body, bool ExpectEmpty = false) = 0;
+        //! Updates just the geometry of a body that is already in the system
+        /*! Things like disabled pairs for that body should stay intact */
+        virtual bool updateBodyGeometry(Body* body, bool ExpectEmpty = false) = 0;
 	//! Remove a body from the collision detection system.
 	virtual void removeBody(Body *body) = 0;
 	/*! Creates a clone of a body that shares the collision geometry hierarchy

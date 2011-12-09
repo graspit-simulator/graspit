@@ -91,46 +91,46 @@ KinematicChain::~KinematicChain()
 int
 KinematicChain::createDynamicJoints(const std::vector<int> &dynJointTypes)
 {
-	Link* prevLink = owner->getBase();
-	for (int l=0; l<numLinks; l++){
-		transf dynJointTran = transf::IDENTITY;
-		if(l==0) dynJointTran = tran;
-
-		if (dynJointTypes[l] == DynJoint::BALL) {
-			linkVec[l]->setDynJoint(new BallDynJoint(
-									jointVec[lastJoint[l]-2],
-									jointVec[lastJoint[l]-1],jointVec[lastJoint[l]],
-									prevLink,linkVec[l], 
-									dynJointTran, jointVec[lastJoint[l]]->getTran().inverse()));
-			jointVec[lastJoint[l]-2]->dynJoint = linkVec[l]->getDynJoint();
-			jointVec[lastJoint[l]-1]->dynJoint = linkVec[l]->getDynJoint();
-			jointVec[lastJoint[l]-0]->dynJoint = linkVec[l]->getDynJoint();
-		} else if (dynJointTypes[l] == DynJoint::UNIVERSAL) {
-			linkVec[l]->setDynJoint(new UniversalDynJoint(
-									jointVec[lastJoint[l]-1], jointVec[lastJoint[l]],
-									prevLink, linkVec[l], 
-									dynJointTran, jointVec[lastJoint[l]]->getTran().inverse()));
-			jointVec[lastJoint[l]-1]->dynJoint = linkVec[l]->getDynJoint();
-			jointVec[lastJoint[l]-0]->dynJoint = linkVec[l]->getDynJoint();
-		} else if (dynJointTypes[l] == DynJoint::REVOLUTE) {
-			linkVec[l]->setDynJoint(new RevoluteDynJoint(jointVec[lastJoint[l]],
-										prevLink,linkVec[l],dynJointTran));
-			jointVec[lastJoint[l]]->dynJoint = linkVec[l]->getDynJoint();
-		} else if (dynJointTypes[l] == DynJoint::PRISMATIC) {
-			linkVec[l]->setDynJoint(new RevoluteDynJoint(jointVec[lastJoint[l]],
-									prevLink,linkVec[l],dynJointTran));
-			jointVec[lastJoint[l]]->dynJoint = linkVec[l]->getDynJoint();
-		} else if (dynJointTypes[l] == DynJoint::FIXED) {
-			DBGA("FIXED dynamic joints not yet fully supported");
-			return FAILURE;
-			//linkVec[l]->setDynJoint(new FixedDynJoint(prevLink, linkVec[l], dynJointTran));
-		} else {
-			DBGA("Unknown joint type requested");
-			return FAILURE;
-		}
-		prevLink = linkVec[l];
-	}
-	return SUCCESS;
+  Link* prevLink = owner->getBase();
+  for (int l=0; l<numLinks; l++){
+    transf dynJointTran = transf::IDENTITY;
+    if(l==0) dynJointTran = tran;
+    
+    if (dynJointTypes[l] == DynJoint::BALL) {
+      linkVec[l]->setDynJoint(new BallDynJoint(
+                                               jointVec[lastJoint[l]-2],
+                                               jointVec[lastJoint[l]-1],jointVec[lastJoint[l]],
+                                               prevLink,linkVec[l], 
+                                               dynJointTran, jointVec[lastJoint[l]]->getTran().inverse()));
+      jointVec[lastJoint[l]-2]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]-1]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]-0]->dynJoint = linkVec[l]->getDynJoint();
+    } else if (dynJointTypes[l] == DynJoint::UNIVERSAL) {
+      linkVec[l]->setDynJoint(new UniversalDynJoint(
+                                                    jointVec[lastJoint[l]-1], jointVec[lastJoint[l]],
+                                                    prevLink, linkVec[l], 
+                                                    dynJointTran, jointVec[lastJoint[l]]->getTran().inverse()));
+      jointVec[lastJoint[l]-1]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]-0]->dynJoint = linkVec[l]->getDynJoint();
+    } else if (dynJointTypes[l] == DynJoint::REVOLUTE) {
+      linkVec[l]->setDynJoint(new RevoluteDynJoint(jointVec[lastJoint[l]],
+                                                   prevLink,linkVec[l],dynJointTran));
+      jointVec[lastJoint[l]]->dynJoint = linkVec[l]->getDynJoint();
+    } else if (dynJointTypes[l] == DynJoint::PRISMATIC) {
+      linkVec[l]->setDynJoint(new RevoluteDynJoint(jointVec[lastJoint[l]],
+                                                   prevLink,linkVec[l],dynJointTran));
+      jointVec[lastJoint[l]]->dynJoint = linkVec[l]->getDynJoint();
+    } else if (dynJointTypes[l] == DynJoint::FIXED) {
+      DBGA("FIXED dynamic joints not yet fully supported");
+      return FAILURE;
+      //linkVec[l]->setDynJoint(new FixedDynJoint(prevLink, linkVec[l], dynJointTran));
+    } else {
+      DBGA("Unknown joint type requested");
+      return FAILURE;
+    }
+    prevLink = linkVec[l];
+  }
+  return SUCCESS;
 }
 
 /*!

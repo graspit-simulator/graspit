@@ -122,6 +122,12 @@ protected:
   //! A pointer to the root node of the geometry of this model
   SoSeparator *IVGeomRoot;
 
+  //! A pointer to a node that scales the geometry of this model
+  SoTransform* IVScaleTran;
+  
+  //! A pointer to a node that offsets the geometry of this model
+  SoTransform *IVOffsetTran;
+
   //! A pointer to a node that can hold the geometry of the bounding volume struture
   SoSeparator *IVBVRoot;
 
@@ -215,6 +221,12 @@ public:
 
   //! Adds this body to the collision detection system as a clone of another body
   virtual void cloneToIvc(const Body* original);
+
+  //! Changes the scale of the geometry. Collision geometry gets updated as well (might be slow)
+  virtual void setGeometryScaling(double x, double y, double z);
+
+  //! Changes the offset of the geometry. Collision geometry gets updates as well (might be slow)
+  virtual void setGeometryOffset(transf tr);
 
   //! Sets the body to another location in the world. Collisions are not checked.
   virtual int setTran(transf const& newTr);

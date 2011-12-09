@@ -80,6 +80,7 @@ public:
 
 	//adding and moving bodies
 	virtual bool addBody(Body *body, bool ExpectEmpty = false);
+        virtual bool updateBodyGeometry(Body* body, bool ExpectEmpty = false);
 	virtual void removeBody(Body *body);
 	virtual void cloneBody(Body*, const Body*);
 	virtual void setBodyTransform(Body *body, const transf &t);

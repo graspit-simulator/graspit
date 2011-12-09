@@ -96,6 +96,12 @@ PQPCollision::addBody(Body *body, bool ExpectEmpty)
 	return true;	
 }
 
+bool PQPCollision::updateBodyGeometry(Body*, bool)
+{
+  DBGA("ERROR: Update body geometry not implemented in PQP collision");
+  return false;
+}
+
 void 
 PQPCollision::removeBody(Body *body)
 {

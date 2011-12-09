@@ -193,6 +193,8 @@ public:
   SoTransform *getIVTran() const {return IVTran;}
   /*! Returns the base transform of the chain relative to the robot base */
   transf const &getTran() const {return tran;}
+  /*! Sets the base transform of the chain relative to the robot base. Does NOT update poses.*/
+  void setTran(transf tr){tran = tr;tran.toSoTransform(IVTran);}
   /*! Returns the value of the flag indicating whether the joints have been
     moved since the last time the link poses have been updated */
   bool jointsHaveMoved() const {return jointsMoved;}

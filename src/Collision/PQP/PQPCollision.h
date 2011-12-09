@@ -61,7 +61,7 @@ public:
 
 	//adding and moving bodies
 	virtual bool addBody(Body *body, bool ExpectEmpty = false);
-	virtual void removeBody(Body *body);
+        virtual bool updateBodyGeometry(Body*, bool);
 	virtual void cloneBody(Body *clone, const Body *original);
 	virtual void setBodyTransform(Body *body, const transf &t);
 
