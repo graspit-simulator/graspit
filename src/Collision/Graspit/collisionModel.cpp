@@ -254,7 +254,7 @@ Branch* Leaf::split()
 	vec3 xAxis = vec3(1,0,0) * mBbox.getTran();
 	vec3 yAxis = vec3(0,1,0) * mBbox.getTran();
 	vec3 zAxis = vec3(0,0,1) * mBbox.getTran();
-	if (mBbox.halfSize.y() > mBbox.halfSize.x()) {
+	if (mBbox.halfSize.y() > mBbox.halfSize.x() + 1.0e-5) {
 		DBGA("Unexpected bounding box dominant axis. Extents: ");
 		DBGA(mBbox.halfSize.x() << " " << mBbox.halfSize.y() << " " << mBbox.halfSize.z());
 		//assert(0);

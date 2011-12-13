@@ -274,6 +274,9 @@ public:
   /*! Returns a pointer to the root of the Inventor geometry that was loaded.*/
   SoSeparator *getIVGeomRoot() const {return IVGeomRoot;}
 
+  /*! Returns a pointer ot the scaling transform of this body */
+  SoTransform* getIVScaleTran() {return IVScaleTran;}
+
 #ifdef GEOMETRY_LIB
   //! The root of the scene graph where we can put primitive geometry
   SoSeparator *getIVPrimitiveRoot() const {return IVPrimitiveRoot;}
