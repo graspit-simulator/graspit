@@ -262,7 +262,7 @@ Branch* Leaf::split()
 		yAxis = - yAxis;
 	}
 	if (mBbox.halfSize.z() > mBbox.halfSize.y() && 
-		mBbox.halfSize.z() > mBbox.halfSize.x() ) {
+		mBbox.halfSize.z() > mBbox.halfSize.x() + 1.0e-5 ) {
 		DBGA("Unexpected bounding box dominant axis. Extents: ");
 		DBGA(mBbox.halfSize.x() << " " << mBbox.halfSize.y() << " " << mBbox.halfSize.z());
 		//assert(0);
