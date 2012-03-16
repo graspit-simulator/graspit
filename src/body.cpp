@@ -954,7 +954,7 @@ Body::loadContactData(QString fn)
 	}
 	int numContacts;
 	VirtualContactOnObject *newContact;
-	if(not fscanf(fp,"%d",&numContacts))
+	if(fscanf(fp,"%d",&numContacts) <= 0)
 		return FAILURE;
 
 	breakVirtualContacts();
