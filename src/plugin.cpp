@@ -45,8 +45,9 @@ PluginCreator::~PluginCreator()
 }
 
 Plugin* PluginCreator::createPlugin(std::string args)
-{
+{	
   Plugin* plugin = (*mCreatePluginFctn)(); 
+  args = args;
   if (!plugin) return NULL;
   if (plugin->init(0,NULL) != SUCCESS) {
     DBGA("Failed to initialize new plugin of type " << mType);
