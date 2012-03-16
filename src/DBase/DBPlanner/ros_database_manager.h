@@ -116,7 +116,8 @@ class RosDatabaseManager : public DatabaseManager
   //! Saves the results of an optimization in the database
   virtual bool SaveOptimizationResults(const OptimizationTaskRecord &rec,
                                        const std::vector<double>& parameters,
-                                       const std::vector<double>& results);
+                                       const std::vector<double>& results,
+				       const std::vector<double>& seed );
   //! Get a list of grasp types available in the database
   virtual bool GraspTypeList(vector<string>* type_list) const;
   //! Get a list of the Grasps for a Model.

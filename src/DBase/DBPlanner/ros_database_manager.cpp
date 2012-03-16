@@ -199,13 +199,16 @@ bool RosDatabaseManager::GetOptimizationTaskRecord(int task_id, OptimizationTask
 
 bool RosDatabaseManager::SaveOptimizationResults(const OptimizationTaskRecord &rec,
                                                  const std::vector<double>& parameters,
-                                                 const std::vector<double>& results)
+                                                 const std::vector<double>& results,
+						 const std::vector<double>& seed )
 {
   household_objects_database::DatabaseOptimizationResult optResult;
   optResult.dbase_task_id_.data() = rec.taskId;
   optResult.parameters_.data() = parameters;
   optResult.hand_name_.data() = rec.hand_name;
   optResult.results_.data() = results;
+  optResult.seed_.data() = seed;
+  
   if (!database_->insertIntoDatabase(&optResult))
   {
     std::cout << "Failed to save optimization results for task id " << rec.taskId << "\n";

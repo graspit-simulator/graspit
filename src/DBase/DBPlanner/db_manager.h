@@ -134,7 +134,8 @@ class DatabaseManager {
   //! Saves the results of an optimization in the database
   virtual bool SaveOptimizationResults(const OptimizationTaskRecord& /*rec*/,
                                        const std::vector<double>& /*parameters*/,
-                                       const std::vector<double>& /*results*/) {return false;}
+                                       const std::vector<double>& /*results*/,
+				       const std::vector<double>& /*seed*/) {return false;}
 
   //! Save a grasp into the database
   virtual bool SaveGrasp(const Grasp*) const = 0;
