@@ -32,8 +32,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <QtCore/QtGlobal>
-
 
 class MainWindow;
 class IVmgr;
@@ -121,11 +119,14 @@ class GraspItGUI
   void exitMainLoop();
 };
 
-
+#ifdef WIN32
 #ifdef GRASPIT_EXPORTS
-#define GRASPIT_API Q_DECL_EXPORT
+#define GRASPIT_API __declspec(dllexport)
 #else
-#define GRASPIT_API Q_DECL_IMPORT
+#define GRASPIT_API __declspec(dllimport)
+#endif
+#else
+#define GRASPIT_API
 #endif
 
 extern GRASPIT_API GraspItGUI *graspItGUI;
