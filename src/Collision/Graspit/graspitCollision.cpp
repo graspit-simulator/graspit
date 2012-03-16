@@ -234,6 +234,7 @@ bool GraspitCollision::updateBodyGeometry(Body* body, bool)
   
   //end the creation process
   model->build();
+  return true;
 }
 
 void 

@@ -25,9 +25,7 @@
 
 #ifndef _OPEN_CLOSE_PLUGIN_H_
 #define _OPEN_CLOSE_PLUGIN_H_
-
 #include "plugin.h"
-
 namespace openclose {
 
 class OpenClosePlugin : public Plugin

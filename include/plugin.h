@@ -26,7 +26,7 @@
 /*! \file
   \brief Defines the interface for a plugin that can be loaded dynamically and used with GraspIt
 */
-
+#ifndef __PLUGIN_H__
 #include <string>
 
 //! Defines a plugin that can can be loaded dynamically and used with GraspIt
@@ -73,3 +73,37 @@ public:
 
   static PluginCreator* loadFromLibrary(std::string libName);
 };
+
+
+
+
+/*Under windows, DLL files only export symbols prefaced with this compiler macro.
+
+
+For both linux and windows, extern "C" are necessary.
+I.E. 
+     namespace fooplugin{
+     class fooPlugin: Plugin{
+     --stuff--
+     }
+     PLUGIN_API extern "C" fooPlugin * createPlugin(){ return static_cast<fooPlugin*>(NULL);}
+     PLUGIN_API extern "C" std::string createPlugin(){ return "foo";}
+
+
+     Some compilers may complain about declaring a function using C++ strings using extern "C",
+     but this does not appear to cause any problems.
+
+
+}
+
+
+Both the createPlugin and getType functions must be declared using these macros.
+*/
+#ifdef WIN32
+#define PLUGIN_API __declspec(dllexport)
+#else
+#define PLUGIN_API
+#endif
+
+
+#endif

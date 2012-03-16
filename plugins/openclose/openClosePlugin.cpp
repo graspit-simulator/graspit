@@ -52,19 +52,24 @@ int OpenClosePlugin::init(int, char**)
 
 int OpenClosePlugin::mainLoop()
 {
+  static int direction = 1.0;
+
   World *world = graspItGUI->getMainWindow()->getMainWorld();
   if (!world) std::cerr << "Open-close plugin main loop: no world?!?\n";
   else if (!world->getCurrentHand()) std::cerr << "Open-close plugin main loop: no hand selected\n";
-  else std::cerr << "Open-close plugin main loop: " << world->getCurrentHand()->getName().latin1() << " selected\n";
+  else world->getCurrentHand()->autoGrasp(true, direction);
+  direction *= -1;
   return 0;
 }
 
 }
 
-extern "C" Plugin* createPlugin() {
+extern "C" PLUGIN_API
+Plugin* createPlugin() {
   return new openclose::OpenClosePlugin();
 }
 
-extern "C" std::string getType() {
+extern "C" PLUGIN_API
+std::string getType() {
   return "open-close";
 }

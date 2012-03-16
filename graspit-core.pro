@@ -77,8 +77,8 @@ HEADERS	+= include/barrett.h \
 	include/dynJoint.h \
 	include/arch.h \
 	include/math/matrix.h \
-	src/Collision\collisionInterface.h \
-	src/Collision\collisionStructures.h \
+	src/Collision/collisionInterface.h \
+	src/Collision/collisionStructures.h \
 	include/Planner/grasp_visualization.h \
 	include/Planner/grasp_tester.h \
 	include/Planner/grasp_preshape.h \
@@ -103,7 +103,7 @@ HEADERS	+= include/barrett.h \
 	include/EGPlanner/onLineGraspInterface.h \
 	include/EGPlanner/listPlanner.h \
 	include/FitParabola.h \
-	include/shadow.h 
+	include/shadow.h
 
 SOURCES	+= src/arch.cpp \
 	src/barrett.cpp \
@@ -475,4 +475,10 @@ staubli{
 	error ("Please define hardware lib")
    }
 
+}
+
+win32{
+#POSIX like wrappers around windows DLL imports
+     SOURCES += src/dlfcn-win32.cpp
+     HEADERS += include/dlfcn-win32.h
 }

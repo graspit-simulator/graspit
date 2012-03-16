@@ -153,9 +153,10 @@ GraspItGUI::processArgs(int argc, char** argv)
   //look for plugins of the form plugin:name in the arguments
   for (int i=1; i<argc; i++) {
     QString arg(argv[i]);
-    if (arg.section(':',0,0)=="plugin") {
-      QString libName = arg.section(':',1,1);
-      PluginCreator* creator = PluginCreator::loadFromLibrary(libName.toStdString());
+    if (arg.section(',',0,0)=="plugin") {
+      QString libName = arg.section(',',1,1);
+	  std::cout << "Processing arguments \n ";
+      PluginCreator* creator = PluginCreator::loadFromLibrary(libName.toStdString());	  
       if (creator) {
         mPluginCreators.push_back(creator);
       } else {
@@ -163,10 +164,11 @@ GraspItGUI::processArgs(int argc, char** argv)
       }
     }
   }
-
+  
   //start any plugins with auto start enabled
   mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void*)this);
   for (size_t i=0; i<mPluginCreators.size(); i++) {
+	  std::cout << "plugin creator autostart " << mPluginCreators[i]->autoStart() << std::endl;
     if (mPluginCreators[i]->autoStart()) {
       startPlugin(mPluginCreators[i], mPluginCreators[i]->defaultArgs());
     }    

@@ -997,6 +997,7 @@ int QPSolver(const Matrix &Q, const Matrix &Eq, const Matrix &b,
                                             objVal);
 #else
 	int result = 0;
+	objVal = objVal; // Fix for unreferenced formal parameter warning. 
 	DBGA("No QP Solver installed");
 	return 0;
 #endif
@@ -1182,6 +1183,7 @@ LPSolver(const Matrix &Q,
                                             objVal);
 #else
 	int result = 0;
+	objVal = objVal; // Fix for unreferenced formal parameter warning. 
 	DBGA("No LP Solver installed");
 	return result;
 #endif

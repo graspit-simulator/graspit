@@ -24,11 +24,13 @@
 //######################################################################
 
 #ifdef WIN32
-extern "C" {
-#include "dlfcn.h"
-}
+#include "dlfcn-win32.h"
+#define LIBRARY_SUFFIX ".dll"
 #else
+extern "C"{
 #include <dlfcn.h>
+}
+#define LIBRARY_SUFFIX ".so"
 #endif
 
 #include <QFile>
@@ -57,9 +59,9 @@ Plugin* PluginCreator::createPlugin(std::string args)
 PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
 {
   QString filename = QString::fromStdString(libName);
-  //append .so if it does not already have it
-  if (!filename.endsWith(".so")) {
-    filename.append(".so");
+  //append library suffix if it does not already have it
+  if (!filename.endsWith(LIBRARY_SUFFIX)) {
+    filename.append(LIBRARY_SUFFIX);
   }
 
   if (filename.startsWith("/")) {
@@ -77,8 +79,8 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
       return NULL;
     }
     bool found = false;
-    for (int i=0; i<=pluginDirs.count(":"); i++) {
-      QString dir = pluginDirs.section(':',i,i);
+    for (int i=0; i<=pluginDirs.count(","); i++) {
+      QString dir = pluginDirs.section(',',i,i);
       if (!dir.endsWith("/")) dir.append("/");
       dir.append(filename);
       QFile file(dir);
@@ -96,7 +98,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   }
 
   //look for the library file and load it
-  void* handle = dlopen(filename.toAscii().constData(), RTLD_NOW | RTLD_GLOBAL);
+   void* handle = dlopen(filename.toAscii().constData(), RTLD_NOW | RTLD_GLOBAL);
   char *errstr = dlerror();
   if (!handle) {
     DBGA("Failed to open dynamic library " << filename.toAscii().constData() );
@@ -124,6 +126,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
     DBGA("Could not load symbol getType from library " << filename.toAscii().constData());
     return NULL;
   }
+  std::cout << "Function name " << (*getTypeFctn)() <<std::endl;
   std::string type = (*getTypeFctn)();
   if (type.empty()) {
     DBGA("Could not get plugin type from library " << filename.toAscii().constData());

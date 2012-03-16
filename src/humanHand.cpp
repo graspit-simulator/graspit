@@ -200,7 +200,7 @@ Tendon::Tendon(Robot *myOwner)
   mIVForceIndToggle->style = SoDrawStyle::INVISIBLE;
   mIVForceIndRoot->addChild(mIVForceIndToggle);
   mIVForceIndMaterial = new SoMaterial;
-  mIVForceIndMaterial->diffuseColor.setValue(0.2 , 0.4 , 0.4);
+  mIVForceIndMaterial->diffuseColor.setValue(0.2f , 0.4f , 0.4f);
   mIVForceIndRoot->addChild(mIVForceIndMaterial);
   mIVForceIndicators = new SoSeparator;
   mIVForceIndRoot->addChild(mIVForceIndicators);
@@ -487,8 +487,8 @@ void Tendon::updateGeometry()
     {
       // make the cylinder tiny so that it is not visible
       SoCylinder* geom = (*insPt)->getIVConnectorGeom();
-      geom->radius=(float)0.1;
-      geom->height = 0.1;
+      geom->radius=0.1f;
+      geom->height = 0.1f;
     }
   }
   PROF_STOP_TIMER(TENDON_COMPUTE_GEOMETRY_CORE);
@@ -780,7 +780,7 @@ void Tendon::select()
       mat->diffuseColor.setValue(1.0f,0.5f,0.5f);
     }
   }
-  mIVForceIndMaterial->diffuseColor.setValue(0.5 , 0.8 , 0.8);
+  mIVForceIndMaterial->diffuseColor.setValue(0.5f , 0.8f , 0.8f);
   mSelected = true;
 }
 
@@ -798,7 +798,7 @@ void Tendon::deselect()
       mat->diffuseColor.setValue(0.5f,0.5f,0.5f);
     }
   }
-  mIVForceIndMaterial->diffuseColor.setValue(0.2 , 0.4 , 0.4);
+  mIVForceIndMaterial->diffuseColor.setValue(0.2f , 0.4f , 0.4f);
   mSelected = false;
 }
 

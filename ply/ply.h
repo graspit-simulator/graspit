@@ -222,7 +222,7 @@ void set_prop_rules_ply (PlyFile *, PlyRuleList *);
 PlyRuleList *append_prop_rule (PlyRuleList *, char *, char *);
 int matches_rule_name (char *);
 
-int equal_strings(char *, char *);
+int equal_strings(const char *, const char *);
 char *recreate_command_line (int, char *argv[]);
 
 

@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <QtCore/QtGlobal>
+
 
 class MainWindow;
 class IVmgr;
@@ -87,7 +89,7 @@ class GraspItGUI
  public:
   GraspItGUI(int argc,char **argv);
   ~GraspItGUI();
-
+  
   /*! Returns whether the UI pieces were successfully initialized. */
   bool terminalFailure() const;
 
@@ -119,7 +121,14 @@ class GraspItGUI
   void exitMainLoop();
 };
 
-extern GraspItGUI *graspItGUI;
+
+#ifdef GRASPIT_EXPORTS
+#define GRASPIT_API Q_DECL_EXPORT
+#else
+#define GRASPIT_API Q_DECL_IMPORT
+#endif
+
+extern GRASPIT_API GraspItGUI *graspItGUI;
 
 #define GRASPITGUI_HXX
 #endif

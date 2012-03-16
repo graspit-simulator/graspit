@@ -38,6 +38,12 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <string.h>
 #include <ply.h>
 
+#define ROUND(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#ifdef __GNUC__
+#define _strdup strdup 
+#endif
+
+
 char *type_names[] = {  /* names of scalar types */
 "invalid",
 "int8", "int16", "int32", "uint8", "uint16", "uint32", "float32", "float64",
@@ -61,13 +67,13 @@ int ply_type_size[] = {
 #define NAMED_PROP       1
 
 /* returns 1 if strings are equal, 0 if not */
-int equal_strings(char *, char *);
+int equal_strings(const char *, const char *);
 
 /* find an element in a plyfile's list */
 PlyElement *find_element(PlyFile *, char *);
 
 /* find a property in an element's list */
-PlyProperty *find_property(PlyElement *, char *, int *);
+PlyProperty *find_property(const PlyElement *, const char *, int *);
 
 /* write to a file the word describing a PLY file data type */
 void write_scalar_type (FILE *, int);
@@ -159,7 +165,7 @@ PlyFile *ply_write(
   for (i = 0; i < nelems; i++) {
     elem = (PlyElement *) myalloc (sizeof (PlyElement));
     plyfile->elems[i] = elem;
-    elem->name = strdup (elem_names[i]);
+    elem->name = _strdup (elem_names[i]);
     elem->num = 0;
     elem->nprops = 0;
   }
@@ -189,9 +195,7 @@ PlyFile *open_for_writing_ply(
   int file_type
 )
 {
-  int i;
   PlyFile *plyfile;
-  PlyElement *elem;
   char *name;
   FILE *fp;
 
@@ -334,9 +338,8 @@ void element_count_ply(
   int nelems
 )
 {
-  int i;
+
   PlyElement *elem;
-  PlyProperty *prop;
 
   /* look for appropriate element */
   elem = find_element (plyfile, elem_name);
@@ -460,7 +463,7 @@ Entry:
 
 void put_element_ply(PlyFile *plyfile, void *elem_ptr)
 {
-  int i,j,k;
+  int j,k;
   FILE *fp = plyfile->fp;
   PlyElement *elem;
   PlyProperty *prop;
@@ -659,7 +662,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
         plyfile->file_type = PLY_BINARY_LE;
       else
         return (NULL);
-      plyfile->version = atof (words[2]);
+      plyfile->version = (float)atof (words[2]);
       found_format = 1;
     }
     else if (equal_strings (words[0], "element"))
@@ -694,7 +697,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
 
   elist = (char **) myalloc (sizeof (char *) * plyfile->num_elem_types);
   for (i = 0; i < plyfile->num_elem_types; i++)
-    elist[i] = strdup (plyfile->elems[i]->name);
+    elist[i] = _strdup (plyfile->elems[i]->name);
 
   *elem_names = elist;
   *nelems = plyfile->num_elem_types;
@@ -967,13 +970,13 @@ Entry:
   elem    - element for which we want to save away other properties
 ******************************************************************************/
 
-void setup_other_props(PlyFile *plyfile, PlyElement *elem)
+void setup_other_props(PlyFile * unused_file, PlyElement *elem)
 {
   int i;
   PlyProperty *prop;
   int size = 0;
   int type_size;
-
+  unused_file = unused_file; //Fix for unreferenced variable warning.  See http://msdn.microsoft.com/en-us/library/26kb9fy0(v=vs.90).aspx for details.
   /* Examine each property in decreasing order of size. */
   /* We do this so that all data types will be aligned by */
   /* word, half-word, or whatever within the structure. */
@@ -1067,7 +1070,7 @@ static PlyOtherProp *get_other_properties(
 
   /* create structure for describing other_props */
   other = (PlyOtherProp *) myalloc (sizeof (PlyOtherProp));
-  other->name = strdup (elem->name);
+  other->name = _strdup (elem->name);
 #if 0
   if (elem->other_offset == NO_OTHER_PROPS) {
     other->size = 0;
@@ -1193,7 +1196,7 @@ PlyOtherElems *get_other_element_ply (PlyFile *plyfile)
   other->elem_count = elem_count;
 
   /* save name of element */
-  other->elem_name = strdup (elem_name);
+  other->elem_name = _strdup (elem_name);
 
   /* create a list to hold all the current elements */
   other->other_data = (OtherData **)
@@ -1252,9 +1255,9 @@ Entry:
   other_elems - data structure to free up
 ******************************************************************************/
 
-void free_other_elements_ply (PlyOtherElems *other_elems)
+void free_other_elements_ply (PlyOtherElems * other_elems)
 {
-
+other_elems = other_elems; //Fix for unused parameter warning. See http://msdn.microsoft.com/en-us/library/26kb9fy0(v=vs.90).aspx
 }
 
 
@@ -1306,9 +1309,8 @@ void get_info_ply(PlyFile *ply, float *version, int *file_type)
 Compare two strings.  Returns 1 if they are the same, 0 if not.
 ******************************************************************************/
 
-int equal_strings(char *s1, char *s2)
+int equal_strings(const char *s1, const char *s2)
 {
-  int i;
 
   while (*s1 && *s2)
     if (*s1++ != *s2++)
@@ -1389,7 +1391,7 @@ Exit:
   returns a pointer to the property, or NULL if not found
 ******************************************************************************/
 
-PlyProperty *find_property(PlyElement *elem, char *prop_name, int *index)
+PlyProperty *find_property(const PlyElement *elem, const char *prop_name, int *index)
 {
   int i;
 
@@ -1414,13 +1416,12 @@ Entry:
 
 void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
 {
-  int i,j,k;
+  int j,k;
   PlyElement *elem;
   PlyProperty *prop;
   char **words;
   int nwords;
   int which_word;
-  FILE *fp = plyfile->fp;
   char *elem_data,*item;
   char *item_ptr;
   int item_size;
@@ -1515,7 +1516,7 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
       if (store_it) {
 	char *str;
 	char **str_ptr;
-	str = strdup (words[which_word++]);
+	str = _strdup (words[which_word++]);
         item = elem_data + prop->offset;
 	str_ptr = (char **) item;
 	*str_ptr = str;
@@ -1549,7 +1550,7 @@ Entry:
 
 void binary_get_element(PlyFile *plyfile, char *elem_ptr)
 {
-  int i,j,k;
+  int j,k;
   PlyElement *elem;
   PlyProperty *prop;
   FILE *fp = plyfile->fp;
@@ -1702,7 +1703,6 @@ Exit:
 char **get_words(FILE *fp, int *nwords, char **orig_line)
 {
 #define BIG_STRING 4096
-  int i,j;
   static char str[BIG_STRING];
   static char str_copy[BIG_STRING];
   char **words;
@@ -1919,7 +1919,7 @@ void write_binary_item(
       fwrite (&uint_val, 4, 1, fp);
       break;
     case Float32:
-      float_val = double_val;
+      float_val = (float)double_val;
       fwrite (&float_val, 4, 1, fp);
       break;
     case Float64:
@@ -2028,13 +2028,13 @@ void get_stored_item(
       break;
     case Float32:
       *double_val = *((float *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = ROUND(*double_val);
+      *uint_val = (long)(*double_val+0.5);
       break;
     case Float64:
       *double_val = *((double *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = ROUND(*double_val);
+      *uint_val = (long)(*double_val+0.5);
       break;
     default:
       fprintf (stderr, "get_stored_item: bad type = %d\n", type);
@@ -2107,17 +2107,17 @@ void get_binary_item(
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Float32:
+	case Float32:
       fread (ptr, 4, 1, fp);
       *double_val = *((float *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = ROUND(*double_val);
+      *uint_val = (long)(*double_val+0.5);
       break;
     case Float64:
-      fread (ptr, 8, 1, fp);
+	  fread (ptr, 8, 1, fp);
       *double_val = *((double *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = ROUND(*double_val);
+      *uint_val = (long)(*double_val+0.5);
       break;
     default:
       fprintf (stderr, "get_binary_item: bad type = %d\n", type);
@@ -2235,7 +2235,7 @@ void store_item (
       break;
     case Float32:
       pfloat = (float *) item;
-      *pfloat = double_val;
+      *pfloat = (float)double_val;
       break;
     case Float64:
       pdouble = (double *) item;
@@ -2258,12 +2258,16 @@ Entry:
 ******************************************************************************/
 
 void add_element (PlyFile *plyfile, char **words, int nwords)
-{
+{  
+	
   PlyElement *elem;
-
+ 
+  nwords = nwords; // Fix for unused parameter error. Other fixes are not portable!	 
+  
+  
   /* create the new element */
   elem = (PlyElement *) myalloc (sizeof (PlyElement));
-  elem->name = strdup (words[1]);
+  elem->name = _strdup (words[1]);
   elem->num = atoi (words[2]);
   elem->nprops = 0;
 
@@ -2319,31 +2323,30 @@ Entry:
 ******************************************************************************/
 
 void add_property (PlyFile *plyfile, char **words, int nwords)
-{
-  int prop_type;
-  int count_type;
+{  
   PlyProperty *prop;
   PlyElement *elem;
 
+  nwords = nwords; // Fix for unused parameter error. Other fixes are not portable!	
+  
   /* create the new property */
-
   prop = (PlyProperty *) myalloc (sizeof (PlyProperty));
 
   if (equal_strings (words[1], "list")) {          /* list */
     prop->count_external = get_prop_type (words[2]);
     prop->external_type = get_prop_type (words[3]);
-    prop->name = strdup (words[4]);
+    prop->name = _strdup (words[4]);
     prop->is_list = PLY_LIST;
   }
   else if (equal_strings (words[1], "string")) {   /* string */
     prop->count_external = Int8;
     prop->external_type = Int8;
-    prop->name = strdup (words[2]);
+    prop->name = _strdup (words[2]);
     prop->is_list = PLY_STRING;
   }
   else {                                           /* scalar */
     prop->external_type = get_prop_type (words[1]);
-    prop->name = strdup (words[2]);
+    prop->name = _strdup (words[2]);
     prop->is_list = PLY_SCALAR;
   }
 
@@ -2410,7 +2413,7 @@ Copy a property.
 
 void copy_property(PlyProperty *dest, PlyProperty *src)
 {
-  dest->name = strdup (src->name);
+  dest->name = _strdup (src->name);
   dest->external_type = src->external_type;
   dest->internal_type = src->internal_type;
   dest->offset = src->offset;
@@ -2524,7 +2527,7 @@ char **get_element_list_ply(PlyFile *ply, int *num_elems)
 
   elist = (char **) myalloc (sizeof (char *) * ply->num_elem_types);
   for (i = 0; i < ply->num_elem_types; i++)
-    elist[i] = strdup (ply->elems[i]->name);
+    elist[i] = _strdup (ply->elems[i]->name);
 
   /* return the number of elements and the list of element names */
   *num_elems = ply->num_elem_types;
@@ -2550,7 +2553,7 @@ void append_comment_ply(PlyFile *ply, char *comment)
 		     sizeof (char *) * (ply->num_comments + 1));
 
   /* add comment to list */
-  ply->comments[ply->num_comments] = strdup (comment);
+  ply->comments[ply->num_comments] = _strdup (comment);
   ply->num_comments++;
 }
 
@@ -2590,7 +2593,7 @@ void append_obj_info_ply(PlyFile *ply, char *obj_info)
 		     sizeof (char *) * (ply->num_obj_info + 1));
 
   /* add info to list */
-  ply->obj_info[ply->num_obj_info] = strdup (obj_info);
+  ply->obj_info[ply->num_obj_info] = _strdup (obj_info);
   ply->num_obj_info++;
 }
 
@@ -2769,9 +2772,7 @@ void describe_element_ply(
   int nelems
 )
 {
-  int i;
   PlyElement *elem;
-  PlyProperty *prop;
 
   /* look for appropriate element */
   elem = find_element (plyfile, elem_name);
@@ -3053,10 +3054,6 @@ Entry:
 
 void start_props_ply (PlyFile *ply, PlyPropRules *rules)
 {
-  int i;
-  int count;
-  PlyElement *elem = rules->elem;
-
   /* save pointer to the rules in the PLY object */
   ply->current_rules = rules;
 
@@ -3263,7 +3260,7 @@ PlyRuleList *append_prop_rule (
   char *ptr;
 
   /* find . */
-  str = strdup (property);
+  str = _strdup (property);
   for (ptr = str; *ptr != '\0' && *ptr != '.'; ptr++) ;
 
   /* split string at . */

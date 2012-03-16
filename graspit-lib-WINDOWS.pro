@@ -1,14 +1,6 @@
 # Windows-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
 
 
-#------- dlfcn ---------------
-!exists($(DLFCN)) {
-		error("DLFCN environment variable not set")
-	}
-HEADERS += $(DLFCN)/dlfcn.h
-SOURCES += $(DLFCN)/dlfcn.c
-INCLUDEPATH += $(DLFCN)
-
 
 # ---------------------- Blas and Lapack----------------------------------------
 
@@ -26,13 +18,13 @@ mkl {
 	!exists($(CLAPACKDIR)) {
 		error("Clapack not installed or CLAPACKDIR environment variable not set")
 	}
-	QMAKE_LIBDIR += $(CLAPACKDIR)/lib
+        QMAKE_LIBDIR += $(CLAPACKDIR)/ia32/lib $(CLAPACKDIR)/LIB/Win32 $(CLAPACKDIR)/LIB/
 	graspitdbg {
-		LIBS += BLASd.lib lapackd.lib libf2cd.lib
+		LIBS += BLASd.lib clapackd.lib libF77d.lib libI77d.lib
 	} else {
-		LIBS += BLAS.lib lapack.lib libf2c.lib
+		LIBS += BLAS.lib clapack.lib libF77.lib libI77.lib
 	}
-	INCLUDEPATH += $(CLAPACKDIR)/include
+        INCLUDEPATH += $(CLAPACKDIR)/include $(CLAPACKDIR)/src/win32/BLAS/WRAP	
 	HEADERS += include/lapack_wrappers.h
 	DEFINES += CLAPACK
 } else {
@@ -116,3 +108,7 @@ hardwarelib {
 ros {
 	error("Ros only available under Linux")
 }
+INCLUDES += include/dlfcn-win32.h
+SOURCES += src/dlfcn-win32.cpp
+DEFINES += GRASPIT_EXPORTS
+
