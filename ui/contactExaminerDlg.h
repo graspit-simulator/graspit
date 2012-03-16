@@ -80,9 +80,9 @@ private:
 	void collectObjectContacts();
 
 public:
-	ContactExaminerDlg(QWidget *parent = 0) : QDialog(parent), mObject(NULL), 
-											  mQual(NULL), mHand(NULL), mWorld(NULL), 
-											  mGrasp(NULL) {
+	ContactExaminerDlg(QWidget *parent = 0) : QDialog(parent), 
+	  mWorld(NULL), mHand(NULL), mObject(NULL), mGrasp(NULL),mQual(NULL)
+	{
 		setupUi(this);
 		init();
 		QObject::connect(handRadioButton, SIGNAL(clicked()), this, SLOT(modeSelected()));

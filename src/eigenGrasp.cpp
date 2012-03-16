@@ -111,10 +111,16 @@ void
 EigenGrasp::readFromFile(FILE *fp)
 {
 	float v;
-	fscanf(fp,"%f",&v);
+	if (fscanf(fp,"%f",&v) <= 0) {
+	  DBGA("EigenGrasp::readFromFile - failed to read eigenvalue");
+	  return;
+	}
 	mEigenValue = v;
 	for (int i=0; i<mSize; i++) {
-		fscanf(fp,"%f",&v);
+	  if(fscanf(fp,"%f",&v) <= 0) {
+	    DBGA("EigenGrasp::readFromFile - failed to read eigenvector");
+	    return;
+	  }
 		mVals[i] = v;
 	}
 }

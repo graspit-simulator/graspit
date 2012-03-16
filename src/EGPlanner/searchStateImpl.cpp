@@ -250,7 +250,7 @@ transf PositionStateEllipsoid::getCoreTran() const
 void PositionStateEllipsoid::setTran(const transf &t)
 {
 	//not yet implemented
-	(void*)&t; //kill the warning
+        const_cast<transf &>(t) = t; //kill the warning
 	assert(0);
 }
 
@@ -272,6 +272,6 @@ transf PositionStateApproach::getCoreTran() const
 void PositionStateApproach::setTran(const transf &t)
 {
 	//not yet implemented
-	(void*)&t; //kill the warning
+	const_cast<transf &>(t) = t; //kill the warning
 	assert(0);
 }

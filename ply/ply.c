@@ -37,11 +37,20 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <math.h>
 #include <string.h>
 #include <ply.h>
-
+//Before this was using a truncating cast with potentially unsafe types. 
+//This is probably better -jw
 #define ROUND(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+
+//strdup is a POSIX legacy function that is shorthand for mallocing and strcopying.
+//it is not ANSI C, and conflicts with ANSI C reserved namespaces.
+//Therefore, the Microsoft guys moved it to _strdup. However, the GCC
+//guys have not yet done anything about it, so this is a kludgey workaround
+//to avoid warnings.
 #ifdef __GNUC__
-#define _strdup strdup 
+  #define _strdup strdup
 #endif
+
+
 
 
 char *type_names[] = {  /* names of scalar types */
@@ -165,7 +174,7 @@ PlyFile *ply_write(
   for (i = 0; i < nelems; i++) {
     elem = (PlyElement *) myalloc (sizeof (PlyElement));
     plyfile->elems[i] = elem;
-    elem->name = _strdup (elem_names[i]);
+    elem->name = _strdup(elem_names[i]);
     elem->num = 0;
     elem->nprops = 0;
   }
@@ -697,7 +706,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
 
   elist = (char **) myalloc (sizeof (char *) * plyfile->num_elem_types);
   for (i = 0; i < plyfile->num_elem_types; i++)
-    elist[i] = _strdup (plyfile->elems[i]->name);
+    elist[i] = _strdup(plyfile->elems[i]->name);
 
   *elem_names = elist;
   *nelems = plyfile->num_elem_types;
@@ -1639,9 +1648,16 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
     else if (prop->is_list == PLY_STRING) {     /* string */
       int len;
       char *str;
-      fread (&len, sizeof(int), 1, fp);
+      if(fread (&len, sizeof(int), 1, fp) != 1) {
+	fprintf (stderr,"binary_get_elements: Error reading ply string.\n");
+	return;
+      }
+      
       str = (char *) myalloc (len);
-      fread (str, len, 1, fp);
+      if( fread (str, len, 1, fp) != 1) {
+	fprintf (stderr, "get_new_props_ply: Error combining properties that should be the same.\n");
+	return;
+      }
       if (store_it) {
 	char **str_ptr;
         item = elem_data + prop->offset;
@@ -2072,49 +2088,76 @@ void get_binary_item(
 
   switch (type) {
     case Int8:
-      fread (ptr, 1, 1, fp);
+      if(fread (ptr, 1, 1, fp) != 1) {
+	fprintf (stderr,"get_binary_item: Error getting Int8.\n");
+	return;
+      }
       *int_val = *((char *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint8:
-      fread (ptr, 1, 1, fp);
+    case Uint8:      
+      if(fread (ptr, 1, 1, fp) != 1) {
+	fprintf (stderr,"get_binary_item: Error getting Int8.\n");
+	return;
+      }
       *uint_val = *((unsigned char *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
     case Int16:
-      fread (ptr, 2, 1, fp);
+      if(fread (ptr, 2, 1, fp) != 1) {
+	fprintf (stderr,"get_binary_item: Error getting Int16.\n");
+	return;
+      }
+      
       *int_val = *((short int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
     case Uint16:
-      fread (ptr, 2, 1, fp);
+      if(fread (ptr, 2, 1, fp) != 1) {
+	fprintf (stderr,"get_binary_item: Error getting UInt16.\n");
+	return;
+      }
       *uint_val = *((unsigned short int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
     case Int32:
-      fread (ptr, 4, 1, fp);
+      if(fread (ptr, 4, 1, fp) != 1) {
+	fprintf (stderr,"get_binary_item: Error getting Int32.\n");
+	return;
+      }
+
       *int_val = *((int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
     case Uint32:
-      fread (ptr, 4, 1, fp);
+      if(fread (ptr, 4, 1, fp) != 1) {
+	fprintf (stderr,"get_binary_item: Error getting UInt32.\n");
+	return;
+      }
       *uint_val = *((unsigned int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-	case Float32:
-      fread (ptr, 4, 1, fp);
+  case Float32:
+    if(fread (ptr, 4, 1, fp) != 1) {
+      fprintf (stderr,"get_binary_item: Error getting Float32.\n");
+      return;
+      }
       *double_val = *((float *) ptr);
       *int_val = ROUND(*double_val);
       *uint_val = (long)(*double_val+0.5);
       break;
     case Float64:
-	  fread (ptr, 8, 1, fp);
+      if(fread (ptr, 8, 1, fp) != 1) {
+	  fprintf (stderr,"get_binary_item: Error getting Float32.\n");
+	  return;
+      }
+	
       *double_val = *((double *) ptr);
       *int_val = ROUND(*double_val);
       *uint_val = (long)(*double_val+0.5);
@@ -2931,14 +2974,14 @@ typedef struct RuleName {
 } RuleName;
 
 RuleName rule_name_list[] = {
-  AVERAGE_RULE, "avg",
-  RANDOM_RULE, "rnd",
-  MINIMUM_RULE, "max",
-  MAXIMUM_RULE, "min",
-  MAJORITY_RULE, "major",
-  SAME_RULE, "same",
-  -1, "end_marker",
-};
+  {AVERAGE_RULE, "avg"},
+  {RANDOM_RULE, "rnd"},
+  {MINIMUM_RULE, "max"},
+  {MAXIMUM_RULE, "min"},
+  {MAJORITY_RULE, "major"},
+  {SAME_RULE, "same"},
+  {-1, "end_marker"},
+  };
 
 
 

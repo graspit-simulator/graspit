@@ -1665,7 +1665,10 @@ IVmgr::restoreCameraPos()
   float x,y,z;
   float q1,q2,q3,q4;
  
-  fscanf(camerafp,"%f %f %f %f %f %f %f\n",&x,&y,&z,&q1,&q2,&q3,&q4);  
+  if(fscanf(camerafp,"%f %f %f %f %f %f %f\n",&x,&y,&z,&q1,&q2,&q3,&q4) <= 0) {
+    DBGA("restoreCameraPos - Failed to read camera pose");
+    return;
+  }  
   myViewer->getCamera()->position.setValue(x,y,z);
   myViewer->getCamera()->orientation.setValue(q1,q2,q3,q4);
 }
@@ -1776,7 +1779,7 @@ IVmgr::keyPressed(SoEventCallback *eventCB)
 	  }
   }
   
-  static bool left = true;  
+  //static bool left = true;  
 
   static SoSeparator *indicators = NULL;
   if (SO_KEY_RELEASE_EVENT(event,V)) {

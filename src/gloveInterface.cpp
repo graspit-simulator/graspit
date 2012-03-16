@@ -96,44 +96,81 @@ void CalibrationPose::readFromFile(FILE *fp)
 	float floatVal;
 	int j;
 
-	fscanf(fp,"%d",&mSize);
+	if(fscanf(fp,"%d",&mSize) <=0){
+	  DBGA("CalibrationPose::readFromFile - Failed to read calibration size");	 
+	  return;
+	}
 	init(mSize);
 
-	fscanf(fp,"%f",&floatVal);
+	if(fscanf(fp,"%f",&floatVal) <= 0) {
+	  DBGA("CalibrationPose::readFromFile - Failed to read recorded distance");	 
+	  return;
+	}
 	recordedDistance = floatVal;
+	if(fscanf(fp,"%d",&val)) {
+	  DBGA("CalibrationPose::readFromFile - Failed to read sensor number");	 
+	  return;
+	}
 	
-	fscanf(fp,"%d",&val);
 	if (val) {
-		for (j=0; j<mSize; j++) {
-			fscanf(fp,"%d",&val);
-			setSensorValue(j,val);
-		}
-		sensorsSet = true;
+	  for (j=0; j<mSize; j++) {
+	    if(fscanf(fp,"%d",&val) <= 0) {
+	      DBGA("CalibrationPose::readFromFile - Failed to read sensor value");	 
+	      return;
+	    }
+	    setSensorValue(j,val);
+	  }
+	  sensorsSet = true;
 	} else sensorsSet = false;
 
-	fscanf(fp,"%d",&val);
+	if (fscanf(fp,"%d",&val) <= 0) {
+	  DBGA("CalibrationPose::readFromFile - Failed to read map size");	 
+	  return;
+	}
+	
 	if (val) {
-		for (j=0; j<mSize; j++) {
-			fscanf(fp,"%d",&val);
-			setMap(j,val);
-		}
-		mapSet = true;
-	} else mapSet = false;
-
-	fscanf(fp,"%d",&val);
+	  for (j=0; j<mSize; j++) {
+	    if(fscanf(fp,"%d",&val) <= 0) {
+	      DBGA("CalibrationPose::readFromFile - Failed to read map value");	 
+	      return;
+	    }
+	    
+	    setMap(j,val);	
+	  }
+	  mapSet = true;
+	} 
+	else mapSet = false;
+	
+	if(fscanf(fp,"%d",&val) <= 0) {
+	  DBGA("CalibrationPose::readFromFile - Failed to read joint number");	 
+	  return;
+	}
+	
 	if (val) {
-		for (j=0; j<mSize; j++) {
-			fscanf(fp,"%f",&floatVal);
-			setJointValue(j,floatVal);
-		}
-		jointsSet = true;
+	  for (j=0; j<mSize; j++) {
+	    if(fscanf(fp,"%f",&floatVal) >= 0) {
+	      DBGA("CalibrationPose::readFromFile - Failed to read joint value");	 
+	      return;
+	    }
+	    
+	    setJointValue(j,floatVal);
+	  }
+	  jointsSet = true;
 	} else jointsSet = false;
-
+	
+	
 	//transform rotation
 	float x,y,z,w;
-	fscanf(fp,"%f %f %f %f",&x, &y, &z, &w);
+	if(fscanf(fp,"%f %f %f %f",&x, &y, &z, &w)) {
+	  DBGA("CalibrationPose::readFromFile - Failed to read calibration orientation");	 
+	  return;
+	}
 	Quaternion q(w,x,y,z);
-	fscanf(fp,"%f %f %f",&x,&y,&z);
+	if(fscanf(fp,"%f %f %f",&x,&y,&z) <= 0) {
+	  DBGA("CalibrationPose::readFromFile - Failed to read calibration location");	 
+	  return;
+	}
+	
 	vec3 t(x,y,z);
 	mTransf.set(q,t);
 }
@@ -184,7 +221,11 @@ void loadPoseListFromFile(std::list<CalibrationPose*> *list, const char *filenam
 
 	int nPoses;
 	CalibrationPose *pose;
-	fscanf(fp,"%d",&nPoses);
+	if(fscanf(fp,"%d",&nPoses) <= 0) {
+	  DBGA("loadPoseListFromFile - Failed to read number of poses");	 
+	  return;
+	
+	}
 	fprintf(stderr,"Total of %d poses\n",nPoses);
 	for (int i=0; i<nPoses; i++) {
 		pose = new CalibrationPose(0);
@@ -448,7 +489,7 @@ float GloveInterface::getDOFValue(int d)
 	return dofVal;
 #else
 	assert(0);
-	(void*)&d;
+	d = d;
 	return 0;
 #endif
 }
@@ -633,7 +674,7 @@ void GloveInterface::recordPoseFromGlove(int d)
 	}
 	delete [] jv;
 #else
-	(void*)&d;
+	d = d;
 	assert(0);
 #endif
 }
@@ -927,24 +968,35 @@ bool GloveInterface::loadCalibration(const char* filename)
 	int numDOF, numSens;
 	float val;
 
-	fscanf(fp,"%d %d ",&numDOF,&numSens);
-	if ( numDOF != mRobot->getNumDOF() || numSens != N_SENSOR_VALUES ) {
-		fprintf(stderr,"WARNING: calibration file contains wrong number of DOFs/sensors\n");
-		return false;
+	if (fscanf(fp,"%d %d ",&numDOF,&numSens)  <= 0) { 
+	  DBGA("GloveInterface::loadCalibration - Failed to dof num or sensor num");	 
+	  return false;
 	}
-
+	
+	if ( numDOF != mRobot->getNumDOF() || numSens != N_SENSOR_VALUES ) {
+	  fprintf(stderr,"WARNING: calibration file contains wrong number of DOFs/sensors\n");
+	  return false;
+	}
+	
 	mData->reset();
 	for (d=0; d<numDOF; d++) {
-		for (s=0; s<numSens; s++) {
-			fscanf(fp,"%f",&val);
-			mData->setSlope(d,s,val);
-		}
+	  for (s=0; s<numSens; s++) {
+	    if(fscanf(fp,"%f",&val) <= 0) {
+	      DBGA("GloveInterface::loadCalibration - Failed to dof or sensor value");	 
+	      return false; 
+	    }
+	  }
+	  mData->setSlope(d,s,val);
 	}
+	
 	for (d=0; d<mRobot->getNumDOF(); d++) {
-		fscanf(fp,"%f",&val);
-		mData->setIntercept(d,val);
+	  if(fscanf(fp,"%f",&val) ){
+	     DBGA("GloveInterface::loadCalibration - Failed to dof num or sensor num");	 
+	     return false;
+	  }
+	  mData->setIntercept(d,val);
 	}
-
+	
 	fclose(fp);
 	fprintf(stderr,"Calibration loaded from file\n");
 	return true;

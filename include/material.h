@@ -31,7 +31,7 @@ enum materialT {frictionless, glass, metal, wood,plastic, rubber, stone, invalid
 
 extern double Cof[NUM_MATERIAL][NUM_MATERIAL];
 extern double KineticCof[NUM_MATERIAL][NUM_MATERIAL];
-extern char *matNameList[NUM_MATERIAL];
+extern char matNameList[NUM_MATERIAL][30];
 
 void initCof();
 materialT readMaterial(const char *matStr);

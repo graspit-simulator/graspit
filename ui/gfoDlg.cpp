@@ -44,7 +44,7 @@
 #define PROF_ENABLED
 #include "profiling.h"
 
-GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : mMainWindow(mw), mHand(h), QDialog(parent)
+GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h) 
 {
   setupUi(this);
   statusLabel->setText("Status: optimization off");

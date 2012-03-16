@@ -233,7 +233,10 @@ VariableSet::readFromFile(FILE *fp)
 {
 	//read the type first and check against my own
 	int type;
-	fscanf(fp,"%d",&type);
+	if( fscanf(fp,"%d",&type) <= 0) {
+	  DBGA("VariableSet::readFromFile - failed to get variable set type");
+	  return false;
+	}
 	if (type != getType()) {
 		fprintf(stderr,"Wrong type %d in state file (%d expected)\n",type,getType());
 		return false;

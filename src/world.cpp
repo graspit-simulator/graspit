@@ -1052,9 +1052,9 @@ World::addElementToSceneGraph(WorldElement *e)
 		DBGA("Element is already in scene graph");
 		return;
 	}
-	int i;
+	unsigned int i;
 	if (e->inherits("Robot")) {
-		for (i=0; i<(int)robotVec.size(); i++) {
+		for (i=0; i< robotVec.size(); i++) {
 			if (robotVec[i] == e) break;
 		}
 		if ( i==robotVec.size() ) {
@@ -1062,7 +1062,7 @@ World::addElementToSceneGraph(WorldElement *e)
 			return;
 		}
 	} else if (e->inherits("Body")) {
-		for (i=0; i<(int)bodyVec.size(); i++) {
+		for (i=0; i< bodyVec.size(); i++) {
 			if (GBVec[i] == e) break;
 		}	
 		if ( i==GBVec.size() ) {

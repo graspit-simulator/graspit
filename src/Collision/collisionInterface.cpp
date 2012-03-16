@@ -190,7 +190,7 @@ CollisionInterface::replaceContactSetWithPerimeter(ContactReport &contactSet)
 		qh_init_A(NULL, qhfp, qhfp, 0, NULL);
 	}
 
-	if(exitcode = setjmp(qh errexit)) {
+	if((exitcode = setjmp(qh errexit))) {
 		delete [] array;
 		if (qhfp) fclose(qhfp);
 		qhull_mutex.unlock();

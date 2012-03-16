@@ -954,7 +954,8 @@ Body::loadContactData(QString fn)
 	}
 	int numContacts;
 	VirtualContactOnObject *newContact;
-	fscanf(fp,"%d",&numContacts);
+	if(not fscanf(fp,"%d",&numContacts))
+		return FAILURE;
 
 	breakVirtualContacts();
 	for (int i=0; i<numContacts; i++) {
@@ -1756,7 +1757,7 @@ float Gaussian7Integrate(const Triangle& triangle, IntegrableFunction integrable
     terms[5], terms[6], terms[6], terms[6], 
     terms[7], terms[7], terms[7]};
 	// Calculate the integration sample points
-	float integration_samples[7][3] = {0};
+  float integration_samples[7][3] = {{0}};
 	const position* vertices[3] = {&(triangle.v1), &(triangle.v2), &(triangle.v3)};
 	for(int sample_num = 0; sample_num < 7; ++sample_num) {
 		float* sample = integration_samples[sample_num];
@@ -1822,7 +1823,7 @@ computeDefaultCoG(std::vector<Triangle> &triangles, position &defaultCoG)
     for (int i = 0; i < 3; ++i) center_of_mass[i] = means[i] / total_area;
 
 	// Get the covariance
-	float covars[3][3] = {0};
+    float covars[3][3] = {{0}};
     GetCovar get_covar;
     for(unsigned a = 0; a < 3; ++a) {
       for(unsigned b = a; b < 3; ++b) {

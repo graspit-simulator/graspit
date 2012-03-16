@@ -1227,7 +1227,7 @@ VirtualContact::getWorldNormal()
 int
 VirtualContact::setUpFrictionEdges(bool dynamicsOn)
 {
-	(void*)&dynamicsOn;
+	dynamicsOn = dynamicsOn;
 	return 1;
 }
 
@@ -1499,38 +1499,60 @@ VirtualContact::readFromFile(FILE *fp)
 	float v,x,y,z;
 
 	//finger and link number
-	fscanf(fp,"%d %d",&mFingerNum, &mLinkNum);
-
+	if ( fscanf(fp,"%d %d",&mFingerNum, &mLinkNum) <= 0){
+	  DBGA("VirtualContact::readFromFile - Failed to read fingernumber or link number");
+	  return;
+	}
 	//numFrictionEdges
-	fscanf(fp,"%d",&numFrictionEdges);
+	if (fscanf(fp,"%d",&numFrictionEdges) <= 0){
+	    DBGA("VirtualContact::readFromFile - Failed to read number of virtual contacts");
+	    return;
+	  }
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++) {
-			fscanf(fp,"%f",&v);
+		  if(fscanf(fp,"%f",&v) <= 0){
+		    DBGA("VirtualContact::readFromFile - Failed to read number of friction edges");
+		    return;
+		  };
 			frictionEdges[6*i+j] = v;
 		}
 	}
 
 	//loc
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0){
+	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact location");
+	 return;
+	}
 	loc = position(x,y,z);
 
 	//frame
 	Quaternion q;
 	vec3 t;
-	fscanf(fp,"%f %f %f %f",&v,&x,&y,&z);
+	if(fscanf(fp,"%f %f %f %f",&v,&x,&y,&z) <= 0) {
+	  DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame orientation");
+	}
 	q.set(v,x,y,z);
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
+	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame location");
+	} 
+
 	t.set(x,y,z);
 	frame.set(q,t);
 
 	//normal
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+	if( fscanf(fp,"%f %f %f",&x, &y, &z) <= 0){
+	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
+	 return;
+	}
 	normal.set(x,y,z);
 
 	//cof
-	fscanf(fp,"%f",&v);
+	if( fscanf(fp,"%f",&v) <= 0){ 
+	DBGA("VirtualContact::readFromFile - Failed to read virtual contact friction");
+	return;
+	}
 	cof = v;
 }
 
@@ -1564,12 +1586,19 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	float w,x,y,z;
 
 	//numFCVectors
-	fscanf(fp,"%d",&numFrictionEdges);
+	if(fscanf(fp,"%d",&numFrictionEdges) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction vectors");
+	  return; 
+	}
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++) {
-			fscanf(fp,"%f",&w);
+		  if (fscanf(fp,"%f",&w) <= 0) {
+		    DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction edges");
+		    return; 
+		  }
+		    
 			frictionEdges[6*i+j] = w;
 		}
 	}
@@ -1579,19 +1608,35 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	//you can use q(v,vec(x,y,z))
 	Quaternion q;
 	vec3 t;
-	fscanf(fp,"%f %f %f %f",&w,&x,&y,&z);
+	if(fscanf(fp,"%f %f %f %f",&w,&x,&y,&z) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact location");
+	  return;
+	}
+	
+
 	q.set(w,x,y,z);
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact orientation");
+	  return;
+	}
+	
 	t.set(x,y,z);
 	loc = position(x,y,z);
 	frame.set(q,t);
 
 	//normal
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
+	  return;
+	}
+
 	normal.set(x,y,z);
 
 	//cof
-	fscanf(fp,"%f",&w);
+	if(fscanf(fp,"%f",&w) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
+	  return;
+	}
 	cof = w;
 }
 
@@ -1608,13 +1653,20 @@ VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int in
 	}
 
 	//numFCVectors
-	fscanf(fp,"%d",&numFrictionEdges);
+	if(fscanf(fp,"%d",&numFrictionEdges) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromRawData - Failed to read virtual contact orientation");
+	  return; 
+	}
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++) {
-			fscanf(fp,"%f",&v);
-			frictionEdges[6*i+j] = v;
+		  if(fscanf(fp,"%f",&v) <= 0) 
+		    {
+		      DBGA("VirtualContactOnObject::readFromRawData - Failed to read number of friction edges for virtual contacts");
+		      return; 
+		    }
+		  frictionEdges[6*i+j] = v;
 		}
 	}
 

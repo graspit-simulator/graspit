@@ -67,6 +67,7 @@ project6(const vec3 &ax,
   return 1;
 }
 
+inline
 bool triangleIntersection(const Triangle &t1, const Triangle &t2)
 {
   vec3 p1, p2, p3;

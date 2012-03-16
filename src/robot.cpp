@@ -374,10 +374,19 @@ Robot::loadContactData(QString filename)
   }
   
   char robotName[500];
-  fscanf(fp,"%s",robotName); //yes, I know, can seg fault...
+  ; //yes, I know, can seg fault...
+  if(fscanf(fp,"%s",robotName) )
+    {
+      DBGA("Robot::loadContactData - failed to read robot name");
+      return 0;
+    }
   
   int numContacts;
-  fscanf(fp,"%d",&numContacts);
+  if( fscanf(fp,"%d",&numContacts) <= 0){
+    DBGA("Robot::loadContactData - failed to read number of contacts");
+    return -1;
+  }
+
   for (int i=0; i<numContacts; i++) {
     VirtualContact* newContact = new VirtualContact();
     newContact->readFromFile(fp);    

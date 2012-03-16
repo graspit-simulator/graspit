@@ -25,6 +25,7 @@
 
 #include "graspRecord.h"
 #include "gloveInterface.h"
+#include "debug.h"
 
 GraspRecord::GraspRecord(int size)
 {
@@ -60,21 +61,32 @@ void GraspRecord::readFromFile(FILE *fp)
 	//read names
 	char name[1000];
 	do {
-		fgets(name, 1000, fp);
+	  if(fgets(name, 1000, fp) == NULL) {
+	    DBGA("GraspRecord::readFromFile - failed to read record name");
+	    return;
+	  } 
 	} while (name[0]=='\n' || name[0]=='\0' || name[0]==' ');
 	mObjectName = QString(name);
 	mObjectName = mObjectName.stripWhiteSpace();
 	fprintf(stderr,"object: %s__\n",mObjectName.latin1());
 	do {
-		fgets(name, 1000, fp);
+	  if(fgets(name, 1000, fp) == NULL) {
+	    DBGA("GraspRecord::readFromFile - failed to read robot name");
+	    return;
+	  }
 	} while (name[0]=='\n' || name[0]=='\0' || name[0]==' ');
 	mRobotName = QString(name);
 	mRobotName = mRobotName.stripWhiteSpace();
 	fprintf(stderr,"robot: %s__\n",mRobotName.latin1());
 	//read transform
-	fscanf(fp,"%f %f %f %f",&x, &y, &z, &w);
+	if( fscanf(fp,"%f %f %f %f",&x, &y, &z, &w) <= 0) {
+	  DBGA("GraspRecord::readFromFile - failed to read record orientation.");
+	  return;
+	}
 	Quaternion q(w, x, y, z);
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+	if( fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
+	  DBGA("GraspRecord::readFromFile - failed to read record location");
+	}
 	vec3 t(x,y,z);
 	mTran.set(q,t);
 	//read pose
@@ -92,7 +104,10 @@ void loadGraspListFromFile(std::vector<GraspRecord*> *list, const char *filename
 
 	GraspRecord *newGrasp;
 	int nGrasps;
-	fscanf(fp,"%d",&nGrasps);
+	if(fscanf(fp,"%d",&nGrasps)) { 
+	  DBGA("loadGraspListFromFile - failed to read number of grasps");
+	  return;
+	}
 	for(int i=0; i<nGrasps; i++) {
 		newGrasp = new GraspRecord(0);
 		newGrasp->readFromFile(fp);

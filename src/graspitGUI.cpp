@@ -143,7 +143,8 @@ int
 GraspItGUI::processArgs(int argc, char** argv)
 {
   QString filename;
-  int errflag=0; (void*)&errflag;
+  int errflag=0; 
+  errflag = errflag;
   QString graspitRoot = QString(getenv("GRASPIT"));
   if (graspitRoot.isNull() ) {
     std::cerr << "Please set the GRASPIT environment variable to the root directory of graspIt." << std::endl;

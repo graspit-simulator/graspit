@@ -49,8 +49,8 @@
 //#define GRASPITDBG
 #include "debug.h"
 
-KinematicChain::KinematicChain(Robot *r,int chainNumber, int jointNum) : owner(r),chainNum(chainNumber),
-    numJoints(0),numLinks(0),lastJoint(NULL), IVRoot(NULL),numChildren(0), firstJointNum(jointNum)
+KinematicChain::KinematicChain(Robot *r,int chainNumber, int jointNum) : owner(r),chainNum(chainNumber), firstJointNum(jointNum),
+									 numJoints(0),numLinks(0),lastJoint(NULL), IVRoot(NULL),numChildren(0)
 {
 }
 

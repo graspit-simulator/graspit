@@ -528,6 +528,8 @@ grasp_planner::existsInList(plannedGrasp pg, std::list<plannedGrasp*> pgList)
     }
   }
   */
+  pg = pg;
+  pgList = pgList;
   assert(0);
   return false;
 }

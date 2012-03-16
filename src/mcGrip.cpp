@@ -52,7 +52,7 @@ int
 McGrip::loadFromXml(const TiXmlElement* root,QString rootPath)
 {
 	int result = HumanHand::loadFromXml(root, rootPath);
-	for (size_t i=0; i<(int)mTendonVec.size(); i++) {
+	for (size_t i=0; i<(unsigned int)mTendonVec.size(); i++) {
 		mTendonVec[i]->setApplyPassiveForce(false);
 	}
 	return result;

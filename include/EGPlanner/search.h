@@ -16,9 +16,6 @@ enum SearchContactType{CONTACT_PRESET, CONTACT_LIVE};
 enum AnnealingType{ANNEAL_DEFAULT, ANNEAL_MODIFIED, ANNEAL_STRICT, ANNEAL_ONLINE, ANNEAL_LOOP};
 enum ActionType{ACTION_GRASP, ACTION_OPEN, ACTION_PLAN};
 
-static unsigned char INPUT_NONE=0;
-static unsigned char INPUT_GLOVE=1;
-static unsigned char INPUT_FILE=2;
-//enum InputType{INPUT_NONE = 0, INPUT_FLOCK = 1, INPUT_GLOVE = 2, INPUT_FILE = 4};
+enum InputType{INPUT_NONE = 0,  INPUT_GLOVE = 1, INPUT_FILE = 2, INPUT_FLOCK = 4};
 
 #endif

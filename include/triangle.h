@@ -42,7 +42,7 @@ public:
 	inline position centroid() const;
 	inline vec3 normal() const;
 
-	friend inline bool triangleIntersection(const Triangle &t1, const Triangle &t2);
+	friend INLINE_RELEASE bool triangleIntersection(const Triangle &t1, const Triangle &t2);
 };
 
 INLINE_RELEASE bool 

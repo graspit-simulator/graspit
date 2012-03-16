@@ -282,7 +282,9 @@ void EGPlanner::threadLoop()
 	while (!done) {
 		PlannerState s = getState();
 		switch(s) {
-			case INIT:
+               		case STARTING_THREAD: //do nothing
+			  break;
+                  	case INIT:
 				sleep(0.1);
 				break;
 			case READY:
@@ -294,6 +296,8 @@ void EGPlanner::threadLoop()
 			case DONE:
 				done = true;
 				break;
+         		case EXITED: //Do nothing
+			        break;
 		}
 		if (!done) checkTerminationConditions();
 	}

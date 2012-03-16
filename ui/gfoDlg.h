@@ -51,10 +51,12 @@ class GFODlg : public QDialog, public Ui::GFODlgUI
 {
   Q_OBJECT
 private:
-  //! The hand that is the target of the optimization
-  Hand *mHand;
   //! A pointer to the main window used to ask for an update of the contact list
   MainWindow *mMainWindow;
+
+  //! The hand that is the target of the optimization
+  Hand *mHand;
+
   //! Calls the GFO routine that computes both contact wrenches and joint torques
   void graspForceOptimization(int computation);
   //! Calls the routine that computes contact forces that balance compliant joints
