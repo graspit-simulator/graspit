@@ -32,5 +32,8 @@ HEADERS += openClosePlugin.h $(GRASPIT)/include/plugin.h
 SOURCES += openClosePlugin.cpp
 
 
-#in order to get symbols defined in the main executable (most notably GraspitGUI * graspItGUI), you need to link against the executable
-LIBS += $(GRASPIT)/bin/graspit.lib
+#in order to get symbols defined in the main executable 
+#(most notably GraspitGUI * graspItGUI), you need to link against the executable
+win32{
+  LIBS += $(GRASPIT)/bin/graspit.lib
+}
