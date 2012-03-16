@@ -1,4 +1,8 @@
-TEMPLATE	= vcapp
+win32 {
+  TEMPLATE = vcapp
+} else {
+  TEMPLATE = app
+}
 LANGUAGE	= C++
 
 #-------------------------options--------------------------
@@ -6,7 +10,7 @@ LANGUAGE	= C++
 #comment out this line for compiling in Release mode
 #usually, compiling in Release mode delivers a significant gain in performance
 #in MS Visual Studio *also* set the project mode to Release
-CONFIG += graspitdbg
+#CONFIG += graspitdbg
 
 #select collision detection engine
 #possible values: graspit_collision pqp_collision
