@@ -60,6 +60,7 @@ HEADERS	+= include/barrett.h \
 	include/m7tool.h \
 	include/robonaut.h \
 	include/robot.h \
+	include/robotiq.h \
 	include/humanHand.h \
 	include/SoArrow.h \
 	include/SoComplexShape.h \
@@ -145,6 +146,7 @@ SOURCES	+= src/arch.cpp \
 	src/quality.cpp \
 	src/robonaut.cpp \
 	src/robot.cpp \
+	src/robotiq.cpp \
 	src/scanSimulator.cpp \
 	src/shadow.cpp \
 	src/SoArrow.cpp \
