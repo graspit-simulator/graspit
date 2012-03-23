@@ -41,6 +41,7 @@
 #include "shadow.h"
 #include "puma560.h"
 #include "mcGrip.h"
+#include "robotiq.h"
 
 WorldElementFactory::~WorldElementFactory()
 {
@@ -81,4 +82,5 @@ WorldElementFactory::registerBuiltinCreators()
   REGISTER_CREATOR("HumanHand",HumanHand);
   REGISTER_CREATOR("Shadow",Shadow);
   REGISTER_CREATOR("McGrip",McGrip);
+  REGISTER_CREATOR("RobotIQ",RobotIQ);
 }
