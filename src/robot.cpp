@@ -375,7 +375,7 @@ Robot::loadContactData(QString filename)
   
   char robotName[500];
   ; //yes, I know, can seg fault...
-  if(fscanf(fp,"%s",robotName) )
+  if(fscanf(fp,"%s",robotName) <= 0)
     {
       DBGA("Robot::loadContactData - failed to read robot name");
       return 0;
