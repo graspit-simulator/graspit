@@ -62,7 +62,9 @@ RobotIQ::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 
   if (speedFactor < 0) 
   {
-    DBGA("Hand opening not yet implemented for RobotIQ hand; forcing it to open pose"); 
+    DBGA("Hand opening not yet implemented for RobotIQ hand; forcing it to open pose");
+    desiredVals[3] = getDOF(3)->getVal();
+    desiredVals[7] = getDOF(7)->getVal();
     forceDOFVals(&desiredVals[0]);
     return false;
   }
