@@ -169,42 +169,48 @@ GuidedPlanner::startChild(const GraspPlanningState *seed)
 void
 GuidedPlanner::stopChild(SimAnnPlanner *pl)
 {
-	DBGP("Child has finished!");
-	//this sets the state to DONE which in turn waits for the thread to stop spinning
-	pl->stopPlanner();
-	DBGP("Thread has stopped.");
-	int j = pl->getListSize();
-	if (j) {
-		//place a copy of the best state (which is the pre-grasp) in my best list
-		GraspPlanningState *s = new GraspPlanningState( pl->getGrasp(0) );
-		//recall that child used its own cloned hand for planning
-		s->changeHand(mHand, true);
-		mBestList.push_back(s);
-
-		//use this part to also save the final grasp from the child planner, 
-		//not just the pre-grasp
-		pl->showGrasp(0);
-		GraspPlanningState *finalGrasp = new GraspPlanningState(pl->getGrasp(0));
-		finalGrasp->setPositionType(SPACE_COMPLETE);
-		//the final grasp is not in eigengrasp space, so we must save it in DOF space
-		finalGrasp->setPostureType(POSE_DOF);
-		finalGrasp->saveCurrentHandState();
-		//change the hand
-		finalGrasp->changeHand(mHand, true);
-		//and save it
-		mBestList.push_back(finalGrasp);		
-
-		//place a copy of the pre-grasp in the avoid list and mark it red
-		GraspPlanningState *s2 = new GraspPlanningState(s);
-		mAvoidList.push_back(s2);
-		mHand->getWorld()->getIVRoot()->addChild( s2->getIVRoot() );
-		if (s2->getEnergy() < 10.0) {
-			s2->setIVMarkerColor(1,0,0);
-		} else {
-			s2->setIVMarkerColor(0.1,0.1,0.1);
-		}
-		//the avoid list gets emptied at cleanup
-	}
+  DBGA("Child has finished!");
+  //this sets the state to DONE which in turn waits for the thread to stop spinning
+  pl->stopPlanner();
+  DBGP("Thread has stopped.");
+  int j = pl->getListSize();
+  if (j) {
+    //place a copy of the best state (which is the pre-grasp) in my best list
+    GraspPlanningState *s = new GraspPlanningState( pl->getGrasp(0) );
+    s->printState();
+    //recall that child used its own cloned hand for planning
+    s->changeHand(mHand, true);
+    mBestList.push_back(s);
+    
+    //use this part to also save the final grasp from the child planner, 
+    //not just the pre-grasp
+    pl->showGrasp(0);
+    GraspPlanningState *finalGrasp = new GraspPlanningState(pl->getGrasp(0));
+    finalGrasp->setPositionType(SPACE_COMPLETE);
+    //the final grasp is not in eigengrasp space, so we must save it in DOF space
+    finalGrasp->setPostureType(POSE_DOF);
+    finalGrasp->saveCurrentHandState();
+    //change the hand
+    finalGrasp->changeHand(mHand, true);
+    //and save it
+    mBestList.push_back(finalGrasp);		
+    
+    //place a copy of the pre-grasp in the avoid list and mark it red
+    GraspPlanningState *s2 = new GraspPlanningState(s);
+    mAvoidList.push_back(s2);
+    mHand->getWorld()->getIVRoot()->addChild( s2->getIVRoot() );
+    if (s2->getEnergy() < 10.0) {
+      s2->setIVMarkerColor(1,0,0);
+    } else {
+      s2->setIVMarkerColor(0.1,0.1,0.1);
+    }
+    DBGA("Enrgy from child: " << s2->getEnergy());
+    //the avoid list gets emptied at cleanup
+  }
+  else
+  {
+    DBGA("Child has no solutions");
+  }  
 }
 
 /*! Does the usual main loop of a SimAnn planner, but checks if the current

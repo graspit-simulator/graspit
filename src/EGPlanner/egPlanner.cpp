@@ -30,6 +30,7 @@
 #include "searchEnergy.h"
 #include "robot.h"
 #include "barrett.h"
+#include "robotiq.h"
 #include "pr2Gripper.h"
 #include "body.h"
 #include "simAnn.h"
@@ -197,37 +198,39 @@ EGPlanner::checkTerminationConditions()
 void
 EGPlanner::createAndUseClone()
 {
-	if (isActive()) {
-		DBGA("Can not change hands while planner is running");
-		return;
-	}
-	if (mMultiThread) {
-		//let collision detection know this is a new thread
-		mHand->getWorld()->getCollisionInterface()->newThread();
-	}
-	Hand *clone;
-	if (mHand->isA("Barrett")) {
-		clone = new Barrett( mHand->getWorld(), "Barrett clone");
-	} else if (mHand->isA("Pr2Gripper")) {
-		clone = new Pr2Gripper( mHand->getWorld(), "PR2 Gripper clone");
-	} else {
-		clone = new Hand(mHand->getWorld(), "Hand clone");
-	}
-	clone->cloneFrom(mHand);
-	clone->setRenderGeometry(false);
-	clone->showVirtualContacts(false);
-	if (mMultiThread) {
-		//we do not want to add the robot to the scene graph from here
-		//it is ideal not to touch the scene graph from outside the main thread
-		mHand->getWorld()->addRobot(clone,false);
-	} else {
-		mHand->getWorld()->addRobot(clone,true);
-	}
-	mHand->getWorld()->toggleCollisions(false, mHand, clone);
-	clone->setTran( mHand->getTran() );
-	mHand = clone;
-	mUsesClone = true;
-	if (mCurrentState) mCurrentState->changeHand(mHand);
+  if (isActive()) {
+    DBGA("Can not change hands while planner is running");
+    return;
+  }
+  if (mMultiThread) {
+    //let collision detection know this is a new thread
+    mHand->getWorld()->getCollisionInterface()->newThread();
+  }
+  Hand *clone;
+  if (mHand->isA("Barrett")) {
+    clone = new Barrett( mHand->getWorld(), "Barrett clone");
+  } else if (mHand->isA("Pr2Gripper")) {
+    clone = new Pr2Gripper( mHand->getWorld(), "PR2 Gripper clone");
+  } else if (mHand->isA("RobotIQ")) {
+    clone = new RobotIQ( mHand->getWorld(), "RobotIQ clone");
+  } else {
+    clone = new Hand(mHand->getWorld(), "Hand clone");
+  }
+  clone->cloneFrom(mHand);
+  clone->setRenderGeometry(false);
+  clone->showVirtualContacts(false);
+  if (mMultiThread) {
+    //we do not want to add the robot to the scene graph from here
+    //it is ideal not to touch the scene graph from outside the main thread
+    mHand->getWorld()->addRobot(clone,false);
+  } else {
+    mHand->getWorld()->addRobot(clone,true);
+  }
+  mHand->getWorld()->toggleCollisions(false, mHand, clone);
+  clone->setTran( mHand->getTran() );
+  mHand = clone;
+  mUsesClone = true;
+  if (mCurrentState) mCurrentState->changeHand(mHand);
 }
 
 /*! The planner can remove the clone from the scene graph. The clone 
