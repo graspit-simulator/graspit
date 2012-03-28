@@ -29,7 +29,7 @@ Troubleshooting
 Ensure that you have compiled the plugin and GraspIt! using the same configuration mode [Release/Debug] or you will 
 have segmentation errors due to a mismatch between the standard libraries on Windows.
 
-If your library uses the graspitGui GraspItGui class singleton to access the ivmanager or world, make sure to link against $(GRASPIT)/bin/graspit.lib
+On Windows, if your library uses the graspitGui GraspItGui class singleton to access the ivmanager or world, make sure to link against $(GRASPIT)/bin/graspit.lib. On Linux, there is no need to link against GraspIt!.
 
 If you change the name of your graspit binary in your compilation environment, the name of the lib file will also change, and you will need to
 recompile your plugin.
