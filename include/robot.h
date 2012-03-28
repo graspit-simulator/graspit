@@ -509,6 +509,8 @@ protected:
   void emitUserInteractionStart(){emit userInteractionStart();}
   //! Emits the user interaction ended signal
   void emitUserInteractionEnd(){emit userInteractionEnd();}
+
+  static const double AUTO_GRASP_TIME_STEP;
 };
 
 /*! Informs the dofs of their new values in \a dofVals. Simply passes through

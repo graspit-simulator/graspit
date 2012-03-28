@@ -62,7 +62,7 @@
 
 PROF_DECLARE(MOVE_DOF);
 
-#define AUTO_GRASP_TIME_STEP 0.01
+const double Robot::AUTO_GRASP_TIME_STEP = 0.01;
 
 /*! Removes the base and mountpiece from the world, and deletes the
 kinematic chains and DOFs.  If this robot is connected to a parent

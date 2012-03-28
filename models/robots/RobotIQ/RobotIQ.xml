@@ -9,21 +9,21 @@
         <draggerScale>24</draggerScale>
     </dof>
     <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
         <draggerScale>19</draggerScale>
     </dof>
     <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>-1.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
         <draggerScale>12</draggerScale>
     </dof>
      <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
@@ -37,21 +37,21 @@
         <draggerScale>24</draggerScale>
     </dof>
     <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
         <draggerScale>19</draggerScale>
     </dof>
      <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>-1.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
         <draggerScale>12</draggerScale>
     </dof>
      <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
@@ -65,14 +65,14 @@
         <draggerScale>24</draggerScale>
     </dof>
     <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
         <draggerScale>19</draggerScale>
     </dof>
      <dof type="r">
-        <defaultVelocity>1.0</defaultVelocity>
+        <defaultVelocity>-1.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
@@ -88,8 +88,8 @@
             <d>0</d>
             <a>57.150</a>
             <alpha>0</alpha>
-            <minValue>-35</minValue>
-            <maxValue>35</maxValue>
+            <minValue>-5.39</minValue>
+            <maxValue>64.61</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
             <CoulombFriction>0</CoulombFriction>
             <springStiffness>4</springStiffness>
@@ -112,8 +112,8 @@
             <d>0</d>
             <a>0</a>
             <alpha>0</alpha>
-            <minValue>-25</minValue>
-            <maxValue>73</maxValue>
+            <minValue>-54.61</minValue>
+            <maxValue>43.39</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
             <CoulombFriction>0</CoulombFriction>
             <springStiffness>4</springStiffness>
@@ -145,8 +145,8 @@
             <d>0</d>
             <a>57.150</a>
             <alpha>0</alpha>
-            <minValue>-35</minValue>
-            <maxValue>35</maxValue>
+            <minValue>-5.39</minValue>
+            <maxValue>64.61</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
             <CoulombFriction>0</CoulombFriction>
             <springStiffness>4</springStiffness>
@@ -169,8 +169,8 @@
             <d>0</d>
             <a>0</a>
             <alpha>0</alpha>
-            <minValue>-25</minValue>
-            <maxValue>73</maxValue>
+            <minValue>-54.61</minValue>
+            <maxValue>43.39</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
             <CoulombFriction>0</CoulombFriction>
             <springStiffness>4</springStiffness>
@@ -203,8 +203,8 @@
             <d>0</d>
             <a>57.150</a>
             <alpha>0</alpha>
-            <minValue>-35</minValue>
-            <maxValue>35</maxValue>
+            <minValue>-5.39</minValue>
+            <maxValue>64.61</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
             <CoulombFriction>0</CoulombFriction>
             <springStiffness>4</springStiffness>
@@ -227,8 +227,8 @@
             <d>0</d>
             <a>0</a>
             <alpha>0</alpha>
-            <minValue>-25</minValue>
-            <maxValue>73</maxValue>
+            <minValue>-54.61</minValue>
+            <maxValue>43.39</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
             <CoulombFriction>0</CoulombFriction>
             <springStiffness>4</springStiffness>
@@ -241,8 +241,12 @@
     </chain>
 
     <approachDirection>
-        <referenceLocation>-15 5 0</referenceLocation>
+        <referenceLocation>0 50 0</referenceLocation>
         <direction>0 1 0</direction>
     </approachDirection>
+
+    <eigenGrasps>eigen/robotiq_eigen.egr</eigenGrasps>
+
+    <virtualContacts>eigen/virtual_all.vgr</virtualContacts>
 
 </robot>

@@ -71,7 +71,11 @@ void PostureStateEigen::createVariables()
 		min = -0.45f;
 		max = 0.45f;
 		jump = (max-min) / 4.0;
-	} else {
+	} else if ( mHand->isA("RobotIQ") ) {
+	        min = 0.0;
+	        max = 2.5;
+		jump = (max-min) / 4.0;
+        } else {
 		min = -4.0f;
 		max = 4.0f;
 		jump = (max-min) / 4.0;

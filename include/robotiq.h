@@ -51,6 +51,11 @@ class RobotIQ : public Hand {
      the palm and the second link of the thumb.
  */
   virtual void cloneFrom(Hand *original);
+
+  //! Performs RobotIQ-specific autograsp where distal links stay parallel unless proximal
+  //  links hit an object.
+  virtual bool autoGrasp(bool renderIt, double speedFactor = 1.0, bool stopAtContact = false);
+
 };
 
 #define ROBOTIQ_H
