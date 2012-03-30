@@ -46,7 +46,7 @@ extern "C" {
 //! A global mutex used for synchronizing access to QHull, which is not thread-safe
 QMutex qhull_mutex;
 //Who actually needs this???
-char qh_version[] = "GraspIt 2.0b";
+//char qh_version[] = "GraspIt 2.0b";
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -291,9 +291,10 @@ GWS::projectTo3D(double *projCoords, std::set<int> fixedCoordSet,
   int numpoints= qh num_points + qh_setsize (qh other_points);
   int vertex_i, vertex_n;
   facetT *neighbor, **neighborp;
- 
+  int unused_numnumtricoplanarsp; //added because countfacets takes more arguments in qhull 2012
+								  //FIXME - understand what this argument does. 
   qh_countfacets (qh facet_list, NULL, !qh_ALL, &numfacets, &numsimplicial, 
-      &totneighbors, &numridges, &numcoplanars);  /* sets facet->visitid */
+      &totneighbors, &numridges, &numcoplanars, &unused_numnumtricoplanarsp);  /* sets facet->visitid */
 
   qh_vertexneighbors();
   vertices= qh_facetvertices (qh facet_list, NULL, !qh_ALL);
@@ -317,7 +318,7 @@ GWS::projectTo3D(double *projCoords, std::set<int> fixedCoordSet,
       j=0;
       FOREACHneighbor_(vertex) {
 		if (!neighbor->visitid) {
-			fprintf(stderr,"Uh oh! neighbor->visitId==0, -neighbor->id: %d\n",-neighbor->id);
+			fprintf(stderr,"Uh oh! neighbor->visitId==0, -neighbor->id: %d\n",-int(neighbor->id));
 			numInLoop--;
 		}
 		else

@@ -11,12 +11,17 @@ HEADERS += include/lapack_wrappers.h
 
 # ---------------------- General libraries and utilities ----------------------------------
 
-#specifying the qhull library by exact file, so that the system does not use
-#the version that comes from the package manager instead 
-LIBS	+= qhull/libqhull.a 
-#LIBS	+= -Lqhull -lqhull 
+#add qhull include dir
+INCLUDEPATH += /usr/include/qhull
 
-LIBS	+= -lSoQt -lCoin -lGL -lpthread
+#add qhull libraries
+LIBS	+= -Lqhull -lqhull 
+
+#add openinventor libraries
+LIBS	+= -lSoQt -lCoin
+
+#add utility libraries
+LIBS += -lGL -lpthread
 
 MOC_DIR = .moc
 OBJECTS_DIR = .obj

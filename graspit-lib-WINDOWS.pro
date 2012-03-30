@@ -33,11 +33,20 @@ mkl {
 }
 
 # ---------------------- General libraries and utilities ----------------------------------
+!exists(($QHULLDIR))
+{
+     warning("QHULLDIR not set. Assuming QHULLDIR=$PWD/qhull")
+     QHULL=qhull
+}else{
+     QHULL=$(QHULLDIR)
+}
+
+INCLUDEPATH += $$QHULL/src/libqhull
 
 graspitdbg {
-	LIBS += qhull/windows/Debug/qhull.lib $(COINDIR)/lib/Coin3d.lib $(COINDIR)/lib/SoQt1d.lib
+	LIBS += $$QHULL/lib/qhullstatic_d.lib $(COINDIR)/lib/Coin3d.lib $(COINDIR)/lib/SoQt1d.lib
 } else {
-	LIBS += qhull/windows/Release/qhull.lib $(COINDIR)/lib/Coin3.lib $(COINDIR)/lib/SoQt1.lib
+	LIBS += $$QHULL/lib/qhullstatic.lib $(COINDIR)/lib/Coin3.lib $(COINDIR)/lib/SoQt1.lib
 }
 
 DEFINES	+= COIN_DLL SOQT_DLL WIN32
