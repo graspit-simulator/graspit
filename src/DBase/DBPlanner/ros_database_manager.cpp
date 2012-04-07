@@ -123,10 +123,10 @@ bool RosDatabaseManager::ScaledModel(Model* &model, int scaled_model_id) const
   return true;
 }
 
-bool RosDatabaseManager::AcquireNextTask(TaskRecord *rec)
+bool RosDatabaseManager::AcquireNextTask(TaskRecord *rec, std::vector<std::string> accepted_types)
 {
   std::vector< boost::shared_ptr<household_objects_database::DatabaseTask> > db_task;
-  if (!database_->acquireNextTask(db_task)) return false;
+  if (!database_->acquireNextTask(db_task, accepted_types)) return false;
   if (db_task.empty()) 
   {
     //no task to be run

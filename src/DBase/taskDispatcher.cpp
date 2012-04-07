@@ -112,7 +112,8 @@ void TaskDispatcher::startNewTask()
     }
 
     db_planner::TaskRecord rec;
-    if (!mDBMgr->AcquireNextTask(&rec)) {
+    std::vector<std::string> empty;
+    if (!mDBMgr->AcquireNextTask(&rec, empty)) {
         DBGA("Dispatcher: error reading next task");
 	mStatus = ERROR;
 	return;

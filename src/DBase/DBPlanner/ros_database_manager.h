@@ -104,9 +104,10 @@ class RosDatabaseManager : public DatabaseManager
   virtual bool ScaledModel(Model* &model, int scaled_model_id) const;
 
   //! Acquires the next experiment to be executed from the list of tasks in the database
-  /*! Also marks it as RUNNING in an atomic fashion, so that it is not acquired by 
-   another process.*/
-  virtual bool AcquireNextTask(TaskRecord *rec);
+  /*! If accepted_types is not empty, it will only get tasks of one of that types. If it's empty,
+    it will get any task. Also marks any task it gets as RUNNING in an atomic fashion, so that it 
+    is not acquired by another process.*/
+  virtual bool AcquireNextTask(TaskRecord *rec, std::vector<std::string> accepted_types);
   //! Change the status of a task in the database (e.g. mark it as COMPLETED)
   virtual bool SetTaskStatus(int task_id, const string &status);
   //! Fills in the details for a planning task based on the task id

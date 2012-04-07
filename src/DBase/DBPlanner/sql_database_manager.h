@@ -127,7 +127,7 @@ class SqlDatabaseManager : public DatabaseManager {
 
   // Functionality not implemented in this manager:
   virtual bool DeleteGrasp(Grasp* /*grasp*/) const  {return false;}
-  virtual bool AcquireNextTask(TaskRecord* /*rec*/){return false;}
+  virtual bool AcquireNextTask(TaskRecord* /*rec*/, std::vector<std::string> /*accepted_types*/){return false;}
   virtual bool SetTaskStatus(int /*task_id*/, const string& /*status*/){return false;}
   virtual bool GetPlanningTaskRecord(int task_id, PlanningTaskRecord* /*rec*/){return false;}
   virtual bool SetGraspClusterRep(Grasp* /*grasp*/, bool /*rep*/) const {return false;}

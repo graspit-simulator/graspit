@@ -122,9 +122,10 @@ class DatabaseManager {
                          const string& hand_name, 
 			 vector<Grasp*>* grasp_list) const = 0;
   //! Acquires the next experiment to be executed from the list of tasks in the database
-  /*! Also marks it as RUNNING in an atomic fashion, so that it is not acquired by 
-   another process.*/
-  virtual bool AcquireNextTask(TaskRecord *rec) = 0;
+  /*! If accepted_types is not empty, it will only get tasks of one of that types. If it's empty,
+    it will get any task. Also marks any task it gets as RUNNING in an atomic fashion, so that it 
+    is not acquired by another process.*/
+  virtual bool AcquireNextTask(TaskRecord *rec, std::vector<std::string> accepted_types) = 0;
   //! Change the status of a task in the database (e.g. mark it as COMPLETED)
   virtual bool SetTaskStatus(int task_id, const string &status) = 0;
   //! Fills in the details for a planning task based on the task id
