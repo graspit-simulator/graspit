@@ -56,35 +56,29 @@ void PostureStateDOF::storeHandDOF(const double *dof)
 
 void PostureStateEigen::createVariables()
 {
-	QString name("EG ");
-	QString num;
-	float min,max,jump;
-
-	//this is a horrible hack to adapt EG range to the characteristics of the hand
-	//should really compute these based on DOF max / min, but for some reason
-	//I've never been able to do that properly
-	if ( mHand->isA("Pr2Gripper") ) {
-		min = -0.6f;
-		max = 0.6f;
-		jump = (max-min) / 4.0;
-	} else 	if ( mHand->isA("Pr2Gripper2010") ) {
-		min = -0.45f;
-		max = 0.45f;
-		jump = (max-min) / 4.0;
-	} else if ( mHand->isA("RobotIQ") ) {
-	        min = 0.0;
-	        max = 2.5;
-		jump = (max-min) / 4.0;
-        } else {
-		min = -4.0f;
-		max = 4.0f;
-		jump = (max-min) / 4.0;
-	}
-
-	for (int i=0; i<mHand->getEigenGrasps()->getSize(); i++) {
-		num.setNum(i);
-		mVariables.push_back( new SearchVariable(name+num, min, max, jump) );
-	}
+  for (int i=0; i<mHand->getEigenGrasps()->getSize(); i++) {
+    QString name("EG ");
+    QString num;
+    num.setNum(i);
+    float min,max;
+    if (mHand->getEigenGrasps()->getGrasp(i)->mPredefinedLimits) {
+      min = mHand->getEigenGrasps()->getGrasp(i)->mMin;
+      max = mHand->getEigenGrasps()->getGrasp(i)->mMax;
+    } else if ( mHand->isA("Pr2Gripper") ) {
+      min = -0.6f;
+      max = 0.6f;
+    } else if ( mHand->isA("Pr2Gripper2010") ) {
+      min = -0.45f;
+      max = 0.45f;
+    } else {
+      //if limits are not pre-defined in files, we use these hard-coded values
+      //as we don't actually trust our abilities to compute them
+      min = -0.4f;
+      max = 0.4f;
+    }
+    float jump  = (max-min) / 4.0;
+    mVariables.push_back( new SearchVariable(name+num, min, max, jump) );
+  }
 }
 void PostureStateEigen::getHandDOF(double *dof) const
 {

@@ -221,6 +221,6 @@
         <link dynamicJointType="Revolute">finger_link_pad.xml</link>
         <link dynamicJointType="Revolute">finger_link_pad.xml</link>
     </chain>
-    <eigenGrasps>eigen/McHand_eigen.egr</eigenGrasps>
+    <eigenGrasps>eigen/McHand_eigen.xml</eigenGrasps>
     <virtualContacts>virtual/all_contacts.vgr</virtualContacts>
 </robot>

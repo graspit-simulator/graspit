@@ -177,7 +177,7 @@
 	<link dynamicJointType="Revolute">finger_tip.xml</link>
     </chain>
 
-    <eigenGrasps>eigen/schunk_eigen.egr</eigenGrasps>
+    <eigenGrasps>eigen/schunk_eigen.xml</eigenGrasps>
 
     <virtualContacts>contacts/all_contacts.vgr</virtualContacts>
 

@@ -245,7 +245,7 @@
         <direction>0 1 0</direction>
     </approachDirection>
 
-    <eigenGrasps>eigen/robotiq_eigen.egr</eigenGrasps>
+    <eigenGrasps>eigen/robotiq_eigen.xml</eigenGrasps>
 
     <virtualContacts>eigen/virtual_all.vgr</virtualContacts>
 

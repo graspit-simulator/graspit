@@ -40,6 +40,7 @@
 */
 #define EIGENGRASP_LOOSE
 
+class TiXmlElement;
 class Matrix;
 class Robot;
 class QTextStream;
@@ -68,6 +69,8 @@ public:
 	double mMin;
 	//! Stores the max value along this eigengrasp that is inside the legal joint range.
 	double mMax;
+	//! True if limits loaded from EigenGrasp File. If this is false Graspit! will attempt to compute limits at runtime.
+	bool mPredefinedLimits;
 	//! Remembers if the amplitude along this EG is fixed (no motion along this EG is allowed)
 	bool mFixed;
 	//! If this eigengrasp is fixed, this is the value that is was fixed at
@@ -106,9 +109,12 @@ public:
 	double dot(double *d);
 
 	void writeToFile(FILE *fp);
+	void writeToFile(TiXmlElement *ep);
 	void readFromFile(FILE *fp);
-	int readFromStream(QTextStream *stream);
 
+	int readFromStream(QTextStream *stream);
+	int readFromXml(const TiXmlElement *element);
+	
 	//! Tells this eigengrasp that it is fixed at the given value
 	void fix(double a){mFixed = true; fixedAmplitude = a;}
 	//! Tells this eigengrasp that it can move freely
@@ -174,7 +180,7 @@ public:
 	~EigenGraspInterface();
 
 	//! Returns the g-th eigengrasp
-	const EigenGrasp* getGrasp(int g){return mGrasps[g];}
+	const EigenGrasp* getGrasp(int g) const {return mGrasps[g];}
 	//! Returns the size of the eigengrasp space (the number of eigengrasps)
 	int getSize() const {return (int)mGrasps.size();}
 

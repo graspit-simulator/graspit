@@ -32,6 +32,7 @@
 #include <QFile>
 #include <QString>
 #include <QTextStream>
+#include "tinyxml.h"
 
 #include "math/matrix.h"
 
@@ -50,6 +51,7 @@ EigenGrasp::EigenGrasp(int size, double e)
 	mSize = size;
 	mEigenValue = e;
 	mFixed = false;
+	mPredefinedLimits=false;
 }
 
 EigenGrasp::EigenGrasp(const EigenGrasp *orig)
@@ -61,6 +63,7 @@ EigenGrasp::EigenGrasp(const EigenGrasp *orig)
 	mMin = orig->mMin; mMax = orig->mMax;
 	mFixed = orig->mFixed;
 	fixedAmplitude = orig->fixedAmplitude;
+	mPredefinedLimits=orig->mPredefinedLimits;
 }
 
 EigenGrasp::~EigenGrasp()
@@ -97,6 +100,33 @@ EigenGrasp::normalize()
 	return norm;
 }
 
+void 
+EigenGrasp::writeToFile(TiXmlElement *ep)
+{
+    	TiXmlElement * EigenValue = new TiXmlElement( "EigenValue" );  
+	EigenValue->SetDoubleAttribute("value",mEigenValue);
+	ep->LinkEndChild( EigenValue );  
+	
+	if(mPredefinedLimits)
+	{
+		TiXmlElement * Limits = new TiXmlElement( "Limits" );
+		Limits->SetDoubleAttribute("min",mMin);
+		Limits->SetDoubleAttribute("max",mMax);
+		ep->LinkEndChild( Limits );
+	}
+
+	TiXmlElement * DimVals = new TiXmlElement( "DimVals" );  
+	QString varStr;
+	for (int i=0; i<mSize; i++) 
+	{
+	    	varStr.setNum(i);
+	    	varStr="d"+varStr;
+		DimVals->SetDoubleAttribute(varStr,mVals[i]);
+	}
+	ep->LinkEndChild( DimVals );  
+	
+}
+
 void
 EigenGrasp::writeToFile(FILE *fp)
 {
@@ -130,13 +160,60 @@ EigenGrasp::readFromStream(QTextStream *stream)
 {
 	if (stream->atEnd()) {fprintf(stderr,"Unable to read EG, end of file\n");return 0;}
 	QString line = stream->readLine();
-	mEigenValue = line.toDouble();
+	bool ok;
+	mEigenValue = line.toDouble(&ok); if (!ok) {DBGA("ERROR: EigenValue should be a number.");return 0;}
 	if (stream->atEnd()) {fprintf(stderr,"Unable to read EG, end of file\n");return 0;}
 	line = stream->readLine();
 	for (int i=0; i<mSize; i++) {
 		QString val = line.section(' ',i,i,QString::SectionSkipEmpty);
 		if ( val.isNull() || val.isEmpty() ) {fprintf(stderr,"Unable to read EG value #%d\n",i);return 0;}
-		mVals[i] = val.toDouble();
+		mVals[i] = val.toDouble(&ok); if (!ok) {DBGA("ERROR: Entries should be numbers.");return 0;}
+	}
+	return 1;
+}
+
+int
+EigenGrasp::readFromXml(const TiXmlElement *element)
+{
+	bool ok;
+	QString valueStr;
+    	std::list<const TiXmlElement*> EVList = findAllXmlElements(element, "EigenValue");
+	if(!countXmlElements(element, "EigenValue")) 
+	{
+		DBGA("WARNING: EigenValue tag missing from file defaulting EigenValue to 0.5!");
+		mEigenValue=0.5;
+	}
+	else
+	{
+		valueStr=(*EVList.begin())->Attribute("value");
+		if(valueStr.isNull()){
+			QTWARNING("DOF Type not found");
+			return 0;
+		}
+		mEigenValue=valueStr.toDouble(&ok); if (!ok) {DBGA("ERROR: EigenValue entries should only contain numbers.");return 0;}
+	}
+
+	EVList = findAllXmlElements(element, "DimVals");
+	if(!countXmlElements(element, "DimVals")) {DBGA("DimVals tag missing from file.");return 0;}
+	for (int i=0; i<mSize; i++) {
+	    	valueStr=(*EVList.begin())->Attribute(QString("d") + QString::number(i));
+		if ( valueStr.isNull() || valueStr.isEmpty() ) mVals[i]=0.0;
+		else {
+		    mVals[i] = valueStr.toDouble(&ok); 
+		    if (!ok) {DBGA("ERROR: DimVals entries should only contain numbers.");return 0;}
+		}
+	}
+
+	EVList = findAllXmlElements(element, "Limits");
+	if(countXmlElements(element, "Limits")) 
+	{
+		mPredefinedLimits=true;
+	   	valueStr=(*EVList.begin())->Attribute("min");
+		mMin=valueStr.toDouble(&ok); if (!ok) {DBGA("ERROR: min entries should only contain numbers.");return 0;}
+		if ( false ) mPredefinedLimits=false;
+	   	valueStr=(*EVList.begin())->Attribute("max");
+		mMax=valueStr.toDouble(&ok); if (!ok) {DBGA("ERROR: max entries should only contain numbers.");return 0;}
+		if ( false ) mPredefinedLimits=false;
 	}
 	return 1;
 }
@@ -224,16 +301,28 @@ EigenGraspInterface::clear()
 int
 EigenGraspInterface::writeToFile(const char *filename)
 {
-	FILE *fp = fopen(filename,"w");
-	if (!fp) return 0;
+	TiXmlDocument doc;  
+ 	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );  
+	doc.LinkEndChild( decl );  
+ 
+	TiXmlElement * root = new TiXmlElement( "EigenGrasps" );  
+	root->SetAttribute("dimensions", mRobot->getNumDOF());
+	doc.LinkEndChild( root );  
 
-	fprintf(fp,"%d\n",eSize);
-	fprintf(fp,"%d\n",mRobot->getNumDOF());
+	TiXmlElement * ep;
 	for (int i=0; i<eSize; i++) {
-		mGrasps[i]->writeToFile(fp);
+	    	ep= new TiXmlElement("EG");
+		mGrasps[i]->writeToFile(ep);
+		root->LinkEndChild(ep);
+		
 	}
-	mOrigin->writeToFile(fp);
-	fclose(fp);
+	//TODO Should ouput norm here
+    	ep = new TiXmlElement("ORIGIN");
+	mOrigin->writeToFile(ep);
+	root->LinkEndChild(ep);
+
+	doc.SaveFile(filename);
+
 	return 1;
 }
 
@@ -279,61 +368,102 @@ EigenGraspInterface::setTrivial()
 int
 EigenGraspInterface::readFromFile(QString filename)
 {
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly)) {
-		DBGA("Failed to open EG file: " << filename.latin1());
+    //open xml file at "filename"
+    	bool ok;
+    	QString fileType = filename.section('.',-1,-1);
+	QString xmlFilename;
+	if (fileType == "xml"){
+		//the file itself is XML
+		xmlFilename = filename;
+	} else {
+	    	QTWARNING("Could not open " + xmlFilename);
+		DBGA("Old non-xml file format is no longer supported");
 		return 0;
 	}
-	QTextStream stream( &file );
 
-	clear();
+    	//load the graspit specific information in XML format or fail
+	TiXmlDocument doc(xmlFilename);
+	if(doc.LoadFile()==false){
+		DBGA("Failed to open EG file: " << filename.latin1());
+		QTWARNING("Could not open " + xmlFilename);
+		return 0;
+	}
+    //get the dimensions
 	int numDims = 0;
-	QString line,id;
-	bool error = false;
-	while (!error && !stream.atEnd() ) {
-		line = stream.readLine();
-		line.stripWhiteSpace();
-		id = line.section(' ',0,0);
-		if (id == "DIMENSIONS") {
-			numDims = line.section(' ',1,1).toInt();
-			if (numDims != mRobot->getNumDOF()) {
-				DBGA("ERROR reading eigengrasp: appears to be constructed for another robot.");
-			}
-		} else if ( id == "EG" ) {
-			if (!numDims) {DBGA("Number of dimensions not specified!"); error = true; continue;}
-			EigenGrasp *newGrasp = new EigenGrasp(numDims);
-			if (!newGrasp->readFromStream(&stream)) {error = true; continue;}
-			newGrasp->normalize();
-			mGrasps.push_back(newGrasp);
-		} else if ( id == "ORIGIN" ) {
-			if (!numDims) {DBGA("Number of dimensions not specified!"); error = true; continue;}
-			mOrigin = new EigenGrasp(numDims);
-			if (!mOrigin->readFromStream(&stream)){error = true; continue;}
-			checkOrigin();
-		} else if ( id == "NORM" ) {
-			if (!numDims) {DBGA("Number of dimensions not specified!"); error = true; continue;}
-			mNorm = new EigenGrasp(numDims);
-			if (!mNorm->readFromStream(&stream)){error = true; continue;}
-			DBGA("EG Normalization data loaded from file");
+	QString valueStr;
+	clear();
+	TiXmlElement* root = doc.RootElement();
+    	if(root == NULL){
+		DBGA("The "<<filename.toStdString()<<" file must contain a root tag named EigenGrasps.");
+		return 0;
+	} else{
+		valueStr = root->Attribute("dimensions");
+		numDims = valueStr.toDouble(&ok); if (!ok) {DBGA("ERROR: Dimension should contain a number.");return 0;}
+		if (numDims <= 0) {
+		    	DBGA("invalid number of dimensions in EigenGrasps tag in file: "<<filename.toStdString());
+			return 0;
 		}
 	}
-	if (error) {
-		DBGA("Error reading EG file");
+
+    //get the list of EG's 
+	std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "EG");
+	int numEG = countXmlElements(root, "EG");
+	if (numEG < 1) {
+		DBGA("Number of Eigengrasps specified: " << numEG);
 		return 0;
+	}
+	std::list<const TiXmlElement*>::iterator p = elementList.begin();
+	while(p!=elementList.end()){
+		EigenGrasp *newGrasp = new EigenGrasp(numDims);
+	    	if (!newGrasp->readFromXml(*p++)) return 0;
+		newGrasp->normalize();
+		mGrasps.push_back(newGrasp);
+	}
+
+
+    //get the orgin and process (if none setsimpleorgin)
+	elementList = findAllXmlElements(root, "ORIGIN");
+	int numORG = countXmlElements(root, "ORIGIN");
+	if (!numORG) {
+	    	DBGA("No EG origin found; using automatic origin");
+		mOrigin = new EigenGrasp(numDims);
+		setSimpleOrigin();
+	}
+	else if(numORG==1)
+	{
+		mOrigin = new EigenGrasp(numDims);
+		if (!mOrigin->readFromXml(*(elementList.begin()))){ return 0;}
+		checkOrigin();
+	}
+	else
+	{
+	    	DBGA("Multiple Origins specified in Eigen Grasp file.");
+		return 0;
+	}
+
+    //get the norm and process (if none set to all 1's)
+	elementList = findAllXmlElements(root, "NORM");
+	int numNORM = countXmlElements(root, "NORM");
+	if (!numNORM) {
+		DBGA("No normalization data found; using factors of 1.0");
+		mNorm = new EigenGrasp(numDims);
+		mNorm->setOnes();
+	}
+	else if(numNORM==1)
+	{
+		mNorm = new EigenGrasp(numDims);
+		if (!mNorm->readFromXml(*(elementList.begin()))){ return 0;}
+		DBGA("EG Normalization data loaded from file");
+	}
+	else
+	{
+	    	DBGA("Multiple Normals specified in Eigen Grasp file.");
+	    	return 0;
 	}
 
 	eSize = mGrasps.size();
 	DBGA("Read " << eSize << " eigengrasps from EG file");
-	if (!mNorm) {
-		DBGA("No normalization data found; using factors of 1.0");
-		mNorm = new EigenGrasp(dSize);
-		mNorm->setOnes();
-	}
-	if (!mOrigin) {
-		DBGA("No EG origin found; using automatic origin");
-		mOrigin = new EigenGrasp(dSize);
-		setSimpleOrigin();
-	}
+
 	computeProjectionMatrices();
 	setMinMax();
 	return 1;
@@ -485,9 +615,10 @@ EigenGraspInterface::setMinMax()
 			if ( M < mmax ) {mmax = M; maxd = d;}
 #endif
 		}
-		mGrasps[e]->mMin = currentAmps[e] + mmin;
-		mGrasps[e]->mMax = currentAmps[e] + mmax;
-
+		if(!mGrasps[e]->mPredefinedLimits){
+			mGrasps[e]->mMin = currentAmps[e] + mmin;
+			mGrasps[e]->mMax = currentAmps[e] + mmax;
+		}
 		//fprintf(stderr,"Current: %f; range: %f(%d) -- %f(%d) \n",currentAmps[e],
 		//		mGrasps[e]->mMin, mind, mGrasps[e]->mMax, maxd);
 	}

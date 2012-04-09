@@ -283,7 +283,7 @@
         <referenceLocation>80 0 0</referenceLocation>
         <direction>0.3 0 1</direction>
     </approachDirection>
-    <eigenGrasps>eigen/robonaut_13DOF.egr</eigenGrasps>
+    <eigenGrasps>eigen/robonaut_13DOF.xml</eigenGrasps>
     <flockOfBirds number="1">
         <transform>
             <translation>50.0 0.0 -30.0</translation>

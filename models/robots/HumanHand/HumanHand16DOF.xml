@@ -342,7 +342,7 @@
         <referenceLocation>-130 -15 0</referenceLocation>
         <direction>0 -1 0</direction>
     </approachDirection>
-    <eigenGrasps>eigen/human_eigen_nodip.egr</eigenGrasps>
+    <eigenGrasps>eigen/human_eigen_nodip.xml</eigenGrasps>
     <flockOfBirds number="1">
         <transform>
             <translation>-85.0 30.0 0.0</translation>

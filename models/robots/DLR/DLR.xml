@@ -253,7 +253,7 @@
         <referenceLocation>-30 90 0</referenceLocation>
         <direction>-1 0 0</direction>
     </approachDirection>
-    <eigenGrasps>eigen/DLR_eigen.egr</eigenGrasps>
+    <eigenGrasps>eigen/DLR_eigen.xml</eigenGrasps>
     <flockOfBirds number="1">
         <transform>
             <translation>45.0 30.0 0.0</translation>

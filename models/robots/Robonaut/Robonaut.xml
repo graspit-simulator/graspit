@@ -300,7 +300,7 @@
         <link dynamicJointType="Revolute">mph4.xml</link>
         <link dynamicJointType="Revolute">bph3.xml</link>
     </chain>
-    <eigenGrasps>eigen/robonaut_eigen.egr</eigenGrasps>
+    <eigenGrasps>eigen/robonaut_eigen.xml</eigenGrasps>
     <flockOfBirds number="t">
         <transform />
     </flockOfBirds>

@@ -370,5 +370,5 @@
         <referenceLocation>-50 -4 0</referenceLocation>
         <direction>-1 -2 0</direction>
     </approachDirection>
-    <eigenGrasps>eigen/monkey_eigen.egr</eigenGrasps>
+    <eigenGrasps>eigen/monkey_eigen.xml</eigenGrasps>
 </robot>

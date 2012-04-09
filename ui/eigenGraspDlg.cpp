@@ -83,6 +83,9 @@ void EigenGraspDlg::eigenGraspChanged()
 	QString val;
 	for (int i=0; i < mNumberGrasps; i++) {
 		double t = mBarList[i]->value() * mSliderConversion;
+		std::cout<<"Barlist["<<i<<"]="<<mBarList[i]->value()<<" slider conversion= "<<mSliderConversion<<std::endl;
+		std::cout<<"Product: "<<mBarList[i]->value() * mSliderConversion<<std::endl;
+
 		//fprintf(stderr,"Slider %d value is %f\n",i,t);
 		if (t > mEigenGrasps->getGrasp(i)->mMax) {
 			mBarList[i]->setValue( (int)(mEigenGrasps->getGrasp(i)->mMax / mSliderConversion) - 1);
@@ -229,10 +232,10 @@ void EigenGraspDlg::setSlaveLayout( int nGrasps )
 void EigenGraspDlg::saveButton_clicked()
 {
 	QString fn = QFileDialog::getSaveFileName(this, QString(), QString(getenv("GRASPIT"))+QString("/models/eigen"),
-			"EigenGrasp Files (*.egr)") ;
+			"EigenGrasp Files (*.xml)") ;
     if ( !fn.isEmpty() ) {
 	    if (fn.section('.',1).isEmpty())
-			fn.append(".egr");
+			fn.append(".xml");
 		mEigenGrasps->writeToFile( fn.latin1() );
 	}
 }
@@ -240,7 +243,7 @@ void EigenGraspDlg::saveButton_clicked()
 void EigenGraspDlg::loadButton_clicked()
 {
 	QString fn = QFileDialog::getOpenFileName( this, QString(), QString(getenv("GRASPIT"))+QString("/models/eigen"),
-			"EigenGrasp Files (*.egr)" );
+			"EigenGrasp Files (*.xml)" );
 	if (fn.isEmpty()) return;
 	mHand->loadEigenData(fn);
 	mEigenGrasps = mHand->getEigenGrasps();
