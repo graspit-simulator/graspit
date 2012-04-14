@@ -83,8 +83,8 @@ void EigenGraspDlg::eigenGraspChanged()
 	QString val;
 	for (int i=0; i < mNumberGrasps; i++) {
 		double t = mBarList[i]->value() * mSliderConversion;
-		std::cout<<"Barlist["<<i<<"]="<<mBarList[i]->value()<<" slider conversion= "<<mSliderConversion<<std::endl;
-		std::cout<<"Product: "<<mBarList[i]->value() * mSliderConversion<<std::endl;
+		//std::cout<<"Barlist["<<i<<"]="<<mBarList[i]->value()<<" slider conversion= "<<mSliderConversion<<std::endl;
+		//std::cout<<"Product: "<<mBarList[i]->value() * mSliderConversion<<std::endl;
 
 		//fprintf(stderr,"Slider %d value is %f\n",i,t);
 		if (t > mEigenGrasps->getGrasp(i)->mMax) {

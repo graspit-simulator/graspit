@@ -1331,6 +1331,7 @@ int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
   matrixMultiply(LeftHand, x, tau);
   matrixAdd(tau, RightHand, tau);
   tau.getData(&jointResiduals);  
+  DBGP("Joint residuals: " << jointResiduals[0] << " " <<jointResiduals[1]);
   unbalanced_magnitude = tau.fnorm();
   
   //pass back the active forces on the tendons
