@@ -247,6 +247,7 @@
 
     <eigenGrasps>eigen/robotiq_eigen.xml</eigenGrasps>
 
-    <virtualContacts>eigen/virtual_all.vgr</virtualContacts>
+    <!--<virtualContacts>eigen/virtual_all.vgr</virtualContacts>-->
+    <virtualContacts>eigen/virtual_fingertip.vgr</virtualContacts>
 
 </robot>
