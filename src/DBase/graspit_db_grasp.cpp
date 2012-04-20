@@ -230,6 +230,16 @@ QString GraspitDBGrasp::getHandGraspitPath(QString handDBName)
 		path = "/models/robots/pr2_gripper/pr2_gripper_2010.xml";
 	} else if (handDBName=="MC_GRIP") {
 		path = "/models/robots/McHand/McGrip.xml";
+	} else if (handDBName=="CAMHand_1") {
+		path = "/../../../gripper_design/gripper_optimization/xml/models/robots/CAMhand/CAMHand_1.xml";
+	} else if (handDBName=="CAMHand_2") {
+		path = "/../../../gripper_design/gripper_optimization/xml/models/robots/CAMhand/CAMHand_2.xml";
+	} else if (handDBName=="CAMHand_3") {
+		path = "/../../../gripper_design/gripper_optimization/xml/models/robots/CAMhand/CAMHand_3.xml";
+	} else if (handDBName=="CAMHand_4") {
+		path = "/../../../gripper_design/gripper_optimization/xml/models/robots/CAMhand/CAMHand_4.xml";
+	} else if (handDBName=="RobotIQ_FingerTip") {
+		path = "/models/robots/RobotIQ/RobotIQ_FingerTip.xml";
 	} else {
                 path = "/models/robots/" + handDBName + "/" + handDBName + ".xml";
 	}
