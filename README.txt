@@ -38,6 +38,13 @@ LICENSE.txt   -  A copy of the license you accepted when you downloaded this.
 models/       -  The geometry and configuration files for all the robots and
 		objects.
 
+plugins/      -  Examples for creating plugins that can be loaded into GraspIt! 
+                 at run time, and can use GraspIt! without being statically linked
+		 into GraspIt's main executable.
+
+ply/          - Code for loading .ply files; see header files for authorship 
+                information and detail.
+
 qhull/	  - A popular package for computing n-dimensional convex hulls.
 		This is used both for the contact system and to create grasp
 	      wrench spaces.
