@@ -1020,6 +1020,7 @@ World::addRobot(Robot *robot, bool addToScene)
 void
 World::removeRobot(Robot *robot)
 {
+	removeElementFromSceneGraph(robot);
 	std::vector<Robot *>::iterator rp;
 	std::vector<Hand *>::iterator hp;
 	for (rp=robotVec.begin();rp!=robotVec.end();rp++) {
