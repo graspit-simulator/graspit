@@ -365,4 +365,30 @@ bool SqlDatabaseManager::SaveGrasp(const Grasp* grasp) const {
 	return true;
 }
 
+QString SqlDatabaseManager::getHandGraspitPath(QString handDBName) const
+{
+	QString path;
+	if (handDBName=="BARRETT_RUBBER") {
+		path = "/models/robots/Barrett/Barrett.xml";
+	} else if (handDBName=="BARRETT_PLASTIC") {
+		path = "/models/robots/Barrett/Barrett.xml";
+	} else if (handDBName=="BARRETT_WOOD") {
+		path = "/models/robots/Barrett/Barrett.xml";
+	} else if (handDBName=="BARRETT_HUMAN") {
+		path = "/models/robots/HumanHand/HumanHand20DOF.xml";
+	} else if (handDBName=="WILLOW_GRIPPER") {
+		path = "/models/robots/pr2_gripper/pr2_gripper.xml";
+	} else if (handDBName=="WILLOW_GRIPPER_2008") {
+		path = "/models/robots/pr2_gripper/pr2_gripper_2008.xml";
+	} else if (handDBName=="WILLOW_GRIPPER_2010") {
+		path = "/models/robots/pr2_gripper/pr2_gripper_2010.xml";
+	} else if (handDBName=="MC_GRIP") {
+		path = "/models/robots/McHand/McGrip.xml";
+	} else {
+                path = "/models/robots/" + handDBName + "/" + handDBName + ".xml";
+	}
+	return path;
+
+}
+
 }  // end namespace db_planner

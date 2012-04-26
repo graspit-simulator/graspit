@@ -139,7 +139,7 @@ void DBasePlannerDlg::retrieveGraspsButton_clicked(){
 	//go through all the neighbors and get their original grasps
 	for(int i = 0; i < (int)mNeighbors.size(); ++i){
 		std::vector<db_planner::Grasp*> grasps;
-		if(!mDBMgr->GetGrasps(*(mNeighbors[i].first), GraspitDBGrasp::getHandDBName(mHand).toStdString(), &grasps)){
+		if(!mDBMgr->GetGrasps(*(mNeighbors[i].first), mHand->getDBName().toStdString(), &grasps)){
 			DBGA("Cannot retrieve grasps from neighbor:" << mNeighbors[i].first->ModelName().c_str());
 			return;
 		}

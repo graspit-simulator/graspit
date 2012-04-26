@@ -91,11 +91,6 @@ public:
 									const vector<double>& grasp_position);
 	//! Returns the hand associated with this grasp
 	const Hand *getHand() const {return mHand;}
-
-	//! Returns the corresponding hand name in CGDB
-	static QString getHandDBName(Hand* h);
-	//! Returns the GraspIt path for loading a hand based on its db name
-	static QString getHandGraspitPath(QString handDBName);
 };
 
 /*! For now, the hand is passed to the constructor. In the future,

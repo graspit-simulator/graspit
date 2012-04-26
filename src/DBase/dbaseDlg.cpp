@@ -202,7 +202,7 @@ void DBaseDlg::loadGraspButton_clicked(){
 	mCurrentFrame = 0;
 	//get new grasps from database manager
 	PROF_START_TIMER(GET_GRASPS_CALL);
-	if(!mDBMgr->GetGrasps(*mCurrentLoadedModel,GraspitDBGrasp::getHandDBName(hand).toStdString(), &mGraspList)){
+	if(!mDBMgr->GetGrasps(*mCurrentLoadedModel,hand->getDBName().toStdString(), &mGraspList)){
 		DBGA("Load grasps failed");
 		mGraspList.clear();
 		return;

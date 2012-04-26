@@ -39,6 +39,8 @@
 
 #include "graspit_db_grasp.h"
 #include "graspit_db_model.h"
+#include "DBPlanner/ros_database_manager.h"
+using namespace db_planner;
 
 #include "debug.h"
 
@@ -76,12 +78,11 @@ void GraspPlanningTask::start()
 
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand we need
-  if (world->getCurrentHand() && 
-      GraspitDBGrasp::getHandDBName(world->getCurrentHand()) == QString(mPlanningTask.handName.c_str())) {
+  if (world->getCurrentHand() && world->getCurrentHand()->getDBName() == QString(mPlanningTask.handName.c_str())) {
     DBGA("Grasp Planning Task: using currently loaded hand");
     mHand = world->getCurrentHand();
   } else {
-    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
+    QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
     DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());	      
     mHand = static_cast<Hand*>(world->importRobot(handPath));
@@ -216,7 +217,7 @@ bool GraspPlanningTask::saveGrasp(const GraspPlanningState *gps)
   std::vector<double> contacts = grasp->GetContacts();
   
   grasp->SetSourceModel( *(static_cast<db_planner::Model*>(dbModel)) );
-  grasp->SetHandName(GraspitDBGrasp::getHandDBName(mHand).toStdString());
+  grasp->SetHandName(mHand->getDBName().toStdString());
   grasp->SetEpsilonQuality(0.0);
   grasp->SetVolumeQuality(0.0);
   grasp->SetEnergy(gps->getEnergy());

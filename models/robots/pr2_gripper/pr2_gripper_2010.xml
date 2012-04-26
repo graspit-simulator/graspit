@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot type="Pr2Gripper2010">
+<robot type="Pr2Gripper2010" DBName="WILLOW_GRIPPER_2010">
     <palm>2010/gripper_palm.xml</palm>
     <dof type="r">
         <defaultVelocity>-1.0</defaultVelocity>

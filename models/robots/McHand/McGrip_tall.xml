@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot type="McGrip">
+<robot type="McGrip" DBName="MC_GRIP">
     <palm>finger_link_pad_tall.xml</palm>
     <dof type="r">
         <defaultVelocity>1.0</defaultVelocity>

@@ -39,6 +39,8 @@
 #include "graspit_db_model.h"
 
 #include "debug.h"
+#include "DBPlanner/ros_database_manager.h"
+using namespace db_planner;
 
 GraspTransferCheckTask::GraspTransferCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
 					       db_planner::TaskRecord rec) : Task (disp, mgr, rec)
@@ -76,7 +78,7 @@ void GraspTransferCheckTask::start()
   World *world = graspItGUI->getIVmgr()->getWorld();
 
   if ( !world->getNumHands()) {
-    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
+    QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
     DBGA("Grasp transfer task: loading hands from " << handPath.latin1());	      
     mHand1 = static_cast<Hand*>(world->importRobot(handPath));
@@ -87,8 +89,8 @@ void GraspTransferCheckTask::start()
       return;
     }
   } else if ( world->getNumHands()==2 &&
-	      GraspitDBGrasp::getHandDBName(world->getHand(0)) == QString(mPlanningTask.handName.c_str()) &&
-	      GraspitDBGrasp::getHandDBName(world->getHand(1)) == QString(mPlanningTask.handName.c_str()) ) {
+	      world->getHand(0)->getDBName() == QString(mPlanningTask.handName.c_str()) &&
+	      world->getHand(1)->getDBName() == QString(mPlanningTask.handName.c_str()) ) {
     mHand1 = world->getHand(0);
     mHand2 = world->getHand(1);
   } else {

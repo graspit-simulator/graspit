@@ -100,6 +100,9 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 		QTWARNING("Robot Name undefined");
 		return FAILURE;
 	}
+	QString robotDBName = root->Attribute("DBName");
+	if(robotDBName.isNull()) robotDBName = robotName;
+
 	const TiXmlElement* element = findXmlElement(root,"palm");
 	QString valueStr;
 	QString ivdir = rootPath + "iv/";

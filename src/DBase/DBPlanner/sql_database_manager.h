@@ -135,6 +135,9 @@ class SqlDatabaseManager : public DatabaseManager {
   virtual bool SetGraspTableClearance(Grasp* /*grasp*/, double /*clearance*/) const { return false;}
   virtual bool LoadModelGeometry(Model*) const {return false;}
   virtual bool ScaledModel(Model* &model, int scaled_model_id) const {return false;}
+
+  // Translate hand database name into a graspit xml path
+  virtual QString getHandGraspitPath(QString handDBName) const;
 };
 
 }  // end namespace db_planne

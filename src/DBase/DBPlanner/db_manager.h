@@ -177,6 +177,9 @@ class DatabaseManager {
       vector<string>* alignment_method_list) const = 0;
   //! Loads a model's geometry directly from the database
   virtual bool LoadModelGeometry(Model*) const = 0;
+  //! Loads the graspit relative path for a hand
+  virtual QString getHandGraspitPath(QString handDBName) const = 0;
+  
 };
 
 }

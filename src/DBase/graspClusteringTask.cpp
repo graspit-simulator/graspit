@@ -37,6 +37,8 @@
 #include "graspit_db_grasp.h"
 
 #include "debug.h"
+#include "DBPlanner/ros_database_manager.h"
+using namespace db_planner;
 
 GraspClusteringTask::GraspClusteringTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
 					 db_planner::TaskRecord rec) : Task (disp, mgr, rec)
@@ -62,12 +64,11 @@ void GraspClusteringTask::start()
  
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand
-  if (world->getCurrentHand() && 
-      GraspitDBGrasp::getHandDBName(world->getCurrentHand()) == QString(mPlanningTask.handName.c_str())) {
+  if (world->getCurrentHand() && world->getCurrentHand()->getDBName() == QString(mPlanningTask.handName.c_str())) {
     DBGA("Grasp Planning Task: using currently loaded hand");
     hand = world->getCurrentHand();
   } else {
-    QString handPath = GraspitDBGrasp::getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
+    QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
     DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());	      
     hand = static_cast<Hand*>(world->importRobot(handPath));

@@ -33,6 +33,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <sstream>
+#include <QString>
 
 //so that overloaded operators work...
 using namespace database_interface;
@@ -376,6 +377,21 @@ bool RosDatabaseManager::LoadModelGeometry(Model* model) const
   }
   model->SetGeometry(mesh.vertices_.data(), mesh.triangles_.data());
   return true;
+}
+
+QString RosDatabaseManager::getHandGraspitPath(QString handDBName) const
+{
+	std::string path;
+     	std::vector<boost::shared_ptr<household_objects_database::HandFilePath> > file_paths;
+      	std::stringstream where;
+      	where << "hand_name = '" << handDBName.toStdString()<<"'";
+      	std::string where_clause (where.str ());
+	if (!database_->getList<household_objects_database::HandFilePath>(file_paths, where_clause)) {
+	      	path = "/models/robots/" + handDBName.toStdString() + "/" + handDBName.toStdString() + ".xml";
+	} else {
+		path = file_paths[0]->file_path_.data ();
+	}
+      	return QString::fromStdString(path);
 }
 
 } //namespace db_planner

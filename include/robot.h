@@ -170,6 +170,9 @@ protected:
   //! The relative tranform used for the Flock of Birds
   FlockTransf mFlockTran;
 
+  //!Holds the DatabaseName for this robot if different than the name
+  QString myDatabaseName;
+
   //!Holds all information about this robot's eigengrasps
   EigenGraspInterface* mEigenGrasps;
 
@@ -378,6 +381,12 @@ protected:
 
   //! Restores the previously saved state (if any).
   virtual void restoreState();
+
+  /*! Returns the Database name of this element */
+  QString getDBName() const {return myDatabaseName;}
+
+  //! Sets the Database name of this element
+  virtual void setDBName(QString newName){myDatabaseName = newName;}
 
   //-------------------------contacts-------------------------------------------------
 

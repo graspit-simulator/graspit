@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <QString>
 
 #include "db_manager.h"
 #include "model.h"
@@ -136,6 +137,10 @@ class RosDatabaseManager : public DatabaseManager
   virtual bool InsertGraspPair(const Grasp *grasp1, const Grasp *grasp2) const;
   //! Loads the model's mesh directly from the database
   virtual bool LoadModelGeometry(Model* model) const;
+
+  //Pulls the graspit path from the database. If nonexistant use default
+  virtual QString getHandGraspitPath(QString handDBName) const;
+
 };
 
 }

@@ -138,7 +138,7 @@ CGDBGraspProcessor::run()
 		currentModel = gModel->getGraspableBody();
 		//get all the grasps
 		std::vector<db_planner::Grasp*> grasps;
-		if(!mDbMgr->GetGrasps(*gModel,GraspitDBGrasp::getHandDBName(mHand).toStdString(), &grasps)){
+		if(!mDbMgr->GetGrasps(*gModel,mHand->getDBName().toStdString(), &grasps)){
 			DBGP("Load grasps failed - no grasps found for model " << gModel->ModelName());
 			continue;
 		}
