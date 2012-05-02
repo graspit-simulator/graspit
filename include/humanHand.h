@@ -274,9 +274,14 @@ public:
   //! Adds an insertion point at the end of the insPointList
   void addInsertionPoint(int chain,int link,vec3 point, double mu, bool isPerm);
   
-  //! Inserts an insertion point at a given position in insPointList
+  //! Inserts an insertion point before a given position in insPointList
   std::list<TendonInsertionPoint*>::iterator 
   insertInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos, 
+                       int chain, int link, vec3 point, double mu, bool isPerm);
+
+  //! Inserts an insertion point before a given other point in the insPtList
+  std::list<TendonInsertionPoint*>::iterator 
+  insertInsertionPoint(const TendonInsertionPoint* nextInsPt, 
                        int chain, int link, vec3 point, double mu, bool isPerm);
   
   //! Removes the insertion point pointed to by the given iterator
@@ -417,7 +422,7 @@ public:
 
   virtual int loadFromXml(const TiXmlElement* root,QString rootPath);
 
-  void updateTendonGeometry();
+  virtual void updateTendonGeometry();
 
   int getNumTendons(){return mTendonVec.size();}
 

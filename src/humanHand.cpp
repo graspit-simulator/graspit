@@ -844,6 +844,19 @@ Tendon::insertInsertionPoint(std::list<TendonInsertionPoint*>::iterator itPos,
   return newInsPt;
 }
 
+std::list<TendonInsertionPoint*>::iterator 
+Tendon::insertInsertionPoint(const TendonInsertionPoint* nextInsPt, 
+			     int chain, int link, vec3 point, double mu, bool isPerm)
+{
+  std::list<TendonInsertionPoint*>::iterator it;
+  for (it = mInsPointList.begin(); it!=mInsPointList.end(); it++)
+  {
+    if ( *it == nextInsPt ) return insertInsertionPoint( it, chain, link, point, mu, isPerm );
+  }
+  DBGA("Next point not found in list when trying to insert new insertion point");
+  assert(0);
+}
+
 int Tendon::getNumPermInsPoints() const
 {
   std::list<TendonInsertionPoint*>::const_iterator it;
