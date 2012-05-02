@@ -177,7 +177,7 @@ GraspCaptureDlg::saveToDBaseButtonClicked()
 		}
 		db_planner::Grasp* grasp = new GraspitDBGrasp(mCurrentHand);
 		grasp->SetSourceModel( *(static_cast<db_planner::Model*>(dbModel)) );
-		grasp->SetHandName(GraspitDBGrasp::getHandDBName(mCurrentHand).toStdString());
+		grasp->SetHandName(mCurrentHand->getDBName().toStdString());
 		grasp->SetEpsilonQuality((*it)->getEpsilonQuality());
 		grasp->SetVolumeQuality((*it)->getVolume());
 		grasp->SetEnergy( - 30*(*it)->getEpsilonQuality() - 100*(*it)->getVolume() );

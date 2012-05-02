@@ -35,9 +35,9 @@ int RobotIQ::loadFromXml(const TiXmlElement* root,QString rootPath)
 {
 	int result = Robot::loadFromXml(root, rootPath);
 	if (result != SUCCESS) return result;
-	myWorld->toggleCollisions(false, base,chainVec[0]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[1]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[2]->getLink(1));
+	getWorld()->toggleCollisions(false, base,chainVec[0]->getLink(1));
+	getWorld()->toggleCollisions(false, base,chainVec[1]->getLink(1));
+	getWorld()->toggleCollisions(false, base,chainVec[2]->getLink(1));
 
 	return result;
 }
@@ -45,16 +45,16 @@ int RobotIQ::loadFromXml(const TiXmlElement* root,QString rootPath)
 void RobotIQ::cloneFrom(Hand *original)
 {
 	Hand::cloneFrom(original);
-	myWorld->toggleCollisions(false, base,chainVec[0]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[1]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[2]->getLink(1));
+	getWorld()->toggleCollisions(false, base,chainVec[0]->getLink(1));
+	getWorld()->toggleCollisions(false, base,chainVec[1]->getLink(1));
+	getWorld()->toggleCollisions(false, base,chainVec[2]->getLink(1));
 } 
 
 bool
 RobotIQ::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 {
   //not implemented for the RobotIQ yet
-  if (myWorld->dynamicsAreOn()) return Hand::autoGrasp(renderIt, speedFactor, stopAtContact);
+  if (getWorld()->dynamicsAreOn()) return Hand::autoGrasp(renderIt, speedFactor, stopAtContact);
 
   if (numDOF != 11) {DBGA("Hard-coded autograsp does not match RobotIQ hand"); return false;}
 
@@ -62,7 +62,7 @@ RobotIQ::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 
   if (speedFactor < 0) 
   {
-    DBGA("Hand opening not yet implemented for RobotIQ hand; forcing it to open pose");
+    //DBGA("Hand opening not yet implemented for RobotIQ hand; forcing it to open pose");
     desiredVals[3] = getDOF(3)->getVal();
     desiredVals[7] = getDOF(7)->getVal();
     forceDOFVals(&desiredVals[0]);

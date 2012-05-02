@@ -31,16 +31,17 @@
 #ifndef ROBOTIQ_H
 
 #include "robot.h"
+#include "humanHand.h"
 
 //! A special hand because collisions must be turned off between the palm and the second link of the thumb. This is done by overriding the load method.
 
-class RobotIQ : public Hand {
+class RobotIQ : public HumanHand {
 	Q_OBJECT
 
  public:
 
   /*! Empty constructor (placeholder) */
-  RobotIQ(World *w,const char *name) : Hand(w,name) {}
+  RobotIQ(World *w,const char *name) : HumanHand(w,name) {}
   
    /*! Performs the normal robot load routine from xml then turns off collisions 
        between the palm and the second link of the thumb.
