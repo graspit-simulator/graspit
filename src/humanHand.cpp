@@ -611,7 +611,7 @@ void Tendon::getInsertionPointLinkTransforms(std::list< std::pair<transf, Link*>
 }
 
 PROF_DECLARE(TENDON_GET_INS_POINT_FORCE_MAGNITUDES);
-void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes)
+void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes, bool permanentOnly)
 {
   PROF_TIMER_FUNC(TENDON_GET_INS_POINT_FORCE_MAGNITUDES);
   if (mInsPointList.size() <= 1) {
@@ -621,6 +621,7 @@ void Tendon::getInsertionPointForceMagnitudes(std::vector<double> &magnitudes)
   std::list<TendonInsertionPoint*>::iterator insPt;  
   for (insPt=mInsPointList.begin(); insPt!=mInsPointList.end(); insPt++)
   {
+    if (permanentOnly && !(*insPt)->isPermanent()) continue;
     SbVec3f pCur = (*insPt)->getWorldPosition();
     std::list<TendonInsertionPoint*>::iterator prevInsPt = insPt; prevInsPt--;
     std::list<TendonInsertionPoint*>::iterator nextInsPt = insPt; nextInsPt++;
@@ -1290,6 +1291,7 @@ int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
       DBGP("Warning: tendon " << i << " is not active or passive");
     }
   }
+  //LeftHand.print();
 
   //add the contribution of the joint springs
   if (useJointSprings)
@@ -1386,6 +1388,8 @@ int HumanHand::contactTorques(std::list<Contact*> contacts,
     Matrix D( insPtForceBlockMatrix( contacts.size() ) );
     Matrix JTD( JTran.rows(), D.cols() );
     matrixMultiply( JTran, D, JTD );
+
+    //JTD.print();
 
     std::vector<double> magnitudes;
     //for now, all contacts apply equal force
@@ -1581,6 +1585,8 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
     t++;
   }
 
+  //LeftHand.print(stderr, "Tendon jacobian");
+
   //use passed in tendon forces
   Matrix x(LeftHand.cols(), 1);
   if ((int)activeTendonForces.size() != x.rows())
@@ -1612,9 +1618,7 @@ int HumanHand::contactForcesFromTendonForces(std::list<Contact*> contacts,
     RightHand.copyMatrix(JTD);    
   }
 
-  //DBGP("Contact jac:\n" << RightHand.elem(0,0) << "\n" <<  RightHand.elem(1,0) );
-  //DBGP("Contact jac:\n" << RightHand.elem(0,0) << " " << RightHand.elem(0,1) << "\n" << 
-  //     RightHand.elem(1,0) << " " << RightHand.elem(1,1));
+  //RightHand.print(stderr, "Contact jacobian");
 
   double scale = std::max(1.0, tau.absMax());
   tau.multiply(1.0/scale);

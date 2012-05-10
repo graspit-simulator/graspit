@@ -390,7 +390,8 @@ public:
   void getInsertionPointTransforms(std::vector<transf> &insPointTrans);
   
   //! Returns the magnitudes of the forces at each insertion point, assuming a total tendon force of 1.0
-  void getInsertionPointForceMagnitudes(std::vector<double> &magnitudes);
+  //! If permanentOnly is true, only values for the permanent insertion points are returned
+  void getInsertionPointForceMagnitudes(std::vector<double> &magnitudes, bool permanentOnly = false);
 
   //! Returns pairs of insertion points and their links, with ins. pt. transforms relative to their links
   void getInsertionPointLinkTransforms(std::list< std::pair<transf, Link*> > &insPointLinkTrans);
