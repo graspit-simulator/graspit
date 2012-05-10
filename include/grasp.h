@@ -260,6 +260,14 @@ public:
   Matrix contactJacobian(const std::list<Joint*> &joints, 
                          const std::list<VirtualContact*> &contacts);
 
+  //! A convenience function that returns the Jacobian of the CoG locations for the links
+  Matrix CoGJacobian(const std::list<Joint*> &joints, 
+                     const std::list<Link*> &links);
+
+  //! Returns the matrix that gives the gravity torque at each joint, considering the given links
+  Matrix gravityMatrix(const std::list<Joint*> &joints, const std::list<Link*> &links,
+                       vec3 gravityWorldDirection);
+
   //! Computes the grasp map matrix G from friction and normal force matrices R and D
   static Matrix graspMapMatrix(const Matrix &R, const Matrix &D);
 

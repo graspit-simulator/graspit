@@ -678,6 +678,46 @@ Grasp::contactJacobian(const std::list<Joint*> &joints,
   return J;
 }
 
+/*! Simply calls the general contactJacobian function with the CoG of each link passed in as the location
+   of the contact. Useful for computing the effects of gravity for example.
+*/
+Matrix
+Grasp::CoGJacobian(const std::list<Joint*> &joints, 
+                   const std::list<Link*> &links)
+{
+  std::list< std::pair<transf, Link*> > cog_locations;
+  std::list<Link*>::const_iterator link_it;
+  for(link_it=links.begin(); link_it!=links.end(); link_it++) {
+    transf tr( Quaternion::IDENTITY, vec3( (*link_it)->getCoG().toSbVec3f() ) );
+    cog_locations.push_back( std::pair<transf, Link*>(tr, *link_it) );
+  }
+  return contactJacobian(joints, cog_locations);
+}
+
+/*! Mass is taken into account, and g is used at 9.81 */
+Matrix
+Grasp::gravityMatrix(const std::list<Joint*> &joints, 
+                     const std::list<Link*> &links,
+                     vec3 gravityWorldDirection)
+{
+  normalise(gravityWorldDirection);
+  Matrix J( CoGJacobian(joints, links) );
+  J.transpose();
+  Matrix f( Matrix::ZEROES<Matrix>(links.size() * 6, 1) );
+  std::list<Link*>::const_iterator link_it; int i;
+  for (link_it=links.begin(), i=0; link_it!=links.end(); link_it++, i++)
+  {
+    vec3 gravLocal =   (*link_it)->getTran().rotation().inverse() * gravityWorldDirection;
+    gravLocal = 9810 * (*link_it)->getMass() * gravLocal;
+    f.elem( i*6 + 0, 0) = gravLocal.x();
+    f.elem( i*6 + 1, 0) = gravLocal.y();
+    f.elem( i*6 + 2, 0) = gravLocal.z();
+  }
+  Matrix r(joints.size(), 1);
+  matrixMultiply(J, f, r);
+  return r;
+}
+
 /*! Simply gets the locations of all the contacts in the list and calls the
   more general version that takes in std::list< std::pair<transf, Link*> > &contact_locations */
 Matrix 
