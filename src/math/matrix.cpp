@@ -594,10 +594,11 @@ operator<<(std::ostream &os, const Matrix &m)
 	return os;
 }
 
-void Matrix::print(FILE *fp) const 
+void Matrix::print(FILE *fp, std::string name) const 
 {
-	std::auto_ptr<double> data = getDataCopy();
-	disp_mat(fp, data.get(), mRows, mCols, 0);
+  if (!name.empty()) fprintf(fp,"%s:\n",name.c_str());
+  std::auto_ptr<double> data = getDataCopy();
+  disp_mat(fp, data.get(), mRows, mCols, 0);
 }
 
 void

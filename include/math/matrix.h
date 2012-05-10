@@ -134,7 +134,7 @@ public:
 	void copyMatrix(const Matrix &m){copySubMatrix(0, 0, m);}
 
 	friend std::ostream& operator<<(std::ostream &os, const Matrix &m);
-	void print(FILE *fp = stderr) const;
+        void print(FILE *fp = stderr, std::string name="") const;
 
 	//! Resets the sequential access to the matrix
 	virtual void sequentialReset() const;
