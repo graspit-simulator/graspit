@@ -36,42 +36,54 @@ class Hand;
 class GraspPlanningState;
 
 /*! The Loop Planner is a Sim Ann planner that will loop forever. After 
-	each loop, it will place the best state found in this loop in the 
-	list of avoidable states, so that at the next run it will search 
-	somewhere else.
-
-	After a couple of loops, the solutions found over the entire planning
-	time are thus found in the avoid list, rather in the best list which
-	just stores the solutions found in the current loop.
+  each loop, it will place the best states found in this loop in the 
+  list of avoidable states, so that at the next run it will search 
+  somewhere else.
+  
+  After a couple of loops, the solutions found over the entire planning
+  time are thus found in the avoid list, rather in the best list which
+  just stores the solutions found in the current loop.
 */
 class LoopPlanner : public SimAnnPlanner
 {
-	Q_OBJECT
-protected:
-	//! The list of states to be avoided during the current loop
-	std::list<GraspPlanningState*> mAvoidList;
-	//! The distance to be kept from the avoided states
-	float mDistanceThreshold;
-	//! Places the best solutions currently available in the avoid list
-	virtual void resetParameters();
+  Q_OBJECT
+  protected:
+  //! The list of states to be avoided during the current loop
+  std::list<GraspPlanningState*> mAvoidList;
+  //! The distance to be kept from the avoided states
+  float mDistanceThreshold;
+  //! After each loop, solutions with energy below this threshold are saved
+  float mSaveThreshold;
+  //! Places the best solutions currently available in the avoid list
+  virtual void resetParameters();
 signals:
-	//! Emmitted after a full loop is completed
-	void loopUpdate();
-
+  //! Emmitted after a full loop is completed
+  void loopUpdate();
+  
 public:
-	LoopPlanner(Hand *h);
-	~LoopPlanner();
-	virtual PlannerType getType(){return PLANNER_LOOP;}
+  LoopPlanner(Hand *h);
+  ~LoopPlanner();
+  virtual PlannerType getType(){return PLANNER_LOOP;}
+  
+  //! Gets grasps from the avoid list instead of the best list
+  virtual const GraspPlanningState* getGrasp(int i);
+  //! Returns the size of the avoid list
+  virtual int getListSize(){return mAvoidList.size();}
+  //! Also clears the avoid list
+  virtual void clearSolutions();
+  
+  //! Sets the threshold for saving solutions from each loop
+  void setSaveThreshold(float t){mSaveThreshold = t;}
+  //! Gets the threshold for saving solutions from each loop
+  float getSaveThreshold() const {return mSaveThreshold;}
 
-	//! Gets grasps from the avoid list instead of the best list
-	virtual const GraspPlanningState* getGrasp(int i);
-	//! Returns the size of the avoid list
-	virtual int getListSize(){return mAvoidList.size();}
-	//! Also clears the avoid list
-	virtual void clearSolutions();
+  //! Sets the distance to be kept from avoided states
+  void setDistanceThreshold(float t);
+  //! Gest the distance to be kept from avoided states
+  float getDistanceThreshold() const{return mDistanceThreshold;}
 
-	//! Adds another state to the avoid list (and implicitly to the list of solutions)
-	/*! Also takes ownership of the passed state, and will delete it on cleanup */
-	void addToAvoidList(GraspPlanningState* state){mAvoidList.push_back(state);}
+  //! Adds another state to the avoid list (and implicitly to the list of solutions)
+  /*! Also takes ownership of the passed state, and will delete it on cleanup */
+  void addToAvoidList(GraspPlanningState* state){mAvoidList.push_back(state);}
 };
 #endif
