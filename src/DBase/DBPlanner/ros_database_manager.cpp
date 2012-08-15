@@ -229,6 +229,7 @@ bool RosDatabaseManager::GetGrasps(const Model& model, const string& hand_name,
 {
   std::vector< boost::shared_ptr<household_objects_database::DatabaseGrasp> > db_grasp_list;
   if ( !database_->getGrasps(model.ModelId(), hand_name, db_grasp_list) ) return false;
+  std::cerr << "Loading grasps for hand " << hand_name << " on model " << model.ModelId() << "\n";
   for (size_t i=0; i<db_grasp_list.size(); i++)
   {
     Grasp *grasp = grasp_allocator_->Get();
@@ -285,6 +286,7 @@ bool RosDatabaseManager::GetGrasps(const Model& model, const string& hand_name,
     
     grasp_list->push_back(grasp);
   }
+  std::cerr << "Loaded " << grasp_list->size() << " grasps\n";
   return true;
 }
 
@@ -381,17 +383,19 @@ bool RosDatabaseManager::LoadModelGeometry(Model* model) const
 
 QString RosDatabaseManager::getHandGraspitPath(QString handDBName) const
 {
-	std::string path;
-     	std::vector<boost::shared_ptr<household_objects_database::HandFilePath> > file_paths;
-      	std::stringstream where;
-      	where << "hand_name = '" << handDBName.toStdString()<<"'";
-      	std::string where_clause (where.str ());
-	if (!database_->getList<household_objects_database::HandFilePath>(file_paths, where_clause)) {
-	      	path = "/models/robots/" + handDBName.toStdString() + "/" + handDBName.toStdString() + ".xml";
-	} else {
-		path = file_paths[0]->file_path_.data ();
-	}
-      	return QString::fromStdString(path);
+  std::string path;
+  std::vector<boost::shared_ptr<household_objects_database::HandFilePath> > file_paths;
+  std::stringstream where;
+  where << "hand_name = '" << handDBName.toStdString()<<"'";
+  std::string where_clause (where.str ());
+  if (!database_->getList<household_objects_database::HandFilePath>(file_paths, where_clause) ||
+      file_paths.empty() ||
+      file_paths[0]->file_path_.data().empty() ) {
+    path = "/models/robots/" + handDBName.toStdString() + "/" + handDBName.toStdString() + ".xml";
+  } else {
+    path = file_paths[0]->file_path_.data ();
+  }
+  return QString::fromStdString(path);
 }
 
 } //namespace db_planner
