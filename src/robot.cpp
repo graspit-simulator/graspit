@@ -102,6 +102,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	}
 	QString robotDBName = root->Attribute("DBName");
 	if(robotDBName.isNull()) robotDBName = robotName;
+        setDBName(robotDBName);
 
 	const TiXmlElement* element = findXmlElement(root,"palm");
 	QString valueStr;
@@ -205,6 +206,8 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 		}
 		dofVec[d]->initDOF(this,jointList);
 	}
+        //with DOF initialized with joints, we can set default values
+        forceDefaultDOFVals();
 
 	//reset the dynamics: fix the base and set desired dof's to current values
 	getBase()->fix();
@@ -478,6 +481,8 @@ Robot::cloneFrom(Robot *original)
 		}
 		dofVec[d]->initDOF(this,jointList);
 	}
+        //with DOF initialized with joints, we can set default values
+        forceDefaultDOFVals();
 
 	base->setTran(transf::IDENTITY);
 	//careful: clones robots have never been tested with the dynamics engine

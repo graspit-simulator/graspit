@@ -262,6 +262,9 @@ protected:
   //! Sets the values of the DOF's to the values in the array dofVals. Collisions are NOT checked.
   inline void forceDOFVals(double *dofVals);
 
+  //! Sets the DOF values to defaults, which are 0.0 unless that falls outside of a joint range
+  inline void forceDefaultDOFVals();
+
   //-------------------------dynamics-------------------------------------------------
 
   //! The main way to move the robot dofs IN DYNAMICS mode. 
@@ -626,6 +629,17 @@ void Robot::forceDOFVals(double *dofVals) {
 	setJointValuesAndUpdate(jointVals);
 	updateDofVals(dofVals);
 	delete [] jointVals;
+}
+
+/*! Will set all DOF vals to their default values. */
+void Robot::forceDefaultDOFVals()
+{
+  std::vector<double> dofVals(numDOF, 0.0);
+  for (int d=0; d<numDOF; d++)
+  {
+    dofVals[d] = dofVec[d]->getDefaultValue();
+  }
+  forceDOFVals(&dofVals[0]);
 }
 
 /*! Asks each dof to update its value based on the joint values supplied in

@@ -37,7 +37,7 @@
 #include "debug.h"
 
   /*! Initializes everything to zero. */
-DOF::DOF() : owner(NULL), q(0.0),desiredq(0.0), desiredVelocity(0.0),defaultVelocity(0.0),
+DOF::DOF() : owner(NULL), q(0.0),desiredq(0.0), desiredVelocity(0.0),defaultVelocity(0.0), defaultValue(0.0),
 	actualVelocity(0.0), maxAccel(10.0), force(0.0),maxForce(0.0),
 	extForce(0.0), Kv(0.0),Kp(0.0),mHistoryMaxSize(10), mDynStartTime(0.0), currTrajPt(0), 
 	draggerScale(20.0)
@@ -88,7 +88,7 @@ DOF::initDOF(Robot *myRobot,const std::list<Joint *>& jList)
 }
 
 /*! Sets the max and min vals of the DOF from the smallest range of the joint 
-  limits. */
+  limits. Also forces defaultValue to be inside those limits.*/
 void DOF::updateMinMax()
 {
   maxq = (*jointList.begin())->getMax()/getStaticRatio(*jointList.begin());
@@ -109,6 +109,8 @@ void DOF::updateMinMax()
     minq = ( testMin > minq ? testMin : minq);
     DBGP("maxq " << maxq << " minq " << minq);
   }
+  if (maxq < defaultValue) {DBGA("DOF default value too large; setting to max"); defaultValue = maxq;}
+  if (minq > defaultValue) {DBGA("DOF default value too small; setting to min"); defaultValue = minq;}
 }
 
 /*!
@@ -253,17 +255,15 @@ DOF::dynamicsProgress()
 bool
 DOF::readParametersFromXml(const TiXmlElement* root)
 {
-	if(!getDouble(root,"defaultVelocity", defaultVelocity))
-		return false;
-	if(!getDouble(root,"maxEffort", maxForce))
-		return false;
-	if(!getDouble(root,"Kp", Kp))
-		return false;
-	if(!getDouble(root,"Kd", Kv))
-		return false;
-	if(!getDouble(root,"draggerScale", draggerScale))
-		return false;
-	return true;
+  if(!getDouble(root,"defaultVelocity", defaultVelocity)) return false;
+  double defaultValueDegrees;
+  if(getDouble(root,"defaultValue", defaultValueDegrees)) defaultValue = defaultValueDegrees * M_PI / 180.0;
+  else defaultValue = 0.0;
+  if(!getDouble(root,"maxEffort", maxForce)) return false;
+  if(!getDouble(root,"Kp", Kp)) return false;
+  if(!getDouble(root,"Kd", Kv)) return false;
+  if(!getDouble(root,"draggerScale", draggerScale)) return false;
+  return true;
 }
 
 /*! Write the value, or the overall state, of this DOF to a stream. Used

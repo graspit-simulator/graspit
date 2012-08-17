@@ -98,6 +98,7 @@ protected:
 
   double desiredVelocity;
   double defaultVelocity;
+  double defaultValue;
   double actualVelocity;
   double maxAccel;
 
@@ -235,6 +236,8 @@ public:
   double getDesiredVelocity() const {return desiredVelocity;}
   /*! Returns the default velocity. */
   double getDefaultVelocity() const {return defaultVelocity;}
+  /*! Returns the default value. */
+  double getDefaultValue() const {return defaultValue;}
   /*! Returns the actual velocity. */
   double getActualVelocity() const {return actualVelocity;}
   /*! Returns the max. acceleration */
