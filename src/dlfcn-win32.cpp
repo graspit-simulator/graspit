@@ -19,8 +19,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include<AtlBase.h>
-#include<AtlConv.h>
+#include <stdlib.h>
 #include "dlfcn-win32.h"
 
 /* Note:
@@ -131,7 +130,6 @@ static int copy_string( char *dest, int dest_size, const char *src )
 
 static void save_err_str( const char *str )
 {
-  USES_CONVERSION;
   DWORD dwMessageId;
   DWORD pos;
 
@@ -143,12 +141,19 @@ static void save_err_str( const char *str )
   /* Format error message to:
    * "<argument to function that failed>": <Windows localized error message>
    */
+
   pos  = copy_string( error_buffer,     sizeof(error_buffer),     "\"" );
   pos += copy_string( error_buffer+pos, sizeof(error_buffer)-pos, str );
   pos += copy_string( error_buffer+pos, sizeof(error_buffer)-pos, "\": " );
-  pos += FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwMessageId,
-			MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-			A2W(error_buffer+pos), sizeof(error_buffer)-pos, NULL );
+
+  size_t size = sizeof(error_buffer) - pos;
+  wchar_t * wErrorBuffer = new wchar_t[size];
+  size_t message_size = FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwMessageId,
+                        MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+                        wErrorBuffer, size, NULL );
+  wcstombs (error_buffer+pos, wErrorBuffer, size);
+  delete [] wErrorBuffer;
+  pos += message_size;
 
   if( pos > 1 )
     {
@@ -171,7 +176,6 @@ static void save_err_ptr_str( const void *ptr )
 
 void *dlopen( const char *file, int mode )
 {
-  USES_CONVERSION;
   HMODULE hModule;
   UINT uMode;
 
@@ -217,8 +221,11 @@ void *dlopen( const char *file, int mode )
        * to UNIX's search paths (start with system folders instead of current
        * folder).
        */
-      hModule = LoadLibraryEx( A2W(lpFileName), NULL, 
-			       LOAD_WITH_ALTERED_SEARCH_PATH );
+    size_t newsize = strlen(lpFileName) + 1;
+	  wchar_t * wFileName = new wchar_t[newsize];
+    mbstowcs ( wFileName, lpFileName, newsize );
+    hModule = LoadLibraryEx(wFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+	  delete [] wFileName;
 
       /* If the object was loaded with RTLD_GLOBAL, add it to list of global
        * objects, so that its symbols may be retrieved even if the handle for
