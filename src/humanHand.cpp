@@ -1529,8 +1529,81 @@ int HumanHand::contactEquilibrium(std::list<Contact*> contacts,
   return 0;
 }
 
+/*! Computes (Jt)^T * f , where Jt is the Jacobian of the tendon insertion points and f
+  is the vector of tendon forces */
+int HumanHand::tendonTorques(const std::set<size_t> &activeTendons,
+                             std::vector<double> &activeTendonForces,
+                             std::vector<double> &jointTorques)
+{
+  std::list<Joint*> joints;
+  for(int c=0; c<getNumChains(); c++) 
+  {
+    std::list<Joint*> chainJoints = getChain(c)->getJoints();
+    joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
+  }
+
+  if (activeTendons.empty()) 
+  {
+    DBGA("Need active tendons for analysis");
+    return -1;
+  }  
+  Matrix LeftHand(joints.size(), activeTendons.size());
+  int t=0;
+  for (size_t i=0; i<mTendonVec.size(); i++)
+  {    
+    if (activeTendons.find(i) == activeTendons.end()) continue;
+
+    std::list< std::pair<transf, Link*> > insPointLinkTrans;
+    mTendonVec[i]->getInsertionPointLinkTransforms(insPointLinkTrans);
+    Matrix J( grasp->contactJacobian(joints, insPointLinkTrans) );
+    Matrix JTran( J.transposed() );
+    Matrix D( insPtForceBlockMatrix( insPointLinkTrans.size() ) );
+    Matrix JTD( JTran.rows(), D.cols() );
+    matrixMultiply( JTran, D, JTD );
+
+    std::vector<double> magnitudes;
+    mTendonVec[i]->getInsertionPointForceMagnitudes(magnitudes);
+    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    assert(M.rows() == JTD.cols());
+    Matrix JTDM( JTD.rows(), M.cols());
+    matrixMultiply( JTD, M, JTDM);
+
+    assert( JTDM.rows() == LeftHand.rows());
+    assert( JTDM.cols() == 1);
+    LeftHand.copySubMatrix(0, t, JTDM);
+    t++;
+  }
+  //use passed in tendon forces
+  Matrix x(LeftHand.cols(), 1);
+  if ((int)activeTendonForces.size() != x.rows())
+  {
+    DBGA("Incorrect active tendon forces passed in");
+    return -1;
+  }
+  t=0;
+  for (size_t i=0; i<mTendonVec.size(); i++)
+  {    
+    if (activeTendons.find(i) != activeTendons.end())
+    {
+      x.elem(t,0) = activeTendonForces.at(t);
+      t++;
+    }
+  }
+  //compute the joint torques
+  Matrix tau(LeftHand.rows(), 1);
+  matrixMultiply(LeftHand, x, tau);
+  jointTorques.resize( joints.size() );
+  //and return them
+  for (size_t i=0; i<joints.size(); i++)
+  {
+    jointTorques[i] = tau.elem(i,0);
+  }
+  return 0;
+}
+
+
 /*! Solves:
-  JTc c = JTt f
+  (Jc)^T * c = (Jt)^T * f
   where Jt is the Jacobian of tendon insertion points and Jc is the Jacobian of contacts.
   Uses passed in tendon forces for f
   Returns the c that minimizes error norm (unbalanced magnitude).

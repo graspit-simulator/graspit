@@ -466,6 +466,11 @@ public:
   int contactTorques(std::list<Contact*> contacts,
                      std::vector<double> &jointTorques);
 
+  //! Returns the joint torques created by the given tendon forces. Does not care about contacts.
+  int tendonTorques(const std::set<size_t> &activeTendons,
+                    std::vector<double> &activeTendonForces,
+                     std::vector<double> &jointTorques);                    
+
   //! Returns true if any of the tendons has a permanent insertion point inside a wrapper
   bool insPointInsideWrapper();
 
