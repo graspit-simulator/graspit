@@ -43,8 +43,8 @@ cgdb {
                 MODEL_DATABASE_CFLAGS = $$system(rospack export --lang=cpp --attrib=cflags household_objects_database)
                 QMAKE_CXXFLAGS += $$MODEL_DATABASE_CFLAGS
 
-                MODEL_DATABASE_LFLAGS = $$system(rospack export --lang=cpp --attrib=lflags household_objects_database)
-                QMAKE_LFLAGS += $$MODEL_DATABASE_LFLAGS
+                MODEL_DATABASE_LIBS = $$system(rospack export --lang=cpp --attrib=lflags household_objects_database)
+                LIBS += $$MODEL_DATABASE_LIBS
         }
 }
 
