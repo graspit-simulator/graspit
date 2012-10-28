@@ -1,0 +1,116 @@
+<?xml version="1.0" ?>
+<robot type="HumanHand" DBName="VELO_FINGERTIP">
+    <palm>velo_palm.xml</palm>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+	<defaultValue>20</defaultValue>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+	<defaultValue>-20</defaultValue>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+	<defaultValue>20</defaultValue>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+	<defaultValue>-20</defaultValue>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+
+    <chain>
+        <transform>
+            <translation>135 0 0</translation>
+            <rotation>-90 z</rotation>
+            <translation>17.5 0 0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>60</a>
+            <alpha>0</alpha>
+            <minValue>20</minValue>
+            <maxValue>110</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+90</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-110</minValue>
+            <maxValue>20</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>-30</restValue>
+        </joint>
+        <link dynamicJointType="Revolute">velo_proximal.xml</link>
+        <link dynamicJointType="Revolute">velo_distal.xml</link>
+    </chain>
+
+    <chain>
+        <transform>
+            <translation>135 0 0</translation>
+            <rotation>180 x</rotation>
+            <rotation>-90 z</rotation>
+            <translation>17.5 0 0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>60</a>
+            <alpha>0</alpha>
+            <minValue>20</minValue>
+            <maxValue>110</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3+90</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-110</minValue>
+            <maxValue>20</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>-30</restValue>
+        </joint>
+        <link dynamicJointType="Revolute">velo_proximal.xml</link>
+        <link dynamicJointType="Revolute">velo_distal.xml</link>
+    </chain>
+
+    <approachDirection>
+        <referenceLocation>140 0 0</referenceLocation>
+        <direction>1 0 0</direction>
+    </approachDirection>
+
+    <eigenGrasps>eigen/velo_eigen.xml</eigenGrasps>
+
+    <virtualContacts>virtual/distal.vgr</virtualContacts>
+
+</robot>
