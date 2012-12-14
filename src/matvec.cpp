@@ -301,6 +301,46 @@ Quaternion::set(const SbRotation &SbRot)
 }
 
 /*!
+  Sets this quaternion as the rotation that transforms start into dest.
+  Inspired by Ogre3D getRotationTo(...) function at:
+  http://www.ogre3d.org/docs/api/html/OgreVector3_8h_source.html#l00651
+*/
+void Quaternion::set(const vec3 &start, const vec3 &dest)
+{
+  vec3 v0(start);
+  vec3 v1(dest);
+  v0 = v0 / v0.len();
+  v1 = v1 / v1.len();
+
+  double d = v0 % v1;
+  // If dot == 1, vectors are the same
+  if (d >= 1.0f)
+  {
+    set(Quaternion::IDENTITY);
+  }
+  if (d < (1e-6f - 1.0f))
+  {
+    // Generate an axis
+    vec3 axis = vec3(1,0,0) * v0;
+    // pick another if colinear
+    if (axis.len() < 1.0e-5) axis = vec3(0,1,0) * v0;
+    axis = axis / axis.len();
+    set(M_PI, axis);
+  }
+  else
+  {
+    double s = sqrt( (1+d)*2 );
+    double invs = 1 / s;    
+    vec3 c = v0 * v1;
+    x = c.x() * invs;
+    y = c.y() * invs;
+    z = c.z() * invs;
+    w = s * 0.5f;
+    normalise();
+  }
+}
+
+/*!
   Converts this quaternion to a 3x3 rotation matrix.
 */
 void

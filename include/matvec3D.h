@@ -365,6 +365,7 @@ public:
   void set(const mat3& R);
   void set(const double& angle, const vec3 &axis);
   void set(const SbRotation &SbRot);
+  void set(const vec3 &start, const vec3 &dest);
 
   void ToRotationMatrix (mat3& m) const;  
   void ToAngleAxis (double& angle, vec3& axis) const;
