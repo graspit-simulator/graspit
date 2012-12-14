@@ -551,6 +551,9 @@ public:
 	int getFingerNum(){return mFingerNum;}
 	//! Returns the number of the link that this contact is on
 	int getLinkNum(){return mLinkNum;}
+
+        //! Changes the frame (and thus also the location and normal) of this virtual contact
+        void changeFrame(transf tr);
 };
 /* just like what VirtualContact class has done, VirtualContactOnObject Class is nothing weird except that
 it changes the virtual contacts' loaction from the finger to an object imported before.
