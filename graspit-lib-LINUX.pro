@@ -45,6 +45,12 @@ cgdb {
 
                 MODEL_DATABASE_LIBS = $$system(rospack export --lang=cpp --attrib=lflags household_objects_database)
                 LIBS += $$MODEL_DATABASE_LIBS
+                # explicitly depend on roscosole until houshold_objects_database gets catkinized
+                # at which point it will report correct dependencies
+                ROSCONSOLE_DATABASE_LIBS = $$system(pkg-config --libs-only-L rosconsole)
+                ROSCONSOLE_DATABASE_LIBS += $$system(pkg-config --libs-only-l rosconsole)
+                ROSCONSOLE_DATABASE_LIBS += $$system(pkg-config --libs-only-other rosconsole)
+                LIBS += $$ROSCONSOLE_DATABASE_LIBS
         }
 }
 
