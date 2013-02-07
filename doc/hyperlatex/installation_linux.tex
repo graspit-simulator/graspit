@@ -8,6 +8,7 @@ You will need the following libraries in order to compile GraspIt!:
 \item Coin 3
 \item SoQt
 \item Blas and Lapack
+\item QHull
 \end{itemize}
 
 On Ubuntu, you should be able to get all these from the package
@@ -24,6 +25,7 @@ Use \texttt{sudo apt-get install} to install the following packages:
 \item \texttt{libsoqt4-dev}
 \item \texttt{libblas-dev}
 \item \texttt{liblapack-dev}
+\item \texttt{libqhull-dev}
 \end{itemize}
 
 \subsubsection{GraspIt!}
@@ -34,9 +36,6 @@ environment variable:
 \begin{itemize}
 \item \texttt{GRASPIT} - the directory where you unzipped GraspIt!
 \end{itemize}
-
-Build QHull. Go to the \texttt{\$GRASPIT/qhull} directory and type
-\texttt{make}.
 
 Create the GraspIt! Makefile from the Qt project file. Edit
 \texttt{\$GRASPIT/graspit.pro} to suit your system and
