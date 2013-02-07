@@ -969,7 +969,7 @@ bool GloveInterface::loadCalibration(const char* filename)
 	float val;
 
 	if (fscanf(fp,"%d %d ",&numDOF,&numSens)  <= 0) { 
-	  DBGA("GloveInterface::loadCalibration - Failed to dof num or sensor num");	 
+	  DBGA("GloveInterface::loadCalibration - Failed to read dof num or sensor num");	 
 	  return false;
 	}
 	
@@ -982,7 +982,7 @@ bool GloveInterface::loadCalibration(const char* filename)
 	for (d=0; d<numDOF; d++) {
 	  for (s=0; s<numSens; s++) {
 	    if(fscanf(fp,"%f",&val) <= 0) {
-	      DBGA("GloveInterface::loadCalibration - Failed to dof or sensor value");	 
+	      DBGA("GloveInterface::loadCalibration - Failed to read dof or sensor value");	 
 	      return false; 
 	    }
 	  }
@@ -990,8 +990,8 @@ bool GloveInterface::loadCalibration(const char* filename)
 	}
 	
 	for (d=0; d<mRobot->getNumDOF(); d++) {
-	  if(fscanf(fp,"%f",&val) ){
-	     DBGA("GloveInterface::loadCalibration - Failed to dof num or sensor num");	 
+	  if(fscanf(fp,"%f",&val) <= 0){
+	     DBGA("GloveInterface::loadCalibration - Failed to read dof num or sensor num");	 
 	     return false;
 	  }
 	  mData->setIntercept(d,val);
