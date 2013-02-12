@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <youngs>1500000</youngs>
+    <mass>20</mass>
+    <cog>-15 0 0</cog>
+    <inertia_matrix>15000 10 10 10 15000 10 10 10 15000</inertia_matrix>
+    <geometryOffset>
+      <transform>
+        <translation>-50.0 0.0 0.0</translation>	
+        <rotation>-90 z</rotation>	
+      </transform>
+    </geometryOffset>
+    <geometryFile type="Inventor">CAM_Finger_link_1_Modified.wrl</geometryFile>
+</root>

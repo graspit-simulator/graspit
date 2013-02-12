@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>CAM_Finger_Base.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>18</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>16</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>14</draggerScale>
+    </dof>
+
+     <chain>
+        <transform>
+            <translation>0.0 0.0 -13.75</translation>
+	    <rotation>90 z</rotation>
+        </transform>
+
+        <joint type="Revolute">
+            <theta>d0+-0</theta>
+            <d>0</d>
+            <a>28</a>
+            <alpha>90</alpha>
+            <minValue>-95</minValue>
+            <maxValue>95</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+0</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>0</alpha>
+            <minValue>-95</minValue>
+            <maxValue>95</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+        <joint type="Revolute">
+            <theta>d2+0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-95</minValue>
+            <maxValue>95</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+
+       <link dynamicJointType="Revolute">CAM_Finger_link_0.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_1.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_2.xml</link>
+
+</chain>
+
+
+
+</robot>

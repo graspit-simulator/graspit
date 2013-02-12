@@ -1,0 +1,289 @@
+<?xml version="1.0" ?>
+<robot type="HumanHand">
+    <palm>CAM_Hand_Base1.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>24</draggerScale>
+    </dof>
+<chain>
+        <transform>
+	    <rotation>110 z</rotation>
+            <translation>45.0 32.0 0.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+0</theta>
+            <d>0</d>
+            <a>28</a>
+            <alpha>90</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+0</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+        <joint type="Revolute">
+            <theta>d2+0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+
+       <link dynamicJointType="Revolute">CAM_Finger_link_0.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_1.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_2.xml</link>
+
+</chain>
+<chain>
+        <transform>
+	    <rotation>110 z</rotation>
+            <translation>58.0 -6.0 0.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3+0</theta>
+            <d>0</d>
+            <a>28</a>
+            <alpha>90</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d4+0</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+        <joint type="Revolute">
+            <theta>d5+0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+
+       <link dynamicJointType="Revolute">CAM_Finger_link_0.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_1.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_2.xml</link>
+
+</chain>
+<chain>
+        <transform>
+	    <rotation>110 z</rotation>
+            <translation>71.0 -44.0 0.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d6+0</theta>
+            <d>0</d>
+            <a>28</a>
+            <alpha>90</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d7+0</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d8+0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+
+       <link dynamicJointType="Revolute">CAM_Finger_link_0.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_1.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_2.xml</link>
+
+</chain>
+<chain>
+        <transform>
+		<translation>37.67 42.33 25</translation>
+	    <rotation>-45 z</rotation>
+	    <rotation>-90 y</rotation>
+            <translation>-15.0 -27.0 -53.5</translation>
+<!--		<translation>37.67 42.33 25</translation>
+            <translation>0.0 0.0 -13.75</translation>
+	    <rotation>90 z</rotation>
+	    <rotation>90 x</rotation>-->
+        </transform>
+        <joint type="Revolute">
+            <theta>d9+-0</theta>
+            <d>0</d>
+            <a>28</a>
+            <alpha>90</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d10+0</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+        <joint type="Revolute">
+            <theta>d11+0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-90</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>4</springStiffness>
+	    <restValue>0</restValue>
+        </joint> 
+
+       <link dynamicJointType="Revolute">CAM_Finger_link_0.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_1.xml</link>
+       <link dynamicJointType="Revolute">CAM_Finger_link_2.xml</link>
+
+</chain>
+    <approachDirection>
+        <referenceLocation>-10 30 23</referenceLocation>
+        <direction>0 0 1</direction>
+    </approachDirection>
+-   <virtualContacts>virtual/Sandia_virtual.vgr</virtualContacts>
+    <eigenGrasps>eigen/Sandia_eigen.xml</eigenGrasps>
+
+</robot>
