@@ -73,8 +73,8 @@ void PostureStateEigen::createVariables()
     } else {
       //if limits are not pre-defined in files, we use these hard-coded values
       //as we don't actually trust our abilities to compute them
-      min = -0.4f;
-      max = 0.4f;
+      min = -4.0f;
+      max = 4.0f;
     }
     float jump  = (max-min) / 4.0;
     mVariables.push_back( new SearchVariable(name+num, min, max, jump) );
