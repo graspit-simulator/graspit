@@ -40,25 +40,11 @@ cgdb {
 
                 DEFINES += ROS_DATABASE_MANAGER
 
-                MODEL_DATABASE_CFLAGS = $$system(rospack export --lang=cpp --attrib=cflags household_objects_database)
+                MODEL_DATABASE_CFLAGS = $$system(pkg-config --cflags household_objects_database)
                 QMAKE_CXXFLAGS += $$MODEL_DATABASE_CFLAGS
 
-                MODEL_DATABASE_LIBS = $$system(rospack export --lang=cpp --attrib=lflags household_objects_database)
+                MODEL_DATABASE_LIBS = $$system(pkg-config --libs household_objects_database)
                 LIBS += $$MODEL_DATABASE_LIBS
-
-                # explicitly depend on roscosole until houshold_objects_database gets catkinized
-                # at which point it will report correct dependencies
-                ROSCONSOLE_LIBS = $$system(pkg-config --libs-only-L rosconsole)
-                ROSCONSOLE_LIBS += $$system(pkg-config --libs-only-l rosconsole)
-                ROSCONSOLE_LIBS += $$system(pkg-config --libs-only-other rosconsole)
-                LIBS += $$ROSCONSOLE_LIBS
-
-                # explicitly depend on sql_database until houshold_objects_database gets catkinized
-                # at which point it will report correct dependencies
-                SQL_DATABASE_LIBS = $$system(pkg-config --libs-only-L sql_database)
-                SQL_DATABASE_LIBS += $$system(pkg-config --libs-only-l sql_database)
-                SQL_DATABASE_LIBS += $$system(pkg-config --libs-only-other sql_database)
-                LIBS += $$SQL_DATABASE_LIBS
         }
 }
 
