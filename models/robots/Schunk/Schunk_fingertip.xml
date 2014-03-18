@@ -2,7 +2,7 @@
 <!-- Model of the Schunk hand -->
 <!-- Created based on urdf model of Care-O-Bot -->
 <!-- installed based on http://www.ros.org/wiki/Robots/Care-O-bot -->
-<robot type="Hand" DBName="Schunk">
+<robot type="Hand" DBName="Schunk_Fingertip">
     <palm>palm_knuckle.xml</palm>
 
     <dof type="r">
@@ -136,7 +136,7 @@
     <!-- finger 3 (thumb) -->
     <chain>
         <transform>
-            <translation>-38.11 0 91.0</translation>
+            <translation>-38.11 0 91</translation>
 	    <rotation>-90 x</rotation>
         </transform>
         <joint type="Revolute">
@@ -162,6 +162,7 @@
     </chain>
 
     <eigenGrasps>eigen/schunk_eigen.xml</eigenGrasps>
-    <virtualContacts>contacts/all_contacts.vgr</virtualContacts>
+
+    <virtualContacts>contacts/finger_tip_compact.vgr</virtualContacts>
 
 </robot>
