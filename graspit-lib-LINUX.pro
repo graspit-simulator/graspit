@@ -11,6 +11,9 @@ HEADERS += include/lapack_wrappers.h
 
 # ---------------------- General libraries and utilities ----------------------------------
 
+#dynamic linking library
+LIBS += -ldl
+
 #add qhull include dir
 INCLUDEPATH += /usr/include/qhull
 
