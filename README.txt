@@ -1,7 +1,7 @@
                                  GraspIt!
                               Version 2.2.0 
 
-Introduction
+Introduction 
 ------------
 Please see the User Manual in doc/ for an introduction to GraspIt!, a list of
 features, installation instructions, getting started examples, etc.
