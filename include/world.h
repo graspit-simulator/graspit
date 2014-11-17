@@ -39,6 +39,8 @@
 
 #include <Inventor/SoType.h>
 
+class btDiscreteDynamicsWorld;
+
 class vec3;
 class position;
 class mat3;
@@ -190,6 +192,9 @@ protected:
   //! Static callback routine for the dynamic operations idle sensor.
   static void dynamicsCB(void *data,SoSensor *sensor);
   
+  btDiscreteDynamicsWorld* mBtDynamicsWorld;
+
+
   friend class Body;
   friend class DynamicBody;
   friend class MainWindow;

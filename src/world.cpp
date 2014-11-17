@@ -39,6 +39,14 @@
 #include <QTextStream>
 #include <Inventor/sensors/SoIdleSensor.h>
 
+#include "btBulletDynamicsCommon.h"
+#include "btBvhTriangleMeshShape.h"
+#include "btTriangleMesh.h"
+#include "btGImpactShape.h"
+#include "btGImpactCollisionAlgorithm.h"
+
+#include "triangle.h"
+
 #include "myRegistry.h"
 #include "matvecIO.h"
 #include "world.h"
@@ -88,6 +96,7 @@ FILE *errFP=NULL;
 
 //#define PROF_ENABLED
 #include "profiling.h"
+
 PROF_DECLARE(WORLD_FIND_CONTACTS);
 PROF_DECLARE(WORLD_COLLISION_REPORT);
 PROF_DECLARE(WORLD_NO_COLLISION);
@@ -96,6 +105,9 @@ PROF_DECLARE(WORLD_POINT_TO_BODY_DISTANCE);
 PROF_DECLARE(WORLD_FIND_VIRTUAL_CONTACTS);
 PROF_DECLARE(WORLD_FIND_REGION);
 PROF_DECLARE(DYNAMICS);
+
+ 
+
 
 #define MAXBODIES 256
 #define TIMER_MILLISECONDS 100.0
@@ -148,6 +160,35 @@ World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,nam
         // This has to happen at runtime, so it's placed here
         // maybe we can find a better solution at some point.
         WorldElementFactory::registerBuiltinCreators();
+
+
+	///-----initialization_start-----
+
+	///collision configuration contains default setup for memory, collision setup. 
+	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+	
+	///use the default collision dispatcher. 
+	btCollisionDispatcher* dispatcher = new	btCollisionDispatcher(collisionConfiguration);
+	btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
+	
+	///btDbvtBroadphase is a good general purpose broadphase. .
+	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+
+	///the default constraint solver. 
+	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+	mBtDynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
+
+	//btCollisionDispatcher * dispatchertest = static_cast<btCollisionDispatcher *>(mBtdynamicsWorld ->getDispatcher());
+	//btGImpactCollisionAlgorithm::registerAlgorithm(dispatchertest);
+
+	mBtDynamicsWorld->setGravity(btVector3(0,0,-10));
+
+	///-----initialization_end-----
+
+	
+
+
 }
 
 /*! Saves the global settings and parameters and deletes the world
@@ -159,6 +200,8 @@ World::~World()
 	DBGP("Deleting world");
 
 	saveSettings();
+
+	delete mBtDynamicsWorld;
 
 	for (i=0;i<numMaterials;i++) {
 		free(cofTable[i]);
@@ -900,6 +943,87 @@ World::addBody(Body *newBody)
 	IVRoot->addChild(newBody->getIVRoot());
 	modified = true;
 	emit numElementsChanged();
+
+	// Adding Bullet Bodies
+	// Creation of CollisionShape
+	btTriangleMesh* triMesh = new btTriangleMesh(true,true);//true,true);
+	
+	
+	// Get the geometry data form the Graspit object
+	std::vector<Triangle> triangles;
+
+	newBody->getGeometryTriangles(&triangles);
+	int numTriangles = triangles.size();
+	printf("NUM TRIANGLES:, %d",numTriangles);
+	Triangle tritemp = triangles.at(0);
+
+	for(int i = 0; i < numTriangles-1; i=i+1)
+	{
+		tritemp = triangles.at(i);
+		btScalar v01(tritemp.v1[0]);
+		btScalar v02(tritemp.v1[1]);
+		btScalar v03(tritemp.v1[2]);
+		btScalar v11(tritemp.v2[0]);
+		btScalar v12(tritemp.v2[1]);
+		btScalar v13(tritemp.v2[2]);
+		btScalar v21(tritemp.v3[0]);
+		btScalar v22(tritemp.v3[1]);
+		btScalar v23(tritemp.v3[2]);
+
+		btVector3 v0(v01,v02,v03);
+		btVector3 v1(v11,v12,v13);
+		btVector3 v2(v21,v22,v23);		
+		printf("%f,%f,%f\n",v01,v02,v03);
+		triMesh->btTriangleMesh::addTriangle(v0,v1,v2,true);
+		
+	}
+	
+	btCollisionShape* mTriMeshShape = new btBvhTriangleMeshShape(triMesh, true,true);
+	
+	btScalar mass(0.);
+	btVector3 localInertia(0,0,0);
+	
+	if (newBody->isDynamic())
+	{	
+		mass = ((DynamicBody*)newBody)->getMass();
+
+		mTriMeshShape = new btGImpactMeshShape(triMesh);
+		((btGImpactMeshShape*)mTriMeshShape)->updateBound();
+		
+		//mTriMeshShape = new btBoxShape(btVector3(btScalar(25.),btScalar(25.),btScalar(25.)));		
+		mTriMeshShape->calculateLocalInertia(mass,localInertia);	
+	}
+	else
+	{
+		//mTriMeshShape = new btBoxShape(btVector3(btScalar(625.),btScalar(625.),btScalar(425.)));
+		printf("THIS IS A STATIC BODY \n");
+	}
+
+
+
+	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+		btDefaultMotionState* myMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0 , 0)));
+		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,mTriMeshShape,localInertia);
+		btRigidBody* body = new btRigidBody(rbInfo);
+
+		//add the body to the dynamics world
+		mBtDynamicsWorld->addRigidBody(body);
+
+
+
+
+	// Add Groundplane as Limit
+	//btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 0, 1), 1);
+	//btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, -1)));
+	//btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
+        //btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
+
+	//mBtDynamicsWorld->addRigidBody(groundRigidBody);
+
+
+
+	
+	
 }
 
 /*! Adds a robot link. No need to add it to scene graph, since the robot 
@@ -1685,12 +1809,54 @@ different.
 void
 World::turnOnDynamics()
 {
+
+	// Update BULLET TRANSFORM whenever Dynamics are turned on
+
+	Body* tempbody = getBody(0);
+	
+	transf temptrans = tempbody->getTran();
+	
+	
+
+	for (int j=mBtDynamicsWorld->getNumCollisionObjects()-1; j>=0 ;j--)
+		{
+			tempbody = getBody(j);
+			temptrans = tempbody->getTran();
+			
+			
+			btScalar wrot(temptrans.rotation().w);
+			btScalar xrot(temptrans.rotation().x);
+			btScalar yrot(temptrans.rotation().y);
+			btScalar zrot(temptrans.rotation().z);
+			
+			btScalar xtrans(temptrans.translation().x());
+			btScalar ytrans(temptrans.translation().y());
+			btScalar ztrans(temptrans.translation().z());
+
+			
+			btCollisionObject* obj = mBtDynamicsWorld->getCollisionObjectArray()[j];
+			btRigidBody* body = btRigidBody::upcast(obj);
+			//if (body )//&& body->getMotionState() )//&& tempbody->isDynamic())
+			{
+				//btTransform trans = new btTransform(btQuaternion( xrot , yrot , zrot , wrot), btVector3(xtrans, ytrans, ztrans));			
+				
+				body->setCenterOfMassTransform(btTransform(btQuaternion( xrot , yrot , zrot , wrot), btVector3(xtrans, ytrans, ztrans)));
+				body->setLinearVelocity(btVector3(0 , 0 , 0));
+				body->setAngularVelocity(btVector3(0 , 0 , 0));
+					}
+		}
+	
+
+
 	//PROF_RESET_ALL;
 	//PROF_START_TIMER(DYNAMICS);
 	dynamicsOn = true;
 	if (idleSensor) delete idleSensor;
 	idleSensor = new SoIdleSensor(dynamicsCB,this);
 	idleSensor->schedule();
+
+	
+
 }
 
 /*! Pauses dynamic simulation; no more time steps are computed*/
@@ -2149,24 +2315,79 @@ joint constraints, for the next time step.
 void
 World::stepDynamics()
 {
-	resetDynamicWrenches();
-	double actualTimeStep = moveDynamicBodies(dynamicsTimeStep);
-	if (actualTimeStep<0) {
-		turnOffDynamics();
-		emit dynamicsError("Timestep failsafe reached.");
-		return;
-	}
 
-	for (int i=0; i<numRobots; i++) {
-		robotVec[i]->DOFController(actualTimeStep);
-		robotVec[i]->applyJointPassiveInternalWrenches();
-	}
+	// Commenting the GRASPIT DYNAMICAL COMPUTATION
 
-	if (computeNewVelocities(actualTimeStep)) {
-		emit dynamicsError("LCP could not be solved.");
-		return;
-	} 
+	//resetDynamicWrenches();
+	//double actualTimeStep = moveDynamicBodies(dynamicsTimeStep);
+	//if (actualTimeStep<0) {
+	//	turnOffDynamics();
+	//	emit dynamicsError("Timestep failsafe reached.");
+	//	return;
+	//}
+
+	//for (int i=0; i<numRobots; i++) {
+	//	robotVec[i]->DOFController(actualTimeStep);
+	//	robotVec[i]->applyJointPassiveInternalWrenches();
+	//}
+
+	//if (computeNewVelocities(actualTimeStep)) {
+	//	emit dynamicsError("LCP could not be solved.");
+	//	return;
+	//} 
 	if (idleSensor) idleSensor->schedule();
+
+	// Step BULLET DYNAMICS
+	{
+		mBtDynamicsWorld->stepSimulation(1.f/60.f,10);
+		
+		
+
+		// Update Transforms in GRASPIT	
+		
+		
+
+		for (int j=mBtDynamicsWorld->getNumCollisionObjects()-1; j>=0 ;j--)
+		{
+		// FEEDBACK TO GRASPIT
+		
+		btCollisionObject* obj = mBtDynamicsWorld->getCollisionObjectArray()[j];
+		btRigidBody* body = btRigidBody::upcast(obj);
+		btTransform feedbacktransform = body->getCenterOfMassTransform();
+		btQuaternion btrotation = feedbacktransform.getRotation();
+		btVector3 bttranslation = feedbacktransform.getOrigin();
+		Body* tempbody = getBody(j);
+
+                
+		Quaternion* rot = new Quaternion(btrotation.getAngle() , 
+		vec3(btrotation.getAxis()[0] , btrotation.getAxis()[1] , btrotation.getAxis()[2]) );
+
+		
+		vec3* transl = new vec3(bttranslation.getX() , bttranslation.getY() , bttranslation.getZ()) ;  		
+		Quaternion rotfix = *rot;
+		vec3 translfix = *transl;
+		
+		transf* temptrans2 = new transf(rotfix , translfix) ;
+		transf temptrans2fix = *temptrans2;
+		
+
+		tempbody->setTran(temptrans2fix);
+
+
+		//OUTPUT OF TRANSFORM TO TERMINAL
+
+			
+			if (body ) 
+			{
+				btTransform trans;
+				body->getMotionState()->getWorldTransform(trans);
+				printf("world pos = %f,%f,%f,%d\n",float(trans.getOrigin().getX()),float(trans.getOrigin().getY()),float(trans.getOrigin().getZ()),j);
+			}
+		}
+		
+
+	}
+
 }
 
 void World::selectTendon(Tendon *t)
