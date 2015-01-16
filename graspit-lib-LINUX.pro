@@ -2,20 +2,6 @@
 
 LIBS += $$ADDITIONAL_LINK_FLAGS
 
-# ---------------------- Bullet ----------------------------------
-
-!exists($(BULLET_PHYSICS_SOURCE_DIR)) {
-		error("Bullet not installed or BULLET_PHYSICS_SOURCE_DIR environment variable not set")
-	}
-	INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src
-	INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletCollision/CollisionShapes
-	INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletCollision/Gimpact
-
-LIBS += -L$(BULLET_PHYSICS_SOURCE_DIR)/build/src/BulletDynamics
-LIBS += -L$(BULLET_PHYSICS_SOURCE_DIR)/build/src/BulletCollision
-LIBS += -L$(BULLET_PHYSICS_SOURCE_DIR)/build/src/LinearMath
-LIBS += -lBulletDynamics -lBulletCollision -lLinearMath
-
 # ---------------------- Blas and Lapack ----------------------------------
 
 LIBS += -lblas -llapack 
@@ -57,11 +43,14 @@ cgdb {
 
                 DEFINES += ROS_DATABASE_MANAGER
 
-                MODEL_DATABASE_CFLAGS = $$system(pkg-config --cflags household_objects_database)
-                QMAKE_CXXFLAGS += $$MODEL_DATABASE_CFLAGS
+                MODEL_DATABASE_CFLAGS = $$system(rospack cflags-only-I household_objects_database)
+                INCLUDEPATH += $$MODEL_DATABASE_CFLAGS
 
-                MODEL_DATABASE_LIBS = $$system(pkg-config --libs household_objects_database)
-                LIBS += $$MODEL_DATABASE_LIBS
+                MODEL_DATABASE_LIBS_L = $$system(rospack libs-only-L household_objects_database)
+                MODEL_DATABASE_LIBS_l = $$system(rospack libs-only-l household_objects_database)
+                QMAKE_LIBDIR += $$MODEL_DATABASE_LIBS_L
+                SPLIT_LIBS = $$split(MODEL_DATABASE_LIBS_l,' ')
+                for(onelib,SPLIT_LIBS):QMAKE_LIBS += -l$${onelib}
         }
 }
 
