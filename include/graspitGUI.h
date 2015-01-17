@@ -41,6 +41,7 @@ class Plugin;
 class PluginCreator;
 class SoIdleSensor;
 class SoSensor;
+class World;
 
 //! This is the main user interface class that is responsible for creating and destroying the MainWindow and IVmgr.
 /*!
@@ -96,6 +97,9 @@ class GraspItGUI
 
   /*! Returns a pointer to the MainWindow. */
   MainWindow *getMainWindow() const {return mainWindow;}
+
+  /*! Returns a pointer to the World (obtained through the main window) */
+  World *getMainWorld() const;
 
   /*! Returns a pointer to the IVmgr. */
   IVmgr *getIVmgr() const {return ivmgr;}

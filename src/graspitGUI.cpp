@@ -321,3 +321,8 @@ void GraspItGUI::stopAllPlugins()
     it = mActivePlugins.erase(it);
   }
 }
+
+World* GraspItGUI::getMainWorld() const
+{
+  return getMainWindow()->getMainWorld();
+}
