@@ -29,8 +29,8 @@
 #include <QTextStream>
 #include <vector>
 
-#include "collisionStructures.h"
-#include "matvec3D.h"
+#include "src/Collision/collisionStructures.h"
+#include "include/matvec3D.h"
 
 class SoSeparator;
 class SoTransform;

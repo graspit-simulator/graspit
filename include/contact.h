@@ -32,7 +32,7 @@
 #include <list>
 #include <vector>
 
-#include "collisionStructures.h"
+#include "src/Collision/collisionStructures.h"
 
 class transf;
 class Body;

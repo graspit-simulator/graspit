@@ -31,8 +31,8 @@
 #include <list>
 #include <vector>
 
-#include "mytools.h"
-#include "matvec3D.h"
+#include "include/mytools.h"
+#include "include/matvec3D.h"
 
 class KinematicChain;
 class DynJoint;

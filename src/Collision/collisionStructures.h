@@ -32,7 +32,7 @@
 #define _collisionstructures_h_
 
 #include <vector>
-#include "matvec3D.h"
+#include "include/matvec3D.h"
 
 class Body;
 class transf;
