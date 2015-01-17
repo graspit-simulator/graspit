@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <QString>
 #include "model.h"
 #include "task.h"
 #include "grasp.h"
