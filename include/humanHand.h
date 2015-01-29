@@ -466,6 +466,13 @@ public:
   int contactTorques(std::list<Contact*> contacts,
                      std::vector<double> &jointTorques);
 
+  //! Solves for contact forces that balance given joint torques. Does not care about tendons.
+  //! Contact forces are allowed in all directions (not just normal)
+  int contactForcesFromJointTorques(std::list<Contact*> contacts,
+				    std::vector<vec3> &contactForces,
+				    const std::vector<double> &jointTorques,
+				    bool convert_to_world_frame);
+
   //! Returns the joint torques created by the given tendon forces. Does not care about contacts.
   int tendonTorques(const std::set<size_t> &activeTendons,
                     std::vector<double> &activeTendonForces,

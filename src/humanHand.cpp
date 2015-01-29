@@ -1233,6 +1233,19 @@ Matrix insPtForceBlockMatrix(unsigned int numInsPoints)
   return D;
 }
 
+/*! Matrix that selects only the yz force components for Jacobians */
+Matrix yzForceBlockMatrix(unsigned int numContacts)
+{
+  if (!numContacts) return Matrix(0,0);
+  Matrix D(Matrix::ZEROES<Matrix>(6*numContacts, 2*numContacts));
+  for(unsigned int i=0; i<numContacts; i++)
+  {
+    D.elem(6*i + 1, 2*i + 0) = 1.0;
+    D.elem(6*i + 2, 2*i + 1) = 1.0;
+  }
+  return D;
+}
+
 PROF_DECLARE(HH_TENDON_EQUILIBRIUM);
 int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
                                  const std::set<size_t> &passiveTendons,
@@ -1365,6 +1378,41 @@ int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
   }
 
   return 0;
+}
+
+
+/*! Solves the following:
+  JTc c = tau
+  where Jc is the Jacobian of the contacts.
+  Returns c.
+  Expects the system to be either perfectly determined or
+  overdetermined.
+*/
+int HumanHand::contactForcesFromJointTorques(std::list<Contact*> contacts,
+					     std::vector<vec3> &contactForces,
+					     const std::vector<double> &jointTorques,
+					     bool convert_to_world_frame)
+{
+  std::list<Joint*> joints;
+  for(int c=0; c<getNumChains(); c++) 
+  {
+    std::list<Joint*> chainJoints = getChain(c)->getJoints();
+    joints.insert(joints.end(), chainJoints.begin(), chainJoints.end());
+  }
+
+  Matrix J( grasp->contactJacobian(joints, contacts) );
+  Matrix JTran( J.transposed() );
+
+  //select just the y and z components - hack for now
+  Matrix D( yzForceBlockMatrix( contacts.size() ) );
+  Matrix JTD( JTran.rows(), D.cols() );
+  matrixMultiply( JTran, D, JTD );
+
+  DBGA("JTD: \n" << JTD);
+
+  Matrix RightHand(&jointTorques[0], jointTorques.size(), 1, true);
+
+  return 1;
 }
 
 /*! Computes the following:
