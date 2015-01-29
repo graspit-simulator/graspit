@@ -461,8 +461,14 @@ public:
                                     const std::set<size_t> &activeTendons,
                                     const std::vector<double> &activeTendonForces);
 
-  //! Returns the joint torques created by the given contacts applying 1N of force along
-  //! their normals. Does not care about tendons.
+  //! Returns the joint torques created by the given contacts applying forces along
+  //! their normals. Does not care about tendons. 
+  int contactTorques(std::list<Contact*> contacts,
+		     const std::vector<double> &contact_forces,
+                     std::vector<double> &jointTorques);
+
+  //! Returns the joint torques created by the given contacts applying forces along
+  //! their normals. Does not care about tendons. All contact forces are assumed to be 1N.  
   int contactTorques(std::list<Contact*> contacts,
                      std::vector<double> &jointTorques);
 

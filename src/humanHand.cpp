@@ -1421,6 +1421,7 @@ int HumanHand::contactForcesFromJointTorques(std::list<Contact*> contacts,
     Returns tau.
 */
 int HumanHand::contactTorques(std::list<Contact*> contacts,
+			      const std::vector<double> &contact_forces,
                               std::vector<double> &jointTorques)
 {
   std::list<Joint*> joints;
@@ -1438,12 +1439,8 @@ int HumanHand::contactTorques(std::list<Contact*> contacts,
     matrixMultiply( JTran, D, JTD );
 
     //JTD.print();
-
-    std::vector<double> magnitudes;
-    //for now, all contacts apply equal force
-    //virtual contact normal points outwards, so use negative magnitude
-    magnitudes.resize(contacts.size(), -1.0);
-    Matrix M(&magnitudes[0], magnitudes.size(), 1, true);
+    if (contact_forces.size() != contacts.size()) {DBGA("Incorrect size for contact forces"); return -1;}
+    Matrix M(&contact_forces[0], contact_forces.size(), 1, true);
     assert(M.rows() == JTD.cols());
     Matrix JTDM( JTD.rows(), M.cols());
     matrixMultiply( JTD, M, JTDM);
@@ -1459,6 +1456,20 @@ int HumanHand::contactTorques(std::list<Contact*> contacts,
     jointTorques[i] = RightHand.elem(i,0) * scale;
   }
   return 0;
+}
+
+/*! Computes the following:
+    JTc c = tau
+    where Jc is the Jacobian of the contacts
+    Returns tau.
+*/
+int HumanHand::contactTorques(std::list<Contact*> contacts,
+                              std::vector<double> &jointTorques)
+{
+  //virtual contact normal points outwards, so use negative magnitude
+  std::vector<double> magnitudes;
+  magnitudes.resize(contacts.size(), -1.0);
+  return contactTorques(contacts, magnitudes, jointTorques);
 }
 
 /*! Solves:
