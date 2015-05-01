@@ -33,8 +33,8 @@ double
 pointBoxDistanceSq(const BoundingBox &box, const position &p)
 {
 	vec3 v = (p - position::ORIGIN) - box.getTran().translation();
-	mat3 RMat;
-	box.getTran().rotation().ToRotationMatrix(RMat);
+	const mat3 &RMat(box.getTran().affine());
+
 
     double sqDist = 0.0;
     for (int i=0; i<3; i++) {
@@ -58,8 +58,8 @@ position
 closestPtBbox(const BoundingBox &bbox, const position &p)
 {
 	vec3 d = (p - position::ORIGIN) - bbox.getTran().translation();
-	mat3 RMat;
-	bbox.getTran().rotation().ToRotationMatrix(RMat);
+	const mat3 & RMat(bbox.getTran().affine());
+
     // Start result at center of box; make steps from there
 	vec3 q = bbox.getTran().translation();
     // For each OBB axis...
@@ -89,8 +89,7 @@ bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2T
 	int i, k;
 
 	transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
-	mat3 RMat;
-	BtoA.rotation().ToRotationMatrix(RMat);
+	const mat3 &RMat(BtoA.affine());
 
 	double B[3][3];
 	for( i=0; i<3 ; i++ ) {
@@ -271,8 +270,7 @@ double bboxDistanceSq(const BoundingBox &bb1, const BoundingBox &bb2, const tran
 	int i, k;
 
 	transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
-	mat3 RMat;
-	BtoA.rotation().ToRotationMatrix(RMat);
+	const mat3 &RMat(BtoA.affine());
 
 	double B[3][3];
 	for( i=0; i<3 ; i++ ) {

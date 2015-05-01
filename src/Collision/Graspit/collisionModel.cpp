@@ -216,9 +216,8 @@ void Leaf::computeBboxOO()
 	for (int i=0; i<3; i++) {
 		if (halfSize[i] < 0) halfSize[i] = -halfSize[i];
 	}
-	mat3 RR;
-	rotate.rotation().ToRotationMatrix(RR);
-	R = RR * R;
+
+	R = rotate.affine() * R;
 
 	mBbox.halfSize = halfSize;
 	mBbox.setTran( transf(R, center ) );
