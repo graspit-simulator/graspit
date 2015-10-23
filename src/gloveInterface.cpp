@@ -1026,8 +1026,7 @@ double GloveInterface::getPoseError(vec3* error, position* thumbLocation)
 	Body *thumbTip = mRobot->getChain(4)->getLink(2);
 	Body *indexTip = mRobot->getChain(0)->getLink(2);
 	position p1, p2;
-    //double rawDistance;
-    //rawDistance = mRobot->getWorld()->getDist(thumbTip, indexTip, p1, p2);
+    mRobot->getWorld()->getDist(thumbTip, indexTip, p1, p2);
 
 	if (thumbLocation != NULL) {
 		*thumbLocation = p1;
