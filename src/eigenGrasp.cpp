@@ -592,7 +592,7 @@ EigenGraspInterface::setMinMax()
 
 	for (int e = 0; e < eSize; e++)
 	{
-		int mind, maxd;
+        //int mind, maxd;
 		//fprintf(stderr,"\n------\nEG %d\n",e);
 #ifdef EIGENGRASP_LOOSE
 		mmin = +1.0e5;
@@ -608,11 +608,15 @@ EigenGraspInterface::setMinMax()
 			M = ( mRobot->getDOF(d)->getMax() - currentDOF[d] ) / ( eg[d] * mNorm->getAxisValue(d) );
 			if ( m > M) {std::swap(m,M);} //swap m and M if needed
 #ifdef EIGENGRASP_LOOSE
-			if ( m < mmin ) {mmin = m; mind = d;}
-			if ( M > mmax ) {mmax = M; maxd = d;}
+            //if ( m < mmin ) {mmin = m; mind = d;}
+            //if ( M > mmax ) {mmax = M; maxd = d;}
+            if ( m < mmin ) {mmin = m;}
+            if ( M > mmax ) {mmax = M;}
 #else
-			if ( m > mmin ) {mmin = m; mind = d;}
-			if ( M < mmax ) {mmax = M; maxd = d;}
+            //if ( m > mmin ) {mmin = m; mind = d;}
+            //if ( M < mmax ) {mmax = M; maxd = d;}
+            if ( m > mmin ) {mmin = m;}
+            if ( M < mmax ) {mmax = M;}
 #endif
 		}
 		if(!mGrasps[e]->mPredefinedLimits){
