@@ -1215,7 +1215,7 @@ LMIOptimizer::findOptimalGraspForce()
     optmXHistory = xzHistoryTransfrom(extendOptmZHistory, optmNTiters+1);
     
     printf("OPTIMAL CONTACT FORCES:\n");
-    disp_mat(stdout,optmx0,1,numWrenches,0);
+    disp_mat(stdout,optmx0,1,numWrenches);
 
     //    double *testOut = new double[6];
     //    dgemv("N",6,numWrenches,1.0,graspMap,6,optmx0,1,0.0,testOut,1);
@@ -1233,7 +1233,7 @@ LMIOptimizer::findOptimalGraspForce()
 	  optmx0, 1,1.0, optTorques, 1);
 
     printf("OPTIMAL TORQUES:\n");
-    disp_mat(stdout,optTorques,1,numDOF,0);
+    disp_mat(stdout,optTorques,1,numDOF);
 
     int offset = 0;
     for (i=0;i<mGrasp->numContacts;i++) {

@@ -598,7 +598,7 @@ void Matrix::print(FILE *fp, std::string name) const
 {
   if (!name.empty()) fprintf(fp,"%s:\n",name.c_str());
   std::auto_ptr<double> data = getDataCopy();
-  disp_mat(fp, data.get(), mRows, mCols, 0);
+  disp_mat(fp, data.get(), mRows, mCols);
 }
 
 void
