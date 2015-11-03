@@ -1389,13 +1389,8 @@ int HumanHand::tendonEquilibrium(const std::set<size_t> &activeTendons,
   overdetermined.
 */
 int HumanHand::contactForcesFromJointTorques(std::list<Contact*> contacts,
-					     std::vector<vec3> &contactForces,
-					     const std::vector<double> &jointTorques,
-					     bool convert_to_world_frame)
+                         const std::vector<double> &jointTorques)
 {
-  Q_UNUSED(contactForces);
-  Q_UNUSED(convert_to_world_frame);
-
   std::list<Joint*> joints;
   for(int c=0; c<getNumChains(); c++) 
   {

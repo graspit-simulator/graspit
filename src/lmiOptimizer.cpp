@@ -708,11 +708,6 @@ double * maxdet_wrap(int m, int L, double *F, int *F_blkszs,
   
   //  struct tms before,after;
   
-  // Gets rid of compiler warning
-#ifndef GRASPDBG
-  pRstFile = NULL;
-#endif
-  
   for (i=0; i<L; i++) {
     if (F_blkszs[i] <= 0) {
       pr_error("Elements of F_blkszs must be positive.\n");
