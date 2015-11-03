@@ -585,13 +585,13 @@ grasp_planner::get_planningParameters(int& nr_of_360_deg_steps_in,
 SoPathList 
 grasp_planner::searchPrimitives(GraspableBody* bg)
 {	
+  Q_UNUSED(bg)
   SoPathList pl_ret;
   SoPathList pl;
   SoSearchAction *saction = new SoSearchAction;
   SoGroup *primGeomRoot;
   int j;
   
-  bg = NULL;  // bg is not needed but gives an unused parameter warning
   primGeomRoot = IVGeomPrimitives;
   
   /* Search for cylinders */
