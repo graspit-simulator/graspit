@@ -356,6 +356,7 @@ SearchEnergy::potentialQualityEnergy(bool verbose) const
 	}
 
 	double gq = -1 ,gv = -1;
+    Q_UNUSED(gv)
 	//to make computations more efficient, we only use a 3D approximation
 	//of the 6D wrench space
 	std::vector<int> forceDimensions(6,0);
@@ -584,7 +585,7 @@ SearchEnergy::dynamicAutograspEnergy() const
 	PRINT_STAT(mOut, "Autograsp done");
 
 	//disable contacts on pedestal
-	Body *obstacle;
+    Body *obstacle=NULL;
 	for (int b=0; b<mHand->getWorld()->getNumBodies(); b++) {
 		Body *bod = mHand->getWorld()->getBody(b);
 		if (bod->isDynamic()) continue;
