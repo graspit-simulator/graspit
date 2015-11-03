@@ -626,7 +626,6 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
   PlyFile *plyfile;
   int nwords;
   char **words;
-  int found_format = 0;
   char **elist;
   PlyElement *elem;
   char *orig_line;
@@ -672,7 +671,6 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
       else
         return (NULL);
       plyfile->version = (float)atof (words[2]);
-      found_format = 1;
     }
     else if (equal_strings (words[0], "element"))
       add_element (plyfile, words, nwords);
