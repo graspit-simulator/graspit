@@ -973,8 +973,7 @@ double SoftContact::CalcContact_Mattress( double nForce )
 */
 SoSeparator* SoftContact::getVisualIndicator()
 {
-    double height;
-    //double radius;
+        double height;
 	SoSeparator *cne;
 	SoTransform *tran;
 	SoCoordinate3 *coords;
