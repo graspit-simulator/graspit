@@ -583,7 +583,7 @@ SearchEnergy::dynamicAutograspEnergy() const
 	PRINT_STAT(mOut, "Autograsp done");
 
 	//disable contacts on pedestal
-    Body *obstacle=NULL;
+	Body *obstacle=NULL;
 	for (int b=0; b<mHand->getWorld()->getNumBodies(); b++) {
 		Body *bod = mHand->getWorld()->getBody(b);
 		if (bod->isDynamic()) continue;
