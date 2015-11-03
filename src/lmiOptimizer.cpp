@@ -695,6 +695,7 @@ double * maxdet_wrap(int m, int L, double *F, int *F_blkszs,
 
 
 {
+  Q_UNUSED(pRstFile);
   register int i;
   int    n, l, max_n, max_l, F_sz, G_sz;  
   int    ptr_size;
