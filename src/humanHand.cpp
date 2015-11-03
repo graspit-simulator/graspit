@@ -705,7 +705,7 @@ PROF_DECLARE(TENDON_UPDATE_INSERTION_FORCES);
 void Tendon::updateInsertionForces()
 {
   PROF_TIMER_FUNC(TENDON_UPDATE_INSERTION_FORCES);
-  SbVec3f pPrev=NULL,pCur=NULL,pNext=NULL;
+  SbVec3f pPrev(0,0,0),pCur(0,0,0),pNext(0,0,0);
   position tmpPos;
   vec3 dPrev,dNext,dRes,c;
   
