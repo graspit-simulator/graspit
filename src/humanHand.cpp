@@ -303,8 +303,8 @@ inline bool wrapperIntersection(TendonWrapper *wrapper, QString tendonName,
   tmpPos = position (P4.toSbVec3f()) * ( link->getTran());
   P4 = vec3 ( tmpPos.toSbVec3f() );
   
-  vec3 Pa, Pb;
-  double mua, mub;
+  vec3 Pa=NULL, Pb=NULL;
+  double mua=0, mub=0;
   LineLineIntersect( pPrev , pNext , P3,P4 , &Pa, &Pb, &mua, &mub);
 
   // if closest point is not between wrapper edges we are done
@@ -705,7 +705,7 @@ PROF_DECLARE(TENDON_UPDATE_INSERTION_FORCES);
 void Tendon::updateInsertionForces()
 {
   PROF_TIMER_FUNC(TENDON_UPDATE_INSERTION_FORCES);
-  SbVec3f pPrev,pCur,pNext;
+  SbVec3f pPrev=NULL,pCur=NULL,pNext=NULL;
   position tmpPos;
   vec3 dPrev,dNext,dRes,c;
   
@@ -1393,6 +1393,9 @@ int HumanHand::contactForcesFromJointTorques(std::list<Contact*> contacts,
 					     const std::vector<double> &jointTorques,
 					     bool convert_to_world_frame)
 {
+  Q_UNUSED(contactForces);
+  Q_UNUSED(convert_to_world_frame);
+
   std::list<Joint*> joints;
   for(int c=0; c<getNumChains(); c++) 
   {
