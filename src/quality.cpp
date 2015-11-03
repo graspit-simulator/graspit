@@ -162,7 +162,7 @@ QualEpsilon::~QualEpsilon()
 double
 QualEpsilon::evaluate()
 {
-  double minOffset;
+  double minOffset=std::numeric_limits<double>::max();
 
   if (!gws->hyperPlanes) {
 #ifdef GRASPITDBG
