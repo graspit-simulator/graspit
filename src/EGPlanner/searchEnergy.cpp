@@ -368,7 +368,7 @@ SearchEnergy::potentialQualityEnergy(bool verbose) const
 		fprintf(stderr,"Quality: %f\n\n",gq);
 	}
 	if (count) {
-	  DBGP("Count: " << count << "; Gq: " << gq << ";");
+	        DBGP("Count: " << count << "; Gq: " << gq << ";");
 	}
 	return -gq;
 }
