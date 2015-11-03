@@ -42,6 +42,8 @@
 #include "grasp.h"
 #include "gws.h"
 
+#include <limits>
+
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
 #endif
