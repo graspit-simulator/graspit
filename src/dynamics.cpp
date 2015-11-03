@@ -379,11 +379,11 @@ iterateDynamics(std::vector<Robot *> robotVec,
   double *v2=NULL;
 
   // intermediate matrices for case of both joint and contact constraints
-  double *NutM_i,*NutM_iNu,*INVNutM_iNu,*INVNutM_iNuNut;
-  double *INVNutM_iNuNutM_i,*INVNutM_iNuNutM_iH;
+  double *NutM_i=NULL,*NutM_iNu=NULL,*INVNutM_iNu=NULL,*INVNutM_iNuNut=NULL;
+  double *INVNutM_iNuNutM_i=NULL,*INVNutM_iNuNutM_iH=NULL;
 
   // intermediate vectors for case of both joint and contact constraints
-  double *NutM_ikminuseps,*INVNutM_iNuNutM_ikminuseps;
+  double *NutM_ikminuseps=NULL,*INVNutM_iNuNutM_ikminuseps=NULL;
 
   double *currq,*currM;
 
