@@ -508,10 +508,10 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 	QString buf, elementType, matStr, elementPath, elementName,mountFilename;
 	Link *mountPiece;
 	QString line;
-    WorldElement *element=NULL;
+	WorldElement *element=NULL;
 	transf tr;
 	int prevRobNum,chainNum,nextRobNum;
-    bool cameraFound;
+	bool cameraFound;
 	while(child!=NULL){
 		elementType = child->Value();
 		if(elementType.isNull()){
@@ -1984,7 +1984,7 @@ World::computeNewVelocities(double timeStep)
 	std::vector<DynamicBody *> robotLinks;
 	std::vector<DynamicBody *> dynIsland;
 	std::vector<Robot *> islandRobots;
-    int i,j,numLinks,numDynBodies,lemkeErrCode;
+	int i,j,numLinks,numDynBodies,lemkeErrCode;
 
 #ifdef GRASPITDBG
 	int islandCount = 0;
@@ -2048,7 +2048,7 @@ World::computeNewVelocities(double timeStep)
 				std::cout << dynIsland[i]->getName() <<" ";
 			std::cout << std::endl;
 			std::cout << "Island Robots"<< islandCount<<" Robots: ";
-            for (i=0;i<islandRobots.size();;i++)
+			for (i=0;i<islandRobots.size();;i++)
 				std::cout << islandRobots[i]->getName() <<" ";
 			std::cout << std::endl << std::endl;
 #endif  
