@@ -1004,7 +1004,6 @@ SoSeparator* SoftContact::getVisualIndicator()
 	zaxisMat->diffuseColor = SbColor(0,0,0);
 	zaxisMat->ambientColor = SbColor(0,0,0);
 
-    //radius = Body::CONE_HEIGHT / 5;
 	height = Body::CONE_HEIGHT;
 
 	tran = new SoTransform;  

@@ -652,7 +652,6 @@ IVmgr::transRot(DraggerInfo *dInfo)
 
 	// save the desired position or orientation and set what percent of the 
 	// desired moved will be accomplished in each step
-    //SbVec3f temp = dInfo->lastTran;
 	if (translating) {
 		if ((myHandleBox->translation.getValue() - dInfo->lastTran).length()<0.00001) {
 			myHandleBox->translation.setValue(dInfo->lastTran); 

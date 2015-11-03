@@ -592,7 +592,6 @@ EigenGraspInterface::setMinMax()
 
 	for (int e = 0; e < eSize; e++)
 	{
-        //int mind, maxd;
 		//fprintf(stderr,"\n------\nEG %d\n",e);
 #ifdef EIGENGRASP_LOOSE
 		mmin = +1.0e5;
