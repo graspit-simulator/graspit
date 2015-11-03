@@ -508,7 +508,7 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 	QString buf, elementType, matStr, elementPath, elementName,mountFilename;
 	Link *mountPiece;
 	QString line;
-	WorldElement *element;
+    WorldElement *element=NULL;
 	transf tr;
 	int prevRobNum,chainNum,nextRobNum;
     bool cameraFound;
