@@ -68,15 +68,15 @@ TEST(SIMPLE_TEST, EXAMPLE_TEST) {
 
   dlg->generateGrasps();
   dlg->visualizeBox->setChecked(true);
-  dlg->testGrasps();
-
+//  dlg->testGrasps();
+//  dlg->showGrasp();
 
   pthread_t thread1;
   int iret1 = pthread_create( &thread1, NULL, foo, (GraspItGUI*) &gui);
 
   gui.startMainLoop();
 
-  dlg->showGrasp();
+
   pthread_join( thread1, NULL);
 
 //  PlannerDlg *dlg = new PlannerDlg(gui.getMainWindow()->mWindow);
