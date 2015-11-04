@@ -25,13 +25,12 @@ void *foo(void *ptr )
     GraspItGUI *gui;
   gui = (GraspItGUI *) ptr;
 
-  std::cout << "about to exit0" << std::endl;
+  std::cout << "Sleeping before killing mainLoop" << std::endl;
   sleep(10);
 
-  std::cout << "about to exit1" << std::endl;
+  std::cout << "about to  kill mainloop" << std::endl;
 
   gui->exitMainLoop();
-  //SoQt::done();
 
 }
 
@@ -52,9 +51,6 @@ TEST(SIMPLE_TEST, EXAMPLE_TEST) {
 
   int num_bodies = graspItGUI->getIVmgr()->getWorld()->getNumBodies();
   EXPECT_EQ(num_bodies, 10);
-
-
-  //Grasp *g = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
 
   QMDlg *d = new QMDlg(gui.getMainWindow()->mWindow);
   d->show();
@@ -78,24 +74,6 @@ TEST(SIMPLE_TEST, EXAMPLE_TEST) {
 
 
   pthread_join( thread1, NULL);
-
-//  PlannerDlg *dlg = new PlannerDlg(gui.getMainWindow()->mWindow);
-//  dlg->setAttribute(Qt::WA_ShowModal, false);
-//  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-//  dlg->show();
-
-
-  //QualEpsilon *qm = new QualEpsilon(g, QString("epsilon_quality_measure"), QualityMeasure::TYPE_LIST[0]);
-
-
-//  qmDlgDataT *qmDlgData = new qmDlgDataT();
-//  qmDlgData->grasp = g;
-//  qmDlgData->qmType ="Epsilon";
-
-//  QualityMeasure::createInstance(qmDlgData);
-
-
-
 
 }
 
