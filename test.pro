@@ -51,13 +51,16 @@ graspitdbg {
 }
 
 win32 {
-	include(graspit-lib-WINDOWS.pro)
+        include(graspit-lib-WINDOWS.pro)
 } else {
-	include(graspit-lib-LINUX.pro)
+        include(graspit-lib-LINUX.pro)
 }
 
-#------------------GraspIt! core files---------------------
 
+#------------------GraspIt! test files---------------------
 include(graspit-core.pro)
-SOURCES += src/main.cpp
 
+
+INCLUDEPATH += test/
+SOURCES += test/simple_test.cpp
+LIBS += -L/usr/lib/ -lgtest

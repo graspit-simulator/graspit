@@ -130,7 +130,6 @@ SOURCES	+= src/arch.cpp \
 	src/joint.cpp \
 	src/kinematicChain.cpp \
 	src/lmiOptimizer.cpp \
-	src/main.cpp \
 	src/material.cpp \
 	src/matvec.cpp \
 	src/matvecIO.cpp \

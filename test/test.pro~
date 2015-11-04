@@ -1,0 +1,11 @@
+
+TEMPLATE = app
+#------------------GraspIt! test files---------------------
+#include(graspit.pro)
+
+INCLUDEPATH += test/
+
+SOURCES += simple_test.cpp
+
+
+LIBS += -Lgtest/build -lgtest
