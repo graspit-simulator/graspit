@@ -104,6 +104,8 @@ HEADERS	+= include/barrett.h \
 	include/EGPlanner/onLineGraspInterface.h \
 	include/EGPlanner/listPlanner.h \
 	include/FitParabola.h \
+        include/SensorInterface.h \
+        include/ContactPDModels.h \
 	include/shadow.h
 
 SOURCES	+= src/arch.cpp \
@@ -179,6 +181,8 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/timeTest.cpp \
 	src/EGPlanner/graspTesterThread.cpp \
 	src/EGPlanner/onLineGraspInterface.cpp \
+        src/SensorInterface.cpp \
+        src/ContactPDModels.cpp \
 	src/EGPlanner/listPlanner.cpp 
 
 #--------------------------------------- Implementations of the collision interface ---------------------------------

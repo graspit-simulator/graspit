@@ -31,14 +31,17 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <list>
 #include <vector>
-
-#include "src/Collision/collisionStructures.h"
-
+//#include "collisionStructures.h"
+#include "Collision/collisionStructures.h"
+#include "ContactPDModels.h"
 class transf;
 class Body;
 class SoSeparator;
 class SoMaterial;
 class Matrix;
+
+//Should not be here, just for visualization
+#include "UncertaintyPlanner/uncertaintyPlannerUtil.h"
 
 #ifdef ARIZONA_PROJECT_ENABLED
 #include <arizona/Arizona_Raw_Exp.h>
@@ -166,6 +169,8 @@ protected:
   //! Sets up frictional forces at this contact using a linearized ellipsoid
   int setUpFrictionEllipsoid(int numLatitudes,int numDirs[], double phi[],double eccen[]);
 
+  bool isRendered;
+
 public:
 
   //! 6 x numFrictionEdges matrix of friction cone boundary wrenches used in dynmaics
@@ -192,7 +197,7 @@ public:
 
   //! Initializes an empty contact (not really used)
   Contact() : body1(NULL),body2(NULL),mate(NULL),cof(0.0),
-	contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL) {}
+	contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL), isRendered(false) {}
 
   //! Constructs a contact between two bodies 
   Contact(Body *b1,Body *b2, position pos, vec3 norm);
@@ -297,7 +302,7 @@ public:
   /*! Sets the dynamic force acting at this contact during the current time step. Used when drawing contact forces.*/
   void setDynamicContactWrench(double f[6])
     {memcpy(dynamicForce,f,6*sizeof(double));}
-
+  
   /*! Sets just the force part of a dynamic wrench using a vec3*/
   void setDynamicContactForce(const vec3 &force) {
     dynamicForce[0] = force.x(); dynamicForce[1] = force.y();dynamicForce[2] = force.z();
@@ -321,7 +326,7 @@ public:
 
   //! Returns the IV root of the visual markers that shows the location of this contact
   virtual SoSeparator* getVisualIndicator(){return NULL;}
-
+  virtual mat3 getRot(){return mat3::IDENTITY;};
   //! Get dynamic sovler LCP information from the previous time step
   double getPrevCn(){return prevCn;}
   //! Get dynamic sovler LCP information from the previous time step
@@ -341,6 +346,15 @@ public:
   SoMaterial *coneMat;
   //! A debug tool to see that contact inheritance works right
   float coneR, coneG, coneB;
+  //! Testing static force output.  Default implementation for baseclass is trivial
+  virtual void getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec){pVec.push_back(loc);floatVec.push_back(1);};
+  //! Only used in SoftFinger contact
+  virtual mat3 getCommonFrameRot(){ return mat3::IDENTITY; }
+  //! Render the ellipse
+  virtual void renderEllipse(SoSeparator* root, std::vector<position> points){}
+
+  bool getRendered() {return isRendered;}
+  void setRendered() {isRendered = true;}
 };
 
 //! A Point Contact With Friction (PCWF) implementing a Coulomb friction model
@@ -400,14 +414,20 @@ protected:
 	//! The angle of the fitRot rotation
 	double fitRotAngle;
 
-	//! The major axis of the ellipse of contact
+	//! The rotation from the contact fit frame to the common frame
+	mat3 commonRot;
+
+	//! The angle of the commonRot rotation, from it's own contact frame to the common frame
+	double commonRotAngle;
+
+	//! The major axis of the ellipse of contact, be careful to distinguish it from r1prime
 	double majorAxis;
-	//! The minor axis of the ellipse of contact
+	//! The minor axis of the ellipse of contact, be careful to distinguish it from r2prime
 	double minorAxis;
 
-	//! The relative radii of curvature of the two bodies
+	//! The relative radii of curvature of the two bodies used in the common frame
 	double r1prime;
-	//! The relative radii of curvature of the two bodies
+	//! The relative radii of curvature of the two bodies used in the common frame
 	double r2prime;
 
 	//calculates the relative angle between the frames with 2 radii of curvature between
@@ -423,10 +443,14 @@ protected:
 	//! Calculates friction characteristics using a Mattress model
 	double CalcContact_Mattress( double nForce );
 
+	UncertaintySpaceVisualizer mVisualizer;
+	double nForceSimulated;
+
+
 public:
 	//! Also takes a local neighborhood of points around body 1
 	SoftContact( Body *b1, Body *b2, position pos, vec3 norm, Neighborhood *bn );
-
+	ContactPressureDistributionModels cpd;
 	//! Deletes its local record of the body neighborhood
 	~SoftContact( );
 
@@ -435,9 +459,18 @@ public:
 
 	//! Visual indicator is a small patch of the fit analytical surface on the body
 	SoSeparator* getVisualIndicator();
-
+	virtual mat3 getRot(){return fitRot;};
 	//! Also attempt to apply some torques in the contact plane; currently disabled.
 	virtual void computeWrenches();
+
+	//! Discretize the common contact area into different regions and compute the corresponding forces within each region
+	virtual void getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec);
+
+	virtual mat3 getCommonFrameRot(){ return commonRot; }
+
+	virtual void renderEllipse(SoSeparator* root, std::vector<position> points);
+
+	double getNForceSimulated(){ return nForceSimulated; }
 };
 
 //! A contact that exists even when a hand is not perfectly touching another object
@@ -551,9 +584,6 @@ public:
 	int getFingerNum(){return mFingerNum;}
 	//! Returns the number of the link that this contact is on
 	int getLinkNum(){return mLinkNum;}
-
-        //! Changes the frame (and thus also the location and normal) of this virtual contact
-        void changeFrame(transf tr);
 };
 /* just like what VirtualContact class has done, VirtualContactOnObject Class is nothing weird except that
 it changes the virtual contacts' loaction from the finger to an object imported before.

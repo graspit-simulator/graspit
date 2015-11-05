@@ -83,6 +83,7 @@ GraspItGUI *graspItGUI = 0;
  */
 GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
 {
+    DBGA("Processing ARGS....");
   if (!initialized) {
     mainWindow = new MainWindow; 
     SoQt::init(mainWindow->mWindow);
@@ -203,14 +204,14 @@ GraspItGUI::processArgs(int argc, char** argv)
   while((c=getopt(argc, argv, "r:w:o:b:")) != EOF) {
     switch(c) {
     case 'r':
-      filename = graspitRoot + QString("/models/robots/")+
-	QString(optarg) + QString("/") + QString(optarg) + QString(".cfg");
+      filename = graspitRoot + QString("models/robots/")+
+	QString(optarg) + QString("/") + QString(optarg) + QString(".xml");
       if (ivmgr->getWorld()->importRobot(filename)==NULL)
 	++errflag;
       break;
     case 'w':
-      filename = graspitRoot + QString("/worlds/")+ QString(optarg) +
-	QString(".wld");
+      filename = graspitRoot + QString("worlds/")+ QString(optarg) +
+	QString(".xml");
       if (ivmgr->getWorld()->load(filename)==FAILURE)
 	++errflag;
       else

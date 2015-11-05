@@ -78,6 +78,7 @@ class Body : public WorldElement {
 public:
   //! Parameter to control the height of friction cones
   static const float CONE_HEIGHT;
+  double contactForceSum[6];
 
 protected:
   //! The surface material of the body specified as an index to the world material list
@@ -358,6 +359,8 @@ public:
   void getGeometryVertices(std::vector<position> *vertices) const;
 };
 
+enum LinkT {LINK, SENSORLINK};
+
 //! The superclass for all bodies that take part in the dynamics.
 /*! A dynamic body adds mass parameters to the generic body description.
     It also includes the state variables q and v, which encode the position
@@ -627,6 +630,8 @@ public:
   static double defaultMass;
 };
 
+
+
 //! Used for bodies that are part of a robot.
 /*! A link is a dynamic body that notifies its owner robot when contacts have
     changed.
@@ -674,6 +679,25 @@ class Link : public DynamicBody {
   vec3 getProximalJointAxis();
 };
 
+
+class BodySensor;
+
+class SensorLink : public Link{
+private:
+    std::vector<BodySensor *> bdSensor;
+public:
+    SensorLink(Robot *r,int c, int l,World *w,const char *name=0);
+    virtual void cloneFrom(const SensorLink * originalLink);
+    virtual bool setPos(const double *new_q);
+    void setBodySensor(BodySensor * toSet);
+    void resetDynamicsFlag();
+    void setEmColor(double x1, double x2, double x3);
+    virtual void addIVMat(bool clone);
+    virtual void updateSensors();
+     virtual void setContactsChanged();
+    void updateAndOuputSensors(QTextStream & qts);
+    static LinkT getType(){return SENSORLINK;};
+};
 
 
 #ifdef CGDB_ENABLED

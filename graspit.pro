@@ -21,9 +21,9 @@ COLLISION = graspit_collision
 LAPACK = clapack
 
 #build and use interface with Columbia Grasp Database
-#CONFIG += cgdb
+CONFIG += cgdb
 #and use the ros database manager
-#CONFIG += graspit_ros
+CONFIG += graspit_ros
 
 #link against Mosek QP solver (must be installed separately)
 #CONFIG += mosek

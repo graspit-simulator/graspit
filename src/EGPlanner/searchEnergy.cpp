@@ -115,21 +115,21 @@ SearchEnergy::analyzeCurrentPosture(Hand *h, Body *o, bool &isLegal, double &sta
 {
 	setHandAndObject(h,o);
 	
-	if (noChange) {
-		h->saveState();
-	}
+    if (noChange) {
+        h->saveState();
+    }
 
-	if ( !legal() ) {
-		isLegal = false;
-		stateEnergy = 0;
-	} else {
-		isLegal = true;
-		stateEnergy = energy();
-	}
+    if ( !legal() ) {
+        isLegal = false;
+        stateEnergy = 0;
+    } else {
+        isLegal = true;
+        stateEnergy = energy();
+    }
 
-	if (noChange) {
-		h->restoreState();
-	}
+    if (noChange) {
+        h->restoreState();
+    }
 }
 
 void SearchEnergy::analyzeState(bool &isLegal, double &stateEnergy, const GraspPlanningState *state, bool noChange)
@@ -168,47 +168,47 @@ double SearchEnergy::energy() const
 		this is if we don't want to use pre-specified contacts, but rather the closest points between each link
 		and the object all iterations. Not necessarily needed for contact energy, but useful for GQ energy
 	*/
-	if (mContactType == CONTACT_LIVE && mType != ENERGY_AUTOGRASP_QUALITY && mType != ENERGY_STRICT_AUTOGRASP) {
-		mHand->getWorld()->findVirtualContacts(mHand, mObject);
-		DBGP("Live contacts computation");
-	}
+    if (mContactType == CONTACT_LIVE && mType != ENERGY_AUTOGRASP_QUALITY && mType != ENERGY_STRICT_AUTOGRASP) {
+        mHand->getWorld()->findVirtualContacts(mHand, mObject);
+        DBGP("Live contacts computation");
+    }
 
 	double e;
-	switch (mType) {
-		case ENERGY_CONTACT:
-			mHand->getGrasp()->collectVirtualContacts();
-			e = contactEnergy();
-			break;
-		case ENERGY_POTENTIAL_QUALITY:
-			mHand->getGrasp()->collectVirtualContacts();
-			e = potentialQualityEnergy();
-			break;
-		case ENERGY_AUTOGRASP_QUALITY:
-			// this one will collect REAL contacs after autograsp is completed
-			e = autograspQualityEnergy();
-			break;
-		case ENERGY_CONTACT_QUALITY:
-			mHand->getGrasp()->collectVirtualContacts();
-			e = guidedPotentialQualityEnergy();
-			break;
-		case ENERGY_GUIDED_AUTOGRASP:
-			// we let this one collect its contact explicitly since is has to do it twice
-			e = guidedAutograspEnergy();
-			break;
-		case ENERGY_STRICT_AUTOGRASP:
-			// this one will collect REAL contacs after autograsp is completed
-			e = strictAutograspEnergy();
-			break;
-		case ENERGY_COMPLIANT:
-			e = compliantEnergy();
-			break;
-		case ENERGY_DYNAMIC:
-			e = dynamicAutograspEnergy();
-			break;
-		default:
-			fprintf(stderr,"Wrong type of energy requested!\n");
-			e = 0;
-	}
+    switch (mType) {
+        case ENERGY_CONTACT:
+            mHand->getGrasp()->collectVirtualContacts();
+            e = contactEnergy();
+            break;
+        case ENERGY_POTENTIAL_QUALITY:
+            mHand->getGrasp()->collectVirtualContacts();
+            e = potentialQualityEnergy();
+            break;
+        case ENERGY_AUTOGRASP_QUALITY:
+            // this one will collect REAL contacs after autograsp is completed
+            e = autograspQualityEnergy();
+            break;
+        case ENERGY_CONTACT_QUALITY:
+            mHand->getGrasp()->collectVirtualContacts();
+            e = guidedPotentialQualityEnergy();
+            break;
+        case ENERGY_GUIDED_AUTOGRASP:
+            // we let this one collect its contact explicitly since is has to do it twice
+            e = guidedAutograspEnergy();
+            break;
+        case ENERGY_STRICT_AUTOGRASP:
+            // this one will collect REAL contacs after autograsp is completed
+            e = strictAutograspEnergy();
+            break;
+        case ENERGY_COMPLIANT:
+            e = compliantEnergy();
+            break;
+        case ENERGY_DYNAMIC:
+            e = dynamicAutograspEnergy();
+            break;
+        default:
+            fprintf(stderr,"Wrong type of energy requested!\n");
+            e = 0;
+    }
 	return e;
 }
 

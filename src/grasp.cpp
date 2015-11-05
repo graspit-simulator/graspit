@@ -157,7 +157,7 @@ Grasp::addGWS(const char *type)
     gws = GWS::createInstance(type,this);
     
     gwsList.push_back(gws);
-    printf("created new %s GWS.\n",type);
+    //printf("created new %s GWS.\n",type);
   }
 
   gws->ref();  // add 1 to the reference count

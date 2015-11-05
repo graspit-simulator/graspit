@@ -84,6 +84,7 @@ extern "C" {
 
 #include <Inventor/actions/SoWriteAction.h>
 
+#include "SensorInterface.h"
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
 #endif
@@ -2307,3 +2308,84 @@ operator<<(QTextStream &os, const GraspableBody &gb)
   os << gb.myFilename << endl;
   return os;
 }
+
+
+/*FIXME - This is possibly the wrong way to do this -
+ sensors only update when the link moves, not when things move in to the link
+Something to do with the contacts changed flag might be better.
+*/
+bool SensorLink::setPos(const double *new_q){
+    //updateSensors();
+    return Link::setPos(new_q);
+}
+
+SensorLink::SensorLink(Robot *r,int c, int l,World *w,const char *name) : Link(r,c,l,w,name){
+ memset(contactForceSum,0,6*sizeof(double));
+};
+
+void SensorLink::resetDynamicsFlag() {
+     updateSensors();
+      dynamicsComputedFlag = false;
+      memset(contactForceSum,0,6*sizeof(double));
+  }
+
+void SensorLink::addIVMat(bool clone){
+    Body::addIVMat(clone);
+    IVMat->emissiveColor.setIgnored(false);
+    IVMat->emissiveColor.setValue(0.0,0.0,1.0);
+}
+
+void SensorLink::setEmColor(double x1, double x2, double x3){
+IVMat->emissiveColor.setValue(x1,x2,x3);
+}
+
+void SensorLink::setBodySensor(BodySensor *si){
+bdSensor.push_back(si);
+}
+
+void SensorLink::updateSensors(){
+    std::vector<BodySensor *>::iterator bi;
+    double maxVal = 0;
+    for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
+        (*bi)->updateSensorModel();
+        double v = (*bi)->getNormalForce() ;
+        if(v > maxVal)
+            maxVal = v;
+    }
+    //no sensor has value
+    if(maxVal < 1e-6)
+    {
+        maxVal = 1e10;
+    }
+    //set the color of each sensor
+    //std::cout << this << std::endl;
+    for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++){
+        (*bi)->setColor(maxVal);
+    }
+}
+
+void  SensorLink::setContactsChanged(){
+    updateSensors();
+    Link::setContactsChanged();
+}
+
+void SensorLink::updateAndOuputSensors(QTextStream & qts){
+    std::vector<BodySensor *>::iterator bi;
+    for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
+        (*bi)->updateSensorModel();
+        (*bi)->outputSensorReadings(qts);
+    }
+    return;
+}
+
+void SensorLink::cloneFrom(const SensorLink * originalLink){
+    Link::cloneFrom(originalLink);
+    //copy all body sensors
+
+    for(std::vector<BodySensor *>::const_iterator bdIt = originalLink->bdSensor.begin();
+        bdIt != bdSensor.end(); ++bdIt){
+            bdSensor.push_back((*bdIt)->clone(this));
+
+    }
+}
+

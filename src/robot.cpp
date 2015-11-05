@@ -33,6 +33,9 @@
 //needed just for the image of the Flock of Birds sensor and the approach direction
 #include "SoArrow.h"
 #include <Inventor/nodes/SoCube.h>
+#include <Inventor/nodes/SoGroup.h>
+#include <Inventor/nodes/SoScale.h>
+
 
 #include "bBox.h"
 #include "mytools.h"
@@ -49,6 +52,9 @@
 #include "eigenGrasp.h"
 #include "matrix.h"
 #include "tinyxml.h"
+#include "collisionInterface.h"
+#include "SensorInterface.h"
+#include "triangle.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -109,10 +115,33 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	QString ivdir = rootPath + "iv/";
 	// read and load the base; automatically placed at origin
 	DBGA("Creating base...\n");  
+    QString sensorType = element->Attribute("sensorType");
 	if(element){
-		valueStr = element->GetText();	
-		valueStr = valueStr.stripWhiteSpace();
-		base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
+        valueStr = element->GetText();
+        valueStr = valueStr.stripWhiteSpace();
+        if(!sensorType.isNull())
+        {
+            if(sensorType == "BodySensor")
+            {
+                sensorType.stripWhiteSpace();
+                base = new SensorLink(this, -1, -1, myWorld, (QString(name())+"Base").latin1());
+                BodySensor * bd = new BodySensor(base);
+                QString sensorNumber = element->Attribute("groupNumber");
+                sensorNumber = sensorNumber.stripWhiteSpace();
+                if(!sensorNumber.isEmpty())
+                {
+                    bd->setGroupNumber(sensorNumber.toInt());
+                }
+            }
+            else if(sensorType == "FilteredSensor"){
+                sensorType.stripWhiteSpace();
+                base = new SensorLink(this, -1, -1, myWorld,  (QString(name())+"Base").latin1());
+            }
+        }
+        else
+        {
+            base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
+        }
 		if (!base  || base->load(ivdir+valueStr)==FAILURE) {
 			if (base) delete base; 
 			base = NULL;
@@ -124,6 +153,15 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 		//init my IVRoot and add the base
 		IVRoot = new SoSeparator;
 		IVRoot->addChild(base->getIVRoot());
+        std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "filter");
+        std::list<const TiXmlElement*>::iterator p;
+        for(p = elementList.begin(); p!=elementList.end(); p++){
+            //Get body number
+            QString bodyNumText = (*p)->GetText();
+            QString params = (*p)->Attribute("params");
+            RegionFilteredSensor * bd = new RegionFilteredSensor(base);
+            bd->setFilterParams(&params);
+        }
 	}
 	else{
 		QTWARNING("Base not found");

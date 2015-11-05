@@ -16,6 +16,7 @@ where R1 and R2 are the radii of curvature
 
 inline void FitParaboloid( vec3 *points, int numpts, double *coeffs );
 inline void RotateParaboloid( double *coeff, double *R1, double *R2, mat3 *Rot, double *rotAngle );
+inline void RotateParaboloid2( double *coeff, double *R1, double *R2, mat3 *Rot, double *rotAngle );
 
 #define FIT_TINY 1.0e-6
 #define CONCAVE_WARNING 1.0e-3
@@ -93,6 +94,8 @@ void RotateParaboloid( double *coeff, double *R1, double *R2, mat3 *Rot, double 
 	//R^t*[[A C/2][C/2 B]]*R = [[rads[0] 0][0 rads[1]]
 	//where R is the rotation matrix [[cos(theta) -sin(theta)][sin(theta) cos(theta)]]
 
+	//in this rotation, we want that in the final frame: A < B since we want the x-axis aligns with the major axis
+
 
 	double theta, sintheta, costheta;
 	vec3 col1, col2, col3;
@@ -153,3 +156,91 @@ void RotateParaboloid( double *coeff, double *R1, double *R2, mat3 *Rot, double 
 
 	//final form of eqn z = 1/2r1*x^2 +1/2r2*y^2
 }
+
+void RotateParaboloid2( double *coeff, double *R1, double *R2, mat3 *Rot, double *rotAngle )
+{
+	//rotate a given parabola so that the xy coefficient is zero
+	//fill out the rads (radii of curvature) and the rotation that
+	//takes you from the first (contact) frame into the rotated frame
+
+	//tan(2theta) = C/(B-A)
+
+	//R^t*[[A C/2][C/2 B]]*R = [[rads[0] 0][0 rads[1]]
+	//where R is the rotation matrix [[cos(theta) -sin(theta)][sin(theta) cos(theta)]]
+
+	//in this rotation, we want that in the final frame: A < B since we want the x-axis aligns with the major axis
+
+
+	double theta, sintheta, costheta;
+	vec3 col1, col2, col3;
+
+	if( fabs(coeff[2]) > FIT_TINY )
+	{
+		if( coeff[0] != coeff[1] )
+			theta = atan( coeff[2]/(coeff[1] - coeff[0])  )/2.0;
+		else
+			theta = M_PI/2;
+
+		*rotAngle = theta;
+		sintheta = sin(theta);
+		costheta = cos(theta);
+
+		double temp1 = (coeff[0]*costheta*costheta + coeff[1]*sintheta*sintheta
+					- coeff[2] * sintheta*costheta)*2;
+		double temp2 = (coeff[0]*sintheta*sintheta + coeff[1]*costheta*costheta
+					+ coeff[2] * sintheta*costheta)*2;
+
+		if( temp1 > temp2 ) // the major axis is not aligned with the x-axis
+		{
+			theta += M_PI/2;
+			*rotAngle = theta;
+			sintheta = sin(theta);
+			costheta = cos(theta);
+			temp1 = (coeff[0]*costheta*costheta + coeff[1]*sintheta*sintheta
+						- coeff[2] * sintheta*costheta)*2;
+			temp2 = (coeff[0]*sintheta*sintheta + coeff[1]*costheta*costheta
+						+ coeff[2] * sintheta*costheta)*2;
+		}
+
+		col1.set( costheta, sintheta, 0.0 );
+		col2.set( -1.0*sintheta, costheta, 0.0 );
+		col3.set( 0.0, 0.0, 1.0 );
+		Rot->set( col1, col2, col3 );
+
+		if( fabs(temp1) > FIT_TINY ) {
+			*R1 = 1/temp1;
+		} else {
+			*R1 = -1.0;
+		}
+		if( fabs(temp2) > FIT_TINY ) {
+			*R2 = 1/temp2;
+		} else {
+			*R2 = -1.0;
+		}
+		//the else's take care of flat case, which will be addressed
+		//in finding the relative radii of curvature
+	}
+	else
+	{
+		if( fabs(coeff[0]) > FIT_TINY ) {
+			*R1 = 1/(2*coeff[0]);
+		} else {
+			*R1 = -1.0;
+		}
+		if( fabs(coeff[1]) > FIT_TINY ) {
+			*R2 = 1/(2*coeff[1]);
+		} else {
+			*R2 = -1.0;
+		}
+
+		*rotAngle = 0;
+		*Rot = mat3::IDENTITY;
+
+	}
+
+	//std::cerr<<"Coeffs on entry: " << coeff[0] << " " << coeff[1] << " " << coeff[2] << std::endl;
+	//std::cerr<<"Radii of curvature: "<<*R1<<"\t"<<*R2<<std::endl;
+
+	//final form of eqn z = 1/2r1*x^2 +1/2r2*y^2
+}
+

@@ -1015,6 +1015,14 @@ World::addRobot(Robot *robot, bool addToScene)
 	emit numElementsChanged();
 }
 
+/*! Adds to this world a sensor that is already created and initialized.
+*/
+
+void
+World::addSensor(SensorInterface * si){
+    sensorVec.push_back(si);
+    numSensors ++;
+}
 
 /*! Removes a robot from the world and also deletes it. */
 void

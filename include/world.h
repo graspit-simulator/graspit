@@ -74,6 +74,9 @@ class SoSeparator;
 class SoIdleSensor;
 class SoSensor;
 
+class SensorInterface;
+class GraspControllerInterface;
+
 //! The simulation world holds the world elements and handles their static and dynamic interactions
 /*! A world object keeps track of all of the world elements (bodies and robots)
     contained within it.  It allows collisions to be turned on or off,
@@ -106,6 +109,9 @@ protected:
   //! A vector of pointers to the hands defined within this world
   std::vector<Hand *> handVec;
 
+  //! A vector of pointers to the sensors defined within this world
+  std::vector<SensorInterface *> sensorVec;
+
   //! The number of bodies currently in this world
   int numBodies;
 
@@ -117,6 +123,9 @@ protected:
 
   //! The number of hands currently in this world
   int numHands;
+
+  //! The number of sensors currently in this world
+  int numSensors;
 
   //! The number of currently selected elements
   int numSelectedElements;
@@ -262,6 +271,9 @@ public:
   //! Returns the number of selected bodies 
   int getNumSelectedBodies() const {return numSelectedBodies;}
 
+  //! Returns the number of sensors defined in the world
+  int getNumSensors() const {return numSensors;}
+
   //! Returns a pointer to the i-th selected body in the world 
   Body *getSelectedBody(int i) const {return selectedBodyVec[i];}
 
@@ -319,6 +331,9 @@ public:
   //! Returns a pointer to the i-th robot defined in this world 
   Robot *getRobot(int i) const {return robotVec[i];}
 
+  //! Returns a pointer to the i-th sensor defined in this world
+  SensorInterface * getSensor(int i) const {return sensorVec[i];}
+
   //! Returns whether the world element pointed to by e is currently selected or not
   bool isSelected(WorldElement *e) const;
 
@@ -369,6 +384,8 @@ public:
 	
   //! Adds an already populated robot to the world,and possibly to the scene graph
   void addRobot(Robot *robot, bool addToScene = true);
+
+  void addSensor(SensorInterface * si);
 
   //! Removes the robot pointed to by robot from the world, then deletes it.
   void removeRobot(Robot *robot);
