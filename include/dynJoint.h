@@ -125,6 +125,8 @@ public:
 
   //! Computes the 6x6 Jacobian of this joint wrt to a point 
   void jacobian(transf toTarget, Matrix *J, bool worldCoords);
+
+  virtual ~DynJoint(){};
 };
 
 //! A fixed joint constrains all translations and rotations.

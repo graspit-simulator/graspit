@@ -38,6 +38,7 @@ class WorldElementCreator
 {
 public:
   virtual WorldElement* operator() (World* parent, const char* name) = 0;
+  virtual ~WorldElementCreator(){};
 };
 
 //! Templated implementation

@@ -350,10 +350,9 @@ CompliantPlannerDlg::showResult()
 {
 	int d = mPlanner->getListSize();
 	int rank, size, iteration; double energy;
-	bool render = true;
 
 	if (d==0) {
-		mBestGraspNum = rank = size = iteration = energy = 0; render = false;
+        mBestGraspNum = rank = size = iteration = energy = 0;
 	} else if (mBestGraspNum < 0){
 		mBestGraspNum = 0;
 	} else if ( mBestGraspNum >= d) {

@@ -695,6 +695,7 @@ double * maxdet_wrap(int m, int L, double *F, int *F_blkszs,
 
 
 {
+  Q_UNUSED(pRstFile);
   register int i;
   int    n, l, max_n, max_l, F_sz, G_sz;  
   int    ptr_size;
@@ -706,11 +707,6 @@ double * maxdet_wrap(int m, int L, double *F, int *F_blkszs,
   
   
   //  struct tms before,after;
-  
-  // Gets rid of compiler warning
-#ifndef GRASPDBG
-  pRstFile = NULL;
-#endif
   
   for (i=0; i<L; i++) {
     if (F_blkszs[i] <= 0) {
@@ -1215,7 +1211,7 @@ LMIOptimizer::findOptimalGraspForce()
     optmXHistory = xzHistoryTransfrom(extendOptmZHistory, optmNTiters+1);
     
     printf("OPTIMAL CONTACT FORCES:\n");
-    disp_mat(stdout,optmx0,1,numWrenches,0);
+    disp_mat(stdout,optmx0,1,numWrenches);
 
     //    double *testOut = new double[6];
     //    dgemv("N",6,numWrenches,1.0,graspMap,6,optmx0,1,0.0,testOut,1);
@@ -1233,7 +1229,7 @@ LMIOptimizer::findOptimalGraspForce()
 	  optmx0, 1,1.0, optTorques, 1);
 
     printf("OPTIMAL TORQUES:\n");
-    disp_mat(stdout,optTorques,1,numDOF,0);
+    disp_mat(stdout,optTorques,1,numDOF);
 
     int offset = 0;
     for (i=0;i<mGrasp->numContacts;i++) {

@@ -336,7 +336,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
   int numJoints=0;
   int numDOF=0;
   int bn,cn,i,j;
-  int Mrows,Dcols,Arows,Hrows,Hcols,Nurows,Nucols;
+  int Mrows,Dcols,Arows=0,Hrows=0,Hcols=0,Nurows=0,Nucols=0;
   int numDOFLimits=0;
 
   std::list<Contact *> contactList;
@@ -354,36 +354,36 @@ iterateDynamics(std::vector<Robot *> robotVec,
   double *fext = new double[6*numBodies];
 
   // LCP matrix
-  double *A;
+  double *A=NULL;
 
   // LCP vectors
-  double *g,*lambda;
+  double *g=NULL,*lambda=NULL;
   double *predLambda = NULL; //used for debugging the prediction of LCP basis
 
   // main matrices for contact constraints
-  double *H;
+  double *H=NULL;
 
   // main matrices for joint constraints
-  double *Nu;
+  double *Nu=NULL;
 
   // main vector for contact constraints
-  double *k;
+  double *k=NULL;
   
   // main vectors for joint constraints
-  double *eps;
+  double *eps=NULL;
 
   // intermediate matrices for contact constraints
-  double *HtM_i,*v1;
+  double *HtM_i=NULL,*v1=NULL;
 
   // intermediate matrices for contact constraints
-  double *v2;
+  double *v2=NULL;
 
   // intermediate matrices for case of both joint and contact constraints
-  double *NutM_i,*NutM_iNu,*INVNutM_iNu,*INVNutM_iNuNut;
-  double *INVNutM_iNuNutM_i,*INVNutM_iNuNutM_iH;
+  double *NutM_i=NULL,*NutM_iNu=NULL,*INVNutM_iNu=NULL,*INVNutM_iNuNut=NULL;
+  double *INVNutM_iNuNutM_i=NULL,*INVNutM_iNuNutM_iH=NULL;
 
   // intermediate vectors for case of both joint and contact constraints
-  double *NutM_ikminuseps,*INVNutM_iNuNutM_ikminuseps;
+  double *NutM_ikminuseps=NULL,*INVNutM_iNuNutM_ikminuseps=NULL;
 
   double *currq,*currM;
 
