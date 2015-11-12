@@ -6,5 +6,6 @@ Talk to me about that. It's complicated.
 
 
 TODO LIST:
-[] Clean up blind planner / make a new window with just what we need
-[] Incorporate the heatmap planner OR make a nice interface for getting the grasp to update from another graspit
+- [ ] Clean up blind planner / make a new window with just what we need
+- [ ] Incorporate the heatmap planner OR make a nice interface for getting the grasp to update from another graspit
+ 
