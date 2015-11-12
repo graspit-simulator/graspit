@@ -1,0 +1,47 @@
+1. Get PostgreSQL binaries and install. 
+
+Add %PSQLDIR%/bin to your PATH, where PSQLDIR is the directory where you installed PostgreSQL (e.g. C:\postgresql-8.3.4).
+
+WARNING: if Qt can not find the PostgreSQL dll's it will NOT complain about it, but just fail to open any databases. If that happens, make sure the path to the dll is in your PATH.
+
+WARNING: some of the dll's from %PSQLDIR%/bin are sometimes also present in other places on your system, such as Windows/system32 etc. For some reason, the system will try to use the wrong version at run-time and libpq won't operate well. When this happens, you will get a "driver not loaded" error from the GraspIt cgdb interface.
+
+The solution is to copy those dlls in the directory that you're running GraspIt from (GRASPIT if running from MSVC or GRASPIT/bin if running the executable directly). Most recently, I have had to do this with libeay32.dll and ssleay32.dll.
+
+2. build the qpsql according to "How to Build the QPSQL Plugin on Windows" in the Qt Assistant:
+
+Install the PostgreSQL developer libraries. Assuming that PostgreSQL was installed in C:\psql, build the plugin as follows:
+  cd %QTDIR%\src\plugins\sqldrivers\psql
+  qmake "INCLUDEPATH+=C:\%PSQLDIR%\include" "LIBS+=C:\%PSQLDIR%\lib\libpq.lib" psql.pro [psql.pro]
+  nmake
+
+After this, check that the qsqlpsql lib and dll files have been built in C:\%QTDIR%\plugins\sqldrivers
+
+3. Create your root for the CGDB, such as C:\cgdb. Set the environment variable CGDB_MODEL_ROOT to point to it.
+
+4. download the PSB itself and unpack it in the CGDB_MODEL_ROOT.
+
+for example, m0 should be in CGDB_MODEL_ROOT\psb\benchmark\db\0\m0\m0.off
+
+the PSB is at shape.cs.princeton.edu/benchmark/download.cgi?file=download/psb_v1.zip
+
+5. Get the iv models from our robotics servers and place them in CGDB_MODELS_ROOT
+
+The models are in /data/hao/. Copy the iv directory in CGDB_MODEL_ROOT
+
+5. Enable the cgdb by editing the graspit.pro file.
+
+You are done!
+
+c:\coin\2.4.6\bin;
+c:\program files\microsoft visual studio .net 2003\common7\ide;
+c:\program files\microsoft visual studio .net 2003\vc7\bin;
+c:\qt\4.4.3\bin;
+c:\program files\php\;
+%systemroot%\system32;%systemroot%;%systemroot%\system32\wbem;
+c:\program files\intel\dmix;c
+:\program files\intel\mkl\ia32\bin;
+c:\program files\tortoisesvn\bin;
+C:\Program Files\MATLAB\R2007a\bin;
+C:\Program Files\MATLAB\R2007a\bin\win32;
+C:\Program Files\QuickTime\QTSystem\

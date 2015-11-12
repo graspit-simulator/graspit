@@ -1,0 +1,25 @@
+#Inventor V1.0 ascii
+#rubber
+#40
+
+Separator {
+#    File {name    "axis_arrows.iv"}
+    File {name    "small.iv"}
+
+	Transform {
+    	translation     38.65 0 0
+    }
+    RotationXYZ {
+		axis Z
+		angle 0.3490658503988659
+	}
+	Transform {
+		translation     21.9 0 0
+	}
+	RotationXYZ {
+		axis Z
+		angle 0.3490658503988659
+	}
+
+    File {name    "tip.iv"}
+}

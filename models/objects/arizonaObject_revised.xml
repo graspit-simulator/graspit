@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>450</mass>
+	<cog>0 0 0</cog>
+	<geometryFile type="Inventor">arizonaObject_revised.iv</geometryFile>
+</root>

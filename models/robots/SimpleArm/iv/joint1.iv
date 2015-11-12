@@ -1,0 +1,41 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 4000
+
+
+Separator {
+	  Material { 
+		diffuseColor 0.8 0.8 0.8
+	  }
+
+Separator{
+	Cube { width 300 height 50 depth 107}
+	Translation {
+		translation -117.5 0 0
+	}
+	Rotation {
+		rotation 1 0 0 1.57
+	}
+	Cylinder { radius 25 height 107 }
+}
+Separator {
+	Material { 
+		diffuseColor 0.4 0.4 0.4
+	}
+	Translation {
+		translation 210 0 48
+	}
+	Cube { width 120 height 50 depth 11}
+}
+
+Separator {
+	Material { 
+		diffuseColor 0.4 0.4 0.4
+	}
+	Translation {
+		translation 210 0 -48
+	}
+	Cube { width 120 height 50 depth 11}
+}
+
+}

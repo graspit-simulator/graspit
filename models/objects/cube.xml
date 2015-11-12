@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<useFlockOfBirds>1.0</useFlockOfBirds>
+	<mass>300</mass>
+	<cog>0 0 0</cog>
+	<inertia_matrix>416.64 0.0 0.0 0.0 416.64 0.0 0.0 0.0 416.64</inertia_matrix>
+	<geometryFile type="Inventor">cube.iv</geometryFile>
+</root>

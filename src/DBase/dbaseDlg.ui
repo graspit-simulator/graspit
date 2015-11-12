@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DBaseDlgUI</class>
+ <widget class="QWidget" name="DBaseDlgUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>425</width>
+    <height>502</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>CGDB - Broswer</string>
+  </property>
+  <widget class="QGroupBox" name="connectionGroup">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>381</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>CGDB Connection</string>
+   </property>
+   <widget class="QLineEdit" name="hostLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>25</y>
+      <width>251</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>localhost</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="hostLabel">
+    <property name="geometry">
+     <rect>
+      <x>47</x>
+      <y>28</y>
+      <width>30</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Host:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="portLabel">
+    <property name="geometry">
+     <rect>
+      <x>235</x>
+      <y>57</y>
+      <width>31</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Port:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="portLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>54</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>5432</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="databaseLabel">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>54</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Database:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="databaseLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>54</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>hao_grasps</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="usernameLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>83</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>User Name:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="usernameLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>82</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>postgres</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="passwordLabel">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>80</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Password:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="passwordLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>80</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>postgres</string>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::Password</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="connectButton">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>110</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Connect</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="handNameLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>110</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>hand name</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="browserGroup">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>381</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Browser</string>
+   </property>
+   <widget class="QComboBox" name="modelsComboBox">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>50</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="modelsLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Models:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadModelButton">
+    <property name="geometry">
+     <rect>
+      <x>24</x>
+      <y>80</y>
+      <width>151</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Model</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadGraspButton">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>120</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Grasps</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="objectGraph">
+    <property name="geometry">
+     <rect>
+      <x>195</x>
+      <y>12</y>
+      <width>176</width>
+      <height>132</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="classesComboBox">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>16</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="classesLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Classes:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="typesComboBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>121</y>
+      <width>81</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="graspsGroup">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>340</y>
+     <width>381</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Grasps</string>
+   </property>
+   <widget class="QPushButton" name="previousGraspButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>41</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextGraspButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>40</y>
+      <width>41</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="graspIndexLabel">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>40</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0/0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="epsilonQualityLabel">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>20</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Epsilon Quality: -1.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="showPreGraspRadioButton">
+    <property name="geometry">
+     <rect>
+      <x>23</x>
+      <y>16</y>
+      <width>101</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>show pre-grasp</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="showFinalGraspRadioButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>15</y>
+      <width>101</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>show final-grasp</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="volumeQualityLabel">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>46</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Volume Quality: -1.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="indexEdit">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="specificGoButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>70</y>
+      <width>41</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GO</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="exitButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>440</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="plannerButton">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>440</y>
+     <width>61</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>DB Planner</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="createGWSButton">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>440</y>
+     <width>51</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>GWS</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="utilButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>440</y>
+     <width>41</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Util</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="semanticPlannerButton">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>440</y>
+     <width>61</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>S. Planner2</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="rerunButton">
+   <property name="geometry">
+    <rect>
+     <x>65</x>
+     <y>440</y>
+     <width>51</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Rerun</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="scanButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>470</y>
+     <width>81</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sample Scan</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

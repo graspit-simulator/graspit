@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.330618 -0.0229857 -0.94348 +0.00310511)[+524.105 +171.634 -1252.98]</fullTransform>
+		</transform>
+	</graspableBody>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.503829 +0.50384 +0.496143 +0.496129)[+127.734 +846.6 -410.865]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.61532 +0.263844 -3.43385 +0.00873889 +1.46111 -0.18796 </dofValues>
+		<transform>
+			<fullTransform>(+1 -4.8049e-17 -5.38594e-15 -1.76084e-16)[-2.90886e-13 -2.56317e-14 -1.42109e-14]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/Barrett/Barrett5.xml</filename>
+		<dofValues>+0.005 +0.604374 +0 +0 +0.570776 +0 +0 +0.514026 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+0.498321 -0.589563 +0.47037 +0.427603)[+125.55 +563.82 -342.537]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +175.05]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>+98.2017 +1689.24 +270.704</position>
+		<orientation>-0.0188041 -0.546525 -0.836997 -0.0198153</orientation>
+		<focalDistance>+1848</focalDistance>
+	</camera>
+</world>

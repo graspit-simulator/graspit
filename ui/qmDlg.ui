@@ -1,0 +1,326 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>QMDlgUI</class>
+ <widget class="QDialog" name="QMDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>576</width>
+    <height>295</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Quality Measures</string>
+  </property>
+  <widget class="QWidget" name="Layout18" >
+   <property name="geometry" >
+    <rect>
+     <x>11</x>
+     <y>11</y>
+     <width>550</width>
+     <height>232</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item row="3" column="0" >
+     <widget class="QLineEdit" name="qmName" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>0</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize" >
+       <size>
+        <width>175</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text" >
+       <string>New Quality Measure</string>
+      </property>
+     </widget>
+    </item>
+    <item rowspan="2" row="0" column="0" >
+     <widget class="Q3ListBox" name="qmListBox" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>0</hsizetype>
+        <vsizetype>7</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize" >
+       <size>
+        <width>175</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" >
+     <widget class="QLabel" name="TextLabel2" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>0</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text" >
+       <string>Quality Measure Type</string>
+      </property>
+      <property name="wordWrap" >
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item rowspan="3" row="1" column="1" colspan="2" >
+     <widget class="Q3GroupBox" name="qmSettingsBox" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>7</hsizetype>
+        <vsizetype>7</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title" >
+       <string>Settings</string>
+      </property>
+      <property name="orientation" >
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2" >
+     <widget class="QComboBox" name="qmTypeComboBox" />
+    </item>
+    <item row="2" column="0" >
+     <widget class="QLabel" name="TextLabel1" >
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>0</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text" >
+       <string>Name</string>
+      </property>
+      <property name="wordWrap" >
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="Q3GroupBox" name="groupBox8" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>250</y>
+     <width>550</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string/>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Vertical</enum>
+   </property>
+   <widget class="QPushButton" name="OKButton" >
+    <property name="geometry" >
+     <rect>
+      <x>456</x>
+      <y>7</y>
+      <width>82</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>OK</string>
+    </property>
+    <property name="default" >
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="AddEditButton" >
+    <property name="geometry" >
+     <rect>
+      <x>280</x>
+      <y>7</y>
+      <width>82</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Add / Edit</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="DeleteButton" >
+    <property name="geometry" >
+     <rect>
+      <x>368</x>
+      <y>7</y>
+      <width>82</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Delete</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="gravityBox" >
+    <property name="geometry" >
+     <rect>
+      <x>11</x>
+      <y>10</y>
+      <width>56</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Gravity</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>Q3GroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>Qt3Support/Q3GroupBox</header>
+   <container>1</container>
+   <pixmap></pixmap>
+  </customwidget>
+  <customwidget>
+   <class>Q3ListBox</class>
+   <extends>Q3Frame</extends>
+   <header>q3listbox.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="local" >graspitGUI.h</include>
+  <include location="local" >ivmgr.h</include>
+  <include location="local" >quality.h</include>
+ </includes>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>OKButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QMDlgUI</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DeleteButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QMDlgUI</receiver>
+   <slot>deleteQM()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>qmTypeComboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>QMDlgUI</receiver>
+   <slot>selectQMType(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AddEditButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QMDlgUI</receiver>
+   <slot>addEditQM()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>qmListBox</sender>
+   <signal>highlighted(int)</signal>
+   <receiver>QMDlgUI</receiver>
+   <slot>selectQM(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>gravityBox</sender>
+   <signal>clicked()</signal>
+   <receiver>QMDlgUI</receiver>
+   <slot>gravityBox_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

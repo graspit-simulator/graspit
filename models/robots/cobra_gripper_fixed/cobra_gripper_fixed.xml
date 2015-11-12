@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+  <palm>sphere.xml</palm>
+  <dof type="r">
+    <defaultVelocity>-1.0</defaultVelocity>
+    <maxEffort>2.5e+9</maxEffort>
+    <Kp>1.0e+11</Kp>
+    <Kd>1.0e+7</Kd>
+    <draggerScale>30</draggerScale>
+  </dof>
+  <dof type="r">
+    <defaultVelocity>-1.0</defaultVelocity>
+    <maxEffort>2.5e+9</maxEffort>
+    <Kp>1.0e+11</Kp>
+    <Kd>1.0e+7</Kd>
+    <draggerScale>30</draggerScale>
+  </dof>
+  <chain>
+    <transform>
+      <translation> 0 0 0</translation>
+      <rotation>0 x</rotation>
+    </transform>
+    <joint type="Revolute">
+      <theta>d0</theta>
+      <d>21.336</d>
+      <a>-10.7442</a>
+      <alpha>-90</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <viscousFriction>5.0e+7</viscousFriction>
+    </joint>
+    <joint type="Revolute">
+      <theta>d1</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>0</alpha>
+      <minValue>0.5</minValue>
+      <maxValue>45</maxValue>
+      <viscousFriction>5.0e+7</viscousFriction>
+    </joint>
+    <link dynamicJointType="Revolute">fixed_jaw.xml</link>
+    <link dynamicJointType="Revolute">rotating_jaw.xml</link>
+  </chain>
+  <approachDirection>
+    <referenceLocation>0.0 0.0 0.0</referenceLocation>
+    <direction>1.0 0.0 0.0</direction>
+  </approachDirection>
+</robot>

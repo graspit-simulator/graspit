@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.993516 -0.080517 +0.0546377 +0.0587947)[+553.007 +575.922 -451.189]</fullTransform>
+		</transform>
+	</graspableBody>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.506237 +0.501415 +0.492862 +0.499393)[+126.708 +846.454 -410.707]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.61532 +0.268473 -3.43365 +0.00868256 +1.49314 -0.185522 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/Barrett/Barrett5.xml</filename>
+		<dofValues>+0.005 +0.60444 +0 +0 +0.570824 +0 +0 +0.513749 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+0.508229 -0.579442 +0.463442 +0.437232)[+125.441 +566.148 -334.353]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +175.05]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>-1818.17 +311.203 -360.472</position>
+		<orientation>-0.539207 +0.423169 +0.640448 -0.346425</orientation>
+		<focalDistance>+1848</focalDistance>
+	</camera>
+</world>

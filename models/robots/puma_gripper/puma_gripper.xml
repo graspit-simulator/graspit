@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+  <palm>palm.xml</palm>
+  <dof type="r">
+    <defaultVelocity>10.0</defaultVelocity>
+    <maxEffort>5.0e+10</maxEffort>
+    <Kp>1.0e+11</Kp>
+    <Kd>1.0e+7</Kd>
+    <draggerScale>20</draggerScale>
+  </dof>
+  <chain>
+    <transform>
+      <translation>-15.875 -61 -35.55</translation>
+    </transform>
+    <joint type="Prismatic">
+      <d>d0</d>
+      <theta>0</theta>
+      <a>0</a>
+      <alpha>0</alpha>
+      <minValue>10</minValue>
+      <maxValue>30</maxValue>
+      <viscousFriction>5.0e+7</viscousFriction>
+    </joint>
+    <link dynamicJointType="Revolute">finger.xml</link>
+  </chain>
+  <chain>
+    <transform>
+      <translation>15.875 -61 35.55</translation>
+      <rotation>180 y</rotation>
+    </transform>
+    <joint type="Prismatic">
+      <d>d0</d>
+      <theta>0</theta>
+      <a>0</a>
+      <alpha>0</alpha>
+      <minValue>-30</minValue>
+      <maxValue>30</maxValue>
+      <viscousFriction>5.0e+7</viscousFriction>
+    </joint>
+    <link dynamicJointType="Revolute">finger.xml</link>
+  </chain>
+  <approachDirection>
+    <referenceLocation>0.0 0.0 0.0</referenceLocation>
+    <direction>0.0 -1.0 0.0</direction>
+  </approachDirection>
+    <flockOfBirds number="1">
+        <transform>
+            <translation>0 0 0</translation>
+            <rotation>90 x</rotation>
+        </transform>
+    </flockOfBirds>
+    <virtualContacts>virtual/gripper.vgr</virtualContacts> 
+</robot>

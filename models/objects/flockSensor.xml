@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<useFlockOfBirds>1.0</useFlockOfBirds>
+	<mass>100</mass>
+	<geometryFile type="Inventor">flockSensor.iv</geometryFile>
+</root>

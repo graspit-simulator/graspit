@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>metal</material>
+    <mass>90</mass>
+    <cog>0.0 0.0 32.0</cog>
+    <inertia_matrix>1666.67 0 0 0 1666.67 0 0 0 444.444</inertia_matrix>
+    <geometryFile>puma6.iv</geometryFile>
+</root>

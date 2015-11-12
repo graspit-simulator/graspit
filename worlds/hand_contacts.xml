@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<world>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 64.84659966 28.85693399 33.06402464 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 58.89311394 7.984735455 79.45951422 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 25.44479345 18.20180411 38.54272227 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -6.167801812 -39.65295645 79.94423178 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 72.6850545 -0.1979173 34.39790351 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 26.9310082 -14.94774216 39.68812252 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -65.50384065 29.42934189 31.06793904 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -14.44384822 13.41589907 4.602346901 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -10.00086702 -9.767894796 4.509752148 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.266137529 -79.36043623 40.29744888 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 91.42611164 24.5746048 85.45510285 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -64.79410503 45.17306045 83.38372745 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -25.55575287 -5.450662227 4.699748136 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 28.70600693 4.102575975 68.19921714 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 28.26070685 67.38517993 43.1567076 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.020615723 -104.6330165 75.49004016 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -31.77913819 26.0722629 79.94203924 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -27.88647227 66.14320842 41.82665395 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -25.84691009 18.20782078 35.75371593 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -87.22854313 73.86856917 71.04230901 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.575829615 -34.19473533 18.24438653 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -59.96764265 52.97687491 41.6263237 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -28.2407781 57.43196267 84.38853381 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 59.66245413 43.13910621 82.36619996 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 63.34095562 55.65776138 40.58234378 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.106856634 -84.61130254 64.14115423 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 29.98410145 43.11028126 56.03543537 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 20.68667393 -10.64160023 5.066640782 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -28.07420878 3.114079572 66.38537697 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.520834821 -25.84075987 67.436616 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.570297815 13.96153915 35.25269197 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 38.6402781 97.14130054 71.92639179 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.195170554 -44.52962844 39.85795732 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -74.44464788 2.957777909 35.36930829 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.222133772 -47.98406377 22.31481971 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 4.41150203 -38.55255797 87.83744284 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.113890256 -60.19203621 49.13822566 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 31.33181079 46.33051584 27.67607184 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.228215768 -87.89382567 85.15119508 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -28.9225263 43.50004401 55.83534509 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 30.30454341 62.6687947 84.37645488 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 4.614270925 -0.093037417 53.18730534 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -107.3842266 28.06538743 75.19637487 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -65.13263253 7.74572123 80.76259394 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 25.8167833 27.5579059 12.39513364 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -38.06744357 90.04041339 75.90733615 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 114.5442565 34.24422885 61.31061088 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.292175636 -71.31179744 88.22768121 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -29.42894884 42.73807983 25.22945327 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 14.83375006 10.1937771 4.306774183 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 83.89899407 73.97206318 75.67387843 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.009412407 -61.1299438 29.89064481 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.5692568 -6.759911943 71.839242 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -26.49039827 -14.8568876 39.49618626 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.125078666 -54.52831468 90.30910644 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -98.15914747 -21.41026134 67.16703107 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.044160942 -61.76353523 71.35761991 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.090185937 -21.63644515 84.52186169 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.877611982 -44.4534227 63.06500018 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 4.883434444 -9.895137865 5.120489944 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ -0.285079258 -20.06573828 36.07456712 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 0.052083333 -117.5007612 56.84585832 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 29.06433177 28.55797091 81.25699419 ]</fullTransform> </transform> </graspableBody>
+<graspableBody> <filename>models/objects/sphere.xml</filename> <transform> <fullTransform>(+1 +0 +0 +0)[ 98.81916153 -24.13004445 69.95363861 ]</fullTransform> </transform> </graspableBody>
+	<robot>
+		<filename>models/robots/Barrett/Barrett.xml</filename>
+		<dofValues>+0.481135 +0 +0 +0 +0 +0 +0 +0 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>-76.6958 +25.0803 +443.854</position>
+		<orientation>-0.00646735 -0.108095 -0.354716 +0.928682</orientation>
+		<focalDistance>+408.168</focalDistance>
+	</camera>
+</world>

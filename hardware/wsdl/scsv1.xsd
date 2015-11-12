@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <schema targetNamespace="urn:CS8ServerV1"
+  xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+  xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:SCSV0="CS8ServerV0"
+  xmlns:xop="http://www.w3.org/2004/08/xop/include"
+  xmlns:xmlmime="http://www.w3.org/2004/11/xmlmime"
+  xmlns:SCSV1="urn:CS8ServerV1"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="CS8ServerV0" schemaLocation="scsv0.xsd"/>
+  <import namespace="http://www.w3.org/2004/08/xop/include"/>
+  <import namespace="http://www.w3.org/2004/11/xmlmime"/>
+  <import namespace="http://www.w3.org/2003/05/soap-encoding"/>
+  <complexType name="VALApplication">
+   <annotation>
+    <documentation>stores information about a VAL3 application</documentation>
+   </annotation>
+   <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="loaded" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="VALApplications">
+   <annotation>
+    <documentation>stores information about a collection of VAL3 applications</documentation>
+   </annotation>
+   <sequence>
+    <element name="application" type="SCSV1:VALApplication" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Data">
+   <annotation>
+    <documentation>stores stream data</documentation>
+   </annotation>
+   <sequence>
+     <element ref="xop:Include" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+     <attribute ref="xmlmime:contentType" use="optional"/>
+  </complexType>
+  <complexType name="Records">
+   <annotation>
+    <documentation>is a collection of recorder filename</documentation>
+   </annotation>
+   <sequence>
+    <element name="record" type="xsd:string" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="JointRange">
+   <annotation>
+    <documentation>gives the min and max limits of the robot</documentation>
+   </annotation>
+   <sequence>
+     <element name="min" type="xsd:double" minOccurs="0" maxOccurs="unbounded"/>
+     <element name="max" type="xsd:double" minOccurs="0" maxOccurs="unbounded"/>
+   </sequence>
+  </complexType>
+  <!-- operation request element -->
+  <element name="getApplications">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getApplicationsResponse">
+   <complexType>
+    <sequence>
+     <element name="applications" type="SCSV1:VALApplications" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getApplicationDatas">
+   <complexType>
+    <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getApplicationDatasResponse">
+   <complexType>
+    <sequence>
+     <element name="data" type="SCSV1:Data" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRecords">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRecordsResponse">
+   <complexType>
+    <sequence>
+     <element name="records" type="SCSV1:Records" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRecord">
+   <complexType>
+    <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRecordResponse">
+   <complexType>
+    <sequence>
+     <element name="data" type="SCSV1:Data" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getJointRange">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getJointRangeResponse">
+   <complexType>
+    <sequence>
+     <element name="range" type="SCSV1:JointRange" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+ </schema>
+

@@ -1,0 +1,16 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 10000
+
+Separator{
+	Material { 
+		diffuseColor 0.5 0.5 0.5
+	}
+	Translation {
+		translation 0 0 1.5
+	}
+	Rotation {
+		rotation 1 0 0 1.57
+	}
+	Cylinder {radius 30 height 16}
+}

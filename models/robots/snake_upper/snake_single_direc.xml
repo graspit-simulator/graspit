@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+  <palm>sphere.xml</palm>
+  <dof type="r">
+    <defaultVelocity>1.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <chain>
+    <transform>
+      <translation>0 0 5</translation>
+      <rotation>0 y</rotation>
+    </transform>
+    <joint type="Snake">
+      <theta>d0</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <joint type="Snake">
+      <theta>d0</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <joint type="Snake">
+      <theta>d0</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <joint type="Snake">
+      <theta>d0</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <link dynamicJointType="Revolute">sphere.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute">sphere.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute">sphere.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute">sphere.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+  </chain>
+</robot>

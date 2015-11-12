@@ -1,0 +1,163 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>anthropomorphic/palm.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>31.1829359563 -0.241480375136 26.690811655</translation>
+            <rotation>-83.3914 z</rotation>
+            <rotation>60.1651 x</rotation>
+            <rotation>86.7012 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>23.3027</a>
+            <alpha>-90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>180</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">anthropomorphic/thumb_l1.xml</link>
+        <link dynamicJointType="Revolute">anthropomorphic/thumb_l2_whole.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>94.0397 -1.25 29.3044</translation>
+            <rotation>-10 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>38.3</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">anthropomorphic/index_l1.xml</link>
+        <link dynamicJointType="Revolute">anthropomorphic/index_l2_whole.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>94.2850 -1.25 3.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d4</theta>
+            <d>0</d>
+            <a>38.3</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">anthropomorphic/middle_l1.xml</link>
+        <link dynamicJointType="Revolute">anthropomorphic/middle_l2_whole.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>82.0225 -1.25 -19.6084</translation>
+            <rotation>7.5015 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d6</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">anthropomorphic/ring_whole.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>70.9457 -1.25 -39.3044</translation>
+            <rotation>10 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d7</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">anthropomorphic/small_whole.xml</link>
+    </chain>
+</robot>

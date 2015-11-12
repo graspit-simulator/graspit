@@ -1,0 +1,313 @@
+#Inventor V2.1 ascii
+
+Separator {
+  #----------------------------------- 
+  # x - Axis
+  Separator {
+    Separator {
+      Material {
+        diffuseColor	1 0 0
+      }
+      Transform {
+        translation	50 0 0 
+      }
+      Cube {
+        width  100
+        height 0.3
+        depth  0.3
+      }
+    }
+    Separator {
+      Material {
+        diffuseColor	1 1 1
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+      Transform {
+        translation	10 0 0 
+      }
+      Cube {
+        width  0.1
+        height 0.5
+        depth  0.5
+      }
+    }
+  }	
+
+  #----------------------------------- 
+  # y - Axis
+  Separator {
+    Separator {
+      Material {
+        diffuseColor	0 1 0
+      }
+      Transform {
+        translation	0 50 0 
+      }
+      Cube {
+        width  0.3
+        height 100
+        depth  0.3
+      }
+    }
+    Separator {
+      Material {
+        diffuseColor	1 1 1
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+      Transform {
+        translation	0 10 0 
+      }
+      Cube {
+        width  0.5
+        height 0.1
+        depth  0.5
+      }
+    }
+  }	
+
+
+  #----------------------------------- 
+  # z - Axis
+  Separator {
+    Separator {
+      Material {
+        diffuseColor	0 0 1
+      }
+      Transform {
+        translation	0 0 50 
+      }
+      Cube {
+        width  0.3
+        height 0.3
+        depth  100
+      }
+    }
+    Separator {
+      Material {
+        diffuseColor	1 1 1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+      Transform {
+        translation	0 0 10 
+      }
+      Cube {
+        width  0.5
+        height 0.5
+        depth  0.1
+      }
+    }
+  }	
+}

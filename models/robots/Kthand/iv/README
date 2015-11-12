@@ -1,0 +1,14 @@
+README
+This file describes the contents in this folder and the geometry files
+for the KTHand. This file and some of the contents in this folder can
+be discarded unless you wish to modify the geometry of the KTHand.
+
+To reduce the complexity of the model and hence improve performance in
+GraspIt!, the model is manually created from vertices and triangles,
+all manually defined. For the creation of some parts' geometry in iv-format, a
+MATLAB script is used to read the points and triangles from two
+different files and output a valid iv-file. There is no documentation,
+but should be fairly easy to understand for anyone with basic
+programming and matlab skills.
+
+Johan Tegin, 2010-01-22

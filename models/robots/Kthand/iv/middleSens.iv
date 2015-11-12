@@ -1,0 +1,34 @@
+#Inventor V2.0 ascii
+#rubber
+#1
+
+Separator {
+   #Sensor
+   Material {
+      ambientColor    1  0  0
+      #        diffuseColor    0 0 0
+      #        specularColor   0.151515 0.151515 0.151515
+      diffuseColor    1  0  0
+      specularColor   1  0  0
+      shininess       1
+      transparency    0
+   }
+   Separator {
+      MatrixTransform {
+	 matrix
+	 # 17 degrees around X
+	 # (1:3,1:3) rotation matrix
+	 # (1:3,4) translation
+	 # Using home made fcn eulerZYXToRot.m tom compute the rotation matrix
+	 0.9714   -0.2374  0        0
+	 0.2374    0.9714  0        0
+	 0         0       1.0000   0
+	 -12.00000  10.30000 0.000000 1.000000
+      }
+      Cube {
+	 width  15 # length
+	 height  3 # thickness/normal
+	 depth  15 # width
+      }
+   }
+}

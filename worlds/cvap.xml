@@ -1,0 +1,184 @@
+<?xml version="1.0" ?>
+<world>
+    <obstacle>
+        <filename>models/obstacles/dinner_table.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+40 +5565 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/dinner_chair.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+200 +6215 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/dinner_chair.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+650 +6215 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/dinner_chair.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+1100 +6215 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/dinner_chair.xml</filename>
+        <transform>
+            <fullTransform>(+6.12303e-17 0 0 +1)[+600 +5895 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/dinner_chair.xml</filename>
+        <transform>
+            <fullTransform>(+6.12303e-17 0 0 +1)[+1050 +5895 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/dinner_chair.xml</filename>
+        <transform>
+            <fullTransform>(+6.12303e-17 0 0 +1)[+1500 +5895 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/sofa_table.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+1300 +1300 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/monitor_table.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+4178 +6928 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/shelf.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+50 +8590 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/shelf2.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+4670 +1810 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/shelf3.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+4670 +3710 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/shelf4.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+4670 +4511 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/simple_shelf.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+90 +3755 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/simple_shelf.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+985 +3755 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/corner_table.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+50 +50 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/sofa.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+870 +25 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/sofa.xml</filename>
+        <transform>
+            <fullTransform>(+0.707107 0 0 -0.707107)[+50 +2920 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/rest_chair.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+2500 +1500 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/lamp.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+1890 +1730 +1650]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/lamp2.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+935 +6095 +1365]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/walls.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/floor.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 -0.5]</fullTransform>
+        </transform>
+    </obstacle>
+    <robot>
+        <filename>models/robots/XR4000/XR4000.xml</filename>
+        <dofValues>+3000 +5000 0</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 +10]</fullTransform>
+        </transform>
+    </robot>
+    <robot>
+        <filename>models/robots/Puma560/Puma560.xml</filename>
+        <dofValues>-1.76053 0 -1.81371 0 0 0</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+3000 +5000 +1541.8]</fullTransform>
+        </transform>
+    </robot>
+    <robot>
+        <filename>models/robots/Barrett/Barrett.xml</filename>
+        <dofValues>0 0 +0 +1 +0.63326 0 +0 +1 +0.63326 0 +0 +0</dofValues>
+        <transform>
+            <fullTransform>(+0.392503 +0.607143 +0.50164 -0.475053)[+2662.07 +4030.38 +1376.13]</fullTransform>
+        </transform>
+    </robot>
+    <connection>
+        <parentRobot>0</parentRobot>
+        <parentChain>0</parentChain>
+        <childRobot>1</childRobot>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 +686.8]</fullTransform>
+        </transform>
+    </connection>
+    <connection>
+        <parentRobot>1</parentRobot>
+        <parentChain>0</parentChain>
+        <childRobot>2</childRobot>
+        <mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 +175.05]</fullTransform>
+        </transform>
+    </connection>
+    <camera>
+        <position>+1018.25 +6226.42 +3216.76</position>
+        <orientation>+0.126248 -0.430673 -0.845204 +0.290193</orientation>
+        <focalDistance>+3144.87</focalDistance>
+    </camera>
+</world>

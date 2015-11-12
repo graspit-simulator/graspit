@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <youngs>1500000</youngs>
+    <mass>150.0</mass>
+    <geometryFile>index3.wrl</geometryFile>
+</root>

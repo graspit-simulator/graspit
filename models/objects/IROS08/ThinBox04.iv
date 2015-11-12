@@ -1,0 +1,44 @@
+#Inventor V2.1 ascii
+#material rubber
+#mass 200
+#cog 0 0 0
+#1584.3     -17.107 0.0
+#-17.107    1910.6  0.0
+#0.0        0.0     1746.5
+#youngssdf 1500000
+
+
+
+Separator { # Body
+	  Transform { rotation 1 0 0 1.5708}
+	  Material { # A bronze color:
+	  ambientColor .33 .22 .27
+	  diffuseColor .78 .57 .11
+          specularColor .99 .94 .81
+          shininess .28
+	  transparency .6
+	  }
+	  Cube { width 37 height 37 depth 6.5}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

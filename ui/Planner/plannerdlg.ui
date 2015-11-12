@@ -1,0 +1,653 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>PlannerDlgUI</class>
+ <widget class="QDialog" name="PlannerDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>535</width>
+    <height>460</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Grasp Planner</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>11</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="Q3GroupBox" name="plannerBox" >
+       <property name="title" >
+        <string>Generator</string>
+       </property>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>11</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="automaticCheckBox" >
+          <property name="text" >
+           <string>Automatic Sampling</string>
+          </property>
+          <property name="checked" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Q3GroupBox" name="automaticBox" >
+          <property name="title" >
+           <string>Automatic</string>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <layout class="QGridLayout" >
+           <property name="margin" >
+            <number>11</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item row="0" column="0" >
+            <widget class="QLabel" name="TextLabel1" >
+             <property name="text" >
+              <string>Sampling density factor</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" >
+            <widget class="QLineEdit" name="densityFactorLine" >
+             <property name="maximumSize" >
+              <size>
+               <width>30</width>
+               <height>27</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="Q3GroupBox" name="manualBox" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="title" >
+           <string>Manual</string>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <layout class="QGridLayout" >
+           <property name="margin" >
+            <number>11</number>
+           </property>
+           <property name="spacing" >
+            <number>6</number>
+           </property>
+           <item row="0" column="1" >
+            <widget class="QLineEdit" name="num360stepsLine" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>30</width>
+               <height>27</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="2" >
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QLineEdit" name="filenameLineEdit" />
+             </item>
+             <item>
+              <widget class="QPushButton" name="BrowseButton" >
+               <property name="text" >
+                <string>Browse...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="1" >
+            <widget class="QLineEdit" name="numGraspRotsLine" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>30</width>
+               <height>27</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" >
+            <widget class="QLineEdit" name="num180graspsLine" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>30</width>
+               <height>27</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" >
+            <widget class="QLineEdit" name="numParPlanesLine" >
+             <property name="sizePolicy" >
+              <sizepolicy>
+               <hsizetype>0</hsizetype>
+               <vsizetype>0</vsizetype>
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize" >
+              <size>
+               <width>30</width>
+               <height>27</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" >
+            <widget class="QLabel" name="TextLabel2" >
+             <property name="text" >
+              <string>360 Deg steps (Even)</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="TextLabel3" >
+             <property name="text" >
+              <string>Parallel planes</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" >
+            <widget class="QLabel" name="TextLabel4" >
+             <property name="text" >
+              <string>180 Deg grasps</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" >
+            <widget class="QLabel" name="TextLabel5" >
+             <property name="text" >
+              <string>Grasp rotations</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2" >
+            <widget class="QLabel" name="TextLabel1_2" >
+             <property name="text" >
+              <string>or use a file</string>
+             </property>
+             <property name="alignment" >
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="Q3GroupBox" name="testerBox" >
+       <property name="title" >
+        <string>Tester</string>
+       </property>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="margin" >
+         <number>11</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" colspan="2" >
+         <widget class="QLabel" name="TextLabel6" >
+          <property name="text" >
+           <string>Max # of backsteps</string>
+          </property>
+          <property name="wordWrap" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLineEdit" name="backstepSizeLine" >
+          <property name="maximumSize" >
+           <size>
+            <width>30</width>
+            <height>27</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2" >
+         <widget class="QCheckBox" name="visualizeBox" >
+          <property name="text" >
+           <string>Visualize process</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QLabel" name="TextLabel9" >
+          <property name="text" >
+           <string>Quality Measure</string>
+          </property>
+          <property name="wordWrap" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QLineEdit" name="maxNumStepsLine" >
+          <property name="maximumSize" >
+           <size>
+            <width>30</width>
+            <height>27</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" >
+         <widget class="QComboBox" name="qmComboBox" >
+          <item>
+           <property name="text" >
+            <string>None</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2" >
+         <widget class="QLabel" name="TextLabel7" >
+          <property name="text" >
+           <string>Backstep size (mm)</string>
+          </property>
+          <property name="wordWrap" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="3" >
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>11</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="savefileLineEdit" />
+          </item>
+          <item>
+           <widget class="QPushButton" name="BrowseSaveButton6" >
+            <property name="text" >
+             <string>Browse...</string>
+            </property>
+            <property name="autoDefault" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="0" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>20</width>
+            <height>120</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="6" column="0" colspan="3" >
+         <widget class="QLabel" name="textLabel1" >
+          <property name="text" >
+           <string>Optional: save results to file:</string>
+          </property>
+          <property name="wordWrap" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2" >
+         <widget class="QPushButton" name="newQMButton" >
+          <property name="text" >
+           <string>New...</string>
+          </property>
+          <property name="autoDefault" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>11</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>170</width>
+         <height>16</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="GenerateButton" >
+       <property name="text" >
+        <string>Generate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="TestButton" >
+       <property name="enabled" >
+        <bool>false</bool>
+       </property>
+       <property name="text" >
+        <string>Test</string>
+       </property>
+       <property name="autoDefault" >
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ShowButton" >
+       <property name="enabled" >
+        <bool>false</bool>
+       </property>
+       <property name="text" >
+        <string>Show</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="CloseButton" >
+       <property name="text" >
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>Q3GroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>Qt3Support/Q3GroupBox</header>
+   <container>1</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>automaticCheckBox</tabstop>
+  <tabstop>densityFactorLine</tabstop>
+  <tabstop>num360stepsLine</tabstop>
+  <tabstop>numParPlanesLine</tabstop>
+  <tabstop>num180graspsLine</tabstop>
+  <tabstop>numGraspRotsLine</tabstop>
+  <tabstop>maxNumStepsLine</tabstop>
+  <tabstop>backstepSizeLine</tabstop>
+  <tabstop>qmComboBox</tabstop>
+  <tabstop>newQMButton</tabstop>
+  <tabstop>visualizeBox</tabstop>
+  <tabstop>GenerateButton</tabstop>
+  <tabstop>ShowButton</tabstop>
+  <tabstop>CloseButton</tabstop>
+ </tabstops>
+ <includes>
+  <include location="global" >qfile.h</include>
+  <include location="global" >q3textstream.h</include>
+ </includes>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>CloseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>GenerateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>generateGrasps()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ShowButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>showGrasp()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>newQMButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>newQM()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>automaticCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>manualBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>automaticCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>automaticBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BrowseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>chooseFile()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BrowseSaveButton6</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>chooseSaveFile()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>TestButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PlannerDlgUI</receiver>
+   <slot>testGrasps()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

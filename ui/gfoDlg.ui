@@ -1,0 +1,106 @@
+<ui version="4.0" >
+ <class>GFODlgUI</class>
+ <widget class="QDialog" name="GFODlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>241</width>
+    <height>139</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Grasp Force Optimization</string>
+  </property>
+  <widget class="QPushButton" name="exitButton" >
+   <property name="geometry" >
+    <rect>
+     <x>180</x>
+     <y>110</y>
+     <width>51</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>221</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string/>
+   </property>
+   <widget class="QLabel" name="statusLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Status:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2" >
+    <property name="geometry" >
+     <rect>
+      <x>190</x>
+      <y>10</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>On:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Optimization type:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="optimizationTypeBox" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>171</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="optimizationOnBox" >
+    <property name="geometry" >
+     <rect>
+      <x>190</x>
+      <y>30</y>
+      <width>21</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string/>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

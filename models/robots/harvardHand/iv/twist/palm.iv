@@ -1,0 +1,18 @@
+#Inventor V2.1 ascii
+#material rubber
+#mass 100
+
+Separator
+{
+	Transform { translation 0 11 0 }
+
+	Material { diffuseColor 0.8 0.8 0.8 }
+	Rotation { rotation 1 0 0 1.57 }
+	Cylinder { radius 1 height 92.71 }
+	Transform { translation 0 0 22 }
+      Cylinder { radius 1 height 92.71 }
+	Transform { translation 0 0 -11 }
+	Cube { width 1 height 92.71 depth 22 }
+
+	
+}	

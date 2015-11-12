@@ -1,0 +1,48 @@
+#Inventor V2.0 ascii
+#plastic
+#30
+
+Separator {
+   Material {
+      ambientColor	0  0.5  0
+      diffuseColor	0  0.5  0
+      specularColor	0  0.5  0
+      transparency  0
+   }
+   # Large edge towards palm
+   Separator {
+      Translation {
+	 translation 11 0 5
+      }
+      Cube {
+	 width 10
+	 height 75
+	 depth 10
+      }
+   }
+   # Simplified body part
+   Separator {
+      Translation {
+	 translation 7.5 0 -5
+      }
+      Cube {
+	 width 3
+	 height 75
+	 depth 10
+      }
+   }
+   # Simplified part towards other robot 
+   # The center of the cylinder is the part origin
+   Separator {
+      Translation {
+	 translation 4.5 0 0
+      }
+      Rotation {
+	 rotation 0 0 1 1.570795
+      }
+      Cylinder {
+	 height      9
+	 radius      25
+      }
+   }
+}

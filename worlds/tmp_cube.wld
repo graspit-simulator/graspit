@@ -1,0 +1,13 @@
+#GraspIt! version 2.0 beta
+GraspableBody
+models/objects/cube.iv
+T (+1 0 0 0)[+130.033 -54.962 +69.9138]
+
+Robot
+models/robots/harvardHand/harvardHand.cfg
+-0.0196582 
+T (+1 0 0 0)[0 0 0]
+
+CameraFull
++130.103 -34.1884 +312.72 +0.0917766 -0.0495225 +0.825227 -0.55509 +229.456
+

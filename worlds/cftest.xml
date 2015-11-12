@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>models/robots/columbia_hand test/iv/columbia finger f2_wcs_v2.wrl</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+	<camera>
+		<position>-72.6437 -72.6861 +284.707</position>
+		<orientation>+0.0415256 -0.165554 -0.0246038 +0.985019</orientation>
+		<focalDistance>+282.125</focalDistance>
+	</camera>
+</world>

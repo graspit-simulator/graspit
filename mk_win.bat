@@ -1,0 +1,1 @@
+qmake -t vcapp -o graspit.vcproj graspit.pro

@@ -1,0 +1,19 @@
+1000000 * exp(-7*(x^0.12)) * (   (1 + 1/(1000000 * exp(-7*(x^0.12) ) ) )  ^ (0.9) -1)  --  neighbor distribution for a neighbor at |2*u-1| = 0.9
+
+exp ( -0.00001 / (1000000 * exp(-7*(x^0.12))))  -- Error acceptance probablity for an error of 0.00001
+
+1.12 * ( 1.0 / sqrt( 0.2 * 2.0 * pi ) ) * exp( -(x*x)/(2*0.2) )  -- Gaussian multiplier factor for angle error
+(cos(x)+1)^(2)/4
+
+1 / ( 2^(x/15))  --  one possibility for distance multiplier
+
+( cos(x*(pi/2)/100)^4 ) -- other possibility, using cosine simple, squared, or to the 4th
+
+100 - 100 / (2^(x/15))
+
+
+(2*pi*0.05)^(-3) * exp(-x^(2) / (2*0.05))
+Boltzmann probability density of sampling input variables for T = 0.05 and D/2 = 3; x in [-1,1]
+
+
+1000000 * exp(-7*(x^0.12))

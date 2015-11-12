@@ -1,0 +1,19 @@
+#Inventor V2.1 ascii
+#plastic
+#1000
+
+Separator {
+	Transform {
+		translation -40.4 0 0
+	}
+#File {name CoordinateSystem0.iv}
+	Transform {
+		translation 0 0 0
+		rotation 0 0 1 3.14159265359
+	} 
+
+	Separator 
+	{
+		File {name armar/hands/metacarpals.iv }
+	}
+}

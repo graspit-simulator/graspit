@@ -1,0 +1,7 @@
+1
+BARRETT_RUBBER
+pouring-water //semantics of the grasp
+45            //id for approaching direction
+90            //fixed rolling adjustment from approaching direction
+dof           //kinematic data
+..            //162-d tactiles

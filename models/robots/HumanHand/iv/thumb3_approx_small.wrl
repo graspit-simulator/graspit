@@ -1,0 +1,24 @@
+#VRML V2.0 utf8
+#material plastic
+#mass 150.0
+
+DEF Poser_Scene Group
+{
+	children
+	[
+
+	Transform {
+	translation -4.5 3 37.5
+	children [
+		Sphere {radius 1}
+	]
+	}
+
+	Transform {
+	translation 10.7 5 20.0
+	children [
+		Sphere {radius 1}
+	]
+	}
+]
+}

@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <schema targetNamespace="CS8ServerV0"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:SCSV0="CS8ServerV0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <simpleType name="SessionId">
+   <restriction base="xsd:int">
+   </restriction>
+  </simpleType>
+  <simpleType name="ServerExceptionCode">
+   <annotation>
+    <documentation>stores all possible exceptions</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="UNKNOWN-CODE"/><!-- enum const = 0 -->
+    <enumeration value="INVALID-SESSION-ID-CODE"/><!-- enum const = 1 -->
+    <enumeration value="INVALID-ROBOT-ID-CODE"/><!-- enum const = 2 -->
+    <enumeration value="READ-ACCESS-ERROR-CODE"/><!-- enum const = 3 -->
+    <enumeration value="WRITE-ACCESS-ERROR-CODE"/><!-- enum const = 4 -->
+    <enumeration value="SET-POS-NOT-SIMUL-CODE"/><!-- enum const = 5 -->
+    <enumeration value="SET-POS-POWER-ON-CODE"/><!-- enum const = 6 -->
+    <enumeration value="FILE-NOT-FOUND-CODE"/><!-- enum const = 7 -->
+    <enumeration value="INVALID-CONFIG-CODE"/><!-- enum const = 8 -->
+    <enumeration value="INVALID-NUMBER-OF-AXIS-CODE"/><!-- enum const = 9 -->
+    <enumeration value="INVALID-MOT-DESC-CODE"/><!-- enum const = 10 -->
+    <enumeration value="CLIENT-ALREADY-CONNECTED"/><!-- enum const = 11 -->
+    <enumeration value="CLIENT-COMMUNICATION-ERROR"/><!-- enum const = 12 -->
+    <enumeration value="APPLICATION-NOT-FOUND"/><!-- enum const = 13 -->
+    <enumeration value="PROGRAM-NOT-FOUND"/><!-- enum const = 14 -->
+    <enumeration value="TASK-NOT-FOUND"/><!-- enum const = 15 -->
+    <enumeration value="STACK-FRAME-NOT-FOUND"/><!-- enum const = 16 -->
+    <enumeration value="TASK-ALREADY-LOCKED"/><!-- enum const = 17 -->
+    <enumeration value="INVALID-SOAP-HANDLER"/><!-- enum const = 18 -->
+    <enumeration value="INVALID-SOAP-HEADER"/><!-- enum const = 19 -->
+    <enumeration value="PROGRAM-LINE-NOT-FOUND"/><!-- enum const = 20 -->
+    <enumeration value="MISMATCHED-CODE"/><!-- enum const = 21 -->
+    <enumeration value="IOWRITE-ACCESS-ERROR-CODE"/><!-- enum const = 22 -->
+    <enumeration value="MANUAL-WORKING-MODE-WRITE-ACCESS-ERROR-CODE"/><!-- enum const = 23 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="Kinematic">
+   <annotation>
+    <documentation>stores the type of the kinematic of the robot</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="KINEMATIC-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="KINEMATIC-ANTHROPOMORPH6"/><!-- enum const = 1 -->
+    <enumeration value="KINEMATIC-ANTHROPOMORPH5"/><!-- enum const = 2 -->
+    <enumeration value="KINEMATIC-SCARA"/><!-- enum const = 3 -->
+    <enumeration value="KINEMATIC-EISENMANN"/><!-- enum const = 4 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="MountType">
+   <annotation>
+    <documentation>stores where the robot is mounted</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="MOUNTTYPE-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="MOUNTTYPE-FLOOR"/><!-- enum const = 1 -->
+    <enumeration value="MOUNTTYPE-CEILING"/><!-- enum const = 2 -->
+    <enumeration value="MOUNTTYPE-WALL"/><!-- enum const = 3 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="LengthAxis3">
+   <annotation>
+    <documentation>stores the length of axis #3</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="LENGTHAXIS3-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="LENGTHAXIS3-L100"/><!-- enum const = 1 -->
+    <enumeration value="LENGTHAXIS3-L200"/><!-- enum const = 2 -->
+    <enumeration value="LENGTHAXIS3-L400"/><!-- enum const = 3 -->
+    <enumeration value="LENGTHAXIS3-L600"/><!-- enum const = 4 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="DiameterAxis3">
+   <annotation>
+    <documentation>stores the diameter of axis #3</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="DIAMETERAXIS3-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="DIAMETERAXIS3-D20"/><!-- enum const = 1 -->
+    <enumeration value="DIAMETERAXIS3-D25"/><!-- enum const = 2 -->
+   </restriction>
+  </simpleType>
+  <!-- fault element type (stbl added) -->  <element name="ServerException" type="SCSV0:ServerException"> </element>
+  <complexType name="ServerException">
+   <sequence>
+     <element name="code" type="SCSV0:ServerExceptionCode" minOccurs="1" maxOccurs="1"/>
+     <element name="description" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="JointPos">
+   <annotation>
+    <documentation>stores an array of double, a double for each axis of the robot</documentation>
+   </annotation>
+   <sequence>
+    <element name="item" type="xsd:double" minOccurs="1" maxOccurs="100" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="CartesianPos">
+   <annotation>
+    <documentation>stores a cartesian position</documentation>
+   </annotation>
+   <sequence>
+     <element name="x" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="y" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="z" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="rx" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="ry" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="rz" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Robot">
+   <annotation>
+    <documentation>stores information about one robot</documentation>
+   </annotation>
+   <sequence>
+     <element name="kinematic" type="SCSV0:Kinematic" minOccurs="1" maxOccurs="1"/>
+     <element name="arm" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="tuning" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="mountType" type="SCSV0:MountType" minOccurs="1" maxOccurs="1"/>
+     <element name="lengthAxis3" type="SCSV0:LengthAxis3" minOccurs="1" maxOccurs="1"/>
+     <element name="diameterAxis3" type="SCSV0:DiameterAxis3" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Version">
+   <annotation>
+    <documentation>stores information about one version</documentation>
+   </annotation>
+   <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="version" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Parameter">
+   <sequence>
+     <element name="key" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="value" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Parameters">
+   <sequence>
+    <element name="Parameters" type="SCSV0:Parameter" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Versions">
+   <sequence>
+    <element name="Versions" type="SCSV0:Version" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="SoapServerVersion">
+   <sequence>
+     <element name="version" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Robots">
+   <sequence>
+    <element name="Robots" type="SCSV0:Robot" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <element name="sessionId" type="SCSV0:SessionId"/>
+  <!-- operation request element -->
+  <element name="getSoapServerVersion">
+   <complexType>
+    <sequence>
+     <element name="cltName" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="cltVersion" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getSoapServerVersionResponse">
+   <complexType>
+    <sequence>
+     <element name="server" type="SCSV0:SoapServerVersion" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="findServer">
+   <complexType>
+    <sequence>
+     <element name="serverName" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="findServerResponse">
+   <complexType>
+    <sequence>
+     <element name="found" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="ping">
+   <complexType>
+    <sequence>
+     <element name="message" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="pingResponse">
+   <complexType>
+    <sequence>
+     <element name="message" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getCS8Versions">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getCS8VersionsResponse">
+   <complexType>
+    <sequence>
+     <element name="out" type="SCSV0:Versions" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getControllerParameters">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getControllerParametersResponse">
+   <complexType>
+    <sequence>
+     <element name="out" type="SCSV0:Parameters" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getCS8Compatibility">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getCS8CompatibilityResponse">
+   <complexType>
+    <sequence>
+     <element name="compatibility" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="login">
+   <complexType>
+    <sequence>
+     <element name="user" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="pwd" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="loginResponse">
+   <complexType>
+    <sequence>
+     <element name="sid" type="SCSV0:SessionId" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="logout">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="logoutResponse">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRobots">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRobotsResponse">
+   <complexType>
+    <sequence>
+     <element name="out" type="SCSV0:Robots" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRobotJointPos">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRobotJointPosResponse">
+   <complexType>
+    <sequence>
+     <element name="pos" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRobotJntCartPos">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="tool" type="SCSV0:CartesianPos" minOccurs="1" maxOccurs="1"/>
+     <element name="frame" type="SCSV0:CartesianPos" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRobotJntCartPosResponse">
+   <complexType>
+    <sequence>
+     <element name="jntPos" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="cartPos" type="SCSV0:CartesianPos" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="setRobotJointPos">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="pos" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="setRobotPosResponse">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+ </schema>
+

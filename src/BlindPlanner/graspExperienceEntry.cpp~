@@ -1,0 +1,44 @@
+/*
+ * graspExperienceEntry.cpp
+ *
+ *  Created on: Jun 11, 2011
+ *      Author: dang
+ */
+
+#include "graspExperienceEntry.h"
+
+GraspExperienceEntry::GraspExperienceEntry(const char* str)
+{
+	int num;
+	int offset;
+	sscanf(str, "%s %d%n", &mGraspId, &num, &offset);
+	//std::cout << mGraspId << " " << num << std::endl;
+	//load the contacts
+	for(int i = 0; i < num; ++i)
+	{
+		double x,y,z,rx,ry,rz,rw;
+		str += offset;
+		sscanf(str, "%lf %lf %lf %lf %lf %lf %lf%n", &x, &y, &z, &rw, &rx, &ry, &rz, &offset);
+		ContactInfo ci;
+		ci.location = vec3(x,y,z);
+		ci.orientation = Quaternion(rw, rx, ry, rz);
+		mContactList.push_back(ci);
+	}
+	printMe();
+}
+
+double GraspExperienceEntry::getSimilarityMeasure(const GraspExperienceEntry& g)
+{
+
+	return -1;
+}
+
+void GraspExperienceEntry::printMe()
+{
+	std::cout << "Grasp: " << mGraspId << " begins" << std::endl;
+	for(size_t i = 0; i < mContactList.size(); ++i)
+	{
+		mContactList[i].printMe();
+	}
+	std::cout << "Grasp: " << mGraspId << " ends" << std::endl;
+}

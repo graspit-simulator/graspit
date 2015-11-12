@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<youngs>1500000</youngs>
+	<mass>100</mass>
+	<cog>0 0 0</cog>
+	<geometryFile type="Inventor">sphere.iv</geometryFile>
+</root>

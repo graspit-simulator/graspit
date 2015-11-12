@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>models/robots/Kth-Columbia/iv/palm.iv</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+	<graspableBody>
+		<filename>models/robots/Kth-Columbia/iv/palm_thingy.iv</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0156742 +0.00253567 -0.000217488]</fullTransform>
+		</transform>
+	</graspableBody>
+	<camera>
+		<position>+0.0333058 +0.0141162 +0.293926</position>
+		<orientation>+0.0687544 -0.0258009 -0.00238187 +0.997297</orientation>
+		<focalDistance>+0.274145</focalDistance>
+	</camera>
+</world>

@@ -1,0 +1,135 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>palm.xml</palm>
+    <dof type="c">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>6.0e+7</maxEffort>
+        <Kp>4.5e+9</Kp>
+        <Kd>4.5e+5</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>0 11 38.1</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+-65</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1600</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*0.6+45</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>45</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1000</springStiffness>
+        </joint>
+        <link dynamicJointType="Revolute">proximal.xml</link>
+        <link dynamicJointType="Revolute">distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 -11 12.7</translation>
+            <rotation>180 y</rotation>
+            <rotation>180 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+-65</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1600</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*0.6+45</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>45</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1000</springStiffness>
+        </joint>
+        <link dynamicJointType="Revolute">proximal.xml</link>
+        <link dynamicJointType="Revolute">distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 11 -12.7</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+-65</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1600</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*0.6+45</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>45</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1000</springStiffness>
+        </joint>
+        <link dynamicJointType="Revolute">proximal.xml</link>
+        <link dynamicJointType="Revolute">distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 -11 -38.1</translation>
+            <rotation>180 y</rotation>
+            <rotation>180 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+-65</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1600</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*0.6+45</theta>
+            <d>0</d>
+            <a>80.57536</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>45</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1000</springStiffness>
+        </joint>
+        <link dynamicJointType="Revolute">proximal.xml</link>
+        <link dynamicJointType="Revolute">distal.xml</link>
+    </chain>
+    <approachDirection>
+        <referenceLocation>0 0 0</referenceLocation>
+        <direction>1 0 0</direction>
+    </approachDirection>
+</robot>

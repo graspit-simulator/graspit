@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>models/objects/mug.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/NewBarrett/NewBarrett.xml</filename>
+		<dofValues>+0 +0 +0 +0 +0 +0 +0 +0 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 -18.4473 -82.2545]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>-290.241 -367.967 -347.416</position>
+		<orientation>+0.88841 +0.113167 -0.324354 +0.304493</orientation>
+		<focalDistance>+595.681</focalDistance>
+	</camera>
+</world>

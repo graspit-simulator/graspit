@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<world>
+	<robot>
+		<filename>models/robots/TX60L/TX60L.xml</filename>
+		<dofValues>0 0 0 -0.428214 0 0 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/Barrett/Barrett.xml</filename>
+		<dofValues>+0 +0 +0 +0 +0 +0 +0 +0 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(-0.977167 +0 +2.22045e-16 +0.212475)[-3.14508e-13 +20 +1034.05]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +114.05]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>-191.829 -2539.33 +287.372</position>
+		<orientation>+0.704319 -0.0321192 -0.0251245 +0.708711</orientation>
+		<focalDistance>+2561.64</focalDistance>
+	</camera>
+</world>

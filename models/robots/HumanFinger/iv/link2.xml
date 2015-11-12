@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>50.18</mass>
+    <cog>-12.9 0.0 0.0</cog>
+    <inertia_matrix>8 0 0 0 59.4 0 0 0 59.4</inertia_matrix>
+    <geometryFile>link2.iv</geometryFile>
+</root>

@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.330618 -0.0229857 -0.94348 +0.00310511)[+524.105 +171.634 -1252.98]</fullTransform>
+		</transform>
+	</graspableBody>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.503829 +0.50384 +0.496143 +0.496129)[+127.734 +846.6 -410.865]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.61535 +0.244552 -3.4331 +0.0110909 +1.68015 +3.23018 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/harvardHand/harvardHandTwist3.xml</filename>
+		<dofValues>+0.140472 +0.035168 -0.371873 +0.117601 -0.296116 +0.151937 -0.250341 +0.0958413 -0.437814 </dofValues>
+		<transform>
+			<fullTransform>(-0.693163 -0.0529838 -0.00996458 -0.718762)[+125.311 +584.164 -313.353]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<transform>
+			<fullTransform>(+0 +0.707107 +0 +0.707107)[+0 +0 +200]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>-151.096 +1170.37 -137.905</position>
+		<orientation>+0.0527269 -0.54622 -0.835547 +0.0269186</orientation>
+		<focalDistance>+1286.21</focalDistance>
+	</camera>
+</world>

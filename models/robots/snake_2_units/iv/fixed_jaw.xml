@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+    <youngs>1500000</youngs>
+    <material>rubber</material>
+    <mass>150.0</mass>
+    <geometryFile>fixed_jaw.wrl</geometryFile>
+</root>

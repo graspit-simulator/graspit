@@ -1,0 +1,10 @@
+#Inventor V2.1 ascii
+#plastic
+#1000
+
+Separator {
+Transform {translation -50 0 0}
+Sphere {radius 1}
+
+
+}

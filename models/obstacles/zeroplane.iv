@@ -1,0 +1,22 @@
+#Inventor V2.1 ascii
+
+Separator {
+    Material {
+	ambientColor	0.9 0.9 0.9
+	diffuseColor	0.9 0.9 0.9
+	emissiveColor	0.4 0.4 0.4
+    }
+    Translation {
+	translation	0 0 -1
+    }
+    Separator {
+	Texture2 {
+	    filename	"textures/wood.jpg"
+	}
+	Cube {
+	    width	1830
+	    height	915
+	    depth	1
+	}
+    }
+}

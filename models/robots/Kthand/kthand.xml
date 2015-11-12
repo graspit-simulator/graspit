@@ -1,0 +1,183 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>palm.xml</palm>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+13</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>129 -23.9 -23.2</translation>
+            <rotationMatrix>1 0 0 0 0 1 0 -1 0</rotationMatrix>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>30.5</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>45</maxValue>
+        </joint>
+	<joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>25.5</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>44</maxValue>
+        </joint>
+	<joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>26.8</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>51</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">proximalPhalanx.xml</link>
+        <link dynamicJointType="Revolute">middlePhalanx.xml</link>
+        <link dynamicJointType="Revolute">distalPhalanx.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>129 25.4 -23.2</translation>
+            <rotationMatrix>1 0 0 0 0 1 0 -1 0</rotationMatrix>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0</d>
+            <a>30.5</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>45</maxValue>
+        </joint>
+	<joint type="Revolute">
+            <theta>d4</theta>
+            <d>0</d>
+            <a>25.5</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>44</maxValue>
+        </joint>
+	<joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>26.8</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>51</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">proximalPhalanx.xml</link>
+        <link dynamicJointType="Revolute">middlePhalanx.xml</link>
+        <link dynamicJointType="Revolute">distalPhalanx.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>67.4 0 -9.1</translation>
+            <rotationMatrix>0 0 -1 0 1 0 1 0 0</rotationMatrix>
+            <rotationMatrix>-1 0 0 0 -1 0 0 0 1</rotationMatrix>
+        </transform>
+	<joint type="Revolute">
+            <theta>d6+90</theta>
+            <d>0</d>
+            <a>50.5</a>
+            <alpha>90</alpha>
+            <minValue>-90</minValue>
+            <maxValue>0</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d7+27</theta>
+            <d>0</d>
+            <a>30.5</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>56</maxValue>
+        </joint>
+	<joint type="Revolute">
+            <theta>d8</theta>
+            <d>0</d>
+            <a>25.5</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>44</maxValue>
+        </joint>
+	<joint type="Revolute">
+            <theta>d9</theta>
+            <d>0</d>
+            <a>26.8</a>
+            <alpha>0</alpha>
+            <minValue>-0.29</minValue>
+            <maxValue>51</maxValue>
+        </joint>
+	<link dynamicJointType="Revolute">thumbBase.xml</link>
+        <link dynamicJointType="Revolute">proximalPhalanx.xml</link>
+        <link dynamicJointType="Revolute">middlePhalanx.xml</link>
+        <link dynamicJointType="Revolute">distalPhalanx.xml</link>
+    </chain>
+</robot>

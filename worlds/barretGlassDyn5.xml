@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.673202 -0.739459 -1.55018e-10 -1.78867e-09)[+91.1923 +784.224 -409.276]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.79355 +0.236057 -3.2339 +0.402569 +1.36269 -0.150855 </dofValues>
+		<transform>
+			<fullTransform>(+1 +1.21635e-15 +8.56872e-15 +3.93491e-16)[+7.70751e-13 -5.25868e-13 -1.13687e-13]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/harvardHand/harvardHandTwist3.xml</filename>
+		<dofValues>0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0</dofValues>
+		<transform>
+	 		<!-- <fullTransform>(+0.540332 -0.498114 +0.538186 +0.412649)[+73.1953 +655.081 -342.49]</fullTransform> -->
+			<fullTransform>(-0.540332 +0.538186 +0.498114 +0.412649)[+73.1953 +655.081 -342.49]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+		<transform>
+			<fullTransform>(+0.0 +0.0 +1.0 +0.0)[+0.0 +0.0 +0.0]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>+205.636 +1801.05 +321.249</position>
+		<orientation>-0.0401173 -0.545845 -0.836245 -0.0337295</orientation>
+		<focalDistance>+1978.8</focalDistance>
+	</camera>
+</world>

@@ -1,0 +1,50 @@
+#!/bin/bash
+#graspit compilation script
+cd qhull
+make
+cd ..
+export GRASPIT=$PWD
+export CGDB_MODEL_ROOT=$GRASPIT/cgdb
+echo $GRASPIT
+echo $CGDB_MODEL_ROOT
+#if libraries are not installed on the standard path variable, add them here.
+#libspaths=#space delimited list of -L/path/to/lib
+qmake $libspaths ./graspit.pro 
+
+
+make
+
+
+rflag= 
+while getopts 'r' OPTION
+do
+	case $OPTION in
+	r)	rflag=1
+		;;
+	?)	printf "Options: %s: [-r] " $(basename $0) >&2
+			exit 2
+			;;
+	esac
+done
+shift $(($OPTIND - 1))
+fr=
+if [ "$rflag" ]
+then 
+cd rosnode
+
+rppsource=#source /path/to/starting/ros/variable
+fr=echo $ROS_PACKAGE_PATH | grep $PWD 
+if ! [ "$ROS_PACKAGE_PATH"]
+    then echo "No ROS_PACKAGE_PATH set"; source $rppsource
+fi
+
+if ! [ "$fr" ]
+then 
+	echo "Adding PWD to ROS_PACKAGE_PATH"; source ./arm.sh;
+fi
+
+	rosmake grasp_common; rosmake grasp_planner; rosmake grasp_test;
+fi
+
+
+

@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.996 -0.0781588 +0.0111872 +0.0418439)[+548.568 +575.733 -340.346]</fullTransform>
+		</transform>
+	</graspableBody>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.518563 +0.488931 +0.471578 +0.519282)[+97.4086 +900.158 -339.578]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.61532 +0.220308 -3.18237 +0.00906244 +1.33166 -0.183067 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/Barrett/Barrett5.xml</filename>
+		<dofValues>+4.98626e-06 +0.604536 +0 +0 +0.570903 +0 +0 +0.51351 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+0.518892 -0.56742 +0.455876 +0.448288)[+121.316 +659.28 -344.553]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +175.05]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>-278.371 +2329.1 +546.323</position>
+		<orientation>-0.0490834 +0.546335 +0.835767 -0.0245377</orientation>
+		<focalDistance>+2557.27</focalDistance>
+	</camera>
+</world>

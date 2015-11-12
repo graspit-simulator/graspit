@@ -1,0 +1,14 @@
+#Inventor V2.1 ascii
+#material rubber
+#mass 440
+#cog 0 0 0
+#youngs 15000
+Separator { # Body
+
+	Material {
+		ambientColor	0.4 0.4 0.8
+		diffuseColor	0.4 0.4 0.8
+	  }
+
+	  Cylinder { radius 15 height 180 }
+}

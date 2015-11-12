@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>metal</material>
+    <mass>17400</mass>
+    <cog>-363.8 6.0 227.5</cog>
+    <inertia_matrix>7471.26 0 0 0 30114.9 0 0 0 30977</inertia_matrix>
+    <geometryFile>puma2.iv</geometryFile>
+</root>

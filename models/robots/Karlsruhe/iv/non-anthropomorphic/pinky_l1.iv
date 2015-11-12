@@ -1,0 +1,21 @@
+#Inventor V2.1 ascii
+
+Separator {
+#File {name armar/hands/axis_arrows.iv }
+#		translation 0 0 0
+#		rotation 0 1 0 -1.57
+#	}	
+	Transform {
+		translation 0 0 0
+		rotation 0 0 1 -1.57
+	}
+	Transform {
+		translation 0 0 0
+		rotation 0 1 0 1.57
+	}
+
+	Separator 
+	{
+		File {name armar/hands/metacarpals.iv }
+	}
+}

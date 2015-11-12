@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<body>
+			<material>wood</material>
+			<geometryFile type = "">none</geometryFile>
+			<mass>300</mass>
+			<cog>5.31527 -0.0600253 12.07</cog>
+			<inertia_matrix>4853 -1.1196 -6.5156 -1.1196 4853 47.542 -6.5156 0 2357.6</inertia_matrix>
+		</body>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/NewBarrett/NewBarrett.xml</filename>
+		<dofValues>+0 +2.44346 +1 +2.21612 +0 +2.44346 +1 +2.42172 +0 +2.44346 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(-0.00109552 +0.999999 +1.34359e-07 -1.34359e-07)[+69.6944 +1.52262 +63.434]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>-226.026 -88.4983 +405.112</position>
+		<orientation>-0.266165 -0.0953503 +0.959195 +0.00316107</orientation>
+		<focalDistance>+488.303</focalDistance>
+	</camera>
+</world>

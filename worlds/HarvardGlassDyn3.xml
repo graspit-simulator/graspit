@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.330618 -0.0229857 -0.94348 +0.00310511)[+524.105 +171.634 -1252.98]</fullTransform>
+		</transform>
+	</graspableBody>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.503829 +0.50384 +0.496143 +0.496129)[+127.734 +846.6 -410.865]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.6123 +0.267622 -3.41852 -0.0449509 +1.49837 -0.142797 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/harvardHand/harvardHandTwist3.xml</filename>
+		<dofValues>+1.05216 -0.0251047 -0.367259 -0.0793719 +0.0452991 -0.0313212 -0.352104 -0.0830048 +0.0465326 </dofValues>
+		<transform>
+			<fullTransform>(+0.677919 -0.0109618 +0.0379542 +0.734074)[+129.858 +511.964 -336.519]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<transform>
+			<fullTransform>(+0.677919 -0.0109618 +0.0379542 +0.734074)[+129.858 +511.964 -336.519]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>+510.452 +722.523 +71.3873</position>
+		<orientation>-0.173372 -0.392547 -0.885399 -0.178657</orientation>
+		<focalDistance>+1141.14</focalDistance>
+	</camera>
+</world>

@@ -1,0 +1,346 @@
+<?xml version="1.0" ?>
+<robot type="Shadow">
+    <palm>Palm.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>1.0e+8</maxEffort>
+        <Kp>1.0e+8</Kp>
+        <Kd>1.0e+11</Kd>
+        <draggerScale>20.0</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>46.4 3.6 0</translation>
+            <rotation>90 x</rotation>
+            <rotation>55 y</rotation>
+            <translation>0 0 21</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>37</a>
+            <alpha>-90</alpha>
+            <minValue>-5</minValue>
+            <maxValue>45</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+305</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-15</minValue>
+            <maxValue>15</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>45</a>
+            <alpha>0</alpha>
+            <minValue>-15</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0</d>
+            <a>25</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3*0.8</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">LF_Meta3.xml</link>
+        <link dynamicJointType="Revolute">Knuckle.xml</link>
+        <link dynamicJointType="Revolute">F_Prox.xml</link>
+        <link dynamicJointType="Revolute">F_Middle.xml</link>
+        <link dynamicJointType="Revolute">F_Distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>92 0 0</translation>
+            <rotation>90 x</rotation>
+            <rotation>55 y</rotation>
+            <rotation>-90 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d4+305</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-15</minValue>
+            <maxValue>15</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>45</a>
+            <alpha>0</alpha>
+            <minValue>-15</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d6</theta>
+            <d>0</d>
+            <a>25</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d6*0.8</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">Knuckle.xml</link>
+        <link dynamicJointType="Revolute">F_Prox.xml</link>
+        <link dynamicJointType="Revolute">F_Middle.xml</link>
+        <link dynamicJointType="Revolute">F_Distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>95 -22 1</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d7</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-15</minValue>
+            <maxValue>15</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d8</theta>
+            <d>0</d>
+            <a>45</a>
+            <alpha>0</alpha>
+            <minValue>-15</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d9</theta>
+            <d>0</d>
+            <a>25</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d9*0.8</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">Knuckle.xml</link>
+        <link dynamicJointType="Revolute">F_Prox.xml</link>
+        <link dynamicJointType="Revolute">F_Middle.xml</link>
+        <link dynamicJointType="Revolute">F_Distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>91 -44 2</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d10</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-15</minValue>
+            <maxValue>15</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d11</theta>
+            <d>0</d>
+            <a>45</a>
+            <alpha>0</alpha>
+            <minValue>-15</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d12</theta>
+            <d>0</d>
+            <a>25</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d12*0.8</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">Knuckle.xml</link>
+        <link dynamicJointType="Revolute">F_Prox.xml</link>
+        <link dynamicJointType="Revolute">F_Middle.xml</link>
+        <link dynamicJointType="Revolute">F_Distal.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>-70.5 -128 8</translation>
+            <rotation>45 z</rotation>
+            <rotation>90 x</rotation>
+            <translation>130 0 0</translation>
+            <rotation>-90 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d13</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d14+90</theta>
+            <d>0</d>
+            <a>38</a>
+            <alpha>-90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d15</theta>
+            <d>0</d>
+            <a>32</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d16</theta>
+            <d>0</d>
+            <a>33</a>
+            <alpha>0</alpha>
+            <minValue>-10</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Universal">TH_Proximal.xml</link>
+        <link dynamicJointType="Revolute">TH_Middle.xml</link>
+        <link dynamicJointType="Revolute">TH_Distal.xml</link>
+    </chain>
+</robot>

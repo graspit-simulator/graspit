@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BlindPlannerDlgUI</class>
+ <widget class="QDialog" name="BlindPlannerDlgUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1122</width>
+    <height>653</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1122</width>
+    <height>653</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1122</width>
+    <height>653</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Blind Grasping</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>550</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadExperienceButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Exp</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="experienceFilePath">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>10</y>
+     <width>261</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/home/jalapeno/curg/graspits/hao/graspit_hao_jared/fiji/experience_cgdb.txt</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="adjustButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>243</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Adjust</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>183</y>
+     <width>311</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Grasp Experience (NN)</string>
+   </property>
+   <widget class="QLabel" name="numGraspsLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>321</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0 grasps loaded</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="knnLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>321</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>20 knn</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="nnIDLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>321</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>NNID: N/A</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="previousNNButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>120</y>
+      <width>31</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextNNButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>120</y>
+      <width>31</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="indexLabel">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>124</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1/20</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="distanceLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>321</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Distance: N/A</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="compareButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>183</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load NN</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="applyAdjustmentButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>300</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Apply</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadObjectButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>330</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>???</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadPoseButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Pose</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="poseFilePath">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>40</y>
+     <width>261</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/home/jalapeno/curg/graspits/hao/graspit_hao_jared/fiji/handpose_cgdb.txt</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="epsilonLineEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>250</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>0.4</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="allInOneAdjustButton">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>190</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>C,A,A</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="distanceLineEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>250</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>50</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>0</y>
+     <width>360</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Test Tools</string>
+   </property>
+   <widget class="QLineEdit" name="testPoseId">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>50</y>
+      <width>141</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="generateTestPoseButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Generate Poses</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="gotoTestPoseButton">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>50</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Goto pose</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="testButton">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Test</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="rotateButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>rotate object</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>100</y>
+     <width>360</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Local Perturbation</string>
+   </property>
+   <widget class="QPushButton" name="perturbButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Perturb</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="perturbLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>141</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;0,0,0&gt;[1,0,0,0]</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="generatePerturbationListButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Generate</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextPerturbationButton">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>50</y>
+      <width>31</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="previousPerturbationButton">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>50</y>
+      <width>31</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="zeroPerturbationButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>50</y>
+      <width>31</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>||</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="perturbationIndexLabel">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>50</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0/0</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>200</y>
+     <width>360</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Temp Buttons</string>
+   </property>
+   <widget class="QPushButton" name="recordDistButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>recordDist</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="recordTargetNNQualityButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>20</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>recordTargetNNQuality</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="writeoutButton">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>20</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>writeoutTactile</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>270</y>
+     <width>360</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>NN</string>
+   </property>
+   <widget class="QPushButton" name="distanceButton">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>60</y>
+      <width>93</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Distance to</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="setPoseButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>93</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Pose</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="graspId">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>241</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_6">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>363</y>
+     <width>361</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Grasp with Offset</string>
+   </property>
+   <widget class="QPushButton" name="sendToRobotButton">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>100</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Send to Robot</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadPoseErrorButton">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>30</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Pose Err</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="generatePoseErrorButton">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>60</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Gen. Pose Err</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="poseErrorComboBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>231</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="showGraspWithPoseErrorButton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>60</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show G w/ Err</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="showIdealGraspButton">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>60</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show G w/o Err</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="isAdjustmentCheckbox">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>100</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>adjust</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="outputPerturbedPoseButton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>100</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Output Pertubed</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_7">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>513</y>
+     <width>361</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Quality</string>
+   </property>
+   <widget class="QPushButton" name="dynamicExamButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>30</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dyn. Exam</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="autoGraspAtFirstContactButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>AutoGrasp</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="loadSVMButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>120</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load SVM</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadCodebookButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>93</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Codebook</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="codebookFilePath">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>90</y>
+     <width>261</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/home/jalapeno/curg/graspits/hao/graspit_hao_jared/fiji/codebooki00.txt</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="svmFilePath">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>120</y>
+     <width>261</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/home/jalapeno/curg/graspits/hao/graspit_hao_jared/fiji/modeli00</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="SVMEvalButton">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>240</y>
+     <width>81</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>SVM eval</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>-40</y>
+     <width>20</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="Line" name="line_2">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>370</y>
+     <width>441</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>250</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>d</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>250</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>e</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>BlindPlannerDlgUI</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>BlindPlannerDlgUI</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

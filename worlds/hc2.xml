@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>models/objects/sphere.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[-110.4903147 30.0133564 71.2188035]</fullTransform>
+		</transform>
+	</graspableBody>
+	<camera>
+		<position>-7.59011 +239.539 +367.205</position>
+		<orientation>-0.316619 +0.0732995 +0.253377 +0.911142</orientation>
+		<focalDistance>+408.168</focalDistance>
+	</camera>
+</world>

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<robot type="M7Tool">
+    <palm>toolbase.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>0 0 0.1</translation>
+            <rotation>0 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>4</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">p1.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 0 -0.1</translation>
+            <rotation>0 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>30</minValue>
+            <maxValue>-4</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">p2.xml</link>
+    </chain>
+</robot>

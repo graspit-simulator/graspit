@@ -1,0 +1,1976 @@
+//######################################################################
+//
+// GraspIt!
+// Copyright (C) 2002-2009  Columbia University in the City of New York.
+// All rights reserved.
+//
+// This software is protected under a Research and Educational Use
+// Only license, (found in the file LICENSE.txt), that you should have
+// received with this distribution.
+//
+// Author(s): Andrew T. Miller 
+//
+// $Id: graspitServer.cpp,v 1.7 2009/03/25 22:10:04 cmatei Exp $
+//
+//######################################################################
+
+/*! \file 
+  \brief Implements the application's TCP server.
+ */
+
+#include <QTextStream>
+#include <iostream>
+#include "graspitServer.h"
+#include "graspitGUI.h"
+#include "ivmgr.h"
+#include "world.h"
+#include "robot.h"
+#include "grasp.h"
+#include "contact.h"
+#include "egPlanner.h"
+#include "egPlannerDlg.h"
+#include "mainWindow.h"
+#include "../ui/EGPlanner/egPlannerDlg.h"
+#include "EGPlanner/egPlanner.h"
+#include "matvec3D.h"
+#include "searchState.h"
+#include "quality.h"
+#include <qlist.h>
+#include "debug.h"
+#include <qfile.h>
+#include <Inventor/nodes/SoScale.h>
+#define PROF_ENABLED
+#include "profiling.h"
+#include <time.h>
+PROF_DECLARE(TOTAL_TIMER);
+PROF_DECLARE(APPROACH_TIMER);
+PROF_DECLARE(AUTOGRASP_TIMER);
+PROF_DECLARE(GMETRIC_TIMER);
+PROF_DECLARE(MATERIAL_TIMER);
+
+#ifdef CGDB_ENABLED
+#include "dbase_grasp.h"
+#endif
+
+/*!
+  Stub destructor.
+*/
+
+namespace GPDB{
+int dbgSwitch;
+}
+
+ClientSocket::~ClientSocket()
+{
+#ifdef GRASPITDBG
+  std::cout << "client socket destroyed"<<std::endl;
+#endif
+}
+
+/*!
+  This reads the next portion of a command line after the command to collect
+  the body indices, and returns a vector of pointers to those bodies.  If
+  this portion starts with the word "ALL", then all the bodies in the world
+  are added to the body vector.  Otherwise it reads the number of body
+  indices, and reads each index in turn, adding the corresponding body
+  pointer to the vector.  If an index is read that does not exist, an error
+  message is sent back and this method returns FAILURE.
+*/
+int
+ClientSocket::readBodyIndList(std::vector<Body *> &bodyVec)
+{
+  QTextStream os(this);
+  int i,numBodies,bodNum;
+  bool ok;
+  World *world = graspItGUI->getIVmgr()->getWorld();
+  std::cout << "ReadBodyIndList Line:"<<line.latin1() << std::endl;
+
+  /* if the index list is empty, use every body and send
+     back the count
+  */
+
+  if (strPtr == lineStrList.end()) return FAILURE;
+
+  if ((*strPtr).startsWith("ALL")) {
+    strPtr++;
+    for (i=0;i<world->getNumBodies();i++)
+      bodyVec.push_back(world->getBody(i));
+    std::cout << "Sending num bodies: "<<world->getNumBodies()<<std::endl;
+    os << world->getNumBodies() << endl;
+    return SUCCESS;
+  }
+  
+  numBodies = (*strPtr).toInt(&ok);
+  if (!ok) return FAILURE;
+  strPtr++;
+  
+  for (i=0;i<numBodies;i++) {
+    if (strPtr == lineStrList.end()) return FAILURE;
+    bodNum = (*strPtr).toInt(&ok);
+    if (!ok) return FAILURE;
+    
+    if (bodNum>=0 && bodNum<world->getNumBodies()) {
+      bodyVec.push_back(world->getBody(bodNum));
+      if (world->getBody(bodNum)==NULL) {
+	os << "Error: Cannot find body " << bodNum <<"\n";
+        return FAILURE;
+      }
+    }
+    else {
+      os << "Error: Cannot find body " << bodNum <<"\n";
+      return FAILURE;
+    }
+    strPtr++;
+  }
+  return SUCCESS;
+}
+
+
+/*!
+  This reads the next portion of a command line after the command to collect
+  the robot indices, and returns a vector of pointers to those robots.  If
+  this portion starts with the word "ALL", then all the robots in the world
+  are added to the robot vector.  Otherwise it reads the number of robot
+  indices, and reads each index in turn, adding the corresponding robot
+  pointer to the vector.  If an index is read that does not exist, an error
+  message is sent back and this method returns FAILURE.
+*/
+int
+ClientSocket::readRobotIndList(std::vector<Robot *> &robVec)
+{
+  QTextStream os(this);
+  int i,robNum,numRobots;
+  bool ok;
+  World *world = graspItGUI->getIVmgr()->getWorld();
+  std::cout << "ReadRobotIndList Line:"<<line.latin1() << std::endl;
+
+  /* if the index list is empty, use every robot and send
+     back the count
+  */
+  if (strPtr == lineStrList.end()) return FAILURE;
+
+  if ((*strPtr).startsWith("ALL")) {
+    strPtr++;
+    for (i=0;i<world->getNumRobots();i++)
+      robVec.push_back(world->getRobot(i));
+    std::cout << "Sending num robots: "<<world->getNumRobots()<<std::endl;
+    os << world->getNumRobots() << endl;
+    return SUCCESS;
+  }
+  
+  numRobots = (*strPtr).toInt(&ok);
+  if (!ok) return FAILURE;
+  strPtr++;
+  
+  for (i=0;i<numRobots;i++) {
+    if (strPtr == lineStrList.end()) return FAILURE;
+    robNum = (*strPtr).toInt(&ok);
+    if (!ok) return FAILURE;
+    
+    if (robNum>=0 && robNum<world->getNumRobots()) {
+      robVec.push_back(world->getRobot(robNum));
+      if (world->getRobot(robNum)==NULL) {
+	os << "Error: Cannot find robot " << robNum <<"\n";
+        return FAILURE;
+      }
+    }
+    else {
+      os << "Error: Cannot find robot " << robNum <<"\n";
+      return FAILURE;
+    }
+    strPtr++;
+  }
+  return SUCCESS;
+}
+
+/*!
+  This is the main routine for parsing input on the clientSocket.
+  There should be one command for each line of input.  This reads one
+  line, and looks at the first word (up to the first space character) to
+  determine the command.   Then if there are body or robot indices to read,
+  it calls a support routine to read those and return a vector of bodies or
+  robots.  These are then passed to the appropriate routine to carry out the
+  action and write out any necessary results.
+*/
+void
+ClientSocket::readClient()
+{
+  int i,numData,numBodies,numRobots;
+  double time;
+  std::vector<Body *> bodyVec;
+  std::vector<Robot *> robVec;
+
+  bool ok;
+
+  while ( canReadLine() ) {
+    line = readLine();
+    line.truncate(line.length()-1); //strip newline character
+    lineStrList =
+      QStringList::split(' ',line);
+    strPtr = lineStrList.begin();
+
+#ifdef GRASPITDBG
+    std::cout <<"Command parser line: "<<line << std::endl;
+#endif
+    
+    if (*strPtr == "getContacts") {
+      strPtr++; if (strPtr == lineStrList.end()) continue;
+      numData = (*strPtr).toInt(&ok); strPtr++;
+      if (!ok) continue;
+
+#ifdef GRASPITDBG
+      std::cout << "Num data: "<<numData<<std::endl;
+#endif
+
+      if (readBodyIndList(bodyVec)) continue;
+      numBodies = bodyVec.size();
+      for (i=0;i<numBodies;i++)
+        sendContacts(bodyVec[i],numData);
+    }
+    
+    else if (*strPtr == "getAverageContacts") {
+      strPtr++;
+      if (readBodyIndList(bodyVec)) continue;
+      numBodies = bodyVec.size();
+      for (i=0;i<numBodies;i++)
+	sendAverageContacts(bodyVec[i]);
+    }
+    
+    else if (*strPtr == "getBodyName") {
+      strPtr++;
+      if (readBodyIndList(bodyVec)) continue;
+      numBodies = bodyVec.size();
+      for (i=0;i<numBodies;i++)
+	sendBodyName(bodyVec[i]);
+    }
+    
+    else if (*strPtr == "getRobotName") {
+      strPtr++;
+      if (readRobotIndList(robVec)) continue;
+      numRobots = robVec.size();
+      for (i=0;i<numRobots;i++)
+	sendRobotName(robVec[i]);
+    }
+    
+    else if (*strPtr == "getDOFVals") {
+      strPtr++;
+      if (readRobotIndList(robVec)) continue;
+      numRobots = robVec.size();
+      for (i=0;i<numRobots;i++)
+	sendDOFVals(robVec[i]);
+    }
+    
+    else if (*strPtr == "moveDOFs") {
+      strPtr++;
+      readDOFVals();
+    }
+    
+    else if (*strPtr == "render")
+      graspItGUI->getIVmgr()->getViewer()->render();
+    
+    else if (*strPtr == "setDOFForces") {
+      strPtr++;
+      if (readRobotIndList(robVec)) continue;
+      numRobots = robVec.size();
+      for (i=0;i<numRobots;i++)
+	if (readDOFForces(robVec[i])==FAILURE) continue;
+    }
+    
+    else if ((*strPtr) == "moveDynamicBodies") {
+      strPtr++;
+      if (strPtr == lineStrList.end()) ok = FALSE;
+      else {
+	time = (*strPtr).toDouble(&ok); strPtr++;
+      }
+      if (!ok)
+	moveDynamicBodies(-1);
+      else
+	moveDynamicBodies(time);
+    }
+    
+    else if (*strPtr == "computeNewVelocities") {
+
+#ifdef GRASPITDBG
+      std::cout << "cnv" << std::endl;
+#endif
+
+      strPtr++; if (strPtr == lineStrList.end()) continue;
+      time = (*strPtr).toDouble(&ok); strPtr++;
+      if (!ok) continue;
+
+#ifdef GRASPITDBG
+      std::cout << time <<std::endl;
+#endif
+      computeNewVelocities(time);
+    }
+    
+  }
+}
+
+/*!
+  Given a pointer to a body, this examines all the contacts on that body and
+  finds the average wrench acting on the body through those contacts and the
+  average contact location in body coordinates.  This is written to the
+  socket on 2 separate lines.
+*/
+void
+ClientSocket::sendAverageContacts(Body* bod)
+{
+  QTextStream os(this);
+  std::list<Contact *> contactList;
+  std::list<Contact *>::iterator cp;
+  int i,numContacts;
+  double totalWrench[6]={0.0,0.0,0.0,0.0,0.0,0.0};
+  double *wrench;
+  vec3 totalLoc = vec3::ZERO;
+
+  numContacts = bod->getNumContacts();
+  contactList = bod->getContacts();
+  for (cp=contactList.begin();cp!=contactList.end();cp++) {
+    wrench = (*cp)->getDynamicContactWrench();
+    for (i=0;i<6;i++) totalWrench[i] += wrench[i];
+    totalLoc += (*cp)->getContactFrame().translation();
+  }
+
+  if (numContacts>1) {
+    for (i=0;i<6;i++) totalWrench[i] /= numContacts;
+    totalLoc = totalLoc / numContacts;
+  }
+
+  os << totalWrench[0]<<" "<<totalWrench[1]<<" "<<totalWrench[2]<<
+    " "<<totalWrench[3]<<" "<<totalWrench[4]<<" "<<totalWrench[5]<<"\n";
+  os << totalLoc[0] << " "<<totalLoc[1] << " " <<totalLoc[2]<<"\n";
+
+}
+
+/*!
+  Given a pointer to a body, this writes the name of the body and a newline
+  to the socket.
+*/
+void
+ClientSocket::sendBodyName(Body* bod)
+{
+  QTextStream os(this);
+  std::cout << "sending " << bod->getName().latin1() << "\n";
+  os << bod->getName().latin1() << "\n";
+}
+
+/*!
+  Given a pointer to a robot, this writes the name of the robot and a newline
+  to the socket.
+*/
+void
+ClientSocket::sendRobotName(Robot* rob)
+{
+  QTextStream os(this);
+  std::cout << "sending " << rob->getName().latin1() << "\n";
+  os << rob->getName().latin1() << "\n";
+}
+
+/*!
+  Given a pointer to a body, this first writes a line containing the number
+  of contacts on the body.  Then it writes \a numData lines for each contact.
+  The first line contains the 6 numbers of the contact wrench.  The next line
+  (if required) contains the 3 numbers specifying the contact location in
+  body coordinates, and the last line (if required) contains the scalar
+  constraint error for that contact.
+*/
+void
+ClientSocket::sendContacts(Body *bod,int numData, QTextStream * osp)
+{
+QTextStream p(this);
+if (osp == NULL)
+	  osp = &p;
+	
+
+  std::list<Contact *> contactList;
+  std::list<Contact *>::iterator cp;
+  vec3 loc;
+  double err;
+  double *wrench;
+
+#ifdef GRASPITDBG
+  std::cout << "sending numContacts: "<<bod->getNumContacts()<<std::endl;
+#endif
+
+  contactList = bod->getContacts();
+  if (numData < 0)
+	  (*osp) << "contactNum " << contactList.size() << " " ;
+  for (cp=contactList.begin();cp!=contactList.end();cp++) {
+	wrench = (*cp)->getDynamicContactWrench();
+	loc = (*cp)->getContactFrame().translation();
+	err = (*cp)->getConstraintError();
+	if (numData < 0)
+		(*osp) << "contact " << (*cp)->getBody2()->getName()<< " "<<  wrench[0]<<" "<<wrench[1]<<" "<<wrench[2]<<" "<<wrench[3]<<" "<<
+      wrench[4]<<" "<<wrench[5]<< " "<< loc[0] << " "<< loc[1] << " " << loc[2]<< " ";
+	
+	if (numData > 0){
+    (*osp) << bod->getNumContacts()<<" \n";
+	(*osp) << wrench[0]<<" "<<wrench[1]<<" "<<wrench[2]<<" "<<wrench[3]<<" "<<
+		wrench[4]<<" "<<wrench[5]<<"\n";}
+	if (numData > 1) 
+	  *osp << loc[0] << " "<< loc[1] << " " << loc[2]<<"\n";
+	if (numData > 2)
+	  (*osp) << err << "\n";
+  }
+}
+
+/*!
+  Given a pointer to robot, this first writes a line to the socket containing
+  the number of %DOF's in the robot, then for each %DOF, it writes a line
+  containting the current value of that %DOF.
+*/
+void
+ClientSocket::sendDOFVals(Robot *rob)
+{
+  QTextStream os(this);
+  int i;
+
+  os << rob->getNumDOF() << "\n";
+  for (i=0;i<rob->getNumDOF();i++)
+    os << rob->getDOF(i)->getVal() << "\n";
+}
+
+/*!
+  After the readDOFVals command was read by readClient, this expects to
+  read a valid robot index, then the correct number of %DOF's for this robot,
+  then a desired value for each %DOF, and finally a value for each DOF to step
+  by during the move.  It performs the %DOF moves, finds the new contacts,
+  updates the grasp, and then it sends one line for each %DOF containing
+  the actual value for the %DOF after the move.
+*/
+int
+ClientSocket::readDOFVals()
+{
+  Robot *rob;
+  double *val,*stepby;
+  QTextStream os(this);
+  int numDOF,i,robNum;
+  bool ok=TRUE;
+
+#ifdef GRASPITDBG
+  std::cout << "in read dof vals"<<std::endl;
+#endif
+
+  if (strPtr == lineStrList.end()) ok=FALSE;
+  if (ok) robNum = (*strPtr).toInt(&ok);
+
+  if (!ok || robNum < 0 ||
+    robNum >= graspItGUI->getIVmgr()->getWorld()->getNumRobots()) {
+	os <<"Error: Robot does not exist.\n";
+    return FAILURE;
+  }
+  rob = graspItGUI->getIVmgr()->getWorld()->getRobot(robNum);
+
+#ifdef GRASPITDBG
+  std::cout << "robnum: "<<robNum<<std::endl;
+#endif
+
+  strPtr++;
+  if (strPtr == lineStrList.end()) return FAILURE;
+
+  numDOF=(*strPtr).toInt(&ok);
+  if (!ok) return FAILURE;
+  strPtr++;
+
+#ifdef GRASPITDBG
+  std::cout << "read robot has: "<< numDOF << " DOF?"<<std::endl;
+#endif
+
+  if (numDOF < 1) {
+
+#ifdef GRASPITDBG
+	std::cout << "numDOF was zero."<<std::endl;
+#endif
+	return FAILURE;
+  }
+  if (numDOF != rob->getNumDOF()) {
+    os <<"Error: robot has " << rob->getNumDOF() <<" DOF."<<endl;
+	return FAILURE;
+  }
+
+  val = new double[numDOF];
+  stepby = new double[numDOF];
+
+  for (i=0;i<rob->getNumDOF();i++) {
+	if (strPtr == lineStrList.end()) return FAILURE;
+	val[i] = (*strPtr).toDouble(&ok);
+	if (!ok) return FAILURE;
+	strPtr++;
+#ifdef GRASPITDBG
+	std::cout<<val[i]<<" ";
+#endif
+  }
+
+#ifdef GRASPITDBG
+  std::cout<<std::endl;
+#endif
+
+  for (i=0;i<rob->getNumDOF();i++) {
+    if (strPtr == lineStrList.end()) return FAILURE;
+	stepby[i] = (*strPtr).toDouble(&ok);
+	if (!ok) return FAILURE;
+	strPtr++;
+  }
+
+  rob->moveDOFToContacts(val,stepby,true);
+
+  // these should be separate commands
+  graspItGUI->getIVmgr()->getWorld()->findAllContacts();
+  graspItGUI->getIVmgr()->getWorld()->updateGrasps();
+
+  for (i=0;i<rob->getNumDOF();i++) {
+    os << rob->getDOF(i)->getVal() << "\n";
+
+#ifdef GRASPITDBG
+    std::cout << "Sending: "<< rob->getDOF(i)->getVal() << "\n";
+#endif
+  }
+  delete [] val;
+  delete [] stepby;
+  return SUCCESS;
+}
+
+/*!
+  After the readDOFForces command was read by readClient, this expects to
+  the correct number of %DOF's for this robot, and then a desired force for
+  each %DOF.  It sets each %DOF force and sends a line for each containing
+  the current force.
+*/
+int
+ClientSocket::readDOFForces(Robot *rob)
+{
+  double val;
+  bool ok;
+ // QTextStream is(this);
+  QTextStream os(this);
+  int numDOF,i;
+
+  if (strPtr == lineStrList.end()) return FAILURE;
+ 
+  numDOF=(*strPtr).toInt(&ok);
+  if (!ok) return FAILURE;
+  strPtr++;
+
+#ifdef GRASPITDBG
+  std::cout << "read robot has: "<< numDOF << " DOF?"<<std::endl;
+#endif
+
+  if (numDOF < 1) {
+#ifdef GRASPITDBG
+    std::cout << "numDOF was zero."<<std::endl;
+#endif
+    return FAILURE;
+  }
+  
+  if (numDOF != rob->getNumDOF()) {
+    os <<"Error: robot has " << rob->getNumDOF() <<" DOF."<<endl;
+    return FAILURE;
+  }
+  
+  for (i=0;i<rob->getNumDOF();i++) {
+    if (strPtr == lineStrList.end()) return FAILURE;
+    val = (*strPtr).toDouble(&ok);
+    if (!ok) return FAILURE;
+    strPtr++;
+    rob->getDOF(i)->setForce(val);
+    
+#ifdef GRASPITDBG
+    std::cout<<val<<" ";
+#endif
+  }
+  
+#ifdef GRASPITDBG
+  std::cout<<std::endl;
+#endif
+  
+  for (i=0;i<rob->getNumDOF();i++) {
+    os << rob->getDOF(i)->getForce() << "\n";
+    
+#ifdef GRASPITDBG
+    std::cout << "Sending: "<< rob->getDOF(i)->getForce() << "\n";
+#endif
+  }
+  return SUCCESS;
+}
+
+/*
+//not finished yet
+void
+ClientSocket::moveBody(Body *bod)
+{
+  double x,y,z,ax,ay,az,r;
+
+  QTextStream is(this);
+  is>>x>>y>>z>>ax>>ay>>az>>r;
+  bod = NULL;  // unused parameter warning
+}
+*/
+
+/*!
+  If given a positive time step value, this will move the dynamic world bodies
+  with that value.  Otherwise it uses the world default time step.  A line
+  with the actual length of that timestep is then sent back.
+*/
+void
+ClientSocket::moveDynamicBodies(double timeStep)
+{
+  QTextStream os(this);
+  if (timeStep<0)
+    timeStep = graspItGUI->getIVmgr()->getWorld()->getTimeStep();
+
+  double actualTimeStep =
+    graspItGUI->getIVmgr()->getWorld()->moveDynamicBodies(timeStep);
+  if (actualTimeStep < 0)
+    os << "Error: Timestep failsafe reached.\n";
+  else 
+    os << actualTimeStep << "\n";
+}
+
+/*!
+  This calls the computeNewVelocities routine in the dynamics with the given
+  value of the timestep.  Afterwards, it sends out a line containing the
+  result code from that operation.
+*/
+void
+ClientSocket::computeNewVelocities(double timeStep)
+{
+  QTextStream os(this);
+  int result = graspItGUI->getIVmgr()->getWorld()->computeNewVelocities(timeStep);
+  os << result << "\n";
+}
+
+/*!
+  This is not complete yet.
+
+void
+ClientSocket::readTorques()
+{
+  QString line;
+  line = readLine();
+  int numDOF = line.toInt();
+  
+  if (numDOF < 0) {} //unused parameter warning
+}
+*/
+
+/*!
+  Starts a TCP server that listens on port \a port.  \a backlog specifies
+  the number of pending connections the server can have.
+*/
+GraspItServer::GraspItServer(Q_UINT16 port, int backlog,
+			     QObject *parent,const char *name) : 
+  Q3ServerSocket(port,backlog,parent,name)
+{
+  if (!ok()) {
+    qWarning("Failed to bind to port");
+  }
+}
+
+/*! 
+  Creates a new ClientSocket to handle communication with this client.
+*/
+void
+GraspItServer::newConnection(int socket)
+{
+  //(void)new ClientSocket(socket, this);
+(void)new GraspPlannerSocket(socket, this);
+#ifdef GRASPITDBG
+  std::cout << "new connection" << std::endl;
+#endif
+}
+
+mat3 yprToRotMatrix(double phi, double theta, double sigma){
+return mat3(vec3(cos(theta)*cos(sigma), cos(theta)*sin(sigma),-sin(theta)),
+			vec3(-cos(phi)*sin(sigma)+sin(phi)*sin(theta)*cos(sigma),cos(phi)*cos(sigma)+sin(phi)*sin(theta)*sin(sigma), sin(phi)*cos(theta)),
+			vec3(sin(phi)*sin(sigma)+cos(phi)*sin(theta)*cos(sigma), -sin(phi)*cos(sigma)+cos(phi)*sin(theta)*sin(sigma), cos(phi)*cos(theta)));
+}
+
+GraspableBody * GraspPlannerSocket::mObject = NULL;
+Hand * GraspPlannerSocket::targetHand = NULL;
+
+GraspPlannerSocket::GraspPlannerSocket( int sock, QObject *parent, const char *name): ClientSocket(sock, parent,name), mDlg(NULL), mPlanner(NULL){
+		 
+	connect( this, SIGNAL(readyRead()), SLOT(readClient()));
+	targetVector.push_back(QString(getenv("GRASPIT")) + QString("/models/objects/cylinder.xml"));
+	handVector.push_back(QString(getenv("GRASPIT")) + QString("/models/robots/Barrett/Barrett.xml"));
+	handVector.push_back(QString(getenv("GRASPIT")) + QString("/models/robots/HumanHand/HumanHand20DOF.xml"));
+	handVector.push_back(QString(getenv("GRASPIT")) + QString("/models/robots/columbia_hand test/ColumbiaFinger3.xml"));
+	return;
+}
+
+
+void GraspPlannerSocket::setEnergyType(QString eType){
+	energyType = eType;
+	return;
+}
+
+void GraspPlannerSocket::setContactType(QString cType){
+	contactType = cType;
+	return;
+}
+void GraspPlannerSocket::setMaxSteps(QString mSteps){
+	mxSteps = mSteps;
+	return;
+}
+void GraspPlannerSocket::addFixedDOF(int dofNum){
+	fixedDOFVec.push_back(dofNum);
+	return;
+}
+
+void GraspPlannerSocket::addInputDOF(int dofNum, double confLevel){
+	inputDOFVec.push_back(dofNum);
+	confDOFVec.push_back(confLevel);
+	updateConfidence();
+	return;
+}
+
+void GraspPlannerSocket::setConfidence(int dofSelect, double confLevel){
+	std::vector<double>::iterator citerator = confDOFVec.begin();
+	for(std::vector<int>::iterator diterator = inputDOFVec.begin();
+		diterator != inputDOFVec.end();
+		diterator ++){
+		if (*diterator == dofSelect)
+			*citerator = confLevel;	
+		
+	++citerator;
+	}
+	updateConfidence();
+}
+
+
+
+void GraspPlannerSocket::openPlanner(){
+    //Open a planner window
+    if (graspItGUI == NULL)
+        gpsErrorFunc("GraspPlannerSocket::openPlanner - no gui window found");
+    graspItGUI->getMainWindow()->eigenGraspPlannerActivated();
+	//Follow the children f and find the one that is a window and has the title of the planner window
+	//Get a handle to the planner window - convert from QWidget * to egPlannerDlg
+	mDlg = static_cast<EigenGraspPlannerDlg*>(graspItGUI->getMainWindow()->mWindow->findChild<QDialog *>(QString("")));
+	//Set current planner type to online -- setCurrentIndex is the QT 4 command
+	//for doing this, setCurrentItem is I believe deprecated.
+	if(mDlg == NULL){
+		QList<QObject*> qchildren = graspItGUI->getMainWindow()->mWindow->children();
+		QList<QObject *>::iterator it;
+		for(it = qchildren.begin(); it != qchildren.end(); it++){
+			std::cout << (*it)->name() << "\n";
+			if(!strcmp((*it)->name(),"EigenGraspPlannerDlgUI"))
+				mDlg = static_cast<EigenGraspPlannerDlg *>(*it);
+
+
+		}
+	}
+	mDlg->plannerTypeBox->setCurrentIndex(3);
+	//Sanity check that this index produces the result expected	
+	if(mDlg->plannerTypeBox->currentText() != "Online")
+		gpsErrorFunc("GraspPlannerSocket:initPlanner - plannerType not set to Online");
+	//Planner is now ready to be initialized.  Send signal that init button was clicked
+	//FIXME it might be better to directly connect a signal to the slot that controls
+	//the init function and simply emit that signal.  This would better respect encapsulization
+	//As written, this function produces all of the signals that actually clicking the button
+	//would produce
+	return;
+}
+
+void GraspPlannerSocket::initPlanner(){
+	mDlg->plannerInitButton->click();
+
+	//targetHand = mDlg->mHand;
+}
+
+void GraspPlannerSocket::updateConfidence(){
+//Set all inputs that are set in DOF input, then set appropriate confidence level
+	std::vector<double>::iterator citerator = confDOFVec.begin();
+	for(std::vector<int>::iterator diterator = inputDOFVec.begin(); diterator != inputDOFVec.end(); diterator ++){
+		if(unsigned(*diterator) < mDlg->varInput.size()){
+			mDlg->varInput[*diterator]->setCheckState(Qt::Checked);
+			mDlg->varConfidence[*diterator]->setValue(*citerator * 100);
+		}
+		++citerator; // fixme there must be a more graceful way to handle this.
+	}
+}
+
+void GraspPlannerSocket::setPlannerParams(){
+     if(mPlanner == NULL) // Check for valid mPlanner
+        gpsErrorFunc("GraspPlannerSocket::setPlannerParams - No planner initialized!");
+// Set energy type
+	 if(energyType != mDlg->energyBox->currentText()){
+		int eboxIndex = mDlg->energyBox->findText(energyType);
+		if (eboxIndex < 0)
+			 gpsErrorFunc("GraspPlannerSocket::setPlannerParams - WRONG ENERGY TYPE!\n");
+		else
+			mDlg->energyBox->setCurrentIndex(eboxIndex);
+	 }
+//Set contact type state
+	if(contactType=="CONTACT_PRESET")
+		mDlg->setContactsBox->setCheckState(Qt::Checked);
+	else
+		mDlg->setContactsBox->setCheckState(Qt::Unchecked);
+//Set number of steps
+	mDlg->annStepsEdit->setText(mxSteps);
+//Fix all elements in fixedDofVec by unchecking the appropriate box in mDlg
+	
+	for(std::vector<int>::iterator diterator = fixedDOFVec.begin(); diterator != fixedDOFVec.end(); diterator ++){
+		if(unsigned(*diterator) < mDlg->varCheck.size())
+			mDlg->varCheck[*diterator]->setCheckState(Qt::Unchecked);
+	}
+	updateConfidence();
+}
+
+void GraspPlannerSocket::startPlanner(){
+    //For now initialize everything here:
+	openPlanner();
+	initPlanner();
+	//setPlannerParams();    
+	mDlg->plannerStartButton->animateClick();
+}
+
+int GraspPlannerSocket::getGraspNum(){
+	QTextStream os(this);
+	int gNum = mDlg->mPlanner->getListSize();
+	os <<"GraspNumber: " << gNum <<'\n';
+	return gNum;
+
+}
+/*Helper function for evaluating grasps*/
+double graspOrientationDistance(const GraspPlanningState & gs, const Hand & h){
+	static double alpha = 1/3.14;
+	static double beta = 1;
+	vec3 hApproachDir = ((h.getApproachTran()*h.getTran()).affine().transpose()*vec3(0,0,1));
+	vec3 gApproachDir = ((h.getApproachTran()* gs.getTotalTran()).affine().transpose()*vec3(0,0,1));
+	double angle = acos(hApproachDir[0]*gApproachDir[0]+hApproachDir[1]*gApproachDir[1]+hApproachDir[2]*gApproachDir[2]);
+	if (angle != angle) //test for NaN
+		angle = 0;
+//	double distance = (h.getApproachTran().translation() - gs.getTotalTran().translation()).len();
+	return alpha * 1/(1-angle);
+}
+void GraspPlannerSocket::sendGrasps(){
+	QTextStream os(this);
+	//This command will also send the number of grasps found
+	int gNum = mDlg->mPlanner->getListSize();
+	int dNum = targetHand->getNumDOF();
+	for(int i = 0; i < gNum; i++){
+		const GraspPlanningState* gs =  mDlg->mPlanner->getGrasp(i);
+		//Send the posture information		
+		double * dofArray = new double[dNum];
+		//Outputs position in quaternion, then 3d position vector format
+		// qw qx qy qz tx ty tz
+		transf curTrans = const_cast<GraspPlanningState*>(gs)->getPosition()->getCoreTran()*targetPosWorld; // move current translation back into world coordinates
+		const vec3 pos = curTrans.translation();
+		const mat3 curM = curTrans.affine();
+		os <<"Grasp: " << i <<" Position: " << pos[0] <<" " << pos[1] <<" " << pos[2]
+		<< " " << " Posture: " << curM[0] << " " << curM[1] << " " << curM[2] << " " << curM[3] << " " << curM[4]
+		<<" " << curM[5] << " " << curM[6] << " " << curM[7] << " " << curM[8] << " ";
+		
+		const_cast<GraspPlanningState*>(gs)->getPosture()->getHandDOF(dofArray);
+		os << "DOF values:";
+		for(int i = 0; i < dNum; i++){
+			os << dofArray[i] <<" ";
+		}
+		os << "OrientationScore: " << graspOrientationDistance(gs,*targetHand);
+		double distance = (targetHand->getApproachTran().translation() - gs->getTotalTran().translation()).len();
+		os << " " << "Distance: " << distance;	
+		os <<"\n";
+		os.flush();
+		
+		delete [] dofArray;
+	}
+}
+
+void transfToTextStream(QTextStream &os, transf curTrans){
+		const vec3 pos = curTrans.translation();
+		
+		const Quaternion curQ = curTrans.rotation();
+		os << pos[0] <<" " << pos[1] <<" " << pos[2]
+		<< " " << " Posture: " << curQ.w << " " << curQ.x << " " << curQ.y << " " << curQ.z << endl;
+}
+
+double * processDOFString(const QStringList & dLineStrList, QStringList::const_iterator & dStrPtr){
+		bool ok;
+		int numDOFs = 0;
+		if(dStrPtr == dLineStrList.end())
+			ok = false;
+		else{
+			++dStrPtr;
+			numDOFs = dStrPtr->toInt(&ok);
+			//if number of degrees of freedom could not be recovered, fail
+			if(!ok){
+				DBGP("graspitServer::failed to translate number of degrees of freedom");
+				return NULL;
+			}
+			double *inputDOFs = new double[numDOFs];
+			for(int ind = 0; ind < numDOFs; ind ++){
+				dStrPtr ++;
+				inputDOFs[ind] = dStrPtr->toDouble(&ok);
+				if(!ok){
+					DBGP("graspitServer::failed to translate of degree of freedom");
+					delete inputDOFs;
+					return NULL;
+				}//if(!ok)
+			}//for(int ind = 0; ind < numDOFS; ind ++)
+		return inputDOFs;
+		}//if (strPtr == lineStrList.end())... else	
+	return NULL;
+}
+
+//uses line discipline structures from main object.
+//FIXME: This is quick and dirty and prone to crash if mistreated.
+void GraspPlannerSocket::transStringToTransf(const QStringList & qLineStrList, QStringList::const_iterator & qStrPtr, transf & thisTrans){
+	bool ok;
+
+	if(*qStrPtr == "6_PARAM_TRANSF"){
+		double transArray[3];
+		double angleArray[3];
+		for(int i = 0; i < 3; i++){
+			++qStrPtr;		
+			angleArray[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to roll pitch yaw");			
+				return;
+			}
+		}
+	
+		for(int i = 0; i < 3; i++){
+			++qStrPtr ;		
+			transArray[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to translation");			
+				return;
+			}
+		}
+		thisTrans.set(yprToRotMatrix(angleArray[0],angleArray[1],angleArray[2]),vec3(transArray));
+		++qStrPtr;
+	}
+
+	if(*qStrPtr == "7_PARAM_TRANSF"){
+		double transArray[3];
+		double quatArray[4];
+		for(int i = 0; i < 4; i++){
+			++qStrPtr;		
+			quatArray[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to quaternion");			
+				return;
+			}
+		}
+	
+		for(int i = 0; i < 3; i++){
+			++qStrPtr ;		
+			transArray[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to translation");			
+				return;
+			}
+		}
+		thisTrans.set(Quaternion(quatArray[0],quatArray[1],quatArray[2],quatArray[3]),vec3(transArray));
+		++qStrPtr;
+	}
+	else if(*qStrPtr == "12_PARAM_TRANSF"){
+			++qStrPtr;
+		
+			
+		double transArray[3];
+		double matArray[9];
+		for(int i = 0; i < 9; i++){
+			
+			ok = false;
+			QString str = *qStrPtr;
+			matArray[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to rotation matrix");			
+				return;
+			}
+			++ qStrPtr;	
+		}
+	
+		for(int i = 0; i < 3; i++){
+			
+			ok = false;
+			transArray[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to translation");			
+				return;
+			}
+			++ qStrPtr;
+		}
+
+		thisTrans.set(Quaternion(mat3(matArray)),vec3(transArray));
+	}
+	else if(*qStrPtr == "16_PARAM_TRANSF"){
+			++qStrPtr;
+		
+			
+		double array[16];
+		
+		for(int i = 0; i < 16; i++){
+			
+			ok = false;
+			QString str = *qStrPtr;
+			array[i] = (*qStrPtr).toDouble(&ok);
+			if(!ok){
+				gpsErrorFunc("transStringToTransf:: Poorly formed param to transform matrix");			
+				return;
+			}
+			++ qStrPtr;	
+		}
+
+			mat3 m;
+	m[0] = array[0];
+	m[1] = array[1];
+	m[2] = array[2];
+	m[3] = array[4];
+	m[4] = array[5];
+	m[5] = array[6];
+	m[6] = array[8];
+	m[7] = array[9];
+	m[8] = array[10];
+	vec3 v;
+	v[0] = array[3];
+	v[1] = array[7];
+	v[2] = array[11];
+	thisTrans.set(m,v);
+	}
+}
+void updateWorld(){
+// these should be separate commands
+  graspItGUI->getIVmgr()->getWorld()->findAllContacts();
+  graspItGUI->getIVmgr()->getWorld()->updateGrasps();
+}
+
+void GraspPlannerSocket::setTargetPos(const transf &targetPos){
+	//setHandPosRel();
+	mObject->setTran(targetPos);
+}
+
+void setTargetPosWRTApproach(Hand * h, Body * b, const vec3 &p){
+	h->setTran(transf(mat3::IDENTITY,p)*((h->getApproachTran()*h->getTran())));
+}
+
+void setTargetPosWRTApproach2(Hand * h, Body * b, const vec3 &p){
+	b->setTran(b->getTran()*transf(mat3::IDENTITY,(h->getApproachTran()*h->getTran()).rotation()*p));
+}
+
+void GraspPlannerSocket::setHandPos(const transf &handPos, bool update){
+	targetHand->setTran(handPos);
+	if(update)
+		updateWorld();
+}
+
+transf GraspPlannerSocket::setHandPosRel(){
+transf relTrans = handPosWorld * targetPosWorld.inverse();
+targetHand->setTran(relTrans);
+return relTrans;
+}
+
+void GraspPlannerSocket::gpsErrorFunc(QString errString){
+	return;
+}
+
+QString parseQuotedStrings (const QStringList & qsl, QStringList::const_iterator & fStrPtr){
+	QString retVal;
+	if (fStrPtr->left(1) == "\""){
+		retVal = (*fStrPtr).right((*fStrPtr).length()-1);
+		fStrPtr ++;
+	}
+	while(fStrPtr != qsl.end()){
+		if(retVal.right(1) == "\"")
+			break;	
+		retVal =  retVal + " " +*fStrPtr;
+		fStrPtr ++;
+	}
+	retVal.truncate(retVal.length() - 1); // clip off the trailing space and trailing quotes
+	return retVal;
+}
+QString GraspPlannerSocket::parseSetTargetArgs(){
+
+	bool stringWasNumber = false;
+	QString gsBody = targetVector[strPtr->toInt(&stringWasNumber,10)];
+	if(stringWasNumber == false)
+		gsBody = *strPtr;
+	if (gsBody.left(1) == "\"")
+		gsBody = parseQuotedStrings(lineStrList, strPtr);
+	return gsBody;
+}
+
+void GraspPlannerSocket::setTarget(QString targetSelectorString, double scaleFactor){
+	//If the planner is running, stop it, then kill it.
+	bool plannerWasRunning = (mDlg != NULL);
+	if(mDlg){
+		if(mDlg->mPlanner->isActive()){
+			mDlg->plannerStart_clicked();
+		}
+		mDlg->close();
+	}
+	// if an object already existed, destroy it, and delete from memory (This may be incorrect,
+	// see graspit_db_model.cpp for counter example
+	if(mObject)
+		mObject->getWorld()->destroyElement(mObject);
+
+
+	//if file is an off, import it thusly:
+	//This comes from graspit_db_model.cpp and should probably be abstracted from the load
+	//and reused directly.
+	QString extension = targetSelectorString.section('.',-1,-1);
+	if (extension == "off" || extension == "iv") {
+		mObject = new GraspableBody(graspItGUI->getIVmgr()->getWorld(), targetSelectorString.latin1());
+	//material is default
+	mObject->setMaterial(graspItGUI->getIVmgr()->getWorld()->getMaterialIdx("wood"));
+	//PSB objects have a scale of their own. To get to "graspable size"
+	//we manually set a scaling factor for each of them, which is in the
+	//database as well. We need to scale the geometry appropriately
+	//For some reason that is yet to be determined, inserting the scale node later
+	//produces inconsistent results with the CGDB, and so here, 
+	//we place the scaling node and set it to the identity transform to be updated
+	//later.
+	SoScale* scale = new SoScale();
+	scale->scaleFactor.setValue(scaleFactor, scaleFactor, scaleFactor);
+	mObject->getIVGeomRoot()->addChild(scale);
+	if (extension == "off")
+		mObject->loadGeometryOFF(targetSelectorString);
+	if (extension == "iv")
+		mObject->loadGeometryIV(targetSelectorString);
+	mObject->addIVMat();
+	//set the dynamic properties. This needs a better solution...
+	mObject->setDefaultDynamicParameters();
+	//hard-coded inertia matrix of the flask...
+	double I[] = {4853.0, -1.1196, -6.5156, -1.1196, 4853.0, 47.542, -6.5156, 0.0, 2357.6};
+	mObject->setInertiaMatrix(I);
+	mObject->setMaxRadius(mObject->computeDefaultMaxRadius());
+	mObject->setMass(300);
+	mObject->addToIvc();
+	//todo: where does dynamic information come from?
+	//static_cast<GraspitDBModel*>(m)->getGraspableBody()->initDynamics();
+	//this adds the object to the graspit world
+	mObject->getWorld()->addBody(mObject);
+	}
+	else
+		mObject = static_cast<GraspableBody *>(graspItGUI->getIVmgr()->getWorld()->importBody("GraspableBody",targetSelectorString));
+	
+	if(plannerWasRunning)
+		startPlanner();
+}
+QualVolume *mVolQual;
+QualEpsilon *mEpsQual;
+void GraspPlannerSocket::setHand(QString handSelectorString){
+	//If the planner is running, stop it, then kill it.
+		bool plannerWasRunning = (mDlg != NULL);
+	if(mDlg){
+		if(mDlg->mPlanner->isActive()){
+			mDlg->plannerStart_clicked();
+		}
+		mDlg->close();
+	}
+	// if a hand exists
+	if(targetHand){
+		targetHand->getWorld()->removeElementFromSceneGraph(targetHand);
+		targetHand->getWorld()->removeRobot(targetHand);
+	}
+	targetHand = static_cast<Hand *>(graspItGUI->getIVmgr()->getWorld()->importRobot(handSelectorString));
+	//mVolQual = new QualVolume( targetHand->getGrasp(), QString("SimAnn_qvol"),"L1 Norm");
+	//mEpsQual= new QualEpsilon( targetHand->getGrasp(), QString("SimAnn_qeps"), "L1 Norm");
+	if(plannerWasRunning)
+		startPlanner();
+}
+
+
+/*Run autograsp helper function
+*/
+bool GraspPlannerSocket::runAutoGrasp(bool renderIt, double speedFactor){
+		bool retVal;
+		retVal = targetHand->autoGrasp(renderIt, speedFactor);
+		if (retVal)
+			targetHand->getWorld()->updateGrasps();
+		return retVal;
+}
+//scalar multiply dof array
+inline void dofsmult( double c, double * dof, double * outp, int numdofs){
+	for (int i = 0; i < numdofs; i ++){
+		outp[i] = dof[i]* c;
+	}
+return;
+}
+//dot product dof arrays
+inline double dofdot(double * dof1, double * dof2, int numdofs){
+	double sum = 0;
+	for(int i = 0; i < numdofs; i++){
+		sum += (dof1[i] * dof2[i]);
+	}
+	return sum;
+}
+
+//subtract dof arrays
+inline void dofminus(double * dof1, double * dof2, double * out, int numdofs){
+	
+	for(int i = 0; i < numdofs; i++){
+		out[i] = (dof1[i] - dof2[i]);
+	}
+	return;
+}
+
+
+
+bool steppingAutograsp(double * initialdofs, Hand * h, double * finaldofs){
+	//assumes autoapproach is done
+	int ndof = h->getNumDOF();
+	double * dofSetting = new double[ndof];
+		
+	for (int i = 0; i <=10; i++){
+		for (int j = 0; j < ndof; j++)
+			dofSetting[j] = finaldofs[j] - (i/10.0*h->getDOF(i)->getMax())/10;
+		h->forceDOFVals(dofSetting);
+		if (h->autoGrasp(0,1.0))
+			delete [] dofSetting;
+			return true;
+	}
+	delete [] dofSetting;
+	return false;
+}
+
+/*World->updateGrasps must be run first*/
+void GraspPlannerSocket::sendGraspMetric(QTextStream & os){
+	//static QualVolume mVolQual( targetHand->getGrasp(), QString("SimAnn_qvol"),"L1 Norm");
+	//static QualEpsilon mEpsQual( targetHand->getGrasp(), QString("SimAnn_qeps"), "L1 Norm");
+	updateWorld();
+	double mVolEval = mVolQual->evaluate();
+	double mEpsEval = mEpsQual->evaluate();
+	
+	//os << "mVolEval: " << mVolEval << " mEpsEval: " <<mEpsEval << endl;
+	os << mVolEval << " " <<mEpsEval << " ";
+	os.flush();
+}
+
+void forceDOFs(double * valDOFs, Hand * targetHand){
+	targetHand->forceDOFVals(valDOFs);
+	targetHand->getWorld()->findAllContacts();
+}
+
+mat3 lineStrIteratorToMat3(const QStringList & qLineStrList, QStringList::const_iterator &qStrPtr){
+	mat3 newMat3;
+	for( int matIndex = 0; matIndex < 9 && qStrPtr!=qLineStrList.end(); ++matIndex){
+		newMat3[matIndex] = qStrPtr->toDouble();
+		++qStrPtr;
+	}
+	return newMat3;
+}
+
+inline float frand(float lmt){
+	return 2.0*lmt*static_cast<float>(rand())/(RAND_MAX) - lmt;
+}
+
+inline float frand1(){
+	return static_cast<float>(rand())/(RAND_MAX);
+}
+
+//Generating random Euler angles - This code is not as fast as it could be but it is very readable. 
+//Uniform rotation from 0 to 2pi is taken from Effective Sampling and Distance Metrics for 3D Rigid Body Path Planning, Kuffner, ICRA '04
+void randEuler(double maxRads, double * theta, double * phi, double * sigma){
+	const double PI = 3.14159265;
+	*theta = 2 * PI * frand1() - PI;
+	*phi =  acos(1.0 - 2.0*frand1())+ PI/2;
+	if (frand1()< 1/2) {
+		if (*phi < PI)
+			 *phi = *phi+PI; 
+		else 
+			*phi = *phi-PI;
+	}
+	*sigma = 2*PI*frand1() - PI;
+	double maxRatio = maxRads/(2*PI);
+	(*theta)*=maxRatio;
+	(*phi)*=maxRatio;
+	(*sigma)*=maxRatio;
+}
+
+Quaternion randQuat(double maxRads){
+ double mag = maxRads/2*frand1();
+ double x = frand(1.0); double y = frand(1.0); double z = frand(1.0);
+ double magxyz = sqrt(x*x+y*y+z*z);
+ return Quaternion(magxyz*cos(mag),x*sin(mag),y*sin(mag),z*sin(mag));
+}
+
+void QuatToRollPitchYaw(const Quaternion & q, double & heading, double &attitude, double & bank){
+	const double PI = 3.14159265;
+	double test = q.x*q.y + q.z*q.w;
+	if (test > 0.499) { // singularity at north pole
+		heading = 2.0 * atan2(q.x,q.w);
+		attitude = PI/2;
+		bank = 0.0;
+		return;
+	}
+	if (test < -0.499) { // singularity at south pole
+		heading = -2.0 * atan2(q.x,q.w);
+		attitude = - PI/2;
+		bank = 0.0;
+		return;
+	}
+    double sqx = q.x*q.x;
+    double sqy = q.y*q.y;
+    double sqz = q.z*q.z;
+    heading = atan2(2.0*q.y*q.w-2*q.x*q.z , 1 - 2*sqy - 2*sqz);
+	attitude = asin(2.0*test);
+	bank = atan2(2.0*q.x*q.w-2*q.y*q.z , 1.0 - 2.0*sqx - 2.0*sqz);
+}
+
+void moveBy(vec3 v, Hand * mHand)
+{
+	transf newTran;
+	// calculate the new position of the hand after the transform of v
+	newTran = translate_transf(v * mHand->getApproachTran()) * mHand->getTran();
+	mHand->setTran(newTran);
+}
+
+// move the hand out of collision, move it back until no collision is detected
+bool moveHandOutOfCollision2(Hand * mHand, Body *targetBody)
+{
+	CollisionReport colReport;
+	int numCols;
+	double offset = -10.0;
+	std::vector<Body*> justPalm;
+	std::vector<Body*> justTarget;
+	justPalm.push_back(mHand->getPalm());
+	justTarget.push_back(targetBody);
+	//go back only while PALM is in collision
+	do{
+		numCols = mHand->getWorld()->getCollisionReport(&colReport, &justPalm);
+		if (numCols) moveBy(vec3(0.0,0.0,offset), mHand);
+	} while (numCols);
+
+	//open fingers that are in collision
+	numCols = mHand->getWorld()->getCollisionReport(&colReport);
+	for (int c=0; c<mHand->getNumChains(); c++) {
+		if (!mHand->snapChainToContacts(c, colReport)) {
+			//std::cout <<"failed to get a chain our of collision" << std::endl;
+			//failed to get a chain out of collision, do not return
+			//return false;
+		}
+	}
+	//go back only while anything is in collision
+	int safeGuard = 0;
+	while (++safeGuard < 1000){
+		numCols = mHand->getWorld()->getCollisionReport(&colReport, &justTarget);
+		if (numCols){
+			moveBy(vec3(0.0,0.0,offset), mHand);
+		}
+		else{
+			break;
+		}
+	}
+	double step = 10.0;
+	for( int i = 0; i < 10; i ++) {
+		if(mHand->approachToContact(step)){
+			break;
+		}
+	}
+
+	
+	return true;
+}
+
+
+void GraspPlannerSocket::readClient()
+{
+  int i,numData,numBodies,numRobots;
+  double itime;
+  std::vector<Body *> bodyVec;
+  std::vector<Robot *> robVec;
+  robVec.push_back(targetHand);
+  bodyVec.push_back(mObject);
+   bool ok;
+  while ( canReadLine() ) {
+    line = readLine();
+ //   line.truncate(line.length()-1); //strip newline character
+	if (line.length() == 0)
+		continue;
+	std::cout<<line.toStdString();
+    lineStrList =
+      QStringList::split(' ',line);
+    strPtr = lineStrList.begin();
+
+#ifdef GRASPITDBG
+    std::cout <<"Command parser line: "<<line << std::endl;
+#endif
+	std::cout << strPtr->toStdString() << endl;
+    if (*strPtr == "getContacts") {
+      strPtr++; if (strPtr == lineStrList.end()) continue;
+      numData = (*strPtr).toInt(&ok); strPtr++;
+      if (!ok) continue;
+
+#ifdef GRASPITDBG
+      std::cout << "Num data: "<<numData<<std::endl;
+#endif
+
+      if (readBodyIndList(bodyVec)) continue;
+      numBodies = bodyVec.size();
+      for (i=0;i<numBodies;i++)
+        sendContacts(bodyVec[i],numData);
+    }
+    if (*strPtr == "getTargetContacts") {
+      strPtr++;
+      sendContacts(mObject,-1);
+    }
+    
+    else if (*strPtr == "getAverageContacts") {
+      strPtr++;
+      if (readBodyIndList(bodyVec)) continue;
+      numBodies = bodyVec.size();
+      for (i=0;i<numBodies;i++)
+	sendAverageContacts(bodyVec[i]);
+    }
+    
+    else if (*strPtr == "getBodyName") {
+      strPtr++;
+      if (readBodyIndList(bodyVec)) continue;
+      numBodies = bodyVec.size();
+      for (i=0;i<numBodies;i++)
+	sendBodyName(bodyVec[i]);
+    }
+    
+    else if (*strPtr == "getRobotName") {
+      strPtr++;
+      if (readRobotIndList(robVec)) continue;
+      numRobots = robVec.size();
+      for (i=0;i<numRobots;i++)
+	sendRobotName(robVec[i]);
+    }
+    
+    else if (*strPtr == "getDOFVals") {
+      strPtr++;
+      if (readRobotIndList(robVec)) continue;
+      numRobots = robVec.size();
+      for (i=0;i<numRobots;i++)
+	sendDOFVals(robVec[i]);
+    }
+    else if (*strPtr == "getDOFs") {
+		sendDOFVals(targetHand);
+    }
+
+    else if (*strPtr == "moveDOFs") {
+      strPtr++;
+      readDOFVals();
+    }
+    
+    else if (*strPtr == "render")
+      graspItGUI->getIVmgr()->getViewer()->render();
+    
+    else if (*strPtr == "setDOFForces") {
+      strPtr++;
+      if (readRobotIndList(robVec)) continue;
+      numRobots = robVec.size();
+      for (i=0;i<numRobots;i++)
+	if (readDOFForces(robVec[i])==FAILURE) continue;
+    }
+    
+    else if ((*strPtr) == "moveDynamicBodies") {
+      strPtr++;
+      if (strPtr == lineStrList.end()) ok = FALSE;
+      else {
+	itime = (*strPtr).toDouble(&ok); strPtr++;
+      }
+      if (!ok)
+	moveDynamicBodies(-1);
+      else
+	moveDynamicBodies(itime);
+    }
+    
+    else if (*strPtr == "computeNewVelocities") {
+
+#ifdef GRASPITDBG
+      std::cout << "cnv" << std::endl;
+#endif
+
+      strPtr++; if (strPtr == lineStrList.end()) continue;
+      itime = (*strPtr).toDouble(&ok); strPtr++;
+      if (!ok) continue;
+
+#ifdef GRASPITDBG
+      std::cout << itime <<std::endl;
+#endif
+      computeNewVelocities(itime);
+    }
+    else if  (*strPtr == "startPlanner") {
+		startPlanner();
+	}	else if (*strPtr == "setHandPos"){
+		strPtr++;
+		transStringToTransf(lineStrList, strPtr,handPosWorld);
+		setHandPos(handPosWorld);
+	}
+	else if (*strPtr == "getHandPos"){
+		QTextStream os(this);
+		transfToTextStream(os,targetHand->getTran());
+	}
+	else if (*strPtr == "setTargetPos"){
+		strPtr++;
+		transStringToTransf(lineStrList, strPtr, targetPosWorld);
+		setTargetPos(targetPosWorld);
+	}
+	else if (*strPtr == "setEnergyType"){
+		strPtr++;
+		setEnergyType(*strPtr);
+	}
+	else if (*strPtr == "setConfidence"){
+		strPtr++;
+		int dofNum = (*strPtr).toInt();
+		strPtr ++;
+		double confLevel = (*strPtr).toDouble();
+		setConfidence(dofNum, confLevel);
+	}
+	else if (*strPtr == "addInputDOF"){
+		strPtr++;
+		int dofNum = (*strPtr).toInt();
+		strPtr ++;
+		double confLevel = (*strPtr).toDouble();
+		addInputDOF(dofNum, confLevel);
+	}
+	else if (*strPtr == "setContactType"){
+		strPtr++;
+		setContactType(*strPtr);
+	}
+	else if (*strPtr == "setMaxSteps"){
+		strPtr++;
+		setMaxSteps(*strPtr);
+	}
+	else if (*strPtr == "getGraspNum"){
+		getGraspNum();
+	}
+	else if (*strPtr == "sendGrasps"){
+		sendGrasps();
+	}
+	else if (*strPtr == "setTarget"){
+		if(strPtr != lineStrList.end()){
+			strPtr ++;
+			setTarget(parseSetTargetArgs());
+		}
+		return;
+	}
+	else if (*strPtr == "setHand"){
+		if(strPtr != lineStrList.end()){
+			strPtr ++;
+			setHand(handVector[strPtr->toInt()]);
+		}
+	}
+	else if (*strPtr == "autoGrasp"){
+		bool renderIt = FALSE;
+		strPtr ++;
+		if(strPtr != lineStrList.end())
+		{
+			renderIt= (*strPtr).toInt();
+		}
+		double speedFactor = 1.0;
+		strPtr ++;
+		if(strPtr != lineStrList.end())
+		{
+			speedFactor = (*strPtr).toDouble();
+		}
+		runAutoGrasp(renderIt, speedFactor);
+	}
+	else if(*strPtr == "approach"){
+		targetHand->findInitialContact(100.0);
+	}
+	else if (*strPtr == "sendGraspMetric"){
+		QTextStream os(this);
+		sendGraspMetric(os);
+	}
+	else if(*strPtr == "forceDOFs"){
+		//Expects input in the form #dofs dof_setting [dof_setting]
+		if(strPtr == lineStrList.end())
+			ok = false;
+		else{
+			double *inputDOFs = processDOFString(lineStrList, strPtr);
+			forceDOFs(inputDOFs, targetHand);
+			delete inputDOFs;
+		}//if (strPtr == lineStrList.end())... else	
+	}//else if(*strPtr == "forceDOFs")	
+	else if(*strPtr == "graspTestFile"){
+		//Parse one grasp at a time
+		strPtr ++;
+		QFile testFile(parseQuotedStrings(lineStrList, strPtr));
+		if(!testFile.open(QIODevice::ReadOnly | QIODevice::Text))
+			return;
+		QTextStream in(&testFile);
+		QString	fLine = in.readLine();
+		QStringList fLineStrList;
+		QStringList::const_iterator fStrPtr;
+		double lastHandSelector = -1, lastTargetSelector = -1, lastScalingFactor = -1;
+		int lineNum;
+		strPtr;
+		bool convOk = false;
+		if(strPtr != lineStrList.end()){
+			std::cout<<strPtr->toStdString() <<std::endl;
+			lineNum = strPtr->toInt(&convOk);
+		}
+		else
+			std::cout << "No LineNum given\n";
+		if(!convOk){
+			std::cout << "conversion failed\n";
+			lineNum = 0;
+		}
+		std::cout << lineNum <<" " <<endl; ;
+		for(int rollForward = 0; rollForward < lineNum; rollForward ++){
+			fLine = in.readLine();
+			if(fLine.isNull()){
+				DBGP("Tried to roll forward too far!");
+				return;
+			}
+			std::cout << rollForward <<" " ;
+		}
+		
+		std::cout << std::endl;
+		std::cout<<"starting line: " <<fLine.toStdString() <<std::endl;
+		QTextStream sockout(this);
+		while (!fLine.isNull()) {
+			 //process the line
+			QTextStream sockout(this);
+			sockout.setFieldWidth(30);
+			PROF_START_TIMER(TOTAL_TIMER);
+			fLineStrList = QStringList::split(' ',fLine);
+			fStrPtr = fLineStrList.begin();
+			//process hand selector
+			bool ok = false;
+			QString GraspID = *fStrPtr;
+			++fStrPtr;
+			int handSelector = fStrPtr->toInt(&ok);
+			if (handSelector == 1 || handSelector ==2)
+				handSelector = 0;
+			if (handSelector == 4)
+				handSelector = 1;
+			if(!ok)
+				DBGP("graspitServer: Error in graspTestFile, no hand selector found");
+			else{
+				if(handSelector != lastHandSelector){
+					setHand(handVector[handSelector]);	
+					lastHandSelector = handSelector;
+				}
+			}
+				//process object string
+				++fStrPtr;
+			int objectIdNum = fStrPtr->toInt(&ok);
+						
+			if(!ok){ 
+				DBGP("graspitServer: Error in graspTestFile, no hand selector found");
+			}
+				++fStrPtr;
+				QString objectString = parseQuotedStrings(fLineStrList, fStrPtr);
+				srand(time(NULL));
+				//process pose string
+				transf handTransFunction;
+				QString testString = *fStrPtr;
+				transStringToTransf(fLineStrList,fStrPtr,handTransFunction);
+				testString = *fStrPtr;
+				//--fStrPtr;
+				if (*fStrPtr == "16_PARAM_TRANSF"){
+					transf secondTrans;
+					transStringToTransf(fLineStrList,fStrPtr,secondTrans);
+					handTransFunction =  handTransFunction *secondTrans;
+				}
+				testString = *fStrPtr;
+				--fStrPtr;
+				//--fStrPtr;
+				double *inputDOFs = processDOFString(fLineStrList, fStrPtr);
+				testString = *fStrPtr;
+				++fStrPtr;
+				testString = *fStrPtr;
+				QString resultPath = parseQuotedStrings(fLineStrList, fStrPtr);
+				testString = *fStrPtr;
+				QFile resultFile(resultPath);
+				if(!resultFile.open(QIODevice::Append | QIODevice::ReadWrite | QIODevice::Text))
+					return;
+				//now apply the transformation to the object, test the grasp, report the results. 
+				QTextStream out(&resultFile);
+				double scaleFactor = (*fStrPtr).toDouble();
+				++fStrPtr;
+				double modelScalingFactor = (*fStrPtr).toDouble();
+				double totalScale = modelScalingFactor*scaleFactor;
+				//set process string
+				if(objectIdNum != lastTargetSelector || lastScalingFactor != totalScale){
+						setTarget(objectString, totalScale);
+						lastTargetSelector = objectIdNum;
+						lastScalingFactor = totalScale;
+						
+				}
+				mObject->showFrictionCones(false,2); // turn off all friction cone visualization calculations!
+				mObject->showAxes(0); // turn off axes visualization
+				targetHand->showVirtualContacts(false);
+				forceDOFs(inputDOFs, targetHand);
+				setHandPos(handTransFunction);
+				transf aptran = handTransFunction;
+				//iterate over positions
+				Quaternion zeroRot(0,vec3(1,0,0));
+				int limit = 10;
+				//int slimit = 0;
+				transf objTrans;
+				bool backoff = true;
+
+				int zlimit = 0;
+				if (!backoff)
+					zlimit = limit;
+				double * finaldofs = new double[targetHand->getNumDOF()];
+				//for (double xoffset = -10.0; xoffset <=10.0; xoffset +=.5){
+				//	for (double yoffset = -10.0; yoffset <=10.0; yoffset +=.5){
+				//		for (double thetaoffset = -5.0; thetaoffset <=5.0; thetaoffset +=.5){
+				//			for (double phioffset = -5.0; phioffset <=5.0; phioffset +=.5){
+				//				for(double sigmaoffset = -5.0; sigmaoffset <=5.0; sigmaoffset +=.5){
+								
+							
+				
+				// do 1 initially without any perturbation as a sanity test:
+					//targetHand->findInitialContact(500);
+					if(!moveHandOutOfCollision2(targetHand, mObject) || !runAutoGrasp(0,1.0)){	
+						out <<GraspID << " " << handSelector << " " <<objectIdNum << " " <<0 << " " << 0 << " " << 0 <<  " " <<1<< " " << 0 << " " << 0<< " " << 0<< " " << targetHand->getTran().translation()[0]<<" " << targetHand->getTran().translation()[1] <<" "<< targetHand->getTran().translation()[2] << " failed" << " failed" << " rl" <<endl ;
+						
+								continue;
+					}				
+					else
+					{ 
+						out <<GraspID << " " << handSelector << " " <<objectIdNum << " "  <<0 << " " << 0 << " " << 0 <<  " " <<1<< " " << 0 << " " << 0<< " " << 0<< " " << targetHand->getTran().translation()[0]<<" " << targetHand->getTran().translation()[1] <<" "<< targetHand->getTran().translation()[2]<< " rl ";
+						sendContacts(mObject, -1, &out);
+						out << "DOFs: " << targetHand->getNumDOF() << " " ;
+											
+						for (i=0;i<targetHand->getNumDOF();i++)
+							out << targetHand->getDOF(i)->getVal() << " ";
+						for (int matInd =5; matInd <= 5; ++matInd){
+							out << "GraspMetric " << matInd << ": ";								
+							if(mObject->getMaterial()!= matInd)						
+								mObject->setMaterial(matInd);
+							sendGraspMetric(out);
+							}	
+							out<<endl;
+							out.flush();
+					}
+					return;
+					//now iterate over many positions
+				for (int ind = 0; ind < 50000; ind ++)
+				{
+					const double PI = 3.14159265;
+					double mag = 10.0*frand1();
+					double ang = 2.0*PI*frand1();
+					double xoffset = mag*cos(ang);
+					double yoffset = mag*sin(ang);		
+					double theta, phi, sigma;
+					Quaternion rq = randQuat(5.0/180*PI);
+					QuatToRollPitchYaw(rq, phi, theta, sigma);
+					double thetaoffset = theta * 180.0/PI,phioffset = phi * 180.0/PI, sigmaoffset = sigma * 180.0/PI;
+					if (ind%100 == 0)
+						std::cout << "iteration: " << ind << std::endl;
+					//double theta(thetaoffset/180.0*PI),phi(phioffset/180.0*PI),sigma(sigmaoffset/180.0*PI);
+					targetHand->forceDOFVals(inputDOFs);
+					position cg = mObject->getCoG();
+					transf cgTrans(Quaternion(1.0,0.0,0.0,0.0),vec3(cg.x(),cg.y(),cg.z()));
+					transf cgInv(Quaternion(1.0,0.0,0.0,0.0),vec3(-cg.x(),-cg.y(),-cg.z()));
+					//setTargetPos(cgInv*transf(yprToRotMatrix(phi, theta, sigma),vec3::ZERO)*cgTrans);
+					setTargetPos(cgInv*transf(rq,vec3::ZERO)*cgTrans);
+					setTargetPosWRTApproach2(targetHand,mObject,vec3(xoffset, yoffset, 0));
+					targetHand->findInitialContact(500);
+					
+					/*if(steppingAutograsp(inputDOFs, targetHand,  finaldofs)){
+						out <<GraspID << " " << handSelector << " " <<objectIdNum << " " <<xoffset << " " << yoffset << " " << 0 <<  " " << thetaoffset << " " << sigmaoffset << " " << phioffset << " " << targetHand->getTran().translation()[0]<<" " << targetHand->getTran().translation()[1] <<" "<< targetHand->getTran().translation()[2] << " failed" << " failed" <<endl ;
+					}				
+					else
+					{ 
+						out <<GraspID << " " << handSelector << " " <<objectIdNum << " " <<xoffset << " " << yoffset << " " << 0 <<  " " << thetaoffset << " " << sigmaoffset << " " << phioffset << " " << targetHand->getTran().translation()[0]<<" " << targetHand->getTran().translation()[1] <<" "<< targetHand->getTran().translation()[2] << endl;
+					}
+
+					targetHand->forceDOFVals(inputDOFs);*/
+					if(!runAutoGrasp(0,1.0)){	
+						out <<GraspID << " " << handSelector << " " <<objectIdNum << " " <<xoffset << " " << yoffset << " " << 0 <<  " " <<rq.w << " " << rq.x << " " << rq.y << " " << rq.z<< " " << targetHand->getTran().translation()[0]<<" " << targetHand->getTran().translation()[1] <<" "<< targetHand->getTran().translation()[2] << " failed" << " failed" << " rl" <<endl ;
+							forceDOFs(inputDOFs, targetHand);
+							//setHandPos(handTransFunction);		
+							continue;
+					}				
+					else
+					{ 
+						out <<GraspID << " " << handSelector << " " <<objectIdNum << " " <<xoffset << " " << yoffset << " " << 0 <<  " " << rq.w << " " << rq.x << " " << rq.y << " " << rq.z << " "<< targetHand->getTran().translation()[0]<<" " << targetHand->getTran().translation()[1] <<" "<< targetHand->getTran().translation()[2]<< " rl ";
+						sendContacts(mObject, -1, &out);
+						out << "DOFs: " << targetHand->getNumDOF() << " " ;
+											
+						for (i=0;i<targetHand->getNumDOF();i++)
+							out << targetHand->getDOF(i)->getVal() << " ";
+						out.flush();
+						for (int matInd =5; matInd <= 5; ++matInd){
+							out << "GraspMetric " << matInd << ": ";								
+							if(mObject->getMaterial()!= matInd)						
+								mObject->setMaterial(matInd);
+							sendGraspMetric(out);
+							}
+						//out << mVolEval << " " <<mEpsEval << " "<< endl;
+					
+							out<<endl;
+							out.flush();
+					}
+				
+
+							/*	}
+							}
+						}
+						std::cout<<yoffset << " " ;
+					}	*/
+				}
+				
+				//targetHand->getDOFVals(finaldofs);
+				
+				//
+				//for(int ind1 = -limit; ind1 <= limit; ind1 ++){
+				//	for(int ind2 = -limit; ind2 <= limit; ind2 ++){
+				//		for(int ind3 = -zlimit; ind3 <= zlimit; ind3 ++){
+				//			targetHand->forceDOFVals(inputDOFs);
+				//			//setHandPos(aptran, false);
+				//			setTargetPosWRTApproach2(targetHand,mObject,vec3(ind1, ind2, ind3));
+				//			if(backoff)
+				//				targetHand->findInitialContact(500);
+				//			//get hand pose wrt initial hand pose
+				//			vec3 backofftrans = (aptran.inverse()*targetHand->getTran()).translation();
+				//			if(!runAutoGrasp(0,1.0)){	
+				//					out <<GraspID << " " << handSelector << " " <<objectIdNum << " " <<ind1 << " " << ind2 << " " << ind3 <<  " " << 0 << " " << 0 << " " << 0 << " " << backofftrans[0] <<" " << backofftrans[1] <<" "<< backofftrans[2] << " failed" << " failed" << endl;
+				//					continue;
+				//			}
+				//		
+				//				out <<GraspID << " " << handSelector << " " <<objectIdNum <<" " <<ind1 << " " << ind2 << " " << ind3 << " " << 0 << " " << 0 << " " << 0 << " "<< backofftrans[0] <<" " << backofftrans[1] <<" "<< backofftrans[2] << " ";
+				//				sendContacts(mObject, -1, &out);
+				//				out << "DOFs: " << targetHand->getNumDOF() << " " ;
+				//				for (i=0;i<targetHand->getNumDOF();i++)
+				//					out << targetHand->getDOF(i)->getVal() << " ";
+				//				
+				//				for (int matInd =3; matInd < 6; ++matInd){
+				//					out << "GraspMetric " << matInd << ": ";								
+				//					if(mObject->getMaterial()!= matInd)
+				//						mObject->setMaterial(matInd);						
+				//					sendGraspMetric(out);
+				//				//out << mVolEval << " " <<mEpsEval << " "<< endl;
+				//				}
+				//				out<<endl;
+				//				out.flush();
+				//		}
+				//	}
+				//}
+				//int anglimits = 10;
+				//const double PI = 3.14159265;
+				//for(int ind1 = -anglimits; ind1 <= anglimits; ind1 ++){
+				//	for(int ind2 = -anglimits; ind2 <= anglimits; ind2 ++){
+				//		for(int ind3 = -anglimits; ind3 <= anglimits; ind3 ++){
+				//			double theta(ind1/180.0*PI),phi(ind2/180.0*PI),sigma(ind3/180.0*PI);
+				//			targetHand->forceDOFVals(inputDOFs);
+				//			position cg = mObject->getCoG();
+				//			transf cgTrans(Quaternion(1.0,0.0,0.0,0.0),vec3(cg.x(),cg.y(),cg.z()));
+				//			transf cgInv(Quaternion(1.0,0.0,0.0,0.0),vec3(-cg.x(),-cg.y(),-cg.z()));
+				//			//setHandPos(aptran, false);
+				//			setTargetPos(cgInv*transf(yprToRotMatrix(phi, theta, sigma),vec3::ZERO)*cgTrans);
+				//			targetHand->findInitialContact(500);
+				//			vec3 backofftrans = (aptran.inverse()*targetHand->getTran()).translation();
+				//			if(!runAutoGrasp(0,1.0)){	
+				//					out <<GraspID << " " << handSelector << " " <<objectIdNum << " " << 0 << " " << 0 << " " << 0 << " " <<ind1 << " " << ind2 << " " << ind3 << " " << backofftrans[0] <<" " << backofftrans[1] <<" "<< backofftrans[2] << " " << "failed" << " failed" << endl;
+				//					continue;
+				//			}
+				//		
+				//				out <<GraspID << " " << handSelector << " " <<objectIdNum <<" " << 0 << " " << 0 << " " << 0 << " " <<ind1 << " " << ind2 << " " << ind3 << " " << backofftrans[0] <<" " << backofftrans[1] <<" "<< backofftrans[2] << " ";
+				//				sendContacts(mObject, -1, &out);
+				//				out << "DOFs: " << targetHand->getNumDOF() << " " ;
+				//				for (i=0;i<targetHand->getNumDOF();i++)
+				//					out << targetHand->getDOF(i)->getVal() << " ";
+				//				for (int matInd =3; matInd < 6; ++matInd){
+				//					if(mObject->getMaterial()!= matInd)	
+				//						mObject->setMaterial(matInd);						
+				//					out << "GraspMetric " << matInd << ": ";								
+				//					mObject->setMaterial(matInd);						
+				//					sendGraspMetric(out);
+				//				
+				//				}
+				//				out<<endl;
+				//			
+				//		}
+				//	}
+				//	std::cout << ind1;
+				//}
+				delete [] finaldofs;
+				delete [] inputDOFs;
+				out.flush();
+				lineNum ++;
+				sockout << lineNum;
+				flush();
+				std::cout<<lineNum << std::endl;
+				//returning instead of exit 22 because that breaks the socket and results in the program gettig killed from the python script, whereas exiting sometimes does not wait to flush the buffer
+				exit(22);
+				fLine = in.readLine();	
+		PROF_PRINT(TOTAL_TIMER);
+
+				}
+				sockout << "done";
+				flush();
+
+	}
+	else if (*strPtr == "moveHandOutOfCollision"){
+			moveHandOutOfCollision2(targetHand, mObject);
+			return;
+	}
+	else if (*strPtr == "testRot"){
+			double phi((++strPtr)->toDouble()), theta((++strPtr)->toDouble()), sigma((++strPtr)->toDouble());
+			position cg = mObject->getCoG();
+			transf cgTrans(Quaternion(1.0,0.0,0.0,0.0),vec3(cg.x(),cg.y(),cg.z()));
+			transf cgInv(Quaternion(1.0,0.0,0.0,0.0),vec3(-cg.x(),-cg.y(),-cg.z()));
+			setTargetPos(cgInv*transf(yprToRotMatrix(phi, theta, sigma),vec3::ZERO)*cgTrans);
+			return;
+		}
+	else if (*strPtr == "testRotQuat"){
+			double w((++strPtr)->toDouble()), x((++strPtr)->toDouble()), y((++strPtr)->toDouble()),z((++strPtr)->toDouble());
+			position cg = mObject->getCoG();
+			transf cgTrans(Quaternion(1.0,0.0,0.0,0.0),vec3(cg.x(),cg.y(),cg.z()));
+			transf cgInv(Quaternion(1.0,0.0,0.0,0.0),vec3(-cg.x(),-cg.y(),-cg.z()));
+			setTargetPos(cgInv*transf(Quaternion(w, x, y,z),vec3::ZERO)*cgTrans);
+			return;
+		}
+
+	else if(*strPtr == "resizeBody"){
+		++strPtr;
+		mat3 newMat = lineStrIteratorToMat3(lineStrList, strPtr);
+		RobotTools::scaleBody(newMat, graspItGUI->getIVmgr()->getWorld()->getBody((strPtr)->toInt(&ok)));
+	}
+	else if(*strPtr == "resizeGraspableBody"){
+		++strPtr;
+		mat3 newMat = lineStrIteratorToMat3(lineStrList, strPtr);
+		RobotTools::scaleGraspableBody(newMat, graspItGUI->getIVmgr()->getWorld()->getGB((strPtr)->toInt(&ok)));
+		
+	}
+	else if(*strPtr == "resizePalm"){
+		++strPtr;
+		mat3 newMat = lineStrIteratorToMat3(lineStrList, strPtr);
+		RobotTools::scalePalm(newMat, targetHand);
+
+	}
+	else if(*strPtr == "resizeHand"){
+		++strPtr;
+		mat3 newMat = lineStrIteratorToMat3(lineStrList, strPtr);
+		RobotTools::scaleHand(newMat, targetHand);
+	}
+	else if(*strPtr == "updateWorld"){
+		  // these should be separate commands
+		updateWorld();
+	}
+	else if(*strPtr == "setTargetPosWRTApproach"){
+		double p1 = (++strPtr)->toDouble(),p2 =(++strPtr)->toDouble(),p3 =(++strPtr)->toDouble();
+		vec3 p(p1,p2,p3);
+		setTargetPosWRTApproach(targetHand, mObject, p);
+	}
+	else if(*strPtr == "setTargetPosWRTApproach2"){
+		double p1 = (++strPtr)->toDouble(),p2 =(++strPtr)->toDouble(),p3 =(++strPtr)->toDouble();
+		vec3 p(p1,p2,p3);
+		setTargetPosWRTApproach2(targetHand, mObject, p);
+	}
+	else if (*strPtr == "tranCurrentHandPos"){
+		strPtr++;
+		transf t;
+		transStringToTransf(lineStrList, strPtr,t);
+		setHandPos(targetHand->getTran()*t);
+	}
+	else if (*strPtr == "subCoM"){
+		mObject->setTran(transf(mObject->getTran().rotation(), vec3(-mObject->getCoG()[0],-mObject->getCoG()[1],-mObject->getCoG()[2])));
+	}
+	}//while
+}
+
+Q_UINT16 GraspItServerTools::parseArgs(int argc, char **argv){
+		if (argc < 2)
+			return 4765;
+		QString portString = argv[2];
+		Q_UINT16 port = portString.toInt();
+		return port;
+}
+
+GraspPlannerSocket::~GraspPlannerSocket(){}

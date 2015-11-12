@@ -1,0 +1,241 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>non-anthropomorphic/palm1_r.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.5</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <rotation>90 x</rotation>
+            <translation>48.9 29.25 0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>40.4</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">non-anthropomorphic/thumb_r1.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/thumb_r2.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <rotation>-90 x</rotation>
+            <rotation>-90 z</rotation>
+            <translation>29.5 8.7 13.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>40.4</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d4</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">non-anthropomorphic/palm2_r.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/index_r1.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/index_r2.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <rotation>-90 x</rotation>
+            <rotation>-90 z</rotation>
+            <translation>29.5 8.7 13.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>-27</d>
+            <a>40.4</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d6</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">non-anthropomorphic/Leer2.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/middle_r1.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/middle_r2.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <rotation>-90 x</rotation>
+            <rotation>-90 z</rotation>
+            <translation>29.5 8.7 13.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>-51</d>
+            <a>40.4</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d7</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d8</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">non-anthropomorphic/Leer2.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/ring_r1.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/ring_r2.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <rotation>-90 x</rotation>
+            <rotation>-90 z</rotation>
+            <translation>29.5 8.7 13.5</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>-73</d>
+            <a>40.4</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d9</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d10</theta>
+            <d>0</d>
+            <a>40.2</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">non-anthropomorphic/Leer2.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/pinky_r1.xml</link>
+        <link dynamicJointType="Revolute">non-anthropomorphic/pinky_r2.xml</link>
+    </chain>
+</robot>

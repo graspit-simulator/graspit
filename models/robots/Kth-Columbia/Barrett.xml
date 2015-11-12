@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<robot type="Barrett">
+    <palm>palm.xml</palm>
+     <chain>
+        <transform>
+            <translation>0.0 0.0 0.0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+90</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">link.xml</link>
+    </chain>
+    <approachDirection>
+        <referenceLocation>0 0 0</referenceLocation>
+        <direction>0 0 1</direction>
+    </approachDirection>
+</robot>

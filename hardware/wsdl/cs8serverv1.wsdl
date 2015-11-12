@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="CS8ServerV1"
+ targetNamespace="urn:CS8ServerV1"
+ xmlns:tns="urn:CS8ServerV1"
+ xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:SCSV0="CS8ServerV0"
+ xmlns:xop="http://www.w3.org/2004/08/xop/include"
+ xmlns:xmlmime="http://www.w3.org/2004/11/xmlmime"
+ xmlns:SCSV1="urn:CS8ServerV1"
+ xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap12/"
+ xmlns:MIME="http://schemas.xmlsoap.org/wsdl/mime/"
+ xmlns:DIME="http://schemas.xmlsoap.org/ws/2002/04/dime/wsdl/"
+ xmlns:WSDL="http://schemas.xmlsoap.org/wsdl/"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<types>
+
+ <schema targetNamespace="urn:CS8ServerV1"
+  xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+  xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:SCSV0="CS8ServerV0"
+  xmlns:xop="http://www.w3.org/2004/08/xop/include"
+  xmlns:xmlmime="http://www.w3.org/2004/11/xmlmime"
+  xmlns:SCSV1="urn:CS8ServerV1"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="CS8ServerV0" schemaLocation="scsv0.xsd"/>
+  <import namespace="http://www.w3.org/2004/08/xop/include"/>
+  <import namespace="http://www.w3.org/2004/11/xmlmime"/>
+  <import namespace="http://www.w3.org/2003/05/soap-encoding"/>
+  <complexType name="VALApplication">
+   <annotation>
+    <documentation>stores information about a VAL3 application</documentation>
+   </annotation>
+   <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="loaded" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="VALApplications">
+   <annotation>
+    <documentation>stores information about a collection of VAL3 applications</documentation>
+   </annotation>
+   <sequence>
+    <element name="application" type="SCSV1:VALApplication" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Data">
+   <annotation>
+    <documentation>stores stream data</documentation>
+   </annotation>
+   <sequence>
+     <element ref="xop:Include" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+     <attribute ref="xmlmime:contentType" use="optional"/>
+  </complexType>
+  <complexType name="Records">
+   <annotation>
+    <documentation>is a collection of recorder filename</documentation>
+   </annotation>
+   <sequence>
+    <element name="record" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+   </sequence>
+  </complexType>
+  <complexType name="JointRange">
+   <annotation>
+    <documentation>gives the min and max limits of the robot</documentation>
+   </annotation>
+   <sequence>
+     <element name="min" type="xsd:double" minOccurs="0" maxOccurs="unbounded"/>
+     <element name="max" type="xsd:double" minOccurs="0" maxOccurs="unbounded"/>
+   </sequence>
+  </complexType>
+  <!-- operation request element -->
+  <element name="getApplications">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getApplicationsResponse">
+   <complexType>
+    <sequence>
+     <element name="applications" type="SCSV1:VALApplications" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getApplicationDatas">
+   <complexType>
+    <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getApplicationDatasResponse">
+   <complexType>
+    <sequence>
+     <element name="data" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRecords">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRecordsResponse">
+   <complexType>
+    <sequence>
+     <element name="records" type="SCSV1:Records" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRecord">
+   <complexType>
+    <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRecordResponse">
+   <complexType>
+    <sequence>
+     <element name="data" type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getJointRange">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getJointRangeResponse">
+   <complexType>
+    <sequence>
+     <element name="range" type="SCSV1:JointRange" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+ </schema>
+
+</types>
+
+<message name="getApplicationsRequest">
+ <part name="parameters" element="SCSV1:getApplications"/>
+</message>
+
+<message name="getApplicationsResponse">
+ <part name="parameters" element="SCSV1:getApplicationsResponse"/>
+</message>
+
+<message name="getApplicationDatas">
+ <part name="parameters" element="SCSV1:getApplicationDatas"/>
+</message>
+
+<message name="getApplicationDatasResponse">
+ <part name="parameters" element="SCSV1:getApplicationDatasResponse"/>
+</message>
+
+<message name="getRecordsRequest">
+ <part name="parameters" element="SCSV1:getRecords"/>
+</message>
+
+<message name="getRecordsResponse">
+ <part name="parameters" element="SCSV1:getRecordsResponse"/>
+</message>
+
+<message name="getRecord">
+ <part name="parameters" element="SCSV1:getRecord"/>
+</message>
+
+<message name="getRecordResponse">
+ <part name="parameters" element="SCSV1:getRecordResponse"/>
+</message>
+
+<message name="getJointRange">
+ <part name="parameters" element="SCSV1:getJointRange"/>
+</message>
+
+<message name="getJointRangeResponse">
+ <part name="parameters" element="SCSV1:getJointRangeResponse"/>
+</message>
+
+<message name="CS8ServerV1Header">
+ <part name="sessionId" element="SCSV0:sessionId"/>
+</message>
+
+<message name="ServerExceptionFault">
+ <part name="fault" element="SCSV0:ServerException"/>
+</message>
+
+<portType name="CS8ServerV1PortType">
+ <operation name="getApplications">
+  <documentation>get the list of applications</documentation>
+  <input message="tns:getApplicationsRequest"/>
+  <output message="tns:getApplicationsResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getApplicationDatas">
+  <documentation>get the data of a VAL3 application</documentation>
+  <input message="tns:getApplicationDatas"/>
+  <output message="tns:getApplicationDatasResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getRecords">
+  <documentation>get the list of record files</documentation>
+  <input message="tns:getRecordsRequest"/>
+  <output message="tns:getRecordsResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getRecord">
+  <documentation>get a record file</documentation>
+  <input message="tns:getRecord"/>
+  <output message="tns:getRecordResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getJointRange">
+  <documentation>get the limit of the robot</documentation>
+  <input message="tns:getJointRange"/>
+  <output message="tns:getJointRangeResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+</portType>
+
+<binding name="CS8ServerV1" type="tns:CS8ServerV1PortType">
+ <SOAP:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+ <operation name="getApplications">
+  <SOAP:operation/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV1Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getApplicationDatas">
+  <SOAP:operation/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV1Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getRecords">
+  <SOAP:operation/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV1Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getRecord">
+  <SOAP:operation/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV1Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getJointRange">
+  <SOAP:operation/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV1Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+</binding>
+
+<service name="CS8ServerV1">
+ <documentation>gSOAP 2.7.10 generated service definition</documentation>
+ <port name="CS8ServerV1" binding="tns:CS8ServerV1">
+  <SOAP:address location="http://localhost:5653/CS8ServerV1"/>
+ </port>
+</service>
+
+</definitions>

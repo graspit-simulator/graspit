@@ -1,0 +1,6 @@
+.graspit.pro.swp
+.moc/
+.obj/
+
+*.bak
+

@@ -1,0 +1,29 @@
+#Inventor V2.1 ascii
+
+Separator {
+    Material {
+	ambientColor	0.9 0.9 0.9
+	diffuseColor	0.9 0.9 0.9
+    }
+    Translation {
+	translation	0 0 -1303
+    }
+    Separator {
+	Texture2Transform {
+	   scaleFactor 32.808 32.808
+        }
+	Texture2 {
+	    filename	"textures/checker.jpg"
+	}
+	Coordinate3 {
+	    point [ -10000 -10000 0,
+		     10000 -10000 0,
+                     10000  10000 0,
+                    -10000  10000 0]
+	}
+	FaceSet {
+	  numVertices [4]
+	}
+    }
+
+}

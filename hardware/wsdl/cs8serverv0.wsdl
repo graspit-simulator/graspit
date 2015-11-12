@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="CS8ServerV0"
+ targetNamespace="CS8ServerV0"
+ xmlns:tns="CS8ServerV0"
+ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+ xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:SCSV0="CS8ServerV0"
+ xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:MIME="http://schemas.xmlsoap.org/wsdl/mime/"
+ xmlns:DIME="http://schemas.xmlsoap.org/ws/2002/04/dime/wsdl/"
+ xmlns:WSDL="http://schemas.xmlsoap.org/wsdl/"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<types>
+
+ <schema targetNamespace="CS8ServerV0"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:SCSV0="CS8ServerV0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <import namespace="CS8ServerV0" schemaLocation="scsv0.xsd"/>
+  <simpleType name="SessionId">
+   <restriction base="xsd:int">
+   </restriction>
+  </simpleType>
+  <simpleType name="ServerExceptionCode">
+   <annotation>
+    <documentation>stores all possible exceptions</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="UNKNOWN-CODE"/><!-- enum const = 0 -->
+    <enumeration value="INVALID-SESSION-ID-CODE"/><!-- enum const = 1 -->
+    <enumeration value="INVALID-ROBOT-ID-CODE"/><!-- enum const = 2 -->
+    <enumeration value="READ-ACCESS-ERROR-CODE"/><!-- enum const = 3 -->
+    <enumeration value="WRITE-ACCESS-ERROR-CODE"/><!-- enum const = 4 -->
+    <enumeration value="SET-POS-NOT-SIMUL-CODE"/><!-- enum const = 5 -->
+    <enumeration value="SET-POS-POWER-ON-CODE"/><!-- enum const = 6 -->
+    <enumeration value="FILE-NOT-FOUND-CODE"/><!-- enum const = 7 -->
+    <enumeration value="INVALID-CONFIG-CODE"/><!-- enum const = 8 -->
+    <enumeration value="INVALID-NUMBER-OF-AXIS-CODE"/><!-- enum const = 9 -->
+    <enumeration value="INVALID-MOT-DESC-CODE"/><!-- enum const = 10 -->
+    <enumeration value="CLIENT-ALREADY-CONNECTED"/><!-- enum const = 11 -->
+    <enumeration value="CLIENT-COMMUNICATION-ERROR"/><!-- enum const = 12 -->
+    <enumeration value="APPLICATION-NOT-FOUND"/><!-- enum const = 13 -->
+    <enumeration value="PROGRAM-NOT-FOUND"/><!-- enum const = 14 -->
+    <enumeration value="TASK-NOT-FOUND"/><!-- enum const = 15 -->
+    <enumeration value="STACK-FRAME-NOT-FOUND"/><!-- enum const = 16 -->
+    <enumeration value="TASK-ALREADY-LOCKED"/><!-- enum const = 17 -->
+    <enumeration value="INVALID-SOAP-HANDLER"/><!-- enum const = 18 -->
+    <enumeration value="INVALID-SOAP-HEADER"/><!-- enum const = 19 -->
+    <enumeration value="PROGRAM-LINE-NOT-FOUND"/><!-- enum const = 20 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="Kinematic">
+   <annotation>
+    <documentation>stores the type of the kinematic of the robot</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="KINEMATIC-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="KINEMATIC-ANTHROPOMORPH6"/><!-- enum const = 1 -->
+    <enumeration value="KINEMATIC-ANTHROPOMORPH5"/><!-- enum const = 2 -->
+    <enumeration value="KINEMATIC-SCARA"/><!-- enum const = 3 -->
+    <enumeration value="KINEMATIC-EISENMANN"/><!-- enum const = 4 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="MountType">
+   <annotation>
+    <documentation>stores where the robot is mounted</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="MOUNTTYPE-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="MOUNTTYPE-FLOOR"/><!-- enum const = 1 -->
+    <enumeration value="MOUNTTYPE-CEILING"/><!-- enum const = 2 -->
+    <enumeration value="MOUNTTYPE-WALL"/><!-- enum const = 3 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="LengthAxis3">
+   <annotation>
+    <documentation>stores the length of axis #3</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="LENGTHAXIS3-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="LENGTHAXIS3-L100"/><!-- enum const = 1 -->
+    <enumeration value="LENGTHAXIS3-L200"/><!-- enum const = 2 -->
+    <enumeration value="LENGTHAXIS3-L400"/><!-- enum const = 3 -->
+    <enumeration value="LENGTHAXIS3-L600"/><!-- enum const = 4 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="DiameterAxis3">
+   <annotation>
+    <documentation>stores the diameter of axis #3</documentation>
+   </annotation>
+   <restriction base="xsd:string">
+    <enumeration value="DIAMETERAXIS3-INVALID"/><!-- enum const = 0 -->
+    <enumeration value="DIAMETERAXIS3-D20"/><!-- enum const = 1 -->
+    <enumeration value="DIAMETERAXIS3-D25"/><!-- enum const = 2 -->
+   </restriction>
+  </simpleType>
+  <!-- fault element type (stbl added) -->  <element name="ServerException" type="SCSV0:ServerException"> </element>
+  <complexType name="ServerException">
+   <sequence>
+     <element name="code" type="SCSV0:ServerExceptionCode" minOccurs="1" maxOccurs="1"/>
+     <element name="description" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="JointPos">
+   <annotation>
+    <documentation>stores an array of double, a double for each axis of the robot</documentation>
+   </annotation>
+   <sequence>
+    <element name="item" type="xsd:double" minOccurs="1" maxOccurs="100" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="CartesianPos">
+   <annotation>
+    <documentation>stores a cartesian position</documentation>
+   </annotation>
+   <sequence>
+     <element name="x" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="y" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="z" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="rx" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="ry" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="rz" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Robot">
+   <annotation>
+    <documentation>stores information about one robot</documentation>
+   </annotation>
+   <sequence>
+     <element name="kinematic" type="SCSV0:Kinematic" minOccurs="1" maxOccurs="1"/>
+     <element name="arm" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="tuning" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="mountType" type="SCSV0:MountType" minOccurs="1" maxOccurs="1"/>
+     <element name="lengthAxis3" type="SCSV0:LengthAxis3" minOccurs="1" maxOccurs="1"/>
+     <element name="diameterAxis3" type="SCSV0:DiameterAxis3" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Version">
+   <annotation>
+    <documentation>stores information about one version</documentation>
+   </annotation>
+   <sequence>
+     <element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="version" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Versions">
+   <sequence>
+    <element name="Versions" type="SCSV0:Version" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="SoapServerVersion">
+   <sequence>
+     <element name="version" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true" default="1.2"/>
+   </sequence>
+  </complexType>
+  <complexType name="Robots">
+   <sequence>
+    <element name="Robots" type="SCSV0:Robot" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <element name="sessionId" type="SCSV0:SessionId"/>
+  <!-- operation request element -->
+  <element name="getSoapServerVersion">
+   <complexType>
+    <sequence>
+     <element name="cltName" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="cltVersion" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getSoapServerVersionResponse">
+   <complexType>
+    <sequence>
+     <element name="server" type="SCSV0:SoapServerVersion" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="ping">
+   <complexType>
+    <sequence>
+     <element name="message" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="pingResponse">
+   <complexType>
+    <sequence>
+     <element name="message" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getCS8Versions">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getCS8VersionsResponse">
+   <complexType>
+    <sequence>
+     <element name="out" type="SCSV0:Versions" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="login">
+   <complexType>
+    <sequence>
+     <element name="user" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+     <element name="pwd" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="loginResponse">
+   <complexType>
+    <sequence>
+     <element name="sid" type="SCSV0:SessionId" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="logout">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="logoutResponse">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRobots">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRobotsResponse">
+   <complexType>
+    <sequence>
+     <element name="out" type="SCSV0:Robots" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRobotJointPos">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRobotJointPosResponse">
+   <complexType>
+    <sequence>
+     <element name="pos" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="getRobotJntCartPos">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="tool" type="SCSV0:CartesianPos" minOccurs="1" maxOccurs="1"/>
+     <element name="frame" type="SCSV0:CartesianPos" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="getRobotJntCartPosResponse">
+   <complexType>
+    <sequence>
+     <element name="jntPos" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="cartPos" type="SCSV0:CartesianPos" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="setRobotJointPos">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="pos" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="setRobotPosResponse">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+ </schema>
+
+</types>
+
+<message name="getSoapServerVersion">
+ <part name="parameters" element="SCSV0:getSoapServerVersion"/>
+</message>
+
+<message name="getSoapServerVersionResponse">
+ <part name="parameters" element="SCSV0:getSoapServerVersionResponse"/>
+</message>
+
+<message name="ping">
+ <part name="parameters" element="SCSV0:ping"/>
+</message>
+
+<message name="pingResponse">
+ <part name="parameters" element="SCSV0:pingResponse"/>
+</message>
+
+<message name="getCS8VersionsRequest">
+ <part name="parameters" element="SCSV0:getCS8Versions"/>
+</message>
+
+<message name="getCS8VersionsResponse">
+ <part name="parameters" element="SCSV0:getCS8VersionsResponse"/>
+</message>
+
+<message name="login">
+ <part name="parameters" element="SCSV0:login"/>
+</message>
+
+<message name="loginResponse">
+ <part name="parameters" element="SCSV0:loginResponse"/>
+</message>
+
+<message name="logout">
+ <part name="parameters" element="SCSV0:logout"/>
+</message>
+
+<message name="logoutResponse">
+ <part name="parameters" element="SCSV0:logoutResponse"/>
+</message>
+
+<message name="getRobotsRequest">
+ <part name="parameters" element="SCSV0:getRobots"/>
+</message>
+
+<message name="getRobotsResponse">
+ <part name="parameters" element="SCSV0:getRobotsResponse"/>
+</message>
+
+<message name="getRobotJointPos">
+ <part name="parameters" element="SCSV0:getRobotJointPos"/>
+</message>
+
+<message name="getRobotJointPosResponse">
+ <part name="parameters" element="SCSV0:getRobotJointPosResponse"/>
+</message>
+
+<message name="getRobotJntCartPos">
+ <part name="parameters" element="SCSV0:getRobotJntCartPos"/>
+</message>
+
+<message name="getRobotJntCartPosResponse">
+ <part name="parameters" element="SCSV0:getRobotJntCartPosResponse"/>
+</message>
+
+<message name="setRobotJointPos">
+ <part name="parameters" element="SCSV0:setRobotJointPos"/>
+</message>
+
+<message name="setRobotPosResponse">
+ <part name="parameters" element="SCSV0:setRobotPosResponse"/>
+</message>
+
+<message name="CS8ServerV0Header">
+ <part name="sessionId" element="SCSV0:sessionId"/>
+</message>
+
+<message name="ServerExceptionFault">
+ <part name="fault" element="SCSV0:ServerException"/>
+</message>
+
+<portType name="CS8ServerV0PortType">
+ <operation name="getSoapServerVersion">
+  <documentation>get the version of the soap server and give the name and the versio of the client</documentation>
+  <input message="tns:getSoapServerVersion"/>
+  <output message="tns:getSoapServerVersionResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="ping">
+  <documentation>test the memory allocation of the soap</documentation>
+  <input message="tns:ping"/>
+  <output message="tns:pingResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getCS8Versions">
+  <documentation>get the versions of a controller</documentation>
+  <input message="tns:getCS8VersionsRequest"/>
+  <output message="tns:getCS8VersionsResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="login">
+  <documentation>logs a remote user and returns a session id</documentation>
+  <input message="tns:login"/>
+  <output message="tns:loginResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="logout">
+  <documentation>logs out a user</documentation>
+  <input message="tns:logout"/>
+  <output message="tns:logoutResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getRobots">
+  <documentation>get an array of robots</documentation>
+  <input message="tns:getRobotsRequest"/>
+  <output message="tns:getRobotsResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getRobotJointPos">
+  <documentation>get the position of a robot</documentation>
+  <input message="tns:getRobotJointPos"/>
+  <output message="tns:getRobotJointPosResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="getRobotJntCartPos">
+  <documentation>get the joint and cartesian position of a robot with a specified tool and frame</documentation>
+  <input message="tns:getRobotJntCartPos"/>
+  <output message="tns:getRobotJntCartPosResponse"/>
+  <fault name="ServerException" message="tns:ServerExceptionFault"/>
+ </operation>
+ <operation name="setRobotJointPos">
+  <documentation>set the joint position of a robot</documentation>
+  <input message="tns:setRobotJointPos"/>
+  <output message="tns:setRobotPosResponse"/>
+ </operation>
+</portType>
+
+<binding name="CS8ServerV0" type="tns:CS8ServerV0PortType">
+ <SOAP:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+ <operation name="getSoapServerVersion">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="ping">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getCS8Versions">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="login">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="logout">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getRobots">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getRobotJointPos">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="getRobotJntCartPos">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+  <fault name="ServerException">
+   <SOAP:fault name="ServerException" use="literal"/>
+  </fault>
+ </operation>
+ <operation name="setRobotJointPos">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="parameters" use="literal"/>
+     <SOAP:header use="literal" message="tns:CS8ServerV0Header" part="sessionId"/>
+  </input>
+  <output>
+     <SOAP:body parts="parameters" use="literal"/>
+  </output>
+ </operation>
+</binding>
+
+<service name="CS8ServerV0">
+ <documentation>gSOAP 2.7.10 generated service definition</documentation>
+ <port name="CS8ServerV0" binding="tns:CS8ServerV0">
+  <SOAP:address location="http://localhost:5653/"/>
+ </port>
+</service>
+
+</definitions>

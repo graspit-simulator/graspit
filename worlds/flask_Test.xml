@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>../GraspIt_svn/models/objects/flask.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +1.15155 +122.57]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>../GraspIt_svn/models/robots/Barrett/Barrett2.xml</filename>
+		<dofValues>+0 +0 +0 +0 +0 +0 +0 +0 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>-505.672 +0.421181 -62.2052</position>
+		<orientation>+0 -0.74313 +0 +0.669148</orientation>
+		<focalDistance>+508.455</focalDistance>
+	</camera>
+</world>

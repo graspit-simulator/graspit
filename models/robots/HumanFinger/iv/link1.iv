@@ -1,0 +1,24 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 150.0
+#cog -23.9 0.0 0.0
+
+#inertia_matrix
+#12.5 0.0 0.0
+#0.0 196.65 0.0
+#0.0 0.0 196.65
+
+Separator { 
+	  Material { 
+	  diffuseColor .78 .57 .11
+	  }
+	  Sphere { radius 5 }
+	  Rotation {
+		rotation 0 0 1 1.57
+	  }
+	  Translation {
+		translation 0 23.9 0
+	  }
+	  Cylinder { radius 5 height 47.8 }
+}
+

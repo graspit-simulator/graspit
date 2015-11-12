@@ -1,0 +1,106 @@
+#Inventor V2.1 ascii
+Separator {
+    Separator {
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }
+    Separator {
+        Translation {
+	    translation 25 15 892.4
+        }
+	DEF leg Cube {
+            width	50
+	    height	30
+	    depth	1785
+	}
+    }
+    Separator {
+	Translation {
+	    translation 25 285 892.5
+	}
+	USE leg
+    }
+    Separator {
+	Translation {
+	    translation 865 15 892.5
+	}
+	USE leg
+    }
+    Separator {
+	Translation {
+	    translation 865 285 892.5
+	}
+	USE leg
+    }
+    Separator {
+	Translation {
+	    translation 445 150 102.5
+        }
+	DEF plate Cube {
+	    width	870
+	    height	280
+	    depth	15
+	}
+    }
+    Separator {
+        Translation {
+	    translation 445 150 457.5
+        }
+	USE plate
+    }
+    Separator {
+        Translation {
+	    translation 445 150 777.5
+	}
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 445 150 1127.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 445 150 1447.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 445 150 1767.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 25 150 700
+        }
+        DEF connector Cube {
+	    width 	10
+	    height	240
+	    depth	40
+	}
+    }
+    Separator {
+	Translation {
+	    translation	25 150 1210
+        }
+	USE connector
+    }
+    Separator {
+	Translation {
+	    translation	865 150 700
+        }
+	USE connector
+    }
+    Separator {
+	Translation {
+	    translation	865 150 1210
+        }
+	USE connector
+    }
+    }
+}
+
+

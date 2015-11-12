@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>wood</material>
+    <mass>.0001</mass>
+    <cog>0 0 0</cog>
+    <inertia_matrix>.0001 .0001 .0001 .0001 .0001 .0001 .0001 .0001 .0001</inertia_matrix>
+    <geometryFile>columbia finger f2_wcs.wrl</geometryFile>
+</root>

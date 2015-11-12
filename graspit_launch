@@ -1,0 +1,6 @@
+#!/bin/bash
+export GRASPIT=$PWD
+export CGDB_MODEL_ROOT=$GRASPIT/cgdb
+#gdb --args 
+./bin/graspit test_planner_task UPDATE_TACTILE_CONTACTS use_console
+#test_planner_task PLAN_EGPLANNER_GUIDED_PLANNER use_console

@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<world>
+    <obstacle>
+        <filename>models/obstacles/simpleFloor.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/table.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </obstacle>
+    <obstacle>
+        <filename>models/obstacles/puma_stand.xml</filename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 -1]</fullTransform>
+        </transform>
+    </obstacle>
+    <graspableBody>
+        <filename>models/objects/glass.xml</filename>
+        <transform>
+            <fullTransform>(+0.996 -0.0781588 +0.0111872 +0.0418439)[+1.31244 +525.048 -465.928]</fullTransform>
+        </transform>
+    </graspableBody>
+    <robot>
+        <filename>models/robots/Puma560/Puma560.xml</filename>
+        <dofValues>+1.85318 +0.43586 -3.20326 +0.00906244 -0.397201 +0.218149</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </robot>
+    <robot>
+        <filename>models/robots/Barrett/Barrett.xml</filename>
+        <dofValues>+4.98626e-06 +0.9 +0 +0 +0.9 +0 +0 +0.9 +0 +0</dofValues>
+        <transform>
+            <fullTransform>(-0.00733326 -0.726523 +0.687044 -0.00902717)[-4.15554 +546.842 -402.042]</fullTransform>
+        </transform>
+    </robot>
+    <connection>
+        <parentRobot>0</parentRobot>
+        <parentChain>0</parentChain>
+        <childRobot>1</childRobot>
+        <mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 +175.05]</fullTransform>
+        </transform>
+    </connection>
+    <camera>
+        <position>-50.3792 +1987.84 +359.447</position>
+        <orientation>-0.0133373 +0.554021 +0.832395 -0.00105661</orientation>
+        <focalDistance>+2155.4</focalDistance>
+    </camera>
+</world>

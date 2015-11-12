@@ -1,0 +1,312 @@
+/************************************************************************\
+
+  Copyright 1997 The University of North Carolina at Chapel Hill.
+  All Rights Reserved.
+
+  Permission to use, copy, modify and distribute this software
+  and its documentation for educational, research and non-profit
+  purposes, without fee, and without a written agreement is
+  hereby granted, provided that the above copyright notice and
+  the following three paragraphs appear in all copies.
+
+  IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL
+  HILL BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+  INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+  ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+  EVEN IF THE UNIVERSITY OF NORTH CAROLINA HAVE BEEN ADVISED OF
+  THE POSSIBILITY OF SUCH DAMAGES.
+
+
+  Permission to use, copy, modify and distribute this software
+  and its documentation for educational, research and non-profit
+  purposes, without fee, and without a written agreement is
+  hereby granted, provided that the above copyright notice and
+  the following three paragraphs appear in all copies.
+
+  THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS"
+  BASIS, AND THE UNIVERSITY OF NORTH CAROLINA HAS NO OBLIGATION
+  TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+  MODIFICATIONS.
+
+
+   --------------------------------- 
+  |Please send all BUG REPORTS to:  |
+  |                                 |
+  |   geom@cs.unc.edu               |
+  |                                 |
+   ---------------------------------
+  
+     
+  The authors may be contacted via:
+
+  US Mail:  A. Pattekar/J. Cohen/T. Hudson/S. Gottschalk/M. Lin/D. Manocha
+            Department of Computer Science
+            Sitterson Hall, CB #3175
+            University of N. Carolina
+            Chapel Hill, NC 27599-3175
+	    
+  Phone:    (919)962-1749
+	    
+  EMail:    geom@cs.unc.edu
+
+\************************************************************************/
+
+
+	 V-COLLIDE USER'S MANUAL - Release 1.1
+	 -------------------------------------
+
+
+INTRODUCTION
+
+    The V-Collide collision detection library performs efficient and
+    exact collision detection between triangulated polygonal models.  It
+    uses a 2-level hierarchical approach: the top level eliminates from
+    consideration pairs of objects that are not close to each other,
+    while the bottom level performs exact collision detection down to
+    the level of the triangles themselves.
+
+    The basic steps involved in using this library are creating objects,
+    adding sets of triangles to these objects, choosing which pairs of
+    objects should be tested for collisions, setting the positions of
+    the objects, performing the collision test, and getting back reports
+    of the test results.  Based on these results and any other
+    parameters of the simulation/interaction, the objects may be moved
+    and the collisions tested again, etc.
+
+    V-Collide is written in C++, but it provides a C interface as well.
+
+C++ COMMAND REFERENCE
+
+    #include <VCollide.H>
+
+    int VCollide::NewObject (int *id);
+	Create a new object and prepare it for adding triangles.
+    int VCollide::AddTri (double v1[3], double v2[3], double v3[3]);
+	Add triangles to the current object (only valid between
+	NewObject() and EndObject()).
+    int VCollide::EndObject (void)
+	Finish adding triangles to the current object and build the
+	hierarchical collision detection structures for the object.
+    int VCollide::DeleteObject (int id);
+	Delete an object.
+    
+    int VCollide::ActivateObject (int id);
+	Turn on collision detection for an object.
+    int VCollide::DeactivateObject (int id);
+	Turn off collision detection for an object.
+    int VCollide::ActivatePair (int id1, int id2);
+	Turn on collision detection between a specific pair of objects.
+    int VCollide::DeactivatePair (int id1, int id2);
+	Turn off collision detection between a specific pair of objects.
+    
+    int VCollide::UpdateTrans (int id, double trans[4][4]);
+	Update the transformation applied to an object.
+	Note that we consider only the change in position of the
+	object. Scaling is not supported.
+    int VCollide::Collide (void);
+	Compute collisions.
+    int VCollide::Report (int size, VCReportType *vcrep);
+	Does not return VC_OK or VC_ERR, but rather the number of
+	collisions that occurred.  If size is nonzero, copies up to size
+	collision reports into the array colrep.
+
+
+C COMMAND REFERENCE
+
+    #include <VCol.h>
+
+    void * vcOpen (void);
+	Creates and returns a valid handle to a new collision detection engine.
+    void vcClose (void *vc_handle);
+	Shuts down a collision detection engine.
+
+    int vcNewObject (void *vc_handle, int *id);
+        Create a new object and prepare it for adding triangles.
+    int vcAddTri (void *vc_handle, double v1[3], double v2[3], double v3[3]);
+        Add triangles to the current object (only valid between
+	begin_object() and end_object()).
+    int vcEndObject (void *vc_handle)
+        Finish adding triangles to the current object and build the
+	hierarchical collision detection structures for the object.
+    int vcDeleteObject (void *vc_handle, int id);
+        Delete an object.
+
+    int vcActivateObject (void *vc_handle, int id);
+        Turn on collision detection for an object.
+    int vcDeactivateObect (void *vc_handle, int id);
+        Turn off collision detection for an object.
+    int vcActivatePair (void *vc_handle, int id1, int id2);
+        Turn on collision detection between a specific pair of objects.
+    int vcDeactivatePair (void *vc_handle, int id1, int id2);
+        Turn off collision detection between a specific pair of objects.
+    
+    int vcUpdateTrans (void *vc_handle, int id, double trans[4][4]);
+        Update the transformation applied to an object.
+	Note that we consider only the change in position of the
+	object. Scaling is not supported.
+
+    int vcCollide (void *vc_handle);
+        Compute collisions.
+    int vcReport (void *vc_handle, int size, col_report_type * colrep);
+        Does not return VC_OK or VC_ERR, but rather the number of
+        collisions that occurred.  If size is nonzero, copies up to size
+        collision reports into the array colrep.
+
+OVERVIEW
+
+    V-Collide is a library that provides fast, exact collision
+    detection, and may be useful for virtual reality and a variety of
+    other simulations applications.  It assumes that you have a model
+    that may be broken down into a set of objects.  These objects
+    typically undergo some rigid-body motions, and are periodically
+    tested for collision.  For each simulation time step, the V-Collide
+    library will report which pairs of objects are currently in
+    contact.  You are free to specify exactly which pairs of objects
+    should be tested for collision, and which may be ignored.
+
+INITIALIZATION
+
+    C++ users may initialize a collision detection engine by declaring a
+    VCollide object.  It is possible to run multiple independent
+    collision detection engines by simply declaring multiple VCollide
+    objects.
+
+    C users must call vcOpen(), which provides a handle to a collision
+    detection engine.  This handle must then be passed as the first
+    parameter to all other functions in the C interface.  vcClose()
+    shuts down the collision detection engine, deallocating all space
+    associated with the handle.
+
+CREATING OBJECTS
+
+    To create an object, first call NewObject(), which will set up an
+    empty object and provide an integer ID for that object.
+
+    For every triangle in the object, call AddTri() with the coordinates
+    of its three vertices.  If the object has faces with more than three
+    vertices, you will first need to triangulate them.
+
+    When you are done adding triangles, call EndObject().  This tells
+    the library to build its data structures for the object.
+
+    The only library call which may appear between NewObject() and
+    EndObject() is AddTri().
+
+    Objects can be deleted with DeleteObject().
+
+    You can create or delete objects at any time during the simulation,
+    but building the data structures for these objects has some run-time
+    overhead.
+
+MANAGING ACTIVATION STATE
+
+    V-Collide's activation state determines which objects will be tested
+    for collisions.  The activation state has two components -- a
+    per-object component and a pairwise component (for each possible
+    pair of objects).  These two components are managed independently,
+    so for a pair of objects to be tested for collision, not only must
+    the pair be active, but each of the two objects must be active as
+    well.
+
+    When an object is created, it is active by default.  In addition,
+    all pairs of objects that include this new object are also active.
+
+    The pairwise component of the activation state is managed using the
+    ActivatePair() and DeactivatePair() calls, while the per-object
+    component is managed using the ActivateObject() and
+    DeactivateObject() calls.  Because these components are managed
+    independently, modifying an objects activation state does not affect
+    the activation state of an object's pairs.
+
+   (Note to I-Collide users: do not confuse the ActivateObject() call in
+    V-Collide with the activate_full() call in I-Collide.  All the
+    activation calls in I-Collide operate on the pairwise activation
+    state.  I-Collide does not have a per-object activation state.)
+
+MOVING OBJECTS
+
+    To move an object, call UpdateTrans().  This function takes as
+    arguments the ID of the object and a new transformation for it,
+    expressed as a 4x4 matrix, formulated to be multiplied to the left
+    of a column vector during the transformation.  This matrix should be
+    a rigid-body transformation -- rotation and translation.  When an
+    object is first created, it has the identity matrix as its
+    transformation.
+
+PERFORMING THE COLLISION TEST
+
+    When all the objects' transformations have been modified as
+    necessary and the activation state is properly set, call collide()
+    to perform the collision testing for the current time step.
+
+GETTING REPORTS
+
+    Calling Report() will return the number of collisions that occurred
+    in the most recent test.  Report() can also be passed a buffer and a
+    buffer size limit, and the buffer will be filled with collision
+    reports (of type VCReportType, defined in VCollide.[Hh]).
+
+RETURN VALUES
+
+    Most operations called on a VCollide engine return an integer
+    success code: VC_OK on success, or an appropriate error code on
+    failure.  These codes are defined in VCollide.[Hh].  Return 
+    values should be checked regularly to make sure that the application
+    is performing correctly.
+
+DATA FILES
+
+    V-Collide has no native data file format, so you are free to use to
+    format of your choice.  The example code reads from several
+    different file types.
+
+CONVERTING FROM I_COLLIDE
+
+    The high-level structure of V-Collide is similar to that of
+    I-Collide, but the underlying basis is different, so shapes need to
+    be described differently. V-Collide does not specify its own file
+    format the way I-Collide did.  Instead, load your objects from
+    whatever storage format is most convenient for you.  Then, specify
+    to V-Collide every triangle in the model.
+
+    V-Collide also differs from I-Collide in its specification of
+    activation state.  V-Collide has two distinct layers of activation
+    state, while I-Collide has only one.  As objects are created in
+    V-Collide, they default to being active objects, and all pairwise
+    interactions are also active by default.
+
+    V-Collide does not currently support I-Collide's object instancing,
+    dynamically-resized bounding boxes, or distance computations.
+
+CONVERTING FROM RAPID
+
+    If you are already using RAPID 2.0, you are accustomed to
+    building multiple objects with the BeginObject, AddTri, EndObject
+    sequence, and then explicitly testing objects pairwise for
+    collisions by calling Collide(...) on each desired pair.
+
+    V-Collide spares you the trouble of explicitly calling each pair
+    by tracking potential object contact pairs for you.  So, a single call
+    to a V-Collide collision detection engine will produce all objects
+    in contact (but generally more efficiently than explicitly testing
+    all pairs).
+
+    V-Collide uses a similar Begin, Add, End sequence for constructing
+    objects.  But RAPID users should note that all these objects
+    should be added to the SAME engine if they are to be tested
+    against one another (e.g. each object should not be placed in
+    its own VCollide engine).
+
+SEE ALSO
+
+    "V-COLLIDE: Accelerated Collision Detection for VRML" T. Hudson,
+    M. Lin, J. Cohen, S. Gottschalk, and D. Manocha In the Proceedings
+    of VRML97, ACM Press, Monterey, California, 24-26 February 1997,
+    pages 119--125.  (Minor changes in the interface have occurred
+    since this paper was written, but it still has an accurate
+    high-level description of the internal structure)
+
+

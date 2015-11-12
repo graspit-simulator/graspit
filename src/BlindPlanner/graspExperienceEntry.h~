@@ -1,0 +1,41 @@
+/*
+ * graspExperienceEntry.h
+ *
+ *  Created on: Jun 11, 2011
+ *      Author: dang
+ */
+
+#ifndef GRASPEXPERIENCEENTRY_H_
+#define GRASPEXPERIENCEENTRY_H_
+
+#include <vector>
+
+#include "matvec3D.h"
+
+struct ContactInfo
+{
+	vec3 location;
+	Quaternion orientation;
+
+	void printMe(){std::cout << "{" << location.x() << ", " << location.y() << ", " << location.z() << "} " <<
+					"[" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << orientation.z << "]" << std::endl;
+	}
+};
+
+class GraspExperienceEntry
+{
+private:
+	char mGraspId[100];
+	std::vector<ContactInfo> mContactList;
+	GraspExperienceEntry();
+
+public:
+	//initialize an entry with one line of string from the file possibly
+	GraspExperienceEntry(const char* str);
+	double getSimilarityMeasure(const GraspExperienceEntry& g);
+	//helper functions
+	void printMe();
+
+};
+
+#endif /* GRASPEXPERIENCEENTRY_H_ */

@@ -1,0 +1,12 @@
+Specifications to be considered in tactile simulation
+Author: Hao Dang
+
+1. youngs modulus
+2. contactSetting.cpp
+   sampling radius to compute the poraboloid parameters
+3. contact.cpp
+   contact depth h = 1.0mm is hardwired
+   in SoftContact::setUpFrictionEdges, CalcContact_Matress(10), 10N is hardwired
+4. ContactPDModel.cpp
+   distribution is dummy
+

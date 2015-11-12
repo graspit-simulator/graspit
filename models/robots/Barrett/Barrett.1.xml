@@ -1,0 +1,315 @@
+<?xml version="1.0" ?>
+<robot type="Barrett">
+    <palm sensorType="FilteredSensor">palm.xml</palm>
+	<filter type="grid" params="-30.0,-20,-1.0,-20.0,-10,9.0">1</filter> 
+	<filter type="grid" params="-30.0,-10,-1.0,-20.0,0,9.0">1</filter> 
+	<filter type="grid" params="-30.0,0,-1.0,-20.0,10,9.0">1</filter> 
+	<filter type="grid" params="-30.0,10,-1.0,-20.0,20,9.0">1</filter> 
+	<filter type="grid" params="-20.0,-20,-1.0,-10.0,-10,9.0">1</filter> 
+	<filter type="grid" params="-20.0,-10,-1.0,-10.0,0,9.0">1</filter> 
+	<filter type="grid" params="-20.0,0,-1.0,-10.0,10,9.0">1</filter> 
+	<filter type="grid" params="-20.0,10,-1.0,-10.0,20,9.0">1</filter> 
+	<filter type="grid" params="-10.0,-20,-1.0,0.0,-10,9.0">1</filter> 
+	<filter type="grid" params="-10.0,-10,-1.0,0.0,0,9.0">1</filter> 
+	<filter type="grid" params="-10.0,0,-1.0,0.0,10,9.0">1</filter> 
+	<filter type="grid" params="-10.0,10,-1.0,0.0,20,9.0">1</filter> 
+	<filter type="grid" params="0.0,-20,-1.0,10.0,-10,9.0">1</filter> 
+	<filter type="grid" params="0.0,-10,-1.0,10.0,0,9.0">1</filter> 
+	<filter type="grid" params="0.0,0,-1.0,10.0,10,9.0">1</filter> 
+	<filter type="grid" params="0.0,10,-1.0,10.0,20,9.0">1</filter> 
+	<filter type="grid" params="10.0,-20,-1.0,20.0,-10,9.0">1</filter> 
+	<filter type="grid" params="10.0,-10,-1.0,20.0,0,9.0">1</filter> 
+	<filter type="grid" params="10.0,0,-1.0,20.0,10,9.0">1</filter> 
+	<filter type="grid" params="10.0,10,-1.0,20.0,20,9.0">1</filter> 
+	<filter type="grid" params="20.0,-20,-1.0,30.0,-10,9.0">1</filter> 
+	<filter type="grid" params="20.0,-10,-1.0,30.0,0,9.0">1</filter> 
+	<filter type="grid" params="20.0,0,-1.0,30.0,10,9.0">1</filter> 
+	<filter type="grid" params="20.0,10,-1.0,30.0,20,9.0">1</filter> 
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+10</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="b">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+    <dof type="b">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+    <dof type="b">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+    <chain>
+        <transform>
+            <translation>25.0 0 -1.0</translation>
+            <rotation>180 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+90</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>-90</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+5</theta>
+            <d>0</d>
+            <a>70</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>144</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1*0.333333333+40</theta>
+            <d>0</d>
+            <a>55</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>144</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">link1.xml</link>
+        <link dynamicJointType="Revolute" sensorType="FilteredSensor">link2.xml</link>
+        <link dynamicJointType="Revolute" sensorType="FilteredSensor">link3.xml</link>
+<filter type="grid" params="-60.0,13,-10.0,-54.0,16,-3.0">1</filter> 
+<filter type="grid" params="-60.0,13,-3.0,-54.0,16,3.0">1</filter> 
+<filter type="grid" params="-60.0,13,3.0,-54.0,16,10.0">1</filter> 
+<filter type="grid" params="-54.0,13,-10.0,-48.0,16,-3.0">1</filter> 
+<filter type="grid" params="-54.0,13,-3.0,-48.0,16,3.0">1</filter> 
+<filter type="grid" params="-54.0,13,3.0,-48.0,16,10.0">1</filter> 
+<filter type="grid" params="-48.0,13,-10.0,-42.0,16,-3.0">1</filter> 
+<filter type="grid" params="-48.0,13,-3.0,-42.0,16,3.0">1</filter> 
+<filter type="grid" params="-48.0,13,3.0,-42.0,16,10.0">1</filter> 
+<filter type="grid" params="-42.0,13,-10.0,-36.0,16,-3.0">1</filter> 
+<filter type="grid" params="-42.0,13,-3.0,-36.0,16,3.0">1</filter> 
+<filter type="grid" params="-42.0,13,3.0,-36.0,16,10.0">1</filter> 
+<filter type="grid" params="-36.0,13,-10.0,-30.0,16,-3.0">1</filter> 
+<filter type="grid" params="-36.0,13,-3.0,-30.0,16,3.0">1</filter> 
+<filter type="grid" params="-36.0,13,3.0,-30.0,16,10.0">1</filter> 
+<filter type="grid" params="-30.0,13,-10.0,-24.0,16,-3.0">1</filter> 
+<filter type="grid" params="-30.0,13,-3.0,-24.0,16,3.0">1</filter> 
+<filter type="grid" params="-30.0,13,3.0,-24.0,16,10.0">1</filter> 
+<filter type="grid" params="-24.0,13,-10.0,-18.0,16,-3.0">1</filter> 
+<filter type="grid" params="-24.0,13,-3.0,-18.0,16,3.0">1</filter> 
+<filter type="grid" params="-24.0,13,3.0,-18.0,16,10.0">1</filter> 
+<filter type="grid" params="-18.0,13,-10.0,-12.0,16,-3.0">1</filter> 
+<filter type="grid" params="-18.0,13,-3.0,-12.0,16,3.0">1</filter> 
+<filter type="grid" params="-18.0,13,3.0,-12.0,16,10.0">1</filter>  
+
+<filter type="grid" params="-48.0,10,-12.0,-42.0,16,-3.0">2</filter> 
+<filter type="grid" params="-48.0,10,-3.0,-42.0,16,3.0">2</filter> 
+<filter type="grid" params="-48.0,10,3.0,-42.0,16,12.0">2</filter> 
+<filter type="grid" params="-42.0,10,-12.0,-36.0,16,-3.0">2</filter> 
+<filter type="grid" params="-42.0,10,-3.0,-36.0,16,3.0">2</filter> 
+<filter type="grid" params="-42.0,10,3.0,-36.0,16,12.0">2</filter> 
+<filter type="grid" params="-36.0,10,-12.0,-30.0,16,-3.0">2</filter> 
+<filter type="grid" params="-36.0,10,-3.0,-30.0,16,3.0">2</filter> 
+<filter type="grid" params="-36.0,10,3.0,-30.0,16,12.0">2</filter> 
+<filter type="grid" params="-30.0,10,-12.0,-24.0,16,-3.0">2</filter> 
+<filter type="grid" params="-30.0,10,-3.0,-24.0,16,3.0">2</filter> 
+<filter type="grid" params="-30.0,10,3.0,-24.0,16,12.0">2</filter> 
+<filter type="grid" params="-24.0,10,-12.0,-18.0,16,-3.0">2</filter> 
+<filter type="grid" params="-24.0,10,-3.0,-18.0,16,3.0">2</filter> 
+<filter type="grid" params="-24.0,10,3.0,-18.0,16,12.0">2</filter> 
+<filter type="grid" params="-18.0,10,-12.0,-12.0,16,-3.0">2</filter> 
+<filter type="grid" params="-18.0,10,-3.0,-12.0,16,3.0">2</filter> 
+<filter type="grid" params="-18.0,10,3.0,-12.0,16,12.0">2</filter> 
+<filter type="grid" params="-12.0,10,-12.0,-6.0,16,-3.0">2</filter> 
+<filter type="grid" params="-12.0,10,-3.0,-6.0,16,3.0">2</filter> 
+<filter type="grid" params="-12.0,10,3.0,-6.0,16,12.0">2</filter> 
+<filter type="grid" params="-6.0,10,-3.0,0.0,16,3.0">2</filter> 
+
+    </chain>
+    <chain>
+        <transform>
+            <translation>-25.0 0 -1.0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+90</theta>
+            <d>0</d>
+            <a>50</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2+5</theta>
+            <d>0</d>
+            <a>70</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>144</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2*0.333333333+40</theta>
+            <d>0</d>
+            <a>55</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>144</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+         <link dynamicJointType="Revolute">link1.xml</link>
+        <link dynamicJointType="Revolute" sensorType="FilteredSensor">link2.xml</link>
+        <link dynamicJointType="Revolute" sensorType="FilteredSensor">link3.xml</link>
+<filter type="grid" params="-60.0,13,-10.0,-54.0,16,-3.0">1</filter> 
+<filter type="grid" params="-60.0,13,-3.0,-54.0,16,3.0">1</filter> 
+<filter type="grid" params="-60.0,13,3.0,-54.0,16,10.0">1</filter> 
+<filter type="grid" params="-54.0,13,-10.0,-48.0,16,-3.0">1</filter> 
+<filter type="grid" params="-54.0,13,-3.0,-48.0,16,3.0">1</filter> 
+<filter type="grid" params="-54.0,13,3.0,-48.0,16,10.0">1</filter> 
+<filter type="grid" params="-48.0,13,-10.0,-42.0,16,-3.0">1</filter> 
+<filter type="grid" params="-48.0,13,-3.0,-42.0,16,3.0">1</filter> 
+<filter type="grid" params="-48.0,13,3.0,-42.0,16,10.0">1</filter> 
+<filter type="grid" params="-42.0,13,-10.0,-36.0,16,-3.0">1</filter> 
+<filter type="grid" params="-42.0,13,-3.0,-36.0,16,3.0">1</filter> 
+<filter type="grid" params="-42.0,13,3.0,-36.0,16,10.0">1</filter> 
+<filter type="grid" params="-36.0,13,-10.0,-30.0,16,-3.0">1</filter> 
+<filter type="grid" params="-36.0,13,-3.0,-30.0,16,3.0">1</filter> 
+<filter type="grid" params="-36.0,13,3.0,-30.0,16,10.0">1</filter> 
+<filter type="grid" params="-30.0,13,-10.0,-24.0,16,-3.0">1</filter> 
+<filter type="grid" params="-30.0,13,-3.0,-24.0,16,3.0">1</filter> 
+<filter type="grid" params="-30.0,13,3.0,-24.0,16,10.0">1</filter> 
+<filter type="grid" params="-24.0,13,-10.0,-18.0,16,-3.0">1</filter> 
+<filter type="grid" params="-24.0,13,-3.0,-18.0,16,3.0">1</filter> 
+<filter type="grid" params="-24.0,13,3.0,-18.0,16,10.0">1</filter> 
+<filter type="grid" params="-18.0,13,-10.0,-12.0,16,-3.0">1</filter> 
+<filter type="grid" params="-18.0,13,-3.0,-12.0,16,3.0">1</filter> 
+<filter type="grid" params="-18.0,13,3.0,-12.0,16,10.0">1</filter>  
+
+<filter type="grid" params="-48.0,10,-12.0,-42.0,16,-3.0">2</filter> 
+<filter type="grid" params="-48.0,10,-3.0,-42.0,16,3.0">2</filter> 
+<filter type="grid" params="-48.0,10,3.0,-42.0,16,12.0">2</filter> 
+<filter type="grid" params="-42.0,10,-12.0,-36.0,16,-3.0">2</filter> 
+<filter type="grid" params="-42.0,10,-3.0,-36.0,16,3.0">2</filter> 
+<filter type="grid" params="-42.0,10,3.0,-36.0,16,12.0">2</filter> 
+<filter type="grid" params="-36.0,10,-12.0,-30.0,16,-3.0">2</filter> 
+<filter type="grid" params="-36.0,10,-3.0,-30.0,16,3.0">2</filter> 
+<filter type="grid" params="-36.0,10,3.0,-30.0,16,12.0">2</filter> 
+<filter type="grid" params="-30.0,10,-12.0,-24.0,16,-3.0">2</filter> 
+<filter type="grid" params="-30.0,10,-3.0,-24.0,16,3.0">2</filter> 
+<filter type="grid" params="-30.0,10,3.0,-24.0,16,12.0">2</filter> 
+<filter type="grid" params="-24.0,10,-12.0,-18.0,16,-3.0">2</filter> 
+<filter type="grid" params="-24.0,10,-3.0,-18.0,16,3.0">2</filter> 
+<filter type="grid" params="-24.0,10,3.0,-18.0,16,12.0">2</filter> 
+<filter type="grid" params="-18.0,10,-12.0,-12.0,16,-3.0">2</filter> 
+<filter type="grid" params="-18.0,10,-3.0,-12.0,16,3.0">2</filter> 
+<filter type="grid" params="-18.0,10,3.0,-12.0,16,12.0">2</filter> 
+<filter type="grid" params="-12.0,10,-12.0,-6.0,16,-3.0">2</filter> 
+<filter type="grid" params="-12.0,10,-3.0,-6.0,16,3.0">2</filter> 
+<filter type="grid" params="-12.0,10,3.0,-6.0,16,12.0">2</filter> 
+<filter type="grid" params="-6.0,10,-3.0,0.0,16,3.0">2</filter> 
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 -50.0 -1.0</translation>
+            <rotation>-90 y</rotation>
+            <rotation>-90 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3+5</theta>
+            <d>0</d>
+            <a>70</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>144</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3*0.333333333+40</theta>
+            <d>0</d>
+            <a>55</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>144</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute" sensorType="FilteredSensor">link2.xml</link>
+        <link dynamicJointType="Revolute" sensorType="FilteredSensor">link3.xml</link>
+<filter type="grid" params="-60.0,13,-10.0,-54.0,16,-3.0">0</filter> 
+<filter type="grid" params="-60.0,13,-3.0,-54.0,16,3.0">0</filter> 
+<filter type="grid" params="-60.0,13,3.0,-54.0,16,10.0">0</filter> 
+<filter type="grid" params="-54.0,13,-10.0,-48.0,16,-3.0">0</filter> 
+<filter type="grid" params="-54.0,13,-3.0,-48.0,16,3.0">0</filter> 
+<filter type="grid" params="-54.0,13,3.0,-48.0,16,10.0">0</filter> 
+<filter type="grid" params="-48.0,13,-10.0,-42.0,16,-3.0">0</filter> 
+<filter type="grid" params="-48.0,13,-3.0,-42.0,16,3.0">0</filter> 
+<filter type="grid" params="-48.0,13,3.0,-42.0,16,10.0">0</filter> 
+<filter type="grid" params="-42.0,13,-10.0,-36.0,16,-3.0">0</filter> 
+<filter type="grid" params="-42.0,13,-3.0,-36.0,16,3.0">0</filter> 
+<filter type="grid" params="-42.0,13,3.0,-36.0,16,10.0">0</filter> 
+<filter type="grid" params="-36.0,13,-10.0,-30.0,16,-3.0">0</filter> 
+<filter type="grid" params="-36.0,13,-3.0,-30.0,16,3.0">0</filter> 
+<filter type="grid" params="-36.0,13,3.0,-30.0,16,10.0">0</filter> 
+<filter type="grid" params="-30.0,13,-10.0,-24.0,16,-3.0">0</filter> 
+<filter type="grid" params="-30.0,13,-3.0,-24.0,16,3.0">0</filter> 
+<filter type="grid" params="-30.0,13,3.0,-24.0,16,10.0">0</filter> 
+<filter type="grid" params="-24.0,13,-10.0,-18.0,16,-3.0">0</filter> 
+<filter type="grid" params="-24.0,13,-3.0,-18.0,16,3.0">0</filter> 
+<filter type="grid" params="-24.0,13,3.0,-18.0,16,10.0">0</filter> 
+<filter type="grid" params="-18.0,13,-10.0,-12.0,16,-3.0">0</filter> 
+<filter type="grid" params="-18.0,13,-3.0,-12.0,16,3.0">0</filter> 
+<filter type="grid" params="-18.0,13,3.0,-12.0,16,10.0">0</filter>  
+
+<filter type="grid" params="-48.0,10,-12.0,-42.0,16,-3.0">1</filter> 
+<filter type="grid" params="-48.0,10,-3.0,-42.0,16,3.0">1</filter> 
+<filter type="grid" params="-48.0,10,3.0,-42.0,16,12.0">1</filter> 
+<filter type="grid" params="-42.0,10,-12.0,-36.0,16,-3.0">1</filter> 
+<filter type="grid" params="-42.0,10,-3.0,-36.0,16,3.0">1</filter> 
+<filter type="grid" params="-42.0,10,3.0,-36.0,16,12.0">1</filter> 
+<filter type="grid" params="-36.0,10,-12.0,-30.0,16,-3.0">1</filter> 
+<filter type="grid" params="-36.0,10,-3.0,-30.0,16,3.0">1</filter> 
+<filter type="grid" params="-36.0,10,3.0,-30.0,16,12.0">1</filter> 
+<filter type="grid" params="-30.0,10,-12.0,-24.0,16,-3.0">1</filter> 
+<filter type="grid" params="-30.0,10,-3.0,-24.0,16,3.0">1</filter> 
+<filter type="grid" params="-30.0,10,3.0,-24.0,16,12.0">1</filter> 
+<filter type="grid" params="-24.0,10,-12.0,-18.0,16,-3.0">1</filter> 
+<filter type="grid" params="-24.0,10,-3.0,-18.0,16,3.0">1</filter> 
+<filter type="grid" params="-24.0,10,3.0,-18.0,16,12.0">1</filter> 
+<filter type="grid" params="-18.0,10,-12.0,-12.0,16,-3.0">1</filter> 
+<filter type="grid" params="-18.0,10,-3.0,-12.0,16,3.0">1</filter> 
+<filter type="grid" params="-18.0,10,3.0,-12.0,16,12.0">1</filter> 
+<filter type="grid" params="-12.0,10,-12.0,-6.0,16,-3.0">1</filter> 
+<filter type="grid" params="-12.0,10,-3.0,-6.0,16,3.0">1</filter> 
+<filter type="grid" params="-12.0,10,3.0,-6.0,16,12.0">1</filter> 
+<filter type="grid" params="-6.0,10,-3.0,0.0,16,3.0">1</filter> 
+    </chain>
+    <approachDirection>
+        <referenceLocation>0 0 0</referenceLocation>
+        <direction>0 0 1</direction>
+    </approachDirection>
+    <eigenGrasps>eigen/barrett_eigen.egr</eigenGrasps>
+    <flockOfBirds number="1">
+        <transform>
+            <translation>0.0 -60 -35</translation>
+            <rotation>90 z</rotation>
+            <rotation>30 y</rotation>
+        </transform>
+    </flockOfBirds>
+    <virtualContacts>virtual/all_16_contacts.vgr</virtualContacts>
+<tactile type="center" dim="162">
+	<sensor>0.0142622295285911 0.0161283156351357 0.0151064113386946 0.0332341049451282 0.000888612431687919 0.00422090905051761 0.000488736837428355 0.0248811480872617 0.00457635402319278 0.00315457413249211 0.00191051672812903 0.0195050428755498 0.00448749278002399 0.00137734926911628 0.00271026791664816 0.0100857510996579 0.00928599991113875 0.00706446883191895 0.00537610521171192 0.00142177989070067 0.0280801528413383 0.0216377127116008 0.0201715021993158 0.0161283156351358 0.00439863153685520 0.00337672724041409 0.0109743635313458 0.000355444972675168 0.000977473674856711 0.00493179899586795 0.000710889945350335 0.000755320566934731 0.000888612431687920 0.000622028702181543 0.00182165548496023 0.00199937797129782 0.000488736837428355 0.00191051672812903 0.00155507175545386 0.000533167459012752 0.00186608610654463 0.000666459323765940 0.000222153107921980 0.00182165548496023 0.000222153107921980 0.00706446883191896 0.00564268894121829 0.00657573199449061 0.00901941618163240 0.00595370329230906 0.00906384680321678 0.0119518372062025 0.00724219131825654 0.0114631003687742 0.0136402008264096 0.00622028702181544 0.0107522104234238 0.0171502199315769 0.00524281334695872 0.00866397120895721 0.0226596170080420 0.00359888034833607 0.00528724396854311 0.0314568800817524 0.00213266983605101 0.0138623539343315 0.0609143821922069 0.000977473674856711 0.0521615497400809 0.0807304394188475 0.0123072821788777 0.00519838272537432 0.0103079042075799 0.00510952148220554 0.00133291864753188 0.00470964588794598 0.00275469853823255 0.00146621051228507 0.000222153107921980 0.00364331096992047 0.00191051672812902 0.000755320566934731 0.00231039232238859 0.00199937797129782 0.000666459323765939 0.000311014351090772 0.00208823921446661 0.000133291864753188 0.00728662193984095 0.00311014351090772 0.00448749278002399 0.0113742391256054 0.00408761718576443 0.00728662193984094 0.00333229661882970 0.00133291864753188 0.00426533967210201 0.00231039232238859 0.00115519616119430 0.00359888034833608 0.00191051672812903 0.000844181810103523 0.00404318656418004 0.00493179899586795 0.00133291864753188 0.00573155018438708 0.00390989469942685 0.00159950237703826 0.00493179899586796 0.00102190429644111 0.000666459323765940 0.00146621051228507 0.0386990714000090 0.00226596170080420 0.0449637890434088 0 0.0249700093304306 0.0183498467143556 0.0243924112498334 0.000666459323765940 0.00204380859288221 0.000266583729506376 0.000488736837428356 0.00142177989070067 0.00111076553960990 0.00182165548496024 0.00217710045763541 0.000888612431687919 0.00159950237703825 0.00262140667347936 0.000622028702181543 0.000222153107921980 0.00204380859288222 0.000577598080597147 0.000622028702181543 0.00253254543031057 0.000399875594259564 0.00848624872261962 0.00644244012973742 0.00897498556004797 0.0110632247745146 0.00622028702181544 0.00968587550539832 0.0147509663660194 0.00861954058737283 0.0143955213933443 0.0135069089616564 0.00746434442617852 0.0148842582307726 0.0113298085040210 0.00484293775269916 0.0119962678277869 0.00657573199449061 0.00191051672812903 0.00608699515706224 0.00133291864753188 0.00151064113386946 0.00133291864753188 0.0528280090638468 0.00328786599724530 0.0482072244190697 0</sensor>
+</tactile>
+</robot>

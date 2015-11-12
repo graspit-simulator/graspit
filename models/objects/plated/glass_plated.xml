@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>300</mass>
+    <geometryFile type="Inventor">glass_plated.iv</geometryFile>
+</root>

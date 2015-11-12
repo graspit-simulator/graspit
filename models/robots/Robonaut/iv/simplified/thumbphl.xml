@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>metal</material>
+    <mass>100</mass>
+    <cog>-26.328 -4.0827 0.0</cog>
+    <inertia_matrix>57.51 -13.3 0 -13.3 249.54 0 0 0 237.07</inertia_matrix>
+    <geometryFile>thumbphl.iv</geometryFile>
+</root>

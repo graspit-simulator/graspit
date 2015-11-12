@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<root>
+
+    <material>plastic</material>
+
+    <mass>150</mass>
+
+    <geometryFile>seg1.wrl</geometryFile>
+
+    <youngs>1500000</youngs>
+</root>

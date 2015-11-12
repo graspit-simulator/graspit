@@ -1,0 +1,21 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 100
+#useFlockOfBirds 1
+
+Cube {width 30 height 20 depth 20}
+Separator {
+	Translation {
+		translation 5 0 -11
+	}
+	Cube{width 20 height 20 depth 2}
+}
+Separator {
+	Translation {
+		translation -20 0 -5
+	}
+	Rotation {
+		rotation 0 0 1 1.57
+	}
+	Cylinder {radius 3 height 10}
+}

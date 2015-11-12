@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<robot type="Robot">
+    <palm>fake.xml</palm>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+7</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>500.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+7</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>500.0</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+7</maxEffort>
+        <Kp>1.0e+7</Kp>
+        <Kd>1.0e+6</Kd>
+        <draggerScale>200.0</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <rotation>90 y</rotation>
+        </transform>
+        <joint type="Prismatic">
+            <theta>0</theta>
+            <d>d0</d>
+            <a>0</a>
+            <alpha>-90</alpha>
+            <minValue>0</minValue>
+            <maxValue>100000</maxValue>
+        </joint>
+        <joint type="Prismatic">
+            <theta>-90</theta>
+            <d>d1</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>100000</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>845</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-360</minValue>
+            <maxValue>360</maxValue>
+        </joint>
+        <link dynamicJointType="Ball">base.xml</link>
+    </chain>
+</robot>

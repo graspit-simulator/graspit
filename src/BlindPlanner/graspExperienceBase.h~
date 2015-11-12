@@ -1,0 +1,32 @@
+/*
+ * graspExperienceBase.h
+ *
+ *  Created on: Jun 11, 2011
+ *      Author: dang
+ */
+
+#ifndef GRASPEXPERIENCEBASE_H_
+#define GRASPEXPERIENCEBASE_H_
+
+#include <string>
+#include <vector>
+
+#include "graspExperienceEntry.h"
+
+class GraspExperienceBase
+{
+private:
+	//is the database loaded
+	bool mIsLoaded;
+
+	std::vector<GraspExperienceEntry> mGraspEntries;
+
+public:
+	GraspExperienceBase() : mIsLoaded(false){}
+	bool loadGraspExperienceBase(std::string path);
+	int getNumGrasps(){return mGraspEntries.size();}
+	std::vector<GraspExperienceEntry> getKNN(const GraspExperienceEntry& e);
+};
+
+
+#endif /* GRASPEXPERIENCEBASE_H_ */

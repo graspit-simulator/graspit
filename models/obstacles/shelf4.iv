@@ -1,0 +1,205 @@
+#Inventor V2.1 ascii
+Separator {
+    Separator {
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }
+    Separator {
+        Translation {
+	    translation 140 10 1010
+        }
+	DEF side Cube {
+            width	280
+	    height	20
+	    depth	2020
+	}
+    }
+    Separator {
+	Translation {
+	    translation 140 790 1010
+	}
+	USE side
+    }
+    Separator {
+	Translation {
+	    translation 269.5 400 1009.5
+        }
+	Cube {
+	    width	19
+	    height	762
+	    depth	2019
+	}
+    }
+    Separator {
+	Translation {
+	    translation	164.5 400 40.5
+	}
+	Cube {
+	    width	229	
+	    height	762
+	    depth	81
+	}
+    }		
+    Separator {
+	Translation {
+	    translation 142 400 100
+	}
+        Cube {
+	    width	274
+	    height	762
+	    depth	40
+        }
+    }
+    Separator {
+        Translation {
+	    translation 142 400 437.5
+	}
+	DEF plate Separator {
+	    Cube {
+		width	274
+		height	762
+		depth	15
+	    }
+        }
+    }
+    Separator {
+        Translation {
+	    translation 142 400 727.5
+        }
+	USE plate
+    }
+    Separator {
+        Translation {
+	    translation 142 400 1047.5
+	}
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 142 400 1397.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 142 400 1687.5
+        }
+	USE plate
+    }
+    Separator {
+	Translation {
+	    translation 139.5 400 2010
+        }
+	Cube {
+	    width	279
+	    height	762
+	    depth	20
+	}
+    }
+    Separator {
+	Translation {
+	    translation -9.5 24.5 1042.5
+	}
+	DEF vertDoorStrip Cube {
+	    width	21
+	    height	43
+	    depth	1935
+	}
+    }
+    Separator {
+	Translation {
+	    translation -9.5 378.5 1042.5
+	}
+	USE vertDoorStrip
+    }
+    Separator {
+	Translation {
+	    translation -9.5 421.5 1042.5
+	}
+	USE vertDoorStrip
+    }
+    Separator {
+	Translation {
+	    translation -9.5 774.5 1042.5
+	}
+	USE vertDoorStrip
+    }
+    Separator {
+	Translation {
+	    translation -9 202 95
+	}
+	DEF horizDoorStrip Cube {
+	    width	20
+	    height	396
+	    depth	40
+	}
+    }
+    Separator {
+	Translation {
+	    translation -9 202 1990
+	}
+	USE horizDoorStrip
+    }
+    Separator {
+	Translation {
+	    translation -9 598 95
+	}
+	USE horizDoorStrip
+    }
+    Separator {
+	Translation {
+	    translation -9 598 1990
+	}
+	USE horizDoorStrip
+    }
+    Separator {
+	Translation {
+	    translation -27 377 1030
+	}
+	DEF doorKnob Separator {
+	    Transform {
+		rotation	0 0 1 1.570796
+	    }
+	    Cylinder {
+		radius	10
+	        height  16
+	    }
+	    Translation {
+	        translation	0 16 0
+	    }
+	    Cylinder {
+		radius 20
+		height 16
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation -27 423 1030
+	}
+	USE doorKnob
+    }
+    }
+    Material {
+	transparency 0.85
+	shininess 0.6
+    }
+    Separator {
+	Translation {
+	    translation -8 202 1042.5
+	}
+	DEF glassDoor Cube {
+	    width	14
+	    height	312
+	    depth	1857
+	}
+    }
+    Separator {
+	Translation {
+	    translation -8 598 1042.5
+	}
+	USE glassDoor
+    }
+}
+
+

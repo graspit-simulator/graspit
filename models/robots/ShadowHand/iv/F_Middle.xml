@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>100</mass>
+    <geometryFile>F_Middle.iv</geometryFile>
+</root>

@@ -1,0 +1,47 @@
+/*
+ * graspExperienceBase.cpp
+ *
+ *  Created on: Jun 11, 2011
+ *      Author: dang
+ */
+#include "graspExperienceBase.h"
+
+#include <iostream>
+#include <fstream>
+
+
+bool GraspExperienceBase::loadGraspExperienceBase(std::string path)
+{
+	std::ifstream file(path.c_str());
+	if(!file.is_open())
+	{
+		std::cout << "File not found: " << path << std::endl;
+		return false;
+	}
+
+	int numGrasps;
+	std::string line;
+	//file opened
+	getline(file, line);
+	sscanf(line.c_str(), "%d", &numGrasps);
+	std::cout << "in total there are " << numGrasps << std::endl;
+
+	for(int i = 0; i < numGrasps; ++i)
+	{
+		getline(file, line);
+		std::cout << "line is: " << line << std::endl;
+		mGraspEntries.push_back(GraspExperienceEntry(line.c_str()));
+	}
+
+	file.close();
+
+	std::cout << "loaded: " << getNumGrasps() << " entries" << std::endl;
+	return true;
+}
+
+std::vector<GraspExperienceEntry> GraspExperienceBase::getKNN(const GraspExperienceEntry& e)
+{
+	std::vector<GraspExperienceEntry> nn;
+
+	return nn;
+}

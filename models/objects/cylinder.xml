@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>rubber</material>
+	<mass>440</mass>
+	<cog>0 0 0</cog>
+	<youngs> 15000 </youngs>
+	<geometryFile type="Inventor">cylinder.iv</geometryFile>
+</root>

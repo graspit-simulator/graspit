@@ -1,0 +1,18 @@
+#Inventor V2.1 ascii
+#material plastic
+#youngs 1500000
+#mass 100
+#cog 0 0 0
+
+Separator { # Body
+	  Transform { translation 0 0 0 }
+	  Material { # A bronze color:
+	  ambientColor .33 .22 .27
+	  diffuseColor .78 .57 .11
+          specularColor .99 .94 .81
+          shininess .28
+	  transparency .6
+	  }
+	  Sphere { radius 8 }
+}
+

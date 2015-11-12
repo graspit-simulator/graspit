@@ -1,0 +1,71 @@
+GraspIt!
+Copyright (C) 2002-2007, Columbia University in the City of New York.
+All rights reserved.
+
+Where noted, program files are covered by the license
+below.  Several other software packages and source files
+have been included in this distribution and, according to their
+own licenses, are either free for all uses or free for 
+non-commercial use.  Please see PQP-VCOLLIDE/*, qhull/*, and
+src/maxdet_src.cpp for information on those packages.
+
+
+                RESEARCH AND EDUCATIONAL USE LICENSE
+
+("Licensee"), and Columbia University in the City of New York
+("Columbia"), regarding current and future versions of software
+produced by the Robotics Lab. License includes all programs, code,
+examples, manuals and other documentation included in the release that
+are not covered by a separate license (collectively, "the
+Software"). Licensee may modify the Software, to make repairs,
+reorganizations, enhancements, extensions, ports, integrations with
+other systems, or add, remove or modify code or documentation
+(collectively, "the Derivatives");
+
+1. Licensee agrees that the Software and the Derivatives will be used
+solely for non-commercial research or educational purposes. Licensee
+is not permitted to sell, lease, distribute, transfer, sublicense, or
+otherwise dispose of the Software and the Derivatives, in whole or in
+part, for any form of actual or potential commercial gain or
+consideration;
+
+2. Copyright of the Software is and will remain with The Trustees of
+Columbia University in the City of New York and/or its employees,
+consultants and students, and shall at no point transfer to
+Licensee. Any copyright notices on the Software shall be included on
+all copies of the Derivatives, or any parts or portions thereof, in
+any form, manner or substance, which are produced by the Licensee
+including but not limited to incorporation of the Software into any
+other program, technical data, documentation, firmware, or other
+information of the like kind, type or quality;
+
+3. Licensee acknowledges that the Software is being supplied in an "as
+is" condition without any support services or future updates or
+releases. Columbia may or may not make future updates and releases
+available to Licensee under this same or another licensing agreement,
+but Columbia is in no way obligated to do so. If Licensee discovers
+any defects or limitations in the Software, Licensee is encouraged to
+inform Columbia by sending electronic mail to
+amiller@cs.columbia.edu. Columbia will not necessarily acknowledge
+any reports or make any requested changes to the Software;
+
+4. Columbia makes no guarantees, warranties or representations of any
+kind, either express or implied. Furthermore, Columbia disclaims and
+Licensee waives and excludes any and all warranties of merchantability
+and any and all warranties of fitness for any particular
+purpose. Licensee agrees that neither Columbia nor its future, current
+or former personnel, including but not limited to employees,
+consultants and students, shall be held to any liability with respect
+to any claim by Licensee or a third party arising from or on account
+of the use of the Software or the Derivatives, regardless of the form
+of action; whether in contract or tort, including negligence. In no
+event will Columbia be liable for consequential or incidental damages
+of any nature whatsoever;
+
+5. Licensee will guarantee that all actual or potential users of the
+Software, and all actual or potential producers of the Derivatives,
+within Licensee organization, or in organizations who have obtained or
+may obtain the Software or the Derivatives from Licensee, are aware of
+this agreement and of the terms for using the Software and producing
+Derivatives.
+

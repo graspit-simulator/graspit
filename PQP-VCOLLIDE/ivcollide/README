@@ -1,0 +1,93 @@
+Legal stuff first:
+Copyright 1998, Massachusetts Institute of Technology.  All Rights Reserved.
+
+The software may be used for research and educational purposes only and
+LICENSEE agrees that the Program shall not be used as the basis of a
+commercial software or hardware product.
+
+LICENSEE acknowledges that title to the COPYRIGHTS shall remain with
+M.I.T. and that any copies of the software and related documentation, or
+portions thereof, made by LICENSEE  hereunder, shall include an M.I.T.
+copyright notice thereon in either of the following forms: "Copyright
+199_, Massachusetts Institute of Technology.  All Rights Reserved." or "©
+199_, M.I.T.  All Rights Reserved."  The notice shall be affixed to all
+copies or portions thereof in such manner and location as to give
+reasonable notice of M.I.T.'s claim of copyright.  LICENSEE shall at all
+times hereafter protect the COPYRIGHTS
+
+LICENSEE accepts the program on an "AS IS' basis.
+M.I.T., its trustees, directors, officers, employees and affiliates MAKE
+NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EITHER EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND VALIDITY OF THE COPYRIGHTS.  NOTHING
+IN THIS AGREEMENT SHALL BE CONSTRUED AS A REPRESENTATION MADE OR WARRANTY
+GIVEN BY M.I.T. THAT THE PRACTICE BY LICENSEE OF THE LICENSE GRANTED
+HEREUNDER SHALL NOT INFRINGE THE INTELLECTUAL PROPERTY RIGHTS OF ANY THIRD
+PARTY.  FURTHERMORE, M.I.T. EXTENDS NO WARRANTIES OF ANY KIND AS TO
+PROGRAM CONFORMITY WITH WHATEVER USER MANUALS OR OTHER LITERATURE MAY BE
+ISSUED FROM TIME TO TIME. IN NO EVENT SHALL M.I.T., ITS TRUSTEES,
+DIRECTORS, OFFICERS, EMPLOYEES AND AFFILIATES BE LIABLE FOR INCIDENTAL OR
+CONSEQUENTIAL DAMAGES OF ANY KIND, INCLUDING ECONOMIC DAMAGE OR INJURY TO
+PROPERTY AND LOST PROFITS, REGARDLESS OF WHETHER M.I.T. SHALL BE ADVISED,
+SHALL HAVE OTHER REASON TO KNOW, OR IN FACT SHALL KNOW OF THE POSSIBILITY
+OF THE FOREGOING.
+
+*******************************************************************************
+
+Questions? Comments? Bugs?
+Send email to David Manowitz
+manowitz@mit.edu, manowitz@alum.mit.edu after 6/1999
+
+*******************************************************************************
+
+
+This README is for ivcollide.  Ivcollide is a package for easily using Open
+Inventor objects with the VCOLLIDE collision detection system.
+IVCOLLIDE SUPPORTS C++ ONLY!  THERE IS NO C INTERFACE TO IVCOLLIDE!
+
+Note: ivcollide assumes that it is in a directory parallel to the root of the
+VCOLLIDE directories.  That is, whichever directory has the main VCOLLIDE
+directory as a subdirectory should also have ivcollide as a subdirectory.  This
+can be changed by modifying the appropriate include and Makefile references.
+
+There is a sample SGI Makefile included.  It should work fine on any machine
+running IRIX 5.3 or higher.  For other machines or other OS's, the Makefile
+will have to be modified appropriately.  Also if ivcollide is moved into a
+different directory than what it expects, the Makefile will need to be
+modified.
+
+
+The public interface to ivcollide is through 2 methods.  To create a new
+ivcollide object, just use the new command:
+
+ivcollide* ivcol = new ivcollide();
+
+This also creates a new VCOLLIDE object, which is available through the public
+vc member of ivcollide.
+
+To add a new Inventor object to the VCOLLIDE database, use the AddInventorObj
+method, as follows:
+
+SoInput sceneInput;
+SoSeparator *scene;
+if (sceneInput.openFile("foo.iv")) {
+  scene = SoDB::readAll(&sceneInput);
+  scene->ref();  
+}
+int foo_id = ivcol->addInventorObj(scene);
+
+This method adds the Inventor object rooted at the given node to the VCOLLIDE
+database and returns the objects assigned VCOLLIDE id.
+
+To change an object's position, use the updateTransform method as follows:
+
+SoTransform* fooxf = new SoTransform;
+fooxf->translation = SbVec3f(1.0f, 0.0f, 0.0f);
+ivcol->updateTransform(fooxf, foo_id);
+
+This method changes the Transform associated with the object with the id given
+to the method.
+
+These methods handle all the conversion necessary between the Inventor and
+VCOLLIDE formats, and all the normal VCOLLIDE functions are still available
+through the vc member of ivcollide. 

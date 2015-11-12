@@ -1,0 +1,73 @@
+#Inventor V2.1 ascii
+
+Separator {
+	
+	SoScale{
+		scaleFactor 5 5 5
+	}
+	Font {
+		name "Arial"
+		size  5
+	}
+	Separator {
+		Material {
+			diffuseColor 1 0 0
+		}
+		Cube {
+			width 35
+			depth 1
+			height 1
+		}
+		Transform {
+			translation 20 0 0 
+			rotation 1 0 0 1.57
+			
+		}
+		Text3 {
+			string "X"
+			parts ALL
+		}
+	}
+
+	Separator {
+		Material {
+			diffuseColor 0 1 0 
+		}
+		Cube {
+			width 1
+			depth 1
+			height 35
+		}
+		Transform {
+			translation 0 20  0
+			rotation 1 0 0 1.57
+		}
+		Text3 {
+			 string "Y"
+			parts ALL
+		}
+	}
+
+	Separator {
+		Material {
+			diffuseColor 0 0 1
+		}
+		Cube {
+			width 1
+			depth 35
+			height 1
+		}
+		Transform {
+			translation 0 0 20 
+			rotation 1 0 0 1.57
+		}
+		Text3 {
+			string "Z"
+			parts ALL
+		}
+	}
+}
+	
+
+	
+	

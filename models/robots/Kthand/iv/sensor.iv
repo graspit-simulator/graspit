@@ -1,0 +1,60 @@
+#Inventor V2.0 ascii
+#rubber
+#1
+
+Separator {
+   # Sensor - Pad
+   Material {
+      ambientColor    1  0  0
+      #        diffuseColor    0 0 0
+      #        specularColor   0.151515 0.151515 0.151515
+      diffuseColor    1  0  0
+      specularColor   1  0  0
+      shininess       1
+      transparency    0
+   }
+   Separator {
+      Transform {
+	 #                   along normal side
+	 translation         10    5.7    0    # 1+4.5
+	 rotation            1     0      0   0
+	 scaleFactor         1     1      1
+	 scaleOrientation    0     0      1   0
+	 center              0     0      0
+      }
+      Cube {
+	 width  20 # length
+	 height  2 # thickness/normal
+	 depth   5 # width
+      }
+   }
+   
+   #Sensor - Tip
+   Material {
+      ambientColor    1  0  0
+      #        diffuseColor    0 0 0
+      #        specularColor   0.151515 0.151515 0.151515
+      diffuseColor    1  0  0
+      specularColor   1  0  0
+      shininess       1
+      transparency    0
+   }
+   Separator {
+      MatrixTransform {
+	 matrix
+	 # 17 degrees around X
+	 # (1:3,1:3) rotation matrix
+	 # (1:3,4) translation
+	 # Using home made fcn eulerZYXToRot.m tom compute the rotation matrix
+	 0.9563   -0.2924  0        0
+	 0.2924    0.9563  0        0
+	 0         0       1.0000   0
+	 25.20000  4.20000 0.000000 1.000000
+      }
+      Cube {
+	 width  10.6 # length
+	 height  2 # thickness/normal
+	 depth   5 # width
+      }
+   }
+}

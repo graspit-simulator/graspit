@@ -1,0 +1,13 @@
+#GraspIt! version 2.0 beta
+GraspableBody
+models/objects/flask.iv
+T (+0.521566 +0.83541 +0.0918163 +0.147065)[+135.378 -3.41013 +176.507]
+
+Robot
+models/robots/Robonaut/Robonaut.cfg
+-1.0472 0 0 0 0 0 0 0 0 0 0 0 0 0 
+T (+1 0 0 0)[0 0 0]
+
+CameraFull
++512.727 +11.2119 +92.4714 +0.494626 +0.482173 +0.511852 +0.510746 +501
+

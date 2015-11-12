@@ -1,0 +1,324 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>carpo-2.xml</palm>
+    <dof type="r">
+        <defaultVelocity>-0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>-0.1</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.1</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.75</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+9</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>15</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>0 -60.488 30</translation>
+            <rotation>-90 y</rotation>
+            <rotation>-45 z</rotation>
+            <rotation>-45 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>43</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>48</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2*.667</theta>
+            <d>0</d>
+            <a>38</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>60</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">jmfp-polegar3.xml</link>
+        <link dynamicJointType="Revolute">metacarpo-polegar3.xml</link>
+        <link dynamicJointType="Revolute">falange-proximal-polegar3.xml</link>
+        <link dynamicJointType="Revolute">falange-distal-polegar3.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 -42 98.727</translation>
+            <rotation>-90 y</rotation>
+            <rotation>-10 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d4</theta>
+            <d>0</d>
+            <a>45</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>35</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5*.667</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>-0</alpha>
+            <minValue>0</minValue>
+            <maxValue>60</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">jmfp-indicador3.xml</link>
+        <link dynamicJointType="Revolute">falange-proximal-indicador3.xml</link>
+        <link dynamicJointType="Revolute">falange-medial-indicador3.xml</link>
+        <link dynamicJointType="Revolute">falange-distal-indicador3.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 -13 104</translation>
+            <rotation>-90 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d6</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d7</theta>
+            <d>0</d>
+            <a>48</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d8</theta>
+            <d>0</d>
+            <a>42</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d8*.667</theta>
+            <d>0</d>
+            <a>32</a>
+            <alpha>-0</alpha>
+            <minValue>0</minValue>
+            <maxValue>60</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">jmfp-medio3.xml</link>
+        <link dynamicJointType="Revolute">falange-proximal-m_dio.xml</link>
+        <link dynamicJointType="Revolute">falange-medial-m_dio.xml</link>
+        <link dynamicJointType="Revolute">falange-distal-m_dio.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 15.533 96.779</translation>
+            <rotation>-90 y</rotation>
+            <rotation>10 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d9</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d10</theta>
+            <d>0</d>
+            <a>45</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d11</theta>
+            <d>0</d>
+            <a>36</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d11*.667</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>-0</alpha>
+            <minValue>0</minValue>
+            <maxValue>60</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">jmfp-anular3.xml</link>
+        <link dynamicJointType="Revolute">falange-proximal-anular.xml</link>
+        <link dynamicJointType="Revolute">falange-medial-anular.xml</link>
+        <link dynamicJointType="Revolute">falange-distal-anular.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 37.144 77.597</translation>
+            <rotation>-90 y</rotation>
+            <rotation>20 z</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d12</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d13</theta>
+            <d>0</d>
+            <a>36</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d14</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d14*.667</theta>
+            <d>0</d>
+            <a>28</a>
+            <alpha>-0</alpha>
+            <minValue>0</minValue>
+            <maxValue>60</maxValue>
+        </joint>
+        <link dynamicJointType="Revolute">jmfp-minimo3.xml</link>
+        <link dynamicJointType="Revolute">falange-proximal-m_nimo.xml</link>
+        <link dynamicJointType="Revolute">falange-medial-m_nimo.xml</link>
+        <link dynamicJointType="Revolute">falange-distal-m_nimo.xml</link>
+    </chain>
+</robot>

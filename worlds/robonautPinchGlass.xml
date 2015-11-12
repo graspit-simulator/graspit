@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<world>
+    <graspableBody>
+        <filename>models/objects/smallGlass.xml</filename>
+        <transform>
+            <fullTransform>(0.92684 -0.00166247 0.0173229 -0.375052)[600.359 -5.33887 -53.8569]</fullTransform>
+        </transform>
+    </graspableBody>
+    <obstacle>
+        <filename>models/obstacles/corner_table.xml</filename>
+        <transform>
+            <fullTransform>(1 0 0 0)[374.667 -281.975 -533.891]</fullTransform>
+        </transform>
+    </obstacle>
+    <robot>
+        <filename>models/robots/SimpleArm/SimpleArm.xml</filename>
+        <dofValues>0.00498839 0.00498483</dofValues>
+        <transform>
+            <fullTransform>(0.707107 0.707107 1.31297e-15 -2.20753e-15)[-1.30116e-06 8.65098e-07 -4.40498e-14]</fullTransform>
+        </transform>
+    </robot>
+    <robot>
+        <filename>models/robots/Robonaut/Robonaut_pinch.xml</filename>
+        <dofValues>-1.04186 0.490678 0.259463 -0.00654366 0.351337 0.451163 0.0318671 0.923418 0.450417 0.467001 0.428995 0.466927 0.231037</dofValues>
+        <transform>
+            <fullTransform>(-0.00249241 0.999994 6.21556e-06 0.00249419)[521.996 9.6341e-07 1.4566]</fullTransform>
+        </transform>
+    </robot>
+    <connection>
+        <parentRobot>0</parentRobot>
+        <parentChain>0</parentChain>
+        <childRobot>1</childRobot>
+        <mountFilename>models/robots/Robonaut/iv/simplified/mount.xml</mountFilename>
+        <transform>
+            <fullTransform>(0.707107 0 -0.707107 0)[0 0 45]</fullTransform>
+        </transform>
+    </connection>
+</world>

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <mass>200</mass>
+    <cog>0 0 0</cog>
+    <youngs>1500000</youngs>
+    <geometryFile type="Inventor">finger_link_pad.iv</geometryFile>
+</root>

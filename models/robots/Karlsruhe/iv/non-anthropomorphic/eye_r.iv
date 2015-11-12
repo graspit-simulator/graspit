@@ -1,0 +1,11 @@
+#Inventor V2.1 ascii
+Separator { #Model
+Transform {
+translation 0 0 0
+rotation 0 0 1 3.14
+}
+File { 
+  name "armar/eyes/eye.iv"
+ # name "armar/eyes/eye_with_4m_ray.iv"
+}
+} #Model

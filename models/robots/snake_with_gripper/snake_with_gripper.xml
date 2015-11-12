@@ -1,0 +1,159 @@
+<?xml version="1.0" ?>
+<robot type="Snake">
+  <palm>sphere.xml</palm>
+  <!-- DOF0, snake base rotate -->
+  <dof type="r">
+    <defaultVelocity>0.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <dof type="r">
+    <!-- DOF1, snake transition between base to bend -->
+    <defaultVelocity>1.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <dof type="r">
+    <!-- DOF2, snake bend -->
+    <defaultVelocity>0.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <dof type="r">
+    <!-- DOF3, connection dof -->
+    <defaultVelocity>0.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <dof type="r">
+    <!-- DOF4, rotate base of the gripper -->
+    <defaultVelocity>0.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <dof type="r">
+    <!-- DOF5, gripper DOF -->
+    <defaultVelocity>-1.0</defaultVelocity>
+    <maxEffort>5.0e+7</maxEffort>
+    <Kp>1.0e+7</Kp>
+    <Kd>1.0e+6</Kd>
+    <draggerScale>20.0</draggerScale>
+  </dof>
+  <chain>
+    <transform>
+      <translation>0 0 0</translation>
+      <rotation>0 y</rotation>
+    </transform>
+    <joint type="Revolute">
+      <theta>d0-90</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>-90</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+    </joint>
+    <joint type="Revolute">
+      <theta>d1+90</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>90</alpha>
+      <minValue>0</minValue>
+      <maxValue>0</maxValue>
+    </joint>
+    <joint type="Snake">
+      <theta>d2</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <joint type="Snake">
+      <theta>d2</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <joint type="Snake">
+      <theta>d2</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <joint type="Snake">
+      <theta>d2</theta>
+      <d>0</d>
+      <a>50</a>
+      <alpha>0</alpha>
+      <minValue>-360</minValue>
+      <maxValue>360</maxValue>
+      <snakeLength>200</snakeLength>
+      <snakeLinks>4</snakeLinks>
+    </joint>
+    <!-- a connection between the last snake joint to the base of the gripper, should be fixed -->
+    <joint type="Revolute">
+      <theta>d3+-90</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>-90</alpha>
+      <minValue>0</minValue>
+      <maxValue>0</maxValue>
+    </joint>
+    <!-- base rotate DOF -->
+    <joint type="Revolute">
+      <theta>d4</theta>
+      <d>21.336</d>
+      <a>-10.7442</a>
+      <alpha>-90</alpha>
+      <minValue>-180</minValue>
+      <maxValue>180</maxValue>
+    </joint>
+    <!-- gripper DOF -->
+    <joint type="Revolute">
+      <theta>d5</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>0</alpha>
+      <minValue>0.5</minValue>
+      <maxValue>45</maxValue>
+    </joint>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute">snakeunit.xml</link>
+    <link dynamicJointType="Revolute" collisionRule="Off">faux.xml</link>
+    <link dynamicJointType="Revolute">fixed_jaw.xml</link>
+    <link dynamicJointType="Revolute">rotating_jaw.xml</link>
+  </chain>
+  - <approachDirection>
+    <referenceLocation>0.0 0.0 0.0</referenceLocation>
+    <direction>0.0 0.0 -1.0</direction>
+  </approachDirection>
+  <virtualContacts>virtual/gripper.vgr</virtualContacts>
+</robot>

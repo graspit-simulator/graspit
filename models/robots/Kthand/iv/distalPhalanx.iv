@@ -1,0 +1,111 @@
+#Inventor V2.0 ascii
+#plastic
+#2.30
+
+Separator {
+   Separator {
+      #Translation {
+      #   translation   0 0 -9.7
+      #   }
+      File {name "distalSens.iv"}
+   }
+
+   Separator {
+      Material {
+         ambientColor	0  1  0
+         diffuseColor	0  1  0
+         specularColor	0  1  0
+         transparency  0.2
+      }
+      Translation {
+	 translation	-26.5  0  -7.65
+      }
+      
+      ShapeHints {
+	 vertexOrdering  CLOCKWISE
+	 shapeType  SOLID
+      }
+
+      Coordinate3 {
+	 point [
+
+	  #The Points 
+	  #1- 0    0    0
+	  #2- 0    0    15.3
+	  #3- 26.5   0    15.3
+	  #4- 26.5   0    0
+	  #5- 3.1   6.7   0
+	  #6- 3.1   6.7   15.3
+	  #7- 26.5   3.0   15.3
+	  #8- 26.5   3.0   0
+
+	  #Triangles that makes up the surfaces
+
+	  #123
+	  0    0    0
+	  0    0    15.3
+	  26.5   0    15.3
+
+	  #16.7
+	  0    0    0
+	  26.5   0    15.3
+	  26.5   0    0
+
+	  #765
+	  26.5   3.0   15.3
+	  3.1   6.7   15.3
+	  3.1   6.7   0
+
+	  #3.126.5
+	  26.5   3.0   0
+	  26.5   3.0   15.3
+	  3.1   6.7   0
+
+	  #3.15
+	  0    0    0
+	  26.5   0    0
+	  26.5   3.0   0
+
+	  #3.05
+	  0    0    0
+	  26.5   3.0   0
+	  3.1   6.7   0
+
+	  #326
+	  26.5   0    15.3
+	  0    0    15.3
+	  3.1   6.7   15.3
+
+	  #367
+	  26.5   0    15.3
+	  3.1   6.7   15.3
+	  26.5   3.0   15.3
+
+	  #437
+	  26.5   0    0
+	  26.5   0    15.3
+	  26.5   3.0   15.3
+
+	  #73.14
+	  26.5   3.0   15.3
+	  26.5   3.0   0
+	  26.5   0    0
+
+	  #3.16
+	  0    0    0
+	  3.1   6.7   0
+	  3.1   6.7   15.3
+
+	  #3.16
+	  0    0    15.3
+	  0    0    0
+	  3.1   6.7   15.3
+         ]
+      }
+      FaceSet {
+	 numVertices [ 
+	  3,3,3,3,3,3,3,3,3,3,3,3
+	 ]
+      }
+   }
+}

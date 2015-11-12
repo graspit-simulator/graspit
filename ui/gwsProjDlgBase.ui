@@ -1,0 +1,237 @@
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>GWSProjDlgBase</class>
+  <widget class="QDialog" name="GWSProjDlgBase" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>419</width>
+        <height>179</height>
+      </rect>
+    </property>
+    <property name="sizePolicy" >
+      <sizepolicy>
+        <hsizetype>5</hsizetype>
+        <vsizetype>5</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+      </sizepolicy>
+    </property>
+    <property name="windowTitle" >
+      <string>Create GWS Projection</string>
+    </property>
+    <layout class="QVBoxLayout" >
+      <property name="margin" >
+        <number>11</number>
+      </property>
+      <property name="spacing" >
+        <number>6</number>
+      </property>
+      <item>
+        <layout class="QHBoxLayout" >
+          <property name="margin" >
+            <number>0</number>
+          </property>
+          <property name="spacing" >
+            <number>6</number>
+          </property>
+          <item>
+            <widget class="QLabel" name="TextLabel1" >
+              <property name="text" >
+                <string>Limit unit GWS using</string>
+              </property>
+              <property name="alignment" >
+                <set>Qt::AlignVCenter|Qt::AlignRight</set>
+              </property>
+              <property name="wordWrap" >
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QComboBox" name="gwsTypeComboBox" />
+          </item>
+        </layout>
+      </item>
+      <item>
+        <layout class="QGridLayout" >
+          <property name="margin" >
+            <number>0</number>
+          </property>
+          <property name="spacing" >
+            <number>6</number>
+          </property>
+          <item row="1" column="1" >
+            <widget class="QCheckBox" name="fyCheckBox" >
+              <property name="text" >
+                <string>fy</string>
+              </property>
+            </widget>
+          </item>
+          <item rowspan="1" row="0" column="0" colspan="6" >
+            <layout class="QHBoxLayout" >
+              <property name="margin" >
+                <number>0</number>
+              </property>
+              <property name="spacing" >
+                <number>6</number>
+              </property>
+              <item>
+                <widget class="QLineEdit" name="fxCoord" >
+                  <property name="text" >
+                    <string>0.00</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="fyCoord" >
+                  <property name="text" >
+                    <string>0.00</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="fzCoord" >
+                  <property name="text" >
+                    <string>0.00</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="txCoord" >
+                  <property name="text" >
+                    <string>0.00</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="tyCoord" >
+                  <property name="text" >
+                    <string>0.00</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLineEdit" name="tzCoord" >
+                  <property name="text" >
+                    <string>0.00</string>
+                  </property>
+                </widget>
+              </item>
+            </layout>
+          </item>
+          <item row="1" column="5" >
+            <widget class="QCheckBox" name="tzCheckBox" >
+              <property name="text" >
+                <string>tz</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="0" >
+            <widget class="QCheckBox" name="fxCheckBox" >
+              <property name="text" >
+                <string>fx</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="3" >
+            <widget class="QCheckBox" name="txCheckBox" >
+              <property name="text" >
+                <string>tx</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="2" >
+            <widget class="QCheckBox" name="fzCheckBox" >
+              <property name="text" >
+                <string>fz</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="4" >
+            <widget class="QCheckBox" name="tyCheckBox" >
+              <property name="text" >
+                <string>ty</string>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+      <item>
+        <widget class="QLabel" name="TextLabel2" >
+          <property name="text" >
+            <string>Select which 3 values are fixed</string>
+          </property>
+          <property name="alignment" >
+            <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap" >
+            <bool>false</bool>
+          </property>
+        </widget>
+      </item>
+      <item>
+        <layout class="QHBoxLayout" >
+          <property name="margin" >
+            <number>0</number>
+          </property>
+          <property name="spacing" >
+            <number>6</number>
+          </property>
+          <item>
+            <spacer name="Spacer1" >
+              <property name="sizeHint" >
+                <size>
+                  <width>20</width>
+                  <height>20</height>
+                </size>
+              </property>
+              <property name="sizeType" >
+                <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+          <item>
+            <widget class="QPushButton" name="OKButton" >
+              <property name="text" >
+                <string>OK</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="CancelButton" >
+              <property name="text" >
+                <string>Cancel</string>
+              </property>
+              <property name="autoDefault" >
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+  <connections>
+    <connection>
+      <sender>OKButton</sender>
+      <signal>clicked()</signal>
+      <receiver>GWSProjDlgBase</receiver>
+      <slot>accept()</slot>
+    </connection>
+    <connection>
+      <sender>CancelButton</sender>
+      <signal>clicked()</signal>
+      <receiver>GWSProjDlgBase</receiver>
+      <slot>reject()</slot>
+    </connection>
+  </connections>
+</ui>

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>1000</mass>
+    <geometryFile>link1.wrl</geometryFile>
+    <youngs>1500000</youngs>
+</root>

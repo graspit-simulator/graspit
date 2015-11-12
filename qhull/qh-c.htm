@@ -1,0 +1,2263 @@
+<!-- Do not edit with Front Page, it adds too many spaces -->
+<html>
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>Qhull functions, macros, and data structures</title>
+</head>
+
+<body>
+<!-- Navigation links -->
+<p><a name="TOP"><b>Up:</b></a> <a
+href="http://www.geom.umn.edu/locate/qhull">Home page for Qhull</a>
+<br>
+<b>Up:</b> <a href="qh-man.htm#TOC">Qhull manual: Table of Contents</a> <br>
+<b>Up:</b> <a href="qh-opt.htm#TOC">Qhull options: Table of Contents</a> <br>
+<b>Up:</b> <a href="qh-in.htm#TOC">Qhull internals: Table of Contents</a> <br>
+<br>
+<b>To:</b> <a href="#files">Qhull files</a> (please wait while loading)<br>
+<b>To:</b> <a href="#geom2">Geom</a> &#149; <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; <a href="#poly2">Poly</a>
+&#149; <a href="#qhull2">Qhull</a> &#149; <a href="#set2">Set</a>
+&#149; <a href="#stat2">Stat</a> &#149; <a href="#user2">User</a>
+</p>
+
+<hr>
+<!-- Main text of document. -->
+
+<h1>Qhull functions, macros, and data structures</h1>
+
+<p>The following sections provide an overview and index to
+Qhull's functions, macros, and data structures. </p>
+
+<p>Each section starts with an introduction. </p>
+
+<p>Qhull uses the following conventions:</p>
+
+<ul>
+<li>in code, global variables start with &quot;qh &quot;
+<li>in documentation, global variables start with 'qh.'
+<li>constants start with an upper case word
+<li>important globals include an '_'
+<li>functions, macros, and constants start with &quot;qh_&quot;</li>
+<li>data types end in &quot;T&quot;</li>
+<li>macros with arguments end in &quot;_&quot;</li>
+<li>iterators are macros that use local variables</li>
+<li>iterators for sets start with &quot;FOREACH&quot;</li>
+<li>iterators for lists start with &quot;FORALL&quot;</li>
+<li>qhull options are in single quotes (e.g., 'Pdn')</li>
+<li>lists are sorted alphabetically</li>
+<li>preprocessor directives on left margin for older compilers</li>
+</ul>
+<p>
+When reading the code, please note that the 
+global data structure, 'qh', is a macro.  It
+either expands to &quot;qh_qh.&quot; or to
+&quot;qh_qh-&gt;&quot;. The later is used for
+applications which run concurrent calls to qh_qhull().
+<p>
+When reading code with an editor, a search for <i>"procedure</i> will
+locate the header of <i>qh_procedure</i>.  A search for <i>* procedure</i>
+will locate the tail of <i>qh_procedure</i>.
+
+<p>Please use a web browser that loads .c and .h files.  Netscape works well.
+Unfortunately, Internet Explorer uses notepad.exe for .c and .h
+files.</p>
+<p>
+Please report documentation and link errors  
+to <a href="mailto:qhull-bug@geom.umn.edu">qhull-bug@geom.umn.edu</a>.
+If you have a program that checks internal links ("#..."), please send
+the results of running the program on qhull.
+<p>
+<i>Brad Barber, Cambridge MA, January 8, 1998</i>
+
+<p><b>Copyright © 1997-1998 The Geometry Center, Minneapolis MN</b></p>
+
+<hr>
+
+<h2><a href="#TOP">»</a><a name="files">Qhull files</a> </h2>
+
+<p>This sections lists the .c and .h files for Qhull. Please
+refer to these files for detailed information.</p>
+
+<dl>
+<dt><a href="qhull.h#TOP"><b>qhull.h</b></a> </dt>
+<dd>Include file for the Qhull library, <tt>qhull.a</tt>.
+Data structures are documented under <a href="#poly2">Poly</a>.
+Global variables are documented under <a href="#global2">Global</a>.
+Other data structures and variables are documented under 
+<a href="#qhull2">Qhull</a> or <a href="#geom2"><b>Geom</b></a><b>.</b></dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#geom2"><b>Geom</b></a><b>, </b>
+<a href="geom.h#TOP"><b>geom.h</b></a><b>, </b>
+<a href="geom.c#TOP"><b>geom.c</b></a><b>, </b>
+<a href="geom2.c#TOP"><b>geom2.c</b></a> </dt>
+<dd>Geometric routines. These routines implement mathematical
+functions such as Gaussian elimination and geometric
+routines needed for Qhull. Frequently used routines are
+in <tt>geom.c</tt> while infrequent ones are in <tt>geom2.c</tt>.
+</dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#global2"><b>Global</b></a><b>, </b>
+<a href="global.c#TOP"><b>global.c</b></a><b>, </b>
+<a href="qhull.h#TOP"><b>qhull.h</b></a> </dt>
+<dd>Global routines. Qhull uses a global data structure, <tt>qh</tt>,
+to store globally defined constants, lists, sets, and
+variables.   
+<tt>global.c</tt> initializes and frees these
+structures. </dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#io2"><b>Io</b></a><b>, </b><a href="io.h#TOP"><b>io.h</b></a><b>,
+</b><a href="io.c#TOP"><b>io.c</b></a> </dt>
+<dd>Input and output routines. Qhull provides a wide range of
+input and output options.</dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#mem2"><b>Mem</b></a><b>, </b>
+<a href="mem.h#TOP"><b>mem.h</b></a><b>, </b>
+<a href="mem.c#TOP"><b>mem.c</b></a> </dt>
+<dd>Memory routines. Qhull provides memory allocation and
+deallocation. It uses quick-fit allocation.</dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#merge2"><b>Merge</b></a><b>, </b>
+<a href="merge.h#TOP"><b>merge.h</b></a><b>, </b>
+<a href="merge.c#TOP"><b>merge.c</b></a> </dt>
+<dd>Merge routines. Qhull handles precision problems by
+merging facets. These routines merge simplicial facets,
+merge non-simplicial facets, merge cycles of facets, and
+rename redundant vertices.</dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#poly2"><b>Poly</b></a><b>, </b>
+<a href="poly.h#TOP"><b>poly.h</b></a><b>, </b>
+<a href="poly.c#TOP"><b>poly.c</b></a><b>, </b>
+<a href="poly2.c#TOP"><b>poly2.c</b></a><b>, </b>
+<a href="qhull.h#TOP"><b>qhull.h</b></a> </dt>
+<dd>Polyhedral routines. Qhull produces a polyhedron as a
+list of facets with vertices, neighbors, ridges, and
+geometric information. <tt>Qhull.h</tt> defines the main
+data structures. Frequently used routines are in <tt>poly.c</tt>
+while infrequent ones are in <tt>poly2.c</tt>.</dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#qhull2"><b>Qhull</b></a><b>, </b>
+<a href="qhull.c#TOP"><b>qhull.c</b></a><b>, </b>
+<a href="qhull.h#TOP"><b>qhull.h</b></a><b>, </b>
+<a href="qhull_a.h#TOP"><b>qhull_a.h</b></a><b>, </b>
+<a href="unix.c#TOP"><b>unix.c</b></a> </dt>
+<dd>Top-level routines. The Quickhull algorithm is
+implemented by <tt>qhull.c</tt>. <tt>qhull_a.h</tt>
+includes all header files. </dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#set2"><b>Set</b></a><b>, </b>
+<a href="set.h#TOP"><b>set.h</b></a><b>, </b>
+<a href="set.c#TOP"><b>set.c</b></a> </dt>
+<dd>Set routines. Qhull implements its data structures as
+sets. A set is an array of pointers that is expanded as
+needed. This is a separate package that may be used in
+other applications. </dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#stat2"><b>Stat</b></a><b>, </b>
+<a href="stat.h#TOP"><b>stat.h</b></a><b>, </b>
+<a href="stat.c#TOP"><b>stat.c</b></a> </dt>
+<dd>Statistical routines. Qhull maintains statistics about
+its implementation. </dd>
+
+<dt>&nbsp;</dt>
+<dt><a href="#user2"><b>User</b></a><b>, </b>
+<a href="user.h#TOP"><b>user.h</b></a><b>, </b>
+<a href="user.c#TOP"><b>user.c</b></a><b>, </b>
+<a href="user_eg.c#TOP"><b>user_eg.c</b></a></dt>
+<dd>User-defined routines. Qhull allows the user to configure
+the code with defined constants and specialized routines.
+</dd>
+</dl>
+
+<hr>
+
+<p><a href="#TOP">»</a> <a href="#geom">Geom</a> <a name="geom2">&#149;</a>
+<a href="#global2">Global</a> &#149; <a href="#io2">Io</a> &#149;
+<a href="#mem2">Mem</a> &#149; <a href="#merge2">Merge</a> &#149;
+<a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a>
+&#149; <a href="#set2">Set</a> &#149; <a href="#stat2">Stat</a>
+&#149; <a href="#user2">User</a> </p>
+
+<h2>geom.c, geom2.c -- geometric and floating point routines</h2>
+
+<p>Geometrically, a vertex is a point with <em>d</em> coordinates
+and a facet is a halfspace. A <em>halfspace</em> is defined by an
+oriented hyperplane through the facet's vertices. A <em>hyperplane</em>
+is defined by <em>d</em> normalized coefficients and an offset. A
+point is <em>above</em> a facet if its distance to the facet is
+positive.</p>
+
+<p>Qhull uses floating point coordinates for input points,
+vertices, halfspace equations, centrums, and an interior point.</p>
+
+<p>Qhull may be configured for single precision or double
+precision floating point arithmetic (see <a href="user.h#realT">realT</a>
+). </p>
+
+<p>Each floating point operation may incur round-off error (see 
+<a href="#merge">Merge</a>). The maximum error for distance
+computations is determined at initialization. The roundoff error
+in halfspace computation is accounted for by computing the
+distance from vertices to the halfspace. </p>
+
+<p><a href="#geom2">»</a> <a href="#geom2">Geom</a> 
+<a name="geom">&#149;</a> <a href="#global">Global</a> &#149; 
+<a href="#io">Io</a> &#149; <a href="#mem">Mem</a> &#149; 
+<a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a> &#149; 
+<a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a> &#149; 
+<a href="#stat">Stat</a> &#149; <a href="#user">User</a> </p>
+
+<h3>Index to <a href="geom.c#TOP">geom.c</a>, 
+<a href="geom2.c#TOP">geom2.c</a>, and <a href="geom.h#TOP">geom.h</a></h3>
+
+<ul>
+<li><a href="#gtype">geometric data types and constants</a> </li>
+<li><a href="#gmacro">mathematical macros</a>
+</li>
+<li><a href="#gmath">mathematical functions</a> </li>
+<li><a href="#gcomp">computational geometry functions</a> </li>
+<li><a href="#gpoint">point array functions</a> </li>
+<li><a href="#gfacet">geometric facet functions</a> </li>
+<li><a href="#ground">geometric roundoff functions</a></li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="gtype">geometric data types
+and constants</a></h3>
+
+<ul>
+<li><a href="qhull.h#coordT">coordT</a> coordinates and
+coefficients are stored as realT</li>
+<li><a href="qhull.h#pointT">pointT</a> a point is an array
+of <tt>DIM3</tt> coordinates </li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="gmacro">mathematical macros</a></h3>
+
+<ul>
+<li><a href="geom.h#fabs_">fabs_</a> returns the absolute
+value of a </li>
+<li><a href="geom.h#fmax_">fmax_</a> returns the maximum
+value of a and b </li>
+<li><a href="geom.h#fmin_">fmin_</a> returns the minimum
+value of a and b </li>
+<li><a href="geom.h#maximize_">maximize_</a> maximize a value
+</li>
+<li><a href="geom.h#minimize_">minimize_</a> minimize a value
+</li>
+<li><a href="geom.h#det2_">det2_</a> compute a 2-d
+determinate </li>
+<li><a href="geom.h#det3_">det3_</a> compute a 3-d
+determinate </li>
+<li><a href="geom.h#dX">dX, dY, dZ</a> compute the difference
+between two coordinates </li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="gmath">mathematical functions</a></h3>
+
+
+<ul>
+<li><a href="geom.c#backnormal">qh_backnormal</a> solve for
+normal using back substitution </li>
+<li><a href="geom2.c#crossproduct">qh_crossproduct</a>
+compute the cross product of two 3-d vectors </li>
+<li><a href="geom2.c#determinant">qh_determinant</a> compute
+the determinant of a square matrix </li>
+<li><a href="geom.c#gausselim">qh_gausselim</a> Gaussian
+elimination with partial pivoting </li>
+<li><a href="geom2.c#gram_schmidt">qh_gram_schmidt</a>
+implements Gram-Schmidt orthogonalization by rows </li>
+<li><a href="geom2.c#maxabsval">qh_maxabsval</a> return max
+absolute value of a vector </li>
+<li><a href="geom2.c#minabsval">qh_minabsval</a> return min
+absolute value of a dim vector </li>
+<li><a href="geom2.c#mindiff">qh_mindiff</a> return index of
+min absolute difference of two vectors </li>
+<li><a href="geom.c#normalize">qh_normalize</a> normalize a
+vector </li>
+<li><a href="geom.c#normalize2">qh_normalize2</a> normalize a
+vector and report if too small </li>
+<li><a href="geom2.c#printmatrix">qh_printmatrix</a> print
+matrix given by row vectors </li>
+<li><a href="geom2.c#rand">qh_rand/srand</a> generate random
+numbers </li>
+<li><a href="geom2.c#randomfactor">qh_randomfactor</a> return
+a random factor near 1.0 </li>
+<li><a href="geom2.c#randommatrix">qh_randommatrix</a>
+generate a random dimXdim matrix in range (-1,1) </li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="gcomp">computational geometry functions</a></h3>
+
+<ul>
+<li><a href="geom2.c#detsimplex">qh_detsimplex</a> compute
+determinate of a simplex of points </li>
+<li><a href="geom2.c#distnorm">qh_distnorm</a> compute
+distance from point to hyperplane as defined by normal and offset</li>
+<li><a href="geom2.c#facetarea_simplex">qh_facetarea_simplex</a>
+return area of a simplex</li>
+<li><a href="geom.c#getangle">qh_getangle</a> return cosine
+of angle (i.e., dot product) </li>
+<li><a href="geom.c#getcenter">qh_getcenter</a> return
+arithmetic center for a set of vertices </li>
+<li><a href="geom2.c#pointdist">qh_pointdist</a> return
+distance between two points </li>
+<li><a href="geom2.c#rotatepoints">qh_rotatepoints</a> rotate
+numpoints points by a row matrix </li>
+<li><a href="geom.c#sethalfspace">qh_sethalfspace</a> set
+coords to dual of halfspace relative to an interior point </li>
+<li><a href="geom.c#sethyperplane_det">qh_sethyperplane_det</a>
+return hyperplane for oriented simplex using determinates
+</li>
+<li><a href="geom.c#sethyperplane_gauss">qh_sethyperplane_gauss</a>
+return hyperplane for oriented simplex using Gaussian
+elimination </li>
+<li><a href="geom2.c#voronoi_center">qh_voronoi_center</a>
+return Voronoi center for a set of points </li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="gpoint">point array functions</a></h3>
+<ul>
+<li><a href="geom2.c#copypoints">qh_copypoints</a> return
+malloc'd copy of points</li>
+<li><a href="geom.c#joggleinput">qh_joggleinput</a> joggle
+input points by qh.JOGGLEmax </li>
+<li><a href="geom2.c#maxmin">qh_maxmin</a> return max/min
+points for each dimension</li>
+<li><a href="geom2.c#maxsimplex">qh_maxsimplex</a> determines
+maximum simplex for a set of points </li>
+<li><a href="geom2.c#printpoints">qh_printpoints</a> print ids for a 
+set of points </li>
+<li><a href="geom.c#projectinput">qh_projectinput</a> project
+input using qh DELAUNAY and qh low_bound/high_bound </li>
+<li><a href="geom2.c#projectpoints">qh_projectpoints</a>
+project points along one or more dimensions </li>
+<li><a href="geom2.c#rotateinput">qh_rotateinput</a> rotate
+input points using row matrix </li>
+<li><a href="geom2.c#scaleinput">qh_scaleinput</a> scale
+input points using qh low_bound/high_bound </li>
+<li><a href="geom.c#scalelast">qh_scalelast</a> scale last
+coordinate to [0,m] for Delaunay triangulations </li>
+<li><a href="geom2.c#scalepoints">qh_scalepoints</a> scale
+points to new lowbound and highbound </li>
+<li><a href="geom2.c#setdelaunay">qh_setdelaunay</a> project
+points to paraboloid for Delaunay triangulation </li>
+<li><a href="geom2.c#sethalfspace_all">qh_sethalfspace_all</a>
+generate dual for halfspace intersection with interior
+point </li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="gfacet">geometric facet functions</a></h3>
+<ul>
+<li><a href="geom.c#distplane">qh_distplane</a> return
+distance from point to facet </li>
+<li><a href="geom2.c#facetarea">qh_facetarea</a> return area
+of a facet </li>
+<li><a href="geom.c#facetcenter">qh_facetcenter</a> return
+Voronoi center for a facet's vertices </li>
+<li><a href="geom.c#findbest">qh_findbest</a> find visible
+facet or best facet for a point </li>
+<li><a href="geom.c#findbestnew">qh_findbestnew</a> find best
+new facet for point </li>
+<li><a href="geom.c#findbestsharp">qh_findbestsharp</a> find best
+new facet for point and detect sharp corners</li>
+<li><a href="geom2.c#getarea">qh_getarea</a> get area of all
+facets in facetlist, collect statistics </li>
+<li><a href="geom.c#getcentrum">qh_getcentrum</a> return
+centrum for a facet </li>
+<li><a href="geom.c#getdistance">qh_getdistance</a> returns
+the max and min distance of a facet's vertices to a
+neighboring facet</li>
+<li><a href="geom2.c#findgooddist">qh_findgooddist</a> find
+best good facet visible for point from facet </li>
+<li><a href="geom2.c#inthresholds">qh_inthresholds</a> return
+True if facet normal within 'Pdn' and 'PDn'</li>
+<li><a href="geom2.c#orientoutside">qh_orientoutside</a>
+orient facet so that <tt>qh.interior_point</tt> is inside</li>
+<li><a href="geom.c#projectpoint">qh_projectpoint</a> project
+point onto a facet </li>
+<li><a href="geom.c#setfacetplane">qh_setfacetplane</a> sets
+the hyperplane for a facet </li>
+</ul>
+
+<h3><a href="#geom">»</a><a name="ground">geometric roundoff functions</a></h3>
+<ul>
+<li><a href="geom2.c#detjoggle">qh_detjoggle</a> determine
+default joggle for points and distance roundoff error</li>
+<li><a href="geom2.c#detroundoff">qh_detroundoff</a>
+determine maximum roundoff error and other precision constants</li>
+<li><a href="geom2.c#distround">qh_distround</a> compute
+maximum roundoff error due to a distance computation to a
+normalized hyperplane</li>
+<li><a href="geom2.c#divzero">qh_divzero</a> divide by a
+number that is nearly zero </li>
+constants</li>
+<li><a href="geom2.c#maxouter">qh_maxouter</a> return maximum outer
+plane</li>
+<li><a href="geom2.c#outerinner">qh_outerinner</a> return actual
+outer and inner planes
+</ul>
+
+<hr>
+
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="global2">&#149;</a> <a href="#global">Global</a> &#149; 
+<a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a> &#149; 
+<a href="#merge2">Merge</a> &#149; <a href="#poly2">Poly</a> &#149; 
+<a href="#qhull2">Qhull</a> &#149; <a href="#set2">Set</a> &#149; 
+<a href="#stat2">Stat</a> &#149; <a href="#user2">User</a> </p>
+
+<h2>global.c -- global variables and their functions</h2>
+
+<p>Qhull uses a global data structure, <tt>qh</tt>, to store
+globally defined constants, lists, sets, and variables. This
+allows multiple instances of Qhull to execute at the same time.
+The structure may be statically allocated or
+dynamically allocated with malloc().  See
+<a href="user.h#QHpointer">QHpointer</a>.
+</p>
+
+<p><a href="#global2">»</a> <a href="#geom">Geom</a> 
+<a name="global">&#149;</a> <a href="#global2">Global</a> &#149; 
+<a href="#io">Io</a> &#149; <a href="#mem">Mem</a> &#149; 
+<a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a> &#149; 
+<a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a> &#149; 
+<a href="#stat">Stat</a> &#149; <a href="#user">User</a> </p>
+
+<h3>Index to <a href="global.c#TOP">global.c</a> and 
+<a href="qhull.h#TOP">qhull.h</a></h3>
+
+<ul>
+<li><a href="#ovar">Qhull's global variables</a> </li>
+<li><a href="#ofunc">Global variable and initialization
+routines</a> </li>
+</ul>
+
+<h3><a href="#global">»</a><a name="ovar">Qhull's global
+variables</a></h3>
+
+<ul>
+<li><a href="qhull.h#qh">qh</a> all global variables for
+qhull are in <tt>qh,qhmem</tt>, and <tt>qhstat</tt></li>
+<li><a href="qhull.h#qh-const">qh constants</a> configuration
+flags and constants for Qhull </li>
+<li><a href="qhull.h#qh-prec">qh precision constants</a>
+precision constants for Qhull </li>
+<li><a href="qhull.h#qh-intern">qh internal constants</a>
+internal constants for Qhull </li>
+<li><a href="qhull.h#qh-lists">qh facet and vertex lists</a>
+lists of facets and vertices </li>
+<li><a href="qhull.h#qh-var">qh global variables</a> minimum
+and maximum distances, next visit ids, several flags, and
+other global variables. </li>
+<li><a href="qhull.h#qh-set">qh global sets</a> global sets
+for merging, hashing, input, etc. </li>
+<li><a href="qhull.h#qh-buf">qh global buffers</a> buffers
+for matrix operations and input </li>
+<li><a href="qhull.h#qh-static">qh static variables</a>
+static variables for individual functions </li>
+</ul>
+
+<h3><a href="#global">»</a><a name="ofunc">Global variable and
+initialization routines</a></h3>
+
+<ul>
+<li><a href="global.c#appendprint">qh_appendprint</a> append
+output format to <tt>qh.PRINTout</tt> </li>
+<li><a href="global.c#freebuffers">qh_freebuffers</a> free
+global memory buffers </li>
+<li><a href="global.c#freeqhull">qh_freeqhull</a> free memory
+used by qhull </li>
+<li><a href="global.c#init_A">qh_init_A</a> called before
+error handling initialized </li>
+<li><a href="global.c#init_B">qh_init_B</a> called after
+points are defined </li>
+<li><a href="global.c#init_qhull_command">qh_init_qhull_command</a>
+build <tt>qh.qhull_command</tt> from <tt>argc/argv</tt></li>
+<li><a href="global.c#initflags">qh_initflags</a> set flags
+and constants from command line </li>
+<li><a href="global.c#initqhull_buffers">qh_initqhull_buffers</a>
+initialize global memory buffers </li>
+<li><a href="global.c#initqhull_globals">qh_initqhull_globals</a>
+initialize global variables </li>
+<li><a href="global.c#initqhull_mem">qh_initqhull_mem</a>
+initialize Qhull memory management </li>
+<li><a href="global.c#initqhull_start">qh_initqhull_start</a>
+initialize default values at Qhull startup </li>
+<li><a href="global.c#initthresholds">qh_initthresholds</a>
+initialize 'Pdn' and 'PDn' thresholds </li>
+<li><a href="global.c#option">qh_option</a> append option
+description to <tt>qh.global_options</tt> </li>
+<li><a href="global.c#restore_qhull">qh_restore_qhull</a>
+restores a previously saved qhull </li>
+<li><a href="global.c#save_qhull">qh_save_qhull</a> saves
+qhull for a later qh_restore_qhull() </li>
+<li><a href="global.c#strtol">qh_strtol</a> duplicates
+strtod() and strtol() </li>
+</ul>
+
+<hr>
+
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> <a name="io2">&#149;</a>
+<a href="#global2">Global</a> &#149; <a href="#io">Io</a> &#149; 
+<a href="#mem2">Mem</a> &#149; <a href="#merge2">Merge</a> &#149; 
+<a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a> &#149; 
+<a href="#set2">Set</a> &#149; <a href="#stat2">Stat</a> &#149; 
+<a href="#user2">User</a> </p>
+
+<h2>io.c -- input and output operations</h2>
+
+<p>Qhull provides a wide range of input
+and output options. To organize the code, most output formats use
+the same driver: </p>
+
+<pre>
+    qh_printbegin( fp, format, facetlist, facets, printall );
+
+    FORALLfacet_( facetlist )
+      qh_printafacet( fp, format, facet, printall );
+
+    FOREACHfacet_( facets )
+      qh_printafacet( fp, format, facet, printall );
+
+    qh_printend( fp, format );
+</pre>
+
+<p>Note the 'printall' flag. It selects whether or not
+qh_skipfacet() is tested. </p>
+
+<p><a href="#io2">»</a> <a href="#geom">Geom</a> <a name="io">&#149;</a>
+<a href="#global">Global</a> &#149; <a href="#io2">Io</a> &#149; 
+<a href="#mem">Mem</a> &#149; <a href="#merge">Merge</a> &#149; 
+<a href="#poly">Poly</a> &#149; <a href="#qhull">Qhull</a> &#149; 
+<a href="#set">Set</a> &#149; <a href="#stat">Stat</a> &#149; 
+<a href="#user">User</a> </p>
+
+<h3>Index to <a href="io.c#TOP">io.c</a> and <a href="io.h#TOP">io.h</a></h3>
+
+<ul>
+<li><a href="#iconst">io.h constants and types</a> </li>
+<li><a href="#ilevel">User level functions</a> </li>
+<li><a href="#iprint">Print functions for all output formats</a></li>
+<li><a href="#itext">Text output functions</a> </li>
+<li><a href="#iutil">Text utility functions</a></li>
+<li><a href="#igeom">Geomview output functions</a> </li>
+<li><a href="#iview">Geomview utility functions</a></li>
+</ul>
+
+<h3><a href="#io">»</a><a name="iconst">io.h constants and types</a></h3>
+
+<ul>
+<li><a href="io.h#qh_MAXfirst">qh_MAXfirst</a> maximum length
+of first two lines of stdin </li>
+<li><a href="io.h#qh_WHITESPACE">qh_WHITESPACE</a> possible
+values of white space </li>
+<li><a href="io.h#printvridgeT">printvridgeT</a> function to
+print results of qh_printvdiagram or qh_eachvoronoi</li>
+</ul>
+
+<h3><a href="#io">»</a><a name="ilevel">User level functions</a></h3>
+
+<ul>
+<li><a href="io.c#eachvoronoi_all">qh_eachvoronoi_all</a>
+visit each Voronoi ridge of the Voronoi diagram
+<li><a href="io.c#printhelp_degenerate">qh_printhelp_degenerate</a>
+prints descriptive message for precision error </li>
+<li><a href="io.c#printhelp_singular">qh_printhelp_singular</a>
+print help message for singular data </li>
+<li><a href="qhull.c#printsummary">qh_printsummary</a> print
+summary ('s')</li>
+<li><a href="io.c#produce_output">qh_produce_output</a>
+prints out the result of qhull()</li>
+<li><a href="io.c#readfeasible">qh_readfeasible</a> read
+interior point from remainder and qh fin ('H')</li>
+<li><a href="io.c#readpoints">qh_readpoints</a> read input
+points </li>
+<li><a href="io.c#setfeasible">qh_setfeasible</a> set
+interior point from qh feasible_string ('Hn,n,n')</li>
+</ul>
+
+<h3><a href="#io">»</a><a name="iprint">Print functions for all
+output formats</a></h3>
+
+<ul>
+<li><a href="io.c#countfacets">qh_countfacets</a> count good
+facets for printing and set visitid </li>
+<li><a href="io.c#markkeep">qh_markkeep</a> mark good facets
+that meet qh.KEEParea ('PAn'), qh.KEEPmerge ('PMn'), and qh.KEEPminArea ('PFn')</li>
+<li><a href="io.c#order_vertexneighbors">qh_order_vertexneighbors</a>
+order neighbors for a 3-d vertex by adjacency ('i', 'o')</li>
+<li><a href="io.c#printafacet">qh_printafacet</a> print facet
+in an output format </li>
+<li><a href="io.c#printbegin">qh_printbegin</a> print header
+for an output format </li>
+<li><a href="io.c#printend">qh_printend</a> print trailer for
+an output format </li>
+<li><a href="user.c#printfacetlist">qh_printfacetlist</a>
+print facets in a facetlist</li>
+<li><a href="io.c#printfacets">qh_printfacets</a> print
+facetlist and/or facet set in an output format </li>
+<li><a href="io.c#printneighborhood">qh_printneighborhood</a>
+print neighborhood of one or two facets ('Po')</li>
+<li><a href="io.c#produce_output">qh_produce_output</a>
+print the results of qh_qhull() </li>
+<li><a href="io.c#skipfacet">qh_skipfacet</a> True if not
+printing this facet ('Pdk:n', 'QVn', 'QGn')</li>
+<li><a href="io.c#facetvertices">qh_facetvertices</a> return
+vertices in a set of facets ('p')</li>
+</ul>
+
+<h3><a href="#io">»</a><a name="itext">Text output functions</a></h3>
+<ul>
+<li><a href="io.c#eachvoronoi">qh_eachvoronoi</a>
+print or visit each Voronoi ridge for an input site of the Voronoi diagram
+<li><a href="io.c#printextremes">qh_printextremes</a> print
+extreme points by point id (vertices of convex hull) ('Fx')</li>
+<li><a href="io.c#printextremes_2d">qh_printextremes_2d</a> print
+2-d extreme points by point id ('Fx')</li>
+<li><a href="io.c#printextremes_d">qh_printextremes_d</a> print
+extreme points of input sites for Delaunay triangulations ('Fx')</li>
+<li><a href="io.c#printfacet">qh_printfacet</a> print all
+fields of a facet ('f')</li>
+<li><a href="io.c#printfacet2math">qh_printfacet2math</a> print
+2-d Mathematica output for a facet ('m')</li>
+<li><a href="io.c#printfacet3math">qh_printfacet3math</a>
+print 3-d Mathematica facet ('m')</li>
+<li><a href="io.c#printfacet3vertex">qh_printfacet3vertex</a>
+print vertices for a 3-d facet ('i', 'o')</li>
+<li><a href="io.c#printfacetheader">qh_printfacetheader</a>
+prints header fields of a facet ('f')</li>
+<li><a href="io.c#printfacetNvertex_nonsimplicial">qh_printfacetNvertex_nonsimplicial</a>
+print vertices for an N-d non-simplicial facet ('i', 'Ft')</li>
+<li><a href="io.c#printfacetNvertex_simplicial">qh_printfacetNvertex_simplicial</a>
+print vertices for an N-d simplicial facet ('i', 'o', 'Ft')</li>
+<li><a href="io.c#printfacetridges">qh_printfacetridges</a>
+prints ridges of a facet ('f')</li>
+<li><a href="io.c#printpoints_out">qh_printpoints_out</a> prints
+vertices for facets by their point coordinates ('p')</li>
+<li><a href="io.c#printridge">qh_printridge</a> print all
+fields for a ridge ('f')</li>
+<li><a href="io.c#printvdiagram">qh_printvdiagram</a> print
+voronoi diagram as Voronoi vertices for each input pair</li>
+<li><a href="io.c#printvertex">qh_printvertex</a> print all
+fields for a vertex ('f')</li>
+<li><a href="io.c#printvertexlist">qh_printvertexlist</a>
+print vertices used by a list or set of facets ('f')</li>
+<li><a href="io.c#printvertices">qh_printvertices</a> print a
+set of vertices ('f')</li>
+<li><a href="io.c#printvneighbors">qh_printvneighbors</a>
+print vertex neighbors of vertices ('FN')</li>
+<li><a href="io.c#printvoronoi">qh_printvoronoi</a> print
+voronoi diagram in 'o' or 'G' format</li>
+</ul>
+
+<h3><a href="#io">»</a><a name="iutil">Text utility functions</a></h3>
+<ul>
+<li><a href="io.c#dfacet">dfacet</a> print facet by id </li>
+<li><a href="io.c#dvertex">dvertex</a> print vertex by id </li>
+<li><a href="io.c#compare_facetarea">qh_compare_facetarea</a>
+used by qsort() to order facets by area </li>
+<li><a href="io.c#compare_facetmerge">qh_compare_facetmerge</a>
+used by qsort() to order facets by number of merges </li>
+<li><a href="io.c#compare_facetvisit">qh_compare_facetvisit</a>
+used by qsort() to order facets by visit id or id </li>
+<li><a href="io.c#compare_vertexpoint">qh_compare_vertexpoint</a>
+used by qsort() to order vertices by point id </li>
+<li><a href="io.c#detvnorm">qh_detvnorm</a> determine normal for Voronoi ridge </li>
+<li><a href="io.c#detvridge">qh_detvridge</a> determine Voronoi
+ridge for an input site
+<li><a href="io.c#detvridge3">qh_detvridge3</a> determine 3-d Voronoi
+ridge for an input site
+<li><a href="io.c#facet2point">qh_facet2point</a> return two
+projected temporary vertices for a 2-d facet ('m', 'G')</li>
+<li><a href="io.c#markvoronoi">qh_markvoronoi</a> mark Voronoi
+vertices for printing
+<li><a href="io.c#printcenter">qh_printcenter</a> print
+facet-&gt;center as centrum or Voronoi center ('Ft', 'v p', 'FC', 'f') </li>
+<li><a href="io.c#printpoint">qh_printpoint</a>, qh_printpointid, print
+coordinates of a point ('p', 'o', 'Fp', 'G', 'f')</li>
+<li><a href="io.c#printpoint3">qh_printpoint3</a> prints 2-d,
+3-d, or 4-d point as 3-d coordinates ('G')</li>
+<li><a href="io.c#printvdiagram2">qh_printvdiagram2</a> print
+voronoi diagram for each ridge of each vertex from qh_markvoronoi</li>
+<li><a href="io.c#printvnorm">qh_printvnorm</a> print 
+separating plane of the Voronoi diagram for a pair of input sites</li>
+<li><a href="io.c#printvridge">qh_printvridge</a> print 
+ridge of the Voronoi diagram for a pair of input sites</li>
+<li><a href="io.c#printvridge3">qh_printvridge3</a> print one
+ridge of a 3-d Voronoi diagram for a pair of input sites</li>
+<li><a href="io.c#projectdim3">qh_projectdim3</a> project 2-d
+3-d or 4-d point to a 3-d point ('G')</li>
+</ul>
+
+<h3><a href="#io">»</a><a name="igeom">Geomview output functions</a></h3>
+<ul>
+<li><a href="io.c#printfacet2geom">qh_printfacet2geom</a>
+print facet as a 2-d VECT object </li>
+<li><a href="io.c#printfacet2geom_points">qh_printfacet2geom_points</a>
+print points as a 2-d VECT object with offset </li>
+<li><a href="io.c#printfacet3geom_nonsimplicial">qh_printfacet3geom_nonsimplicial</a>
+print Geomview OFF for a 3-d nonsimplicial facet. </li>
+<li><a href="io.c#printfacet3geom_points">qh_printfacet3geom_points</a>
+prints a 3-d facet as OFF Geomview object. </li>
+<li><a href="io.c#printfacet3geom_simplicial">qh_printfacet3geom_simplicial</a>
+print Geomview OFF for a 3-d simplicial facet. </li>
+<li><a href="io.c#printfacet4geom_nonsimplicial">qh_printfacet4geom_nonsimplicial</a>
+print Geomview 4OFF file for a 4d nonsimplicial facet </li>
+<li><a href="io.c#printfacet4geom_simplicial">qh_printfacet4geom_simplicial</a>
+print Geomview 4OFF file for a 4d simplicial facet </li>
+<li><a href="io.c#printhyperplaneintersection">qh_printhyperplaneintersection</a>
+print hyperplane intersection as OFF or 4OFF </li>
+<li><a href="io.c#printvoronoi">qh_printvoronoi</a> print
+voronoi diagram in 'o' or 'G' format</li>
+</ul>
+<h3><a href="#io">»</a><a name="iview">Geomview utility functions</a></h3>
+<ul>
+<li><a href="io.c#geomplanes">qh_geomplanes</a>
+    return outer and inner planes for Geomview</li>
+<li><a href="io.c#printcentrum">qh_printcentrum</a> print
+centrum for a facet in OOGL format </li>
+<li><a href="io.c#printend4geom">qh_printend4geom</a> helper
+function for qh_printbegin/printend </li>
+<li><a href="io.c#printhyperplaneintersection">qh_printhyperplaneintersection</a>
+print Geomview OFF or 4OFF for the intersection of two
+hyperplanes in 3-d or 4-d </li>
+<li><a href="io.c#printline3geom">qh_printline3geom</a> prints a
+line as a VECT </li>
+<li><a href="io.c#printpointvect">qh_printpointvect</a>
+prints a 2-d or 3-d point as 3-d VECT's </li>
+<li><a href="io.c#printpointvect2">qh_printpointvect2</a>
+prints a 2-d or 3-d point as 2 3-d VECT's </li>
+<li><a href="io.c#printspheres">qh_printspheres</a> prints 3-d
+vertices as OFF spheres </li>
+<li><a href="io.c#printspheres3">qh_printspheres3</a> print
+3-d vertices as spheres (OFF) </li>
+</ul>
+<p>
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="mem2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; 
+<a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a>
+&#149; <a href="#set2">Set</a> &#149; <a href="#stat2">Stat</a>
+&#149; <a href="#user2">User</a> </p>
+<h2>mem.c -- memory operations</h2>
+<p>Qhull uses quick-fit memory allocation. It maintains a
+set of free lists for a variety of small allocations. A
+small request returns a block from the best fitting free
+list. If the free list is empty, Qhull allocates a block
+from a reserved buffer. </p>
+<p>Use 'T5' to trace memory allocations.</p>
+<p><a href="#mem2">»</a> <a href="#geom">Geom</a> 
+<a name="mem">&#149;</a> <a href="#global">Global</a> &#149;
+<a href="#io">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a>
+&#149; <a href="#stat">Stat</a> &#149; <a href="#user">User</a>
+</p>
+<h3>Index to <a href="mem.c#TOP">mem.c</a> and 
+<a href="mem.h#TOP">mem.h</a></h3>
+<ul>
+<li><a href="#etype">mem.h data types</a> </li>
+<li><a href="#emacro">mem.h macros</a> </li>
+<li><a href="#efunc">User level functions</a> </li>
+</ul>
+<h3><a href="#mem">»</a><a name="etype">mem.h data types and constants</a></h3>
+<ul>
+<li><a href="mem.h#ptr_intT">ptr_intT</a> for casting
+a void* to an integer-type </li>
+<li><a href="mem.h#qhmemT">qhmemT</a> global memory
+structure for mem.c </li>
+<li><a href="mem.h#NOmem">qh_NOmem</a> disable memory allocation</li>
+</ul>
+<h3><a href="#mem">»</a><a name="emacro">mem.h macros</a></h3>
+<ul>
+<li><a href="mem.h#memalloc_">qh_memalloc_</a>
+allocate memory</li>
+<li><a href="mem.h#memfree_">qh_memfree_</a> free
+memory</li>
+</ul>
+<h3><a href="#mem">»</a><a name="efunc">User level
+functions</a></h3>
+<ul>
+<li><a href="mem.c#memalloc">qh_memalloc</a> allocate
+memory </li>
+<li><a href="mem.c#memfree">qh_memfree</a> free
+memory </li>
+<li><a href="mem.c#meminit">qh_meminit</a> initialize
+memory </li>
+<li><a href="mem.c#memstatistics">qh_memstatistics</a>
+print memory statistics </li>
+<li><a href="mem.c#NOmem">qh_NOmem</a> allocation routines with malloc() and free()
+</ul>
+
+<h3><a href="#mem">»</a><a name="m">Initialization and
+termination functions</a></h3>
+<ul>
+<li><a href="mem.c#intcompare">qh_intcompare</a> used by
+qsort and bsearch to compare two integers </li>
+<li><a href="mem.c#memfreeshort">qh_memfreeshort</a>
+frees up all short and qhmem memory allocations </li>
+<li><a href="mem.c#meminit">qh_meminit</a> initialize
+memory </li>
+<li><a href="mem.c#meminitbuffers">qh_meminitbuffers</a>
+initialize qhmem </li>
+<li><a href="mem.c#memsetup">qh_memsetup</a> set up
+memory after running memsize() </li>
+<li><a href="mem.c#memsize">qh_memsize</a> define a free
+list for this size </li>
+<li><a href="mem.c#memstatistics">qh_memstatistics</a>
+print out memory statistics </li>
+</ul>
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="merge2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge">Merge</a> &#149; <a href="#poly2">Poly</a>
+&#149; <a href="#qhull2">Qhull</a> &#149; <a href="#set2">Set</a>
+&#149; <a href="#stat2">Stat</a> &#149; <a href="#user2">User</a>
+</p>
+<h2>merge.c -- facet merge operations</h2>
+<p>Qhull handles precision problems by merging facets.
+Except for redundant vertices, it corrects a problem by
+merging two facets. When done, all facets are clearly
+convex. See <a href="qh-impre.htm">Imprecision in Qhull</a>
+for further information. </p>
+<p>Users may joggle the input ('<a href="qh-optq.htm#QJn">QJn</a>')
+instead of merging facets. </p>
+<p>Qhull detects and corrects the following problems: </p>
+<ul>
+<li><b>More than two facets meeting at a ridge. </b>When
+Qhull creates facets, it creates an even number
+of facets for each ridge. A convex hull always
+has two facets for each ridge. More than two
+facets may be created if non-adjacent facets
+share a vertex. This is called a <em>duplicate
+ridge</em>. In 2-d, a duplicate ridge would
+create a loop of facets. </li>
+</ul>
+<ul>
+<li><b>A facet contained in another facet. </b>Facet
+merging may leave all vertices of one facet as a
+subset of the vertices of another facet. This is
+called a <em>redundant facet</em>. </li>
+</ul>
+<ul>
+<li><b>A facet with fewer than three neighbors. </b>Facet
+merging may leave a facet with one or two
+neighbors. This is called a <em>degenerate facet</em>.
+</li>
+</ul>
+<ul>
+<li><b>A facet with flipped orientation. </b>A
+facet's hyperplane may define a halfspace that
+does not include the interior point.This is
+called a <em>flipped facet</em>. </li>
+</ul>
+<ul>
+<li><strong>A coplanar horizon facet.</strong> A
+newly processed point may be coplanar with an
+horizon facet. Qhull creates a new facet without
+a hyperplane. It links new facets for the same
+horizon facet together. This is called a <em>samecycle</em>.
+The new facet or samecycle is merged into the
+horizon facet. </li>
+</ul>
+<ul>
+<li><b>Concave facets. </b>A facet's centrum may be
+above a neighboring facet. If so, the facets meet
+at a concave angle. </li>
+</ul>
+<ul>
+<li><b>Coplanar facets. </b>A facet's centrum may be
+coplanar with a neighboring facet (i.e., it is
+neither clearly below nor clearly above the
+facet's hyperplane). Qhull removes coplanar
+facets in independent sets sorted by angle.</li>
+</ul>
+<ul>
+<li><b>Redundant vertex. </b>A vertex may have fewer
+than three neighboring facets. If so, it is
+redundant and may be renamed to an adjacent
+vertex without changing the topological
+structure.This is called a <em>redundant vertex</em>.
+</li>
+</ul>
+<p><a href="#merge2">»</a> <a href="#geom">Geom</a> 
+<a name="merge">&#149;</a> <a href="#global">Global</a>
+&#149; <a href="#io">Io</a> &#149; <a href="#mem">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a>
+&#149; <a href="#stat">Stat</a> &#149; <a href="#user">User</a>
+</p>
+<h3>Index to <a href="merge.c#TOP">merge.c</a> and 
+<a href="merge.h#TOP">merge.h</a></h3>
+<ul>
+<li><a href="#mtype">merge.h data types, macros, and
+global sets</a> </li>
+<li><a href="#mconst">merge.h constants</a> </li>
+</ul>
+<ul>
+<li><a href="#mtop">top-level merge functions</a> </li>
+<li><a href="#mset">functions for identifying merges</a></li>
+<li><a href="#mbest">functions for determining the
+best merge</a> </li>
+<li><a href="#mmerge">functions for merging facets</a>
+</li>
+<li><a href="#mcycle">functions for merging a cycle
+of facets</a> </li>
+<li><a href="#mrename">functions for renaming a
+vertex</a> </li>
+<li><a href="#mvertex">functions for identifying
+vertices for renaming</a> </li>
+<li><a href="#mcheck">functions for check and trace</a> </li>
+</ul>
+<h3><a href="#merge">»</a><a name="mtype">merge.h data
+types, macros, and global sets</a></h3>
+<ul>
+<li><a href="merge.h#mergeT">mergeT</a> structure to
+identify a merge of two facets</li>
+<li><a href="merge.h#FOREACHmerge_">FOREACHmerge_</a>
+assign 'merge' to each merge in merges </li>
+<li><a href="qhull.h#qh-set">qh global sets</a>
+qh.facet_mergeset contains non-convex merges
+while qh.degen_mergeset contains degenerate and
+redundant facets</li>
+</ul>
+<h3><a href="#merge">»</a><a name="mconst">merge.h
+constants</a></h3>
+<ul>
+<li><a href="qhull.h#qh-prec">qh precision constants</a>
+precision constants for Qhull </li>
+<li><a href="merge.h#MRG...">MRG...</a> indicates the
+type of a merge (mergeT-&gt;type)</li>
+<li><a href="merge.h#qh_ANGLEredundant">qh_ANGLEredundant</a>
+indicates redundant merge in mergeT-&gt;angle </li>
+<li><a href="merge.h#qh_ANGLEdegen">qh_ANGLEdegen</a>
+indicates degenerate facet in mergeT-&gt;angle </li>
+<li><a href="merge.h#qh_ANGLEconcave">qh_ANGLEconcave</a>
+offset to indicate concave facets in
+mergeT-&gt;angle </li>
+<li><a href="merge.h#qh_MERGEapex">qh_MERGEapex</a>
+flag for qh_mergefacet() to indicate an apex
+merge </li>
+</ul>
+<h3><a href="#merge">»</a><a name="mtop">top-level merge
+functions</a></h3>
+<ul>
+<li><a href="merge.c#all_merges">qh_all_merges</a>
+merge all non-convex facets </li>
+<li><a href="merge.c#checkzero">qh_checkzero</a>
+check that facets are clearly convex </li>
+<li><a href="merge.c#flippedmerges">qh_flippedmerges</a>
+merge flipped facets into best neighbor </li>
+<li><a href="merge.c#forcedmerges">qh_forcedmerges</a>
+merge all duplicate ridges </li>
+<li><a href="merge.c#merge_degenredundant">qh_merge_degenredundant</a>
+merge degenerate and redundant facets </li>
+<li><a href="merge.c#merge_nonconvex">qh_merge_nonconvex</a>
+merge a non-convex ridge </li>
+<li><a href="merge.c#premerge">qh_premerge</a>
+pre-merge non-convex facets </li>
+<li><a href="merge.c#postmerge">qh_postmerge</a>
+post-merge nonconvex facets as defined by
+maxcentrum/maxangle </li>
+</ul>
+
+<h3><a href="#merge">»</a><a name="mset">functions for
+identifying merges</a></h3>
+<ul>
+<li><a href="merge.c#appendmergeset">qh_appendmergeset</a>
+appends an entry to qh.facet_mergeset</li>
+<li><a href="merge.c#compareangle">qh_compareangle</a>
+used by qsort() to order merges </li>
+<li><a href="merge.c#comparemerge">qh_comparemerge</a>
+used by qsort() to order merges </li>
+<li><a href="merge.c#degen_redundant_facet">qh_degen_redundant_facet</a>
+check for a degenerate and redundant facet</li>
+<li><a href="merge.c#degen_redundant_neighbors">qh_degen_redundant_neighbors</a>
+append degenerate and redundant neighbors to
+qh.degen_mergeset </li>
+<li><a href="merge.c#facetdegen">qh_facetdegen</a>
+true if facet already in mergeset as a degenerate
+</li>
+<li><a href="merge.c#getmergeset_initial">qh_getmergeset_initial</a>
+build initial qh.facet_mergeset </li>
+<li><a href="merge.c#getmergeset">qh_getmergeset</a>
+update qh.facet_mergeset </li>
+<li><a href="merge.c#mark_dupridges">qh_mark_dupridges</a>
+add duplicated ridges to qh.facet_mergeset</li>
+<li><a href="merge.c#maydropneighbor">qh_maydropneighbor</a>
+drop neighbor relationship if no ridge between
+facet and neighbor </li>
+<li><a href="merge.c#test_appendmerge">qh_test_appendmerge</a>
+test a pair of facets for convexity and append to
+qh.facet_mergeset if non-convex </li>
+<li><a href="merge.c#test_vneighbors">qh_test_vneighbors</a>
+test vertex neighbors for convexity </li>
+</ul>
+
+<h3><a href="#merge">»</a><a name="mbest">functions for
+determining the best merge</a></h3>
+<ul>
+<li><a href="merge.c#findbest_test">qh_findbest_test</a>
+test neighbor for best merge </li>
+<li><a href="merge.c#findbestneighbor">qh_findbestneighbor</a>
+finds best neighbor of a facet for merging (i.e.,
+closest hyperplane) </li>
+</ul>
+
+<h3><a href="#merge">»</a><a name="mmerge">functions for
+merging facets</a></h3>
+<ul>
+<li><a href="merge.c#copynonconvex">qh_copynonconvex</a>
+copy non-convex flag to another ridge for the
+same neighbor </li>
+<li><a href="merge.c#makeridges">qh_makeridges</a>
+creates explicit ridges between simplicial facets
+</li>
+<li><a href="merge.c#mergefacet">qh_mergefacet</a>
+merges one facet into another facet</li>
+<li><a href="merge.c#mergeneighbors">qh_mergeneighbors</a>
+merges the neighbors of two facets </li>
+<li><a href="merge.c#mergeridges">qh_mergeridges</a>
+merges the ridge sets of two facets </li>
+<li><a href="merge.c#mergesimplex">qh_mergesimplex</a>
+merge a simplicial facet into another simplicial
+facet </li>
+<li><a href="merge.c#mergevertex_del">qh_mergevertex_del</a>
+delete a vertex due to merging one facet into
+another facet </li>
+<li><a href="merge.c#mergevertex_neighbors">qh_mergevertex_neighbors</a>
+merge the vertex neighbors of two facets </li>
+<li><a href="merge.c#mergevertices">qh_mergevertices</a>
+merge the vertex sets of two facets </li>
+<li><a href="merge.c#newvertices">qh_newvertices</a>
+register all vertices as new vertices </li>
+<li><a href="merge.c#mergevertices2d">qh_mergevertices2d</a>
+merges vertices1 into vertices2 in 2-d case </li>
+<li><a href="merge.c#updatetested">qh_updatetested</a>
+clear tested flags and centrums involved in a
+merge </li>
+<li><a href="merge.c#willdelete">qh_willdelete</a>
+moves facet to qh.visible_list; sets replacement
+or NULL </li>
+</ul>
+
+<h3><a href="#merge">»</a><a name="mcycle">functions for
+merging a cycle of facets</a></h3>
+<p>If a point is coplanar with an horizon facet, the
+corresponding new facets are linked together (a <em>samecycle</em>)
+for merging.</p>
+<ul>
+<li><a href="merge.c#basevertices">qh_basevertices</a>
+return temporary set of base vertices for a
+samecycle </li>
+<li><a href="merge.c#mergecycle">qh_mergecycle</a>
+merge a samecycle into a horizon facet </li>
+<li><a href="merge.c#mergecycle_all">qh_mergecycle_all</a>
+merge all samecycles into horizon facets</li>
+<li><a href="merge.c#mergecycle_facets">qh_mergecycle_facets</a>
+finish merge of samecycle </li>
+<li><a href="merge.c#mergecycle_neighbors">qh_mergecycle_neighbors</a>
+merge neighbor sets for samecycle </li>
+<li><a href="merge.c#mergecycle_ridges">qh_mergecycle_ridges</a>
+merge ridge sets for samecycle </li>
+<li><a href="merge.c#mergecycle_vneighbors">qh_mergecycle_vneighbors</a>
+merge vertex neighbor sets for samecycle </li>
+</ul>
+<h3><a href="#merge">»</a><a name="mrename">functions
+for renaming a vertex</a></h3>
+<ul>
+<li><a href="merge.c#comparevisit">qh_comparevisit</a>
+used by qsort() to order vertices by visitid</li>
+<li><a href="merge.c#reducevertices">qh_reducevertices</a>
+reduce vertex sets </li>
+<li><a href="merge.c#redundant_vertex">qh_redundant_vertex</a>
+returns true if detect and rename redundant
+vertex </li>
+<li><a href="merge.c#rename_sharedvertex">qh_rename_sharedvertex</a>
+detect and rename a shared vertex </li>
+<li><a href="merge.c#renameridgevertex">qh_renameridgevertex</a>
+rename oldvertex to newvertex in a ridge </li>
+<li><a href="merge.c#renamevertex">qh_renamevertex</a>
+rename oldvertex to newvertex in ridges </li>
+<li><a href="merge.c#remove_extravertices">qh_remove_extravertices</a>
+remove extra vertices in non-simplicial facets </li>
+</ul>
+
+<h3><a href="#merge">»</a><a name="mvertex">functions
+for identifying vertices for renaming</a></h3>
+<ul>
+<li><a href="merge.c#find_newvertex">qh_find_newvertex</a>
+locate new vertex for renaming old vertex </li>
+<li><a href="merge.c#hashridge">qh_hashridge</a> add
+ridge to hashtable </li>
+<li><a href="merge.c#hashridge_find">qh_hashridge_find</a>
+returns matching ridge in hashtable</li>
+<li><a href="merge.c#neighbor_intersections">qh_neighbor_intersections</a>
+return intersection of vertex sets for
+neighboring facets </li>
+<li><a href="merge.c#vertexridges">qh_vertexridges</a>
+return temporary set of ridges adjacent to a
+vertex </li>
+<li><a href="merge.c#vertexridges_facet">qh_vertexridges_facet</a>
+add adjacent ridges for a vertex in facet </li>
+</ul>
+
+<h3><a href="#merge">»</a><a name="mcheck">functions for check and
+trace</a></h3>
+<ul>
+<li><a href="merge.c#checkconnect">qh_checkconnect</a>
+check that new facets are connected </li>
+<li><a href="merge.c#checkridge_boundary">qh_checkridge_boundary</a>
+checks that ridges of a facet are boundaryless </li>
+<li><a href="merge.c#tracemerge">qh_tracemerge</a>
+print trace message after merge </li>
+<li><a href="merge.c#tracemerging">qh_tracemerging</a>
+print trace message during post-merging </li>
+</ul>
+
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="poly2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull2">Qhull</a> &#149; <a href="#set2">Set</a>
+&#149; <a href="#stat2">Stat</a> &#149; <a href="#user2">User</a>
+</p>
+<h2>poly.c, poly2.c -- polyhedron operations</h2>
+
+<p>Qhull uses dimension-free terminology. Qhull builds a
+polyhedron in dimension <em>d. </em>A <em>polyhedron</em> is a
+simplicial complex of faces with geometric information for the
+top and bottom-level faces. A (<em>d-1</em>)-face is a <em>facet</em>,
+a (<em>d-2</em>)-face is a <em>ridge</em>, and a <em>0</em>-face
+is a <em>vertex</em>. For example in 3-d, a facet is a polygon
+and a ridge is an edge. A facet is built from a ridge (the <em>base</em>)
+and a vertex (the <em>apex</em>). See 
+<a href="qh-man.htm#structure">Qhull's data structures</a>.</p>
+
+<p>Qhull's primary data structure is a polyhedron. A
+polyhedron is a list of facets. Each facet has a set of
+neighoring facets and a set of vertices. Each facet has a
+hyperplane. For example, a tetrahedron has four facets.
+If its vertices are <em>a, b, c, d</em>, and its facets
+are <em>1, 2, 3, 4,</em> the tetrahedron is </p>
+<ul>
+<li>facet 1 <ul>
+    <li>vertices: b c d </li>
+    <li>neighbors: 2 3 4 </li>
+</ul>
+</li>
+<li>facet 2 <ul>
+    <li>vertices: a c d </li>
+    <li>neighbors: 1 3 4 </li>
+</ul>
+</li>
+<li>facet 3 <ul>
+    <li>vertices: a b d </li>
+    <li>neighbors: 1 2 4 </li>
+</ul>
+</li>
+<li>facet 4 <ul>
+    <li>vertices: a b c </li>
+    <li>neighbors: 1 2 3 </li>
+</ul>
+</li>
+</ul>
+<p>A facet may be simplicial or non-simplicial. In 3-d, a
+<i>simplicial facet</i> has three vertices and three
+neighbors. A <i>nonsimplicial facet</i> has more than
+three vertices and more than three neighbors. A
+nonsimplicial facet has a set of ridges and a centrum. </p>
+<p>
+A simplicial facet has an orientation. An <i>orientation</i>
+is either <i>top</i> or <i>bottom</i>.  
+The flag, <tt>facet-&gt;toporient,</tt>
+defines the orientation of the facet's vertices.  For example in 3-d,
+'top' is left-handed orientation (i.e., the vertex order follows the direction
+of the left-hand fingers when the thumb is pointing away from the center).
+Except for axis-parallel facets in 5-d and higher, topological orientation
+determines the geometric orientation of the facet's hyperplane.
+</b>
+<p>A nonsimplicial facet is due to merging two or more
+facets. The facet's ridge set determine a simplicial
+decomposition of the facet. Each ridge is a 1-face (i.e.,
+it has two vertices and two neighboring facets). The
+orientation of a ridge is determined by the order of the
+neighboring facets. The flag, <tt>facet-&gt;toporient,</tt>is
+ignored. </p>
+<p>A nonsimplicial facet has a centrum for testing
+convexity. A <i>centrum</i> is a point on the facet's
+hyperplane that is near the center of the facet. Except
+for large facets, it is the arithmetic average of the
+facet's vertices. </p>
+<p>A nonsimplicial facet is an approximation that is
+defined by offsets from the facet's hyperplane. When
+Qhull finishes, the <i>outer plane</i> is above all
+points while the <i>inner plane</i> is below the facet's
+vertices. This guarantees that any exact convex hull
+passes between the inner and outer planes. The outer
+plane is defined by <tt>facet-&gt;maxoutside</tt> while
+the inner plane is computed from the facet's vertices.</p>
+<p><a href="#poly2">»</a> <a href="#geom">Geom</a> 
+<a name="poly">&#149;</a> <a href="#global">Global</a>
+&#149; <a href="#io">Io</a> &#149; <a href="#mem">Mem</a>
+&#149; <a href="#merge">Merge</a> &#149; <a href="#poly2">Poly</a>
+&#149; <a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a>
+&#149; <a href="#stat">Stat</a> &#149; <a href="#user">User</a>
+</p>
+<h3>Index to <a href="poly.c#TOP">poly.c</a>, 
+<a href="poly2.c#TOP">poly2.c</a>, <a href="poly.h#TOP">poly.h</a>,
+and <a href="qhull.h#TOP">qhull.h</a></h3>
+<ul>
+<li><a href="#ptype">Data types and global
+lists for polyhedrons</a> </li>
+<li><a href="#pconst">poly.h constants</a> </li>
+<li><a href="#pgall">Global FORALL macros</a> </li>
+<li><a href="#pall">FORALL macros</a> </li>
+<li><a href="#peach">FOREACH macros</a> </li>
+<li><a href="#pieach">Indexed FOREACH macros</a> </li>
+<li><a href="#pmacro">Other macros for polyhedrons</a><p>&nbsp;</li>
+<li><a href="#plist">Facetlist functions</a> </li>
+<li><a href="#pfacet">Facet functions</a> </li>
+<li><a href="#pvertex">Vertex, ridge, and point
+functions</a> </li>
+<li><a href="#phash">Hashtable functions</a> </li>
+<li><a href="#pnew">Allocation and deallocation
+functions</a> </li>
+<li><a href="#pcheck">Check functions</a> </li>
+</ul>
+<h3><a href="#poly">»</a><a name="ptype">Data
+types and global lists for polyhedrons</a></h3>
+<ul>
+<li><a href="poly.h#hashentryT">hashentryT</a> hash
+table entry for sub-ridges</li>
+<li><a href="qhull.h#facetT">facetT</a> defines a
+facet </li>
+<li><a href="qhull.h#ridgeT">ridgeT</a> defines a
+ridge </li>
+<li><a href="qhull.h#vertexT">vertexT</a> defines a
+vertex </li>
+<li><a href="qhull.h#qh-lists">qh facet and vertex
+lists</a> lists of facets and vertices </li>
+<li><a href="qhull.h#qh-set">qh global sets</a>
+global sets for merging, hashing, input, etc. </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pconst">poly.h constants</a></h3>
+<ul>
+<li><a href="poly.h#ALGORITHMfault">ALGORITHMfault</a>
+flag to not report errors in qh_checkconvex() </li>
+<li><a href="poly.h#DATAfault">DATAfault</a> flag to
+report errors in qh_checkconvex() </li>
+<li><a href="poly.h#DUPLICATEridge">DUPLICATEridge</a>
+special value for facet-&gt;neighbor to indicate
+a duplicate ridge </li>
+<li><a href="poly.h#MERGEridge">MERGEridge</a>
+special value for facet-&gt;neighbor to indicate
+a merged ridge </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pgall">Global FORALL
+macros</a></h3>
+<ul>
+<li><a href="qhull.h#FORALLfacets">FORALLfacets</a>
+assign 'facet' to each facet in qh.facet_list </li>
+<li><a href="poly.h#FORALLnew_facets">FORALLnew_facets</a>
+assign 'facet' to each facet in qh.newfacet_list </li>
+<li><a href="poly.h#FORALLvisible_facets">FORALLvisible_facets</a>
+assign 'visible' to each visible facet in
+qh.visible_list </li>
+<li><a href="qhull.h#FORALLpoints">FORALLpoints</a>
+assign 'point' to each point in qh.first_point,
+qh.num_points </li>
+<li><a href="qhull.h#FORALLvertices">FORALLvertices</a>
+assign 'vertex' to each vertex in qh.vertex_list </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pall">FORALL macros</a></h3>
+<ul>
+<li><a href="poly.h#FORALLfacet_">FORALLfacet_</a>
+assign 'facet' to each facet in facetlist </li>
+<li><a href="qhull.h#FORALLpoint_">FORALLpoint_</a>
+assign 'point' to each point in points array</li>
+<li><a href="poly.h#FORALLsame_">FORALLsame_</a>
+assign 'same' to each facet in samecycle</li>
+<li><a href="poly.h#FORALLsame_cycle_">FORALLsame_cycle_</a>
+assign 'same' to each facet in samecycle</li>
+<li><a href="poly.h#FORALLvertex_">FORALLvertex_</a>
+assign 'vertex' to each vertex in vertexlist </li>
+</ul>
+<h3><a href="#poly">»</a><a name="peach">FOREACH macros</a></h3>
+<ul>
+<li><a href="poly.h#FOREACHentry_">FOREACHentry_</a>
+assign 'entry' to each hash entry in entry set </li>
+<li><a href="qhull.h#FOREACHfacet_">FOREACHfacet_</a>
+assign 'facet' to each facet in facets </li>
+<li><a href="qhull.h#FOREACHneighbor_">FOREACHneighbor_</a>
+assign 'neighbor' to each facet in
+facet-&gt;neighbors or vertex-&gt;neighbors</li>
+<li><a href="poly.h#FOREACHnewfacet_">FOREACHnewfacet_</a>
+assign 'newfacet' to each facet in facet set </li>
+<li><a href="qhull.h#FOREACHpoint_">FOREACHpoint_</a>
+assign 'point' to each point in points set </li>
+<li><a href="qhull.h#FOREACHridge_">FOREACHridge_</a>
+assign 'ridge' to each ridge in ridge set </li>
+<li><a href="qhull.h#FOREACHvertex_">FOREACHvertex_</a>
+assign 'vertex' to each vertex in vertex set </li>
+<li><a href="poly.h#FOREACHvertexA_">FOREACHvertexA_</a>
+assign 'vertexA' to each vertex in vertex set</li>
+<li><a href="poly.h#FOREACHvisible_">FOREACHvisible_</a>
+assign 'visible' to each facet in facet set </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pieach">Indexed
+FOREACH macros</a></h3>
+<ul>
+<li><a href="qhull.h#FOREACHfacet_i_">FOREACHfacet_i_</a>
+assign 'facet' and 'facet_i' to each facet in
+facet set </li>
+<li><a href="qhull.h#FOREACHneighbor_i_">FOREACHneighbor_i_</a>
+assign 'neighbor' and 'neighbor_i' to each facet
+in facet-&gt;neighbors or vertex-&gt;neighbors</li>
+<li><a href="qhull.h#FOREACHpoint_i_">FOREACHpoint_i_</a>
+assign 'point' and 'point_i' to each point in
+points set </li>
+<li><a href="qhull.h#FOREACHridge_i_">FOREACHridge_i_</a>
+assign 'ridge' and 'ridge_i' to each ridge in
+ridges set </li>
+<li><a href="qhull.h#FOREACHvertex_i_">FOREACHvertex_i_</a>
+assign 'vertex' and 'vertex_i' to each vertex in
+vertices set </li>
+<li><a href="poly.h#FOREACHsetelementreverse12_">FOREACHvertexreverse12_</a>
+assign 'vertex' to each vertex in vertex set;
+reverse the order of first two vertices </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pmacro">Other macros for polyhedrons</a></h3>
+<ul>
+<li><a href="qhull.h#getid_">getid_</a> return id for
+a facet, ridge, or vertex </li>
+<li><a href="qhull.h#otherfacet_">otherfacet_</a>
+return neighboring facet for a ridge in a facet </li>
+</ul>
+<h3><a href="#poly">»</a><a name="plist">Facetlist
+functions</a></h3>
+<ul>
+<li><a href="poly.c#appendfacet">qh_appendfacet</a>
+appends facet to end of qh.facet_list</li>
+<li><a href="poly.c#attachnewfacets">qh_attachnewfacets</a>
+attach new facets in qh.newfacet_list to the
+horizon </li>
+<li><a href="poly2.c#findfacet">qh_findfacet</a> find
+facet that is furthest below a point </li>
+<li><a href="poly2.c#findgood">qh_findgood</a>
+identify good facets for qh.PRINTgood </li>
+<li><a href="poly2.c#findgood_all">qh_findgood_all</a>
+identify more good facets for qh.PRINTgood </li>
+<li><a href="poly2.c#furthestnext">qh_furthestnext</a>
+move facet with furthest of furthest points to
+facet_next </li>
+<li><a href="poly2.c#initialhull">qh_initialhull</a>
+construct the initial hull as a simplex of
+vertices </li>
+<li><a href="poly2.c#nearcoplanar">qh_nearcoplanar</a> 
+  remove near-inside points from coplanar sets</li>
+<li><a href="poly2.c#nonupper">qh_nonupper</a> return
+first non-flipped facet </li>
+<li><a href="poly2.c#prependfacet">qh_prependfacet</a>
+prepends facet to start of facetlist </li>
+<li><a href="poly.c#removefacet">qh_removefacet</a>
+unlinks facet from qh.facet_list</li>
+<li><a href="poly2.c#resetlists">qh_resetlists</a>
+reset qh.newvertex_list, qh.newfacet_list, and
+qh.visible_list </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pfacet">Facet
+functions</a></h3>
+<ul>
+<li><a href="poly2.c#createsimplex">qh_createsimplex</a>
+create a simplex of facets from a set of vertices
+</li>
+<li><a href="poly2.c#furthestout">qh_furthestout</a>
+make furthest outside point the last point of a
+facet's outside set </li>
+<li><a href="poly.c#makenew_nonsimplicial">qh_makenew_nonsimplicial</a>
+make new facets from ridges of visible facets </li>
+<li><a href="poly.c#makenew_simplicial">qh_makenew_simplicial</a>
+make new facets for horizon neighbors </li>
+<li><a href="poly.c#makenewfacet">qh_makenewfacet</a>
+create a facet from vertices and apex </li>
+<li><a href="poly2.c#makenewfacets">qh_makenewfacets</a>
+make new facets from vertex, horizon facets, and
+visible facets </li>
+<li><a href="poly.c#makenewplanes">qh_makenewplanes</a>
+make new hyperplanes for facets </li>
+<li><a href="poly2.c#outcoplanar">qh_outcoplanar</a>
+move points from outside set to coplanar set </li>
+<li><a href="poly2.c#setvoronoi_all">qh_setvoronoi_all</a>
+compute Voronoi centers for all facets </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pvertex">Vertex,
+ridge, and point functions</a></h3>
+<ul>
+<li><a href="poly.c#appendvertex">qh_appendvertex</a>
+append vertex to end of qh.vertex_list, </li>
+<li><a href="poly2.c#facet3vertex">qh_facet3vertex</a>
+return an oriented vertex set for a 3-d facet </li>
+<li><a href="poly.c#facetintersect">qh_facetintersect</a>
+return intersection of simplicial facets </li>
+<li><a href="poly2.c#initialvertices">qh_initialvertices</a>
+return non-singular set of initial vertices </li>
+<li><a href="poly2.c#isvertex">qh_isvertex</a> true
+if point is in a vertex set </li>
+<li><a href="poly2.c#nearvertex">qh_nearvertex</a>
+return nearest vertex to point </li>
+<li><a href="poly2.c#nextridge3d">qh_nextridge3d</a>
+iterate over each ridge and vertex for a 3-d
+facet </li>
+<li><a href="poly2.c#point">qh_point</a> return point
+for a point id </li>
+<li><a href="poly2.c#pointfacet">qh_pointfacet</a>
+return temporary set of facets indexed by point
+id </li>
+<li><a href="poly.c#pointid">qh_pointid</a> return id
+for a point</li>
+<li><a href="poly2.c#pointvertex">qh_pointvertex</a>
+return temporary set of vertices indexed by point
+id </li>
+<li><a href="poly.c#removevertex">qh_removevertex</a>
+unlink vertex from qh.vertex_list, </li>
+<li><a href="poly.c#updatevertices">qh_updatevertices</a>
+update vertex neighbors and delete interior
+vertices </li>
+<li><a href="poly2.c#vertexintersect">qh_vertexintersect</a>
+intersect two vertex sets </li>
+<li><a href="poly2.c#vertexintersect_new">qh_vertexintersect_new</a>
+return intersection of two vertex sets </li>
+<li><a href="poly2.c#vertexneighhbors">qh_vertexneighhbors</a>
+for each vertex in hull, determine facet
+neighbors </li>
+<li><a href="poly2.c#vertexsubset">qh_vertexsubset</a>
+returns True if vertexsetA is a subset of
+vertexsetB </li>
+</ul>
+<h3><a href="#poly">»</a><a name="phash">Hashtable functions</a></h3>
+<ul>
+<li><a href="poly2.c#addhash">qh_addhash</a> add hash
+element to linear hash table</li>
+<li><a href="poly.c#gethash">qh_gethash</a> return
+hash value for a set</li>
+<li><a href="poly2.c#matchduplicates">qh_matchduplicates</a>
+match duplicate ridges in hash table </li>
+<li><a href="poly.c#matchneighbor">qh_matchneighbor</a>
+try to match subridge of new facet with a
+neighbor </li>
+<li><a href="poly.c#matchnewfacets">qh_matchnewfacets</a>
+match new facets with their new facet neighbors </li>
+<li><a href="poly.c#matchvertices">qh_matchvertices</a>
+tests whether a facet and hash entry match at a
+ridge </li>
+<li><a href="poly2.c#newhashtable">qh_newhashtable</a>
+allocate a new qh.hash_table </li>
+<li><a href="poly2.c#printhashtable">qh_printhashtable</a>
+print hash table </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pnew">Allocation and
+deallocation functions</a></h3>
+<ul>
+<li><a href="poly2.c#clearcenters">qh_clearcenters</a>
+clear old data from facet-&gt;center </li>
+<li><a href="poly.c#deletevisible">qh_deletevisible</a>
+delete visible facets and vertices </li>
+<li><a href="poly.c#delfacet">qh_delfacet</a> free up
+the memory occupied by a facet </li>
+<li><a href="poly2.c#delridge">qh_delridge</a> delete
+ridge</li>
+<li><a href="poly2.c#delvertex">qh_delvertex</a>
+delete vertex </li>
+<li><a href="poly.c#newfacet">qh_newfacet</a> create
+and allocate space for a facet </li>
+<li><a href="poly.c#newridge">qh_newridge</a> create
+and allocate space for a ridge </li>
+<li><a href="poly2.c#newvertex">qh_newvertex</a>
+create and allocate space for a vertex </li>
+</ul>
+<h3><a href="#poly">»</a><a name="pcheck">Check
+functions</a></h3>
+<ul>
+<li><a href="poly2.c#check_bestdist">qh_check_bestdist</a>
+check that points are not outside of facets </li>
+<li><a href="poly2.c#check_maxout">qh_check_maxout</a>
+updates qh.max_outside and checks all points
+against bestfacet </li>
+<li><a href="poly2.c#check_output">qh_check_output</a>
+check topological and geometric output</li>
+<li><a href="poly2.c#check_point">qh_check_point</a>
+check that point is not outside of facet </li>
+<li><a href="poly2.c#check_points">qh_check_points</a>
+check that all points are inside all facets </li>
+<li><a href="poly2.c#checkconvex">qh_checkconvex</a>
+check that each ridge in facetlist is convex </li>
+<li><a href="poly2.c#checkfacet">qh_checkfacet</a>
+check for consistency errors in facet </li>
+<li><a href="poly.c#checkflipped">qh_checkflipped</a>
+check facet orientation to the interior point </li>
+<li><a href="poly2.c#checkflipped_all">qh_checkflipped_all</a>
+check facet orientation for a facet list </li>
+<li><a href="poly2.c#checkpolygon">qh_checkpolygon</a>
+check topological structure </li>
+<li><a href="poly2.c#checkvertex">qh_checkvertex</a>
+check vertex for consistency </li>
+<li><a href="poly2.c#infiniteloop">qh_infiniteloop</a>
+report error for a loop of facets </li>
+<li><a href="poly2.c#printlists">qh_printlists</a>
+print out facet list for debugging </li>
+</ul>
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="qhull2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; 
+<a href="#poly2">Poly</a> &#149; <a href="#qhull">Qhull</a>
+&#149; <a href="#set2">Set</a> &#149; <a href="#stat2">Stat</a>
+&#149; <a href="#user2">User</a> </p>
+<h2>qhull.c -- top-level functions and basic data types</h2>
+<p>Qhull implements the Quickhull algorithm for computing
+the convex hull. The Quickhull algorithm combines two
+well-known algorithms: the 2-d quickhull algorithm and
+the n-d beneath-beyond algorithm. See 
+<a href="#description">Description of Qhull</a>. </p>
+<p>This section provides an index to the top-level
+functions and base data types.  The top-level header file, <tt>qhull.h</tt>,
+contains prototypes for these functions.</p>
+<p><a href="#qhull2">»</a> <a href="#geom">Geom</a> 
+<a name="qhull">&#149;</a> <a href="#global">Global</a>
+&#149; <a href="#io">Io</a> &#149; <a href="#mem">Mem</a>
+&#149; <a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull2">Qhull</a> &#149; <a href="#set">Set</a>
+&#149; <a href="#stat">Stat</a> &#149; <a href="#user">User</a>
+</p>
+<h3>Index to <a href="qhull.c#TOP">qhull.c</a>,
+<a href="qhull.h#TOP">qhull.h</a>, and 
+<a href="unix.c#TOP">unix.c</a></h3>
+<ul>
+<li><a href="#qtype">qhull.h other data types and
+constants</a> </li>
+<li><a href="#qmacro">qhull.h other macros</a> </li>
+<li><a href="#qfunc">Quickhull routines in call order</a> </li>
+<li><a href=="#qinit">Top-level routines for initializing and terminating Qhull</a></li>
+<li><a href="#qin">Top-level routines for reading and modifying the input</a></li>
+<li><a href="#qcall">Top-level routines for calling Qhull</a></li>
+<li><a href="#qout">Top-level routines for returning results</a></li>
+<li><a href="#qtest">Top-level routines for testing and debugging</a></li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qtype">qhull.h other
+data types and constants</a></h3>
+<ul>
+<li><a href="qhull.h#flagT">flagT</a> Boolean flag as
+a bit </li>
+<li><a href="qhull.h#boolT">boolT</a> boolean value,
+either True or False </li>
+<li><a href="qhull.h#CENTERtype">CENTERtype</a> to
+distinguish facet-&gt;center </li>
+<li><a href="qhull.h#qh_PRINT">qh_PRINT</a> output
+formats for printing (qh.PRINTout) </li>
+<li><a href="qhull.h#qh_ALL">qh_ALL</a> argument flag
+for selecting everything </li>
+<li><a href="qhull.h#qh_ERR">qh_ERR</a> Qhull exit
+codes for indicating errors </li>
+<li><a href="unix.c#prompt">qh_prompt</a> version and long prompt for Qhull</li>
+<li><a href="unix.c#prompt2">qh_prompt2</a> synopsis for Qhull</li>
+<li><a href="unix.c#prompt3">qh_prompt3</a> concise prompt for Qhull</li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qmacro">qhull.h other
+macros</a></h3>
+<ul>
+<li><a href="qhull.h#traceN">traceN</a> print trace
+message if <em>qh.IStracing &gt;= N</em>. </li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qfunc">Quickhull
+routines in call order</a></h3>
+<ul>
+<li><a href="unix.c#main">main</a> processes the
+command line, calls qhull() to do the work, and
+exits </li>
+<li><a href="qhull.c#qhull">qh_qhull</a> construct
+the convex hull of a set of points </li>
+<li><a href="qhull.c#build_withrestart">qh_build_withrestart</a>
+allow restarts while calling qh_buildhull</li>
+<li><a href="poly2.c#initbuild">qh_initbuild</a>
+initialize hull and outside sets with point array</li>
+<li><a href="qhull.c#partitionall">qh_partitionall</a>
+partition all points into outside sets </li>
+<li><a href="qhull.c#buildhull">qh_buildhull</a>
+construct a convex hull by adding points one at a
+time </li>
+<li><a href="qhull.c#nextfurthest">qh_nextfurthest</a>
+return next furthest point for processing </li>
+<li><a href="qhull.c#buildtracing">qh_buildtracing</a>
+trace an iteration of buildhull </li>
+<li><a href="qhull.c#addpoint">qh_addpoint</a> add a
+point to the convex hull </li>
+<li><a href="qhull.c#findhorizon">qh_findhorizon</a>
+find the horizon and visible facets for a point </li>
+<li><a href="qhull.c#partitionvisible">qh_partitionvisible</a>
+partition points from facets in qh.visible_list
+to facets in qh.newfacet_list </li>
+<li><a href="qhull.c#partitionpoint">qh_partitionpoint</a>
+partition a point as inside, coplanar with, or
+outside a facet </li>
+<li><a href="qhull.c#partitioncoplanar">qh_partitioncoplanar</a>
+partition coplanar point into a facet </li>
+<li><a href="qhull.c#precision">qh_precision</a> restart on precision errors if not merging and if 'QJn'</li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qinit">Top-level routines for initializing and terminating Qhull</a></h3>
+<ul>
+<li><a href="global.c#freebuild">qh_freebuild</a>
+free memory used by qh_initbuild and qh_buildhull
+</li>
+<li><a href="global.c#freeqhull">qh_freeqhull</a>
+free memory used by qhull </li>
+<li><a href="global.c#init_A">qh_init_A</a> called
+before error handling initialized </li>
+<li><a href="global.c#init_B">qh_init_B</a> called
+after points are defined </li>
+<li><a href="global.c#initflags">qh_initflags</a> set
+flags and constants from command line </li>
+<li><a href="qhull.c#restore_qhull">qh_restore_qhull</a>
+restores a saved qhull </li>
+<li><a href="qhull.c#save_qhull">qh_save_qhull</a>
+saves qhull for later restoring </li>
+<li><a href="qhull.c#user_memsizes">qh_user_memsizes</a>
+define additional quick allocation sizes
+</li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qin">Top-level routines for reading and modifying the input</a></h3>
+<ul>
+<li><a href="geom2.c#gram_schmidt">qh_gram_schmidt</a>
+implements Gram-Schmidt orthogonalization by rows </li>
+<li><a href="qhull.c#projectinput">qh_projectinput</a>
+project input along one or more dimensions +
+Delaunay projection </li>
+<li><a href="geom2.c#randommatrix">qh_randommatrix</a>
+generate a random dimXdim matrix in range (-1,1) </li>
+<li><a href="io.c#readpoints">qh_readpoints</a> read
+points from input </li>
+<li><a href="geom2.c#rotateinput">qh_rotateinput</a> rotate
+input points using row matrix </li>
+<li><a href="geom2.c#scaleinput">qh_scaleinput</a> scale
+input points using qh low_bound/high_bound </li>
+<li><a href="geom2.c#setdelaunay">qh_setdelaunay</a> project
+points to paraboloid for Delaunay triangulation </li>
+<li><a href="geom2.c#sethalfspace_all">qh_sethalfspace_all</a>
+generate dual for halfspace intersection with interior
+point </li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qcall">Top-level routines for calling Qhull</a></h3>
+<ul>
+<li><a href="qhull.c#addpoint">qh_addpoint</a> add
+point to convex hull </li>
+<li><a href="poly2.c#findbestfacet">qh_findbestfacet</a>
+find facet that is furthest below a point </li>
+<li><a href="poly2.c#findfacet_all">qh_findfacet_all</a>
+exhaustive search for facet below a point </li>
+<li><a href="qhull.c#qhull">qh_qhull</a> construct
+the convex hull of a set of points </li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qout">Top-level routines for returning results</a></h3>
+<ul>
+<li><a href="stat.c#collectstatistics">qh_collectstatistics</a>
+collect statistics for qh.facet_list </li>
+<li><a href="geom2.c#nearvertex">qh_nearvertex</a>
+return nearest vertex to point </li>
+<li><a href="poly2.c#point">qh_point</a> return point
+for a point id </li>
+<li><a href="poly2.c#pointfacet">qh_pointfacet</a>
+return temporary set of facets indexed by point
+id </li>
+<li><a href="poly.c#pointid">qh_pointid</a> return id
+for a point</li>
+<li><a href="poly2.c#pointvertex">qh_pointvertex</a>
+return vertices (if any) for all points</li>
+<li><a href="stat.c#printallstatistics">qh_printallstatistics</a>
+print all statistics </li>
+<li><a href="io.c#printneighborhood">qh_printneighborhood</a>
+print neighborhood of one or two facets </li>
+<li><a href="qhull.c#printsummary">qh_printsummary</a>
+print summary </li>
+<li><a href="io.c#produce_output">qh_produce_output</a>
+print the results of qh_qhull() </li>
+<li><a href="qhull.c#setvoronoi_all">qh_setvoronoi_all</a>
+compute Voronoi centers for all facets </li>
+</ul>
+
+<h3><a href="#qhull">»</a><a name="qtest">Top-level routines for testing and debugging</a></h3>
+<ul>
+<li><a href="io.c#dfacet">dfacet</a> print facet by
+id from debugger </li>
+<li><a href="io.c#dvertex">dvertex</a> print vertex
+by id from debugger </li>
+<li><a href="poly2.c#check_output">qh_check_output</a>
+check output </li>
+<li><a href="poly2.c#check_points">qh_check_points</a>
+verify that all points are inside the convex hull
+</li>
+<li><a href="user.c#errexit">qh_errexit</a> report
+error with a facet and a ridge</li>
+<li><a href="qhull.c#errexit2">qh_errexit2</a> report
+error with two facets </li>
+<li><a href="user.c#errprint">qh_errprint</a> print
+erroneous facets, ridge, and vertex </li>
+<li><a href="user.c#printfacetlist">qh_printfacetlist</a>
+print all fields for a list of facets </li>
+</ul>
+
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="set2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; 
+<a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a>
+&#149; <a href="#set">Set</a> &#149; <a href="#stat2">Stat</a>
+&#149; <a href="#user2">User</a> </p>
+<h2>set.c -- set data type and operations</h2>
+<p>Qhull's data structures are constructed from sets. The
+functions and macros in set.c construct, iterate, and
+modify these sets. They are the most frequently called
+functions in Qhull. For this reason, efficiency is the
+primary concern. </p>
+<p>In Qhull, a <i>set</i> is represented by an unordered
+array of pointers with a maximum size and a NULL
+terminator (<a href="set.h#setT">setT</a>). 
+Most sets correspond to mathematical sets
+(i.e., the pointers are unique). Some sets are sorted to
+enforce uniqueness. Some sets are ordered. For example,
+the order of vertices in a ridge determine the ridge's
+orientation. If you reverse the order of adjacent
+vertices, the orientation reverses. Some sets are not
+mathematical sets. They may be indexed as an array and
+they may include NULL pointers. </p>
+<p>The most common operation on a set is to iterate its
+members. This is done with a 'FOREACH...' macro. Each set
+has a custom macro. For example, 'FOREACHvertex_'
+iterates over a set of vertices. Each vertex is assigned
+to the variable 'vertex' from the pointer 'vertexp'. </p>
+<p>Most sets are constructed by appending elements to the
+set. The last element of a set is either NULL or the
+index of the terminating NULL for a partially full set.
+If a set is full, appending an element copies the set to
+a larger array. </p>
+<p><a href="#set2">»</a> <a href="#geom">Geom</a> 
+<a name="set">&#149;</a> <a href="#global">Global</a> &#149;
+<a href="#io">Io</a> &#149; <a href="#mem">Mem</a> &#149;
+<a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull">Qhull</a> &#149; <a href="#set2">Set</a>
+&#149; <a href="#stat">Stat</a> &#149; <a href="#user">User</a>
+</p>
+<h3>Index to <a href="set.c#TOP">set.c</a> and 
+<a href="set.h#TOP">set.h</a></h3>
+<ul>
+<li><a href="#stype">Data types and constants</a> </li>
+<li><a href="#seach">FOREACH macros</a> </li>
+<li><a href="#saccess">access and size macros</a> </li>
+<li><a href="#sint">internal macros</a> </li>
+<li><a href="#saddr">address macros</a><p>&nbsp;</li>
+
+<li><a href="#snew">Allocation and deallocation functions</a> </li>
+<li><a href="#spred">Access and predicate functions</a>
+</li>
+<li><a href="#sadd">Add functions</a> </li>
+<li><a href="#scheck">Check and print functions</a></li>
+<li><a href="#scopy">Copy, compact, and zero functions</a></li>
+<li><a href="#sdel">Delete functions</a> </li>
+<li><a href="#stemp">Temporary set functions</a> </li>
+</ul>
+<h3><a href="#set">»</a><a name="stype">Data types and
+constants</a></h3>
+<ul>
+<li><a href="set.h#SETelemsize">SETelemsize</a> size
+of a set element in bytes </li>
+<li><a href="set.h#setT">setT</a> a set with a
+maximum size and a current size</li>
+<li><a href="qhull.h#qh-set">qh global sets</a>
+global sets for temporary sets, etc. </li>
+</ul>
+<h3><a href="#set">»</a><a name="seach">FOREACH macros</a></h3>
+<ul>
+<li><a href="set.h#FOREACHelem_">FOREACHelem_</a>
+assign 'elem' to each element in a set </li>
+<li><a href="set.h#FOREACHset_">FOREACHset_</a>
+assign 'set' to each set in a set of sets </li>
+<li><a href="set.h#FOREACHsetelement_">FOREACHsetelement_</a>
+define a FOREACH iterator </li>
+<li><a href="set.h#FOREACHsetelement_i_">FOREACHsetelement_i_</a>
+define an indexed FOREACH iterator </li>
+<li><a href="set.h#FOREACHsetelementreverse_">FOREACHsetelementreverse_</a>
+define a reversed FOREACH iterator </li>
+<li><a href="set.h#FOREACHsetelementreverse12_">FOREACHsetelementreverse12_</a>
+define a FOREACH iterator with e[1] and e[0]
+reversed </li>
+</ul>
+<h3><a href="#set">»</a><a name="saccess">Access and
+size macros</a></h3>
+<ul>
+<li><a href="set.h#SETelem_">SETelem_</a> return the
+n'th element of set </li>
+<li><a href="set.h#SETelemt_">SETelemt_</a> return
+the n'th element of set as a type</li>
+<li><a href="set.h#SETempty_">SETempty_</a> return
+true (1) if set is empty </li>
+<li><a href="set.h#SETfirst_">SETfirst_</a> return
+first element of set </li>
+<li><a href="set.h#SETfirstt_">SETfirstt_</a> return
+first element of set as a type</li>
+<li><a href="set.h#SETindex_">SETindex_</a> return
+index of elem in set </li>
+<li><a href="set.h#SETreturnsize_">SETreturnsize_</a>
+return size of a set (normally use <a href="set.c#setsize">qh_setsize</a>) </li>
+<li><a href="set.h#SETsecond_">SETsecond_</a> return
+second element of set </li>
+<li><a href="set.h#SETsecondt_">SETsecondt_</a>
+return second element of set as a type</li>
+</ul>
+<h3><a href="#set">»</a><a name="sint">Internal macros</a></h3>
+<ul>
+<li><a href="set.c#SETsizeaddr&quot;">SETsizeaddr_</a>
+return pointer to end element of a set (indicates
+current size) </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="saddr">address macros</a></h3>
+<ul>
+<li><a href="set.h#SETaddr_">SETaddr_</a> return
+address of a set's elements </li>
+<li><a href="set.h#SETelemaddr_">SETelemaddr_</a>
+return address of the n'th element of a set </li>
+<li><a href="set.h#SETref_">SETref_</a> l.h.s. for
+modifying the current element in a FOREACH
+iteration </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="snew">Allocation and
+deallocation functions</a></h3>
+<ul>
+<li><a href="set.c#setfree">qh_setfree</a> free the
+space occupied by a set </li>
+<li><a href="set.c#setfree2">qh_setfree2</a> free a
+set and its elements </li>
+<li><a href="set.c#setfreelong">qh_setfreelong</a>
+free a set only if it is in long memory </li>
+<li><a href="set.c#setnew">qh_setnew</a> create a new
+set </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="spred">Access and
+predicate functions </a></h3>
+<ul>
+<li><a href="set.c#setequal">qh_setequal</a> return 1
+if two sorted sets are equal </li>
+<li><a href="set.c#setequal_except">qh_setequal_except</a>
+return 1 if two sorted sets are equal except for
+an element </li>
+<li><a href="set.c#setequal_skip">qh_setequal_skip</a>
+return 1 if two sorted sets are equal except for
+a pair of skipped elements </li>
+<li><a href="set.c#setequal_skip">qh_setequal_skip</a>
+return 1 if two sorted sets are equal except for
+a pair of skipped elements </li>
+<li><a href="set.c#setin">qh_setin</a> return 1 if an
+element is in a set </li>
+<li><a href="set.c#setindex">qh_setindex</a> return
+the index of an element in a set </li>
+<li><a href="set.c#setlast">qh_setlast</a> return
+last element of a set</li>
+<li><a href="set.c#setsize">qh_setsize</a> returns
+the size of a set </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="sadd">Add functions</a></h3>
+<ul>
+<li><a href="set.c#setaddnth">qh_setaddnth</a> add a
+element as n'th element of sorted or unsorted set
+</li>
+<li><a href="set.c#setaddsorted">qh_setaddsorted</a>
+add an element to a sorted set </li>
+<li><a href="set.c#setappend">qh_setappend</a> append
+an element to a set </li>
+<li><a href="set.c#setappend_set">qh_setappend_set</a>
+append a set of elements to a set </li>
+<li><a href="set.c#setappend2ndlast">qh_setappend2ndlast</a>
+add an element as the next to the last element in
+a set </li>
+<li><a href="set.c#setlarger">qh_setlarger</a> return
+a larger set with the same elements</li>
+<li><a href="set.c#setreplace">qh_setreplace</a>
+replace one element with another in a set</li>
+<li><a href="set.c#setunique">qh_setunique</a> add an
+element if it is not already in a set </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="scheck">Check and print functions</a></h3>
+<ul>
+<li><a href="set.c#setcheck">qh_setcheck</a> check a
+set for validity </li>
+<li><a href="set.c#setprint">qh_setprint</a> print a
+set's elements to fp </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="scopy">Copy, compact, and zero functions</a></h3>
+<ul>
+<li><a href="set.c#setcompact">qh_setcompact</a>
+compact NULLs from an unsorted set </li>
+<li><a href="set.c#setcopy">qh_setcopy</a> make a
+copy of a sorted or unsorted set </li>
+<li><a href="set.c#setduplicate">qh_setduplicate</a>
+duplicate a set and its elements </li>
+<li><a href="set.c#settruncate">qh_settruncate</a>
+truncate a set to size elements </li>
+<li><a href="set.c#setzero">qh_setzero</a> zero the
+remainder of a set </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="sdel">Delete functions</a></h3>
+<ul>
+<li><a href="set.c#setdel">qh_setdel</a> delete an
+element from an unsorted set. </li>
+<li><a href="set.c#setdellast">qh_setdellast</a>
+delete and return last element from a set</li>
+<li><a href="set.c#setdelnth">qh_setdelnth</a> delete
+and return nth element from an unsorted set </li>
+<li><a href="set.c#setdelnthsorted">qh_setdelnthsorted</a>
+delete and return nth element from a sorted set </li>
+<li><a href="set.c#setdelsorted">qh_setdelsorted</a>
+delete an element from a sorted set </li>
+<li><a href="set.c#setnew_delnthsorted">qh_setnew_delnthsorted</a>
+create a sorted set not containing the nth
+element </li>
+</ul>
+
+<h3><a href="#set">»</a><a name="stemp">Temporary set functions</a></h3>
+<ul>
+<li><a href="set.c#settemp">qh_settemp</a> return a
+temporary set and append it qhmem.tempstack</li>
+<li><a href="set.c#settempfree">qh_settempfree</a>
+free and pop a set from qhmem.tempstack</li>
+<li><a href="set.c#settempfree_all">qh_settempfree_all</a>
+free all sets in qhmem.tempstack </li>
+<li><a href="set.c#settemppop">qh_settemppop</a> pop
+a set from qhmem.tempstack (makes it permanent) </li>
+<li><a href="set.c#settemppush">qh_settemppush</a>
+push a set unto qhmem.tempstack (makes it
+temporary) </li>
+</ul>
+
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="stat2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; 
+<a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a>
+&#149; <a href="#set2">Set</a> &#149; <a href="#stat">Stat</a>
+&#149; <a href="#user2">User</a> </p>
+<h2>stat.c -- statistical operations</h2>
+<p>Qhull records many statistics. These functions and
+macros make it inexpensive to add a statistic. 
+<p>As with Qhull's global variables, the statistics data structure is
+accessed by a macro, 'qhstat'.  If qh_QHpointer is defined, the macro
+is 'qh_qhstat->', otherwise the macro is 'qh_qhstat.'.
+Statistics
+may be turned off in user.h. If so, all but the 'zz'
+statistics are ignored.</p>
+<p><a href="#stat2">»</a> <a href="#geom">Geom</a> 
+<a name="stat">&#149;</a> <a href="#global">Global</a>
+&#149; <a href="#io">Io</a> &#149; <a href="#mem">Mem</a>
+&#149; <a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a>
+&#149; <a href="#stat2">Stat</a> &#149; <a href="#user">User</a>
+</p>
+<h3>Index to <a href="stat.c#TOP">stat.c</a> and 
+<a href="stat.h#TOP">stat.h</a></h3>
+<ul>
+<li><a href="#ttype">stat.h types</a> </li>
+<li><a href="#tconst">stat.h constants</a> </li>
+<li><a href="#tmacro">stat.h macros</a> </li>
+<li><a href="#tfunc">stat.c functions</a> </li>
+</ul>
+
+<h3><a href="#stat">»</a><a name="ttype">stat.h types</a></h3>
+<ul>
+<li><a href="stat.h#intrealT">intrealT</a> union of
+integer and real</li>
+<li><a href="stat.h#qhstat">qhstat</a> global data
+structure for statistics </li>
+</ul>
+<h3><a href="#stat">»</a><a name="tconst">stat.h
+constants</a></h3>
+<ul>
+<li><a href="stat.h#KEEPstatistics">qh_KEEPstatistics</a> 0 turns off most statistics</li>
+<li><a href="stat.h#statistics">Z..., W...</a> integer (Z) and real (W) statistics
+</li>
+<li><a href="stat.h#ZZstat">ZZstat</a> Z.../W... statistics that
+remain defined if qh_KEEPstatistics=0
+</li>
+<li><a href="stat.h#ztype">ztype</a> zdoc, zinc, etc.
+for definining statistics </li>
+</ul>
+<h3><a href="#stat">»</a><a name="tmacro">stat.h macros</a></h3>
+<ul>
+<li><a href="stat.h#MAYdebugx">MAYdebugx</a> called
+frequently for error trapping </li>
+<li><a href="stat.h#zadd_">zadd_/wadd_</a> add value
+to an integer or real statistic </li>
+<li><a href="stat.h#zdef_">zdef_</a> define a
+statistic </li>
+<li><a href="stat.h#zinc_">zinc_</a> increment an
+integer statistic </li>
+<li><a href="stat.h#zmax_">zmax_/wmax_</a> update
+integer or real maximum statistic </li>
+<li><a href="stat.h#zmin_">zmin_/wmin_</a> update
+integer or real minimum statistic </li>
+<li><a href="stat.h#zval_">zval_/wval_</a> set or
+return value of a statistic </li>
+</ul>
+
+<h3><a href="#stat">»</a><a name="tfunc">stat.c
+functions</a></h3>
+<ul>
+<li><a href="stat.c#allstatA">qh_allstatA</a> define
+statistics in groups of 20 </li>
+<li><a href="stat.c#allstatistics">qh_allstatistics</a>
+reset printed flag for all statistics </li>
+<li><a href="stat.c#collectstatistics">qh_collectstatistics</a>
+collect statistics for qh.facet_list </li>
+<li><a href="stat.c#freestatistics">qh_freestatistics</a>
+free memory used for statistics </li>
+<li><a href="stat.c#initstatistics">qh_initstatistics</a>
+allocate and initialize statistics </li>
+<li><a href="stat.c#newstats">qh_newstats</a> returns
+True if statistics for zdoc </li>
+<li><a href="stat.c#nostatistic">qh_nostatistic</a>
+true if no statistic to print </li>
+<li><a href="stat.c#printallstatistics">qh_printallstatistics</a>
+print all statistics </li>
+<li><a href="stat.c#printstatistics">qh_printstatistics</a>
+print statistics to a file </li>
+<li><a href="stat.c#printstatlevel">qh_printstatlevel</a>
+print level information for a statistic </li>
+<li><a href="stat.c#printstats">qh_printstats</a>
+print statistics for a zdoc group </li>
+<li><a href="stat.c#stddev">qh_stddev</a> compute the
+standard deviation and average from statistics </li>
+</ul>
+<hr>
+<p><a href="#TOP">»</a> <a href="#geom2">Geom</a> 
+<a name="user2">&#149;</a> <a href="#global2">Global</a>
+&#149; <a href="#io2">Io</a> &#149; <a href="#mem2">Mem</a>
+&#149; <a href="#merge2">Merge</a> &#149; 
+<a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a>
+&#149; <a href="#set2">Set</a> &#149; <a href="#stat2">Stat</a>
+&#149; <a href="#user">User</a> </p>
+<h2>user.c -- user-definable operations</h2>
+<p>This section contains functions and constants that the
+user may want to change. </p>
+<p><a href="#user2">»</a> <a href="#geom">Geom</a> 
+<a name="user">&#149;</a> <a href="#global">Global</a>
+&#149; <a href="#io">Io</a> &#149; <a href="#mem">Mem</a>
+&#149; <a href="#merge">Merge</a> &#149; <a href="#poly">Poly</a>
+&#149; <a href="#qhull">Qhull</a> &#149; <a href="#set">Set</a>
+&#149; <a href="#stat">Stat</a> &#149; <a href="#user2">User</a>
+</p>
+<h3>Index to <a href="user.c#TOP">user.c</a> and 
+<a href="user.h#TOP">user.h</a></h3>
+<ul>
+<li><a href="#utype">user.h data types and
+configuration macros</a> </li>
+<li><a href="#ujoggle">joggle constants</a></li>
+<li><a href="#uperform">performance related constants</a></li>
+<li><a href="#umemory">memory and other constants</a></li>
+<li><a href="#ucond">conditional compilation</a></li>
+<li><a href="#umerge">merge constants</a> </li>
+<li><a href="#ufunc">user.c functions</a> </li>
+</ul>
+<h3><a href="#user">»</a><a name="utype">user.h data
+types and configuration macros</a></h3>
+<ul>
+<li><a href="user.h#realT">realT, qh_REAL...</a> size
+of floating point numbers </li>
+<li><a href="user.h#CPUclock">qh_CPUclock</a> clock()
+function for reporting the total time spent by
+Qhull </li>
+<li><a href="user.h#ORIENTclock">qh_ORIENTclock</a>
+define convention for orienting facets</li>
+<li><a href="user.h#RANDOM">qh_RANDOM...</a> random
+number generator </li>
+</ul>
+
+<h3><a href="#user">»</a><a name="ujoggle">joggle constants</a></h3>
+<ul>
+<li><a href="user.h#JOGGLEagain">qh_JOGGLEagain</a>
+how often to retry before using qh_JOGGLEmaxincrease
+again </li>
+<li><a href="user.h#JOGGLEdefault">qh_JOGGLEdefault</a>
+default value for qh.JOGGLEmax for 'QP' </li>
+<li><a href="user.h#JOGGLEincrease">qh_JOGGLEincrease</a>
+factor to increase qh.JOGGLEmax on retrys for
+'QPn' </li>
+<li><a href="user.h#JOGGLEmaxincrease">qh_JOGGLEmaxincrease</a> max
+for increasing qh.JOGGLEmax relative to
+qh.MAXwidth </li>
+<li><a href="user.h#JOGGLEretry">qh_JOGGLEmaxretry</a>
+report error if this many retries </li>
+<li><a href="user.h#JOGGLEretry">qh_JOGGLEretry</a>
+how often to retry before using qh_JOGGLEmax </li>
+</ul>
+
+<h3><a href="#user">»</a><a name="uperform">performance
+related constants</a></h3>
+<ul>
+<li><a href="user.h#HASHfactor">qh_HASHfactor</a>
+total/used hash slots </li>
+<li><a href="user.h#INITIALmax">qh_INITIALmax</a> if
+dim &gt;= qh_INITIALmax, use min/max coordinate
+points for initial simplex </li>
+<li><a href="user.h#INITIALsearch">qh_INITIALsearch</a>
+if qh.INITIALmax, search points up to this
+dimension </li>
+<li><a href="user.h#NOtrace">qh_NOtrace</a> disallow
+tracing </li>
+<li><a href="user.h#VERIFYdirect">qh_VERIFYdirect</a>
+'Tv' verifies all <em>points X facets</em> if op
+count is smaller </li>
+</ul>
+
+<h3><a href="#user">»</a><a name="umemory">memory and
+other constants</a></h3>
+<ul>
+<li><a href="user.h#DEFAULTbox">qh_DEFAULTbox</a>
+default box size (Geomview expects 0.5) </li>
+<li><a href="user.h#INFINITE">qh_INFINITE</a> on
+output, indicates Voronoi center at infinity </li>
+<li><a href="user.h#MEMalign">qh_MEMalign</a> memory
+alignment for qh_meminitbuffers() in global.c </li>
+<li><a href="user.h#MEMbufsize">qh_MEMbufsize</a>
+size of additional memory buffers </li>
+<li><a href="user.h#MEMinitbuf">qh_MEMinitbuf</a>
+size of initial memory buffer </li>
+</ul>
+
+<h3><a href="#user">»</a><a name="ucond">conditional compilation</a></h3>
+<ul>
+<li><a href="user.h#compiler">compiler</a> defined symbols, 
+e.g., _STDC_ and _cplusplus
+
+<li><a href="user.h#COMPUTEfurthest">qh_COMPUTEfurthest</a>
+    compute furthest distance to an outside point instead of storing it with the facet
+<li><a href="user.h#KEEPstatistics">qh_KEEPstatistics</a>
+    enable statistic gathering and reporting with option 'Ts'
+<li><a href="user.h#MAXoutside">qh_MAXoutside</a>
+record outer plane for each facet
+<li><a href="user.h#NOmerge">qh_NOmerge</a>
+disable facet merging
+<li><a href="user.h#NOtrace">qh_NOtrace</a>
+disable tracing with option 'T4'
+<li><a href="user.h#QHpointer">qh_QHpointer</a>
+access global data with pointer or static structure
+<li><a href="user.h#QUICKhelp">qh_QUICKhelp</a>
+use abbreviated help messages, e.g., for degenerate inputs
+</ul>
+
+<h3><a href="#user">»</a><a name="umerge">merge
+constants</a></h3>
+<ul>
+<li><a href="user.h#BESTcentrum">qh_BESTcentrum</a>
+when does qh_findbestneighbor() test centrums? </li>
+<li><a href="user.h#BESTnonconvex">qh_BESTnonconvex</a>
+when does qh_findbestneighbor() test nonconvex
+ridges only? </li>
+<li><a href="user.h#COPLANARratio">qh_COPLANARratio</a>
+what is qh.MINvisible? </li>
+<li><a href="user.h#DIMreduceBuild">qh_DIMreduceBuild</a>
+max dimension for vertex reduction </li>
+<li><a href="user.h#DIMmergeVertex">qh_DIMmergeVertex</a>
+max dimension for vertex merging </li>
+<li><a href="user.h#DISToutside">qh_DISToutside</a>
+when does qh_findbestnew() stop search? </li>
+<li><a href="user.h#MAXnarrow">qh_MAXnarrow</a> max.
+cosine for qh.NARROWhull </li>
+<li><a href="user.h#MAXnewcentrum">qh_MAXnewcentrum</a>
+when does qh_reducevertices_centrum() reset the
+centrum? </li>
+<li><a href="user.h#MAXnewmerges">qh_MAXnewmerges</a>
+when does qh_merge_nonconvex() call
+qh_reducevertices_centrums? </li>
+<li><a href="user.h#RATIOnearinside">qh_RATIOnearinside</a>
+ratio for retaining inside points for
+qh_check_maxout() </li>
+<li><a href="user.h#USEfindbestnew">qh_USEfindbestnew</a>
+cut-off between qh_findbest() and
+qh_findbestnew()</li>
+<li><a href="user.h#WIDEcoplanar">qh_WIDEcoplanar</a>
+what is a WIDEfacet? </li>
+<li><a href="user.h#WARNnarrow">qh_WARNnarrow</a>
+max. cosine to warn about qh.NARROWhull </li>
+</ul>
+
+<h3><a href="#user">»</a><a name="ufunc">user.c
+functions</a></h3>
+<ul>
+<li><a href="user.c#errexit">qh_errexit</a> report
+error and exit qhull()</li>
+<li><a href="user.c#errlog">qh_errlog</a> write
+qh.errmsg and open qh.ferrlog </li>
+<li><a href="user.c#errprint">qh_errprint</a> print
+information about facets and ridges </li>
+<li><a href="user.c#printfacetlist">qh_printfacetlist</a>
+print all fields of all facets </li>
+</ul>
+
+<p><!-- Navigation links --> </p>
+<hr>
+<p><b>Up:</b> 
+<a href="http://www.geom.umn.edu/locate/qhull">Home page for
+Qhull</a> <br>
+<b>Up:</b> <a href="qh-man.htm#TOC">Qhull manual: Table of Contents</a> <br>
+<b>Up:</b> <a href="qh-opt.htm#TOC">Qhull options: Table of Contents</a><br>
+<b>Up:</b> <a href="qh-in.htm#TOC">Qhull internals: Table of Contents</a> <br>
+<br>
+<b>To:</b> <a href="#files">Qhull files</a><br>
+<b>To:</b> <a href="#geom2">Geom</a> &#149; 
+<a href="#global2">Global</a> &#149; <a href="#io2">Io</a>
+&#149; <a href="#mem2">Mem</a> &#149; <a href="#merge2">Merge</a>
+&#149; <a href="#poly2">Poly</a> &#149; <a href="#qhull2">Qhull</a>
+&#149; <a href="#set2">Set</a> &#149; <a href="#stat2">Stat</a>
+&#149; <a href="#user2">User</a><br>
+</p>
+<p><!-- GC common information --> </p>
+<hr>
+<p><a href="http://www.geom.umn.edu/"><img
+src="qh--geom.gif" align="middle" width="40" height="40"></a><i>The
+Geometry Center Home Page </i></p>
+<p>Comments to: 
+<a href="http://www.geom.umn.edu/software/qhull/qhull-mail.html">qhull@geom.umn.edu
+</a><br>
+Created: May 2, 1997 --- <!-- hhmts start --> Last modified: see top <!-- hhmts end --> </p>
+</li>
+</dir>
+</body>
+</html>

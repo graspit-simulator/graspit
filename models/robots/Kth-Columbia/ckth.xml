@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>palm.iv</palm>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+10</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+</dof>
+     <chain>
+        <transform>
+            <translation>0.0 0.0 0.022</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0.0</d>
+            <a>0.043</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>-.008</d>
+            <a>0.0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">link.iv</link>
+        <link dynamicJointType="Revolute">distal_link.iv</link>
+    </chain>
+     <chain>
+        <transform>
+            <translation>0.0 0.0 -0.022</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0.0</d>
+            <a>0.043</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>-.008</d>
+            <a>0.0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">link.iv</link>
+        <link dynamicJointType="Revolute">distal_link.iv</link>
+    </chain>
+     <chain>
+        <transform>
+            <translation>-0.05 -0.007 0.0</translation>
+			<rotation>90 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+180</theta>
+            <d>0.05</d>
+            <a>0.05</a>
+            <alpha>0</alpha>
+            <minValue>-360</minValue>
+            <maxValue>360</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">thumb_joint.iv</link>
+    </chain>
+</robot>

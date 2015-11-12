@@ -1,0 +1,16 @@
+
+#include "soapH.h"
+SOAP_NMAC struct Namespace namespaces[] =
+{
+	{"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
+	{"SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL},
+	{"xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL},
+	{"xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL},
+	{"ns5", "http://tempuri.org/xmlmime.xsd", NULL, NULL},
+	{"ns3", "http://www.w3.org/2004/08/xop/include", NULL, NULL},
+	{"ns4", "http://www.w3.org/2004/11/xmlmime", NULL, NULL},
+	{"ns1", "CS8ServerV0", NULL, NULL},
+	{"ns2", "urn:CS8ServerV1", NULL, NULL},
+	{"ns6", "urn:CS8ServerV3", NULL, NULL},
+	{NULL, NULL, NULL, NULL}
+};

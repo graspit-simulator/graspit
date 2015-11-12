@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>models/objects/cylinder.xml</filename>
+		<transform>
+			<fullTransform>(+0.707107 +0 +0 -0.707107)[+0 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/NewBarrett/NewBarrett.xml</filename>
+		<dofValues>+0 +0 +0 +0 +0 +0 +0 +0 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +2.05544 -30.5891]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>+462.343 -49.798 -79.7179</position>
+		<orientation>+0.132372 +0.749445 +0.0437733 +0.647219</orientation>
+		<focalDistance>+470.962</focalDistance>
+	</camera>
+</world>

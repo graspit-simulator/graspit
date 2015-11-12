@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <schema targetNamespace="urn:CS8ServerV3"
+  xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+  xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:SCSV0="CS8ServerV0"
+  xmlns:xop="http://www.w3.org/2004/08/xop/include"
+  xmlns:xmlmime="http://tempuri.org/xmlmime.xsd"
+  xmlns:SCSV1="urn:CS8ServerV1"
+  xmlns:SCSV3="urn:CS8ServerV3"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="CS8ServerV0" schemaLocation="scsv0.xsd"/>
+  <import namespace="http://www.w3.org/2004/08/xop/include"/>
+  <import namespace="urn:CS8ServerV1" schemaLocation="scsv1.xsd"/>
+  <import namespace="http://www.w3.org/2003/05/soap-encoding"/>
+  <simpleType name="MoveType">
+   <restriction base="xsd:string">
+    <enumeration value="ABSOLUTE-MOVE"/><!-- enum const = 0 -->
+    <enumeration value="RELATIVE-MOVE"/><!-- enum const = 1 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="BlendType">
+   <restriction base="xsd:string">
+    <enumeration value="BLEND-OFF"/><!-- enum const = 0 -->
+    <enumeration value="BLEND-JOINT"/><!-- enum const = 1 -->
+    <enumeration value="BLEND-CART"/><!-- enum const = 2 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="ShoulderConfig">
+   <restriction base="xsd:string">
+    <enumeration value="SSAME"/><!-- enum const = 0 -->
+    <enumeration value="LEFTY"/><!-- enum const = 1 -->
+    <enumeration value="RIGHTY"/><!-- enum const = 2 -->
+    <enumeration value="SFREE"/><!-- enum const = 3 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="PositiveNegativeConfig">
+   <restriction base="xsd:string">
+    <enumeration value="PNSAME"/><!-- enum const = 0 -->
+    <enumeration value="POSITIVE"/><!-- enum const = 1 -->
+    <enumeration value="NEGATIVE"/><!-- enum const = 2 -->
+    <enumeration value="PNFREE"/><!-- enum const = 3 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="AboveBelowConfig">
+   <restriction base="xsd:string">
+    <enumeration value="ABSAME"/><!-- enum const = 0 -->
+    <enumeration value="ABOVE"/><!-- enum const = 1 -->
+    <enumeration value="BELOW"/><!-- enum const = 2 -->
+    <enumeration value="ABFREE"/><!-- enum const = 3 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="MotionReturnCode">
+   <restriction base="xsd:string">
+    <enumeration value="SCSV3-MOT-NO-ERR"/><!-- enum const = 0 -->
+    <enumeration value="SCSV3-MOT-NOT-READY"/><!-- enum const = 1 -->
+    <enumeration value="SCSV3-MOT-ERR-PARAM"/><!-- enum const = 2 -->
+    <enumeration value="SCSV3-MOT-ERR-MISUSE"/><!-- enum const = 3 -->
+    <enumeration value="SCSV3-MOT-ERR-UNEXPECTED"/><!-- enum const = 4 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="ReversingResult">
+   <restriction base="xsd:string">
+    <enumeration value="REVERSE-OK"/><!-- enum const = 0 -->
+    <enumeration value="NO-CONVERGENCE"/><!-- enum const = 1 -->
+    <enumeration value="OUT-OF-JNT-RANGE"/><!-- enum const = 2 -->
+    <enumeration value="OUT-OF-WORKSPACE"/><!-- enum const = 3 -->
+    <enumeration value="INVALID-CONFIG"/><!-- enum const = 4 -->
+    <enumeration value="INVALID-ORIENTATION"/><!-- enum const = 5 -->
+    <enumeration value="UNSUPPORTED-KINEMATICS"/><!-- enum const = 6 -->
+    <enumeration value="UNCONSTRAINT-FRAME"/><!-- enum const = 7 -->
+    <enumeration value="INVALID-ERROR-CODE"/><!-- enum const = 8 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="SchedulingMode">
+   <restriction base="xsd:string">
+    <enumeration value="SCHEDULING-INTERNAL"/><!-- enum const = 0 -->
+    <enumeration value="SCHEDULING-EXTERNAL"/><!-- enum const = 1 -->
+   </restriction>
+  </simpleType>
+  <simpleType name="PowerReturnCode">
+   <restriction base="xsd:string">
+    <enumeration value="POWER-NO-ERR"/><!-- enum const = 0 -->
+    <enumeration value="POWER-CHANGE-WHILE-ROBOT-NOT-STOPPED"/><!-- enum const = 1 -->
+    <enumeration value="POWER-ENABLE-TIMEOUT"/><!-- enum const = 2 -->
+    <enumeration value="POWER-DISABLE-TIMEOUT"/><!-- enum const = 3 -->
+    <enumeration value="POWER-CHANGE-ONLY-IN-REMOTE-MODE"/><!-- enum const = 4 -->
+   </restriction>
+  </simpleType>
+  <complexType name="JointPos">
+   <sequence>
+    <element name="item" type="xsd:double" minOccurs="1" maxOccurs="100" nillable="false"/>
+   </sequence>
+  </complexType>
+  <complexType name="Parameters">
+   <sequence>
+    <element name="Parameters" type="SCSV0:Parameter" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Versions">
+   <sequence>
+    <element name="Versions" type="SCSV0:Version" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Robots">
+   <sequence>
+    <element name="Robots" type="SCSV0:Robot" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="VALApplications">
+   <sequence>
+    <element name="application" type="SCSV1:VALApplication" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Records">
+   <sequence>
+    <element name="record" type="xsd:string" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <complexType name="Frame">
+   <sequence>
+     <element name="nx" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="ny" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="nz" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="ox" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="oy" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="oz" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="ax" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="ay" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="az" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="px" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="py" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="pz" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="AnthroConfig">
+   <sequence>
+     <element name="shoulder" type="SCSV3:ShoulderConfig" minOccurs="1" maxOccurs="1"/>
+     <element name="elbow" type="SCSV3:PositiveNegativeConfig" minOccurs="1" maxOccurs="1"/>
+     <element name="wrist" type="SCSV3:PositiveNegativeConfig" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="ScaraConfig">
+   <sequence>
+     <element name="shoulder" type="SCSV3:ShoulderConfig" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="VrbxConfig">
+   <sequence>
+     <element name="jnt1" type="SCSV3:AboveBelowConfig" minOccurs="1" maxOccurs="1"/>
+     <element name="jnt3" type="SCSV3:PositiveNegativeConfig" minOccurs="1" maxOccurs="1"/>
+     <element name="jnt5" type="SCSV3:PositiveNegativeConfig" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="Config">
+    <choice>
+     <element name="anthroConfig" type="SCSV3:AnthroConfig" minOccurs="1" maxOccurs="1"/>
+     <element name="scaraConfig" type="SCSV3:ScaraConfig" minOccurs="1" maxOccurs="1"/>
+     <element name="vrbxConfig" type="SCSV3:VrbxConfig" minOccurs="1" maxOccurs="1"/>
+    </choice>
+  </complexType>
+  <complexType name="MotionDesc">
+   <sequence>
+     <element name="tool" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="frame" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="absRel" type="SCSV3:MoveType" minOccurs="1" maxOccurs="1"/>
+     <element name="config" type="SCSV3:Config" minOccurs="1" maxOccurs="1"/>
+     <element name="blendType" type="SCSV3:BlendType" minOccurs="1" maxOccurs="1"/>
+     <element name="distBlendPrev" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="distBlendNext" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="vel" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="acc" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="dec" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="transVel" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="rotVel" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <element name="freq" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="RobotPos">
+   <sequence>
+     <element name="settled" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <element name="joint" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="position" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="config" type="SCSV3:Config" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+  <complexType name="AllRobotsPos">
+   <sequence>
+    <element name="RobotsPos" type="SCSV3:RobotPos" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+   </sequence>
+  </complexType>
+  <!-- operation request element -->
+  <element name="forwardKin">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="joint" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="forwardKinResponse">
+   <complexType>
+    <sequence>
+     <element name="position" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="config" type="SCSV3:Config" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="reverseKin">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="jointIn" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="target" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="config" type="SCSV3:Config" minOccurs="1" maxOccurs="1"/>
+     <element name="jointRange" type="SCSV1:JointRange" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="reverseKinResponse">
+   <complexType>
+    <sequence>
+     <element name="jointOut" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="reversingResult" type="SCSV3:ReversingResult" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="moveJJ">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="joint" type="SCSV0:JointPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+     <element name="mdesc" type="SCSV3:MotionDesc" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="moveResponse">
+   <complexType>
+    <sequence>
+     <element name="id" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="motRet" type="SCSV3:MotionReturnCode" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="moveJC">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="frame" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="mdesc" type="SCSV3:MotionDesc" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="moveL">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="frame" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="mdesc" type="SCSV3:MotionDesc" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="moveC">
+   <complexType>
+    <sequence>
+     <element name="robot" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     <element name="frameB" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="frameC" type="SCSV3:Frame" minOccurs="1" maxOccurs="1"/>
+     <element name="mdesc" type="SCSV3:MotionDesc" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="resetMotion">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="motionResponse">
+   <complexType>
+    <sequence>
+     <element name="motRet" type="SCSV3:MotionReturnCode" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="stopMotion">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="restartMotion">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="setSchedulingMode">
+   <complexType>
+    <sequence>
+     <element name="schedulingMode" type="SCSV3:SchedulingMode" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="setSchedulingModeResponse">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="schedulerRefresh">
+   <complexType>
+    <sequence>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="MotionAndRobotsPos">
+   <complexType>
+    <sequence>
+     <element name="schedulingMode" type="SCSV3:SchedulingMode" minOccurs="1" maxOccurs="1"/>
+     <element name="motionEmpty" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <element name="allRobotsPos" type="SCSV3:AllRobotsPos" minOccurs="1" maxOccurs="1" nillable="false"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="setPower">
+   <complexType>
+    <sequence>
+     <element name="power" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="setPowerResponse">
+   <complexType>
+    <sequence>
+     <element name="code" type="SCSV3:PowerReturnCode" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+   </complexType>
+  </element>
+ </schema>
+

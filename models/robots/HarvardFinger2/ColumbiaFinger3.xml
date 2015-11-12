@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>columbia palm f1.xml</palm>
+    <dof type="c">
+	<!-- d0 -->
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>6.0e+7</maxEffort>
+        <Kp>5.0e10</Kp>
+        <Kd>5.0e5</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+	<!-- d1 -->
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>6.0e+7</maxEffort>
+        <Kp>0</Kp>
+        <Kd>0</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+	<!-- d2 -->
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>6.0e+7</maxEffort>
+        <Kp>0</Kp>
+        <Kd>0</Kd>
+        <draggerScale>20</draggerScale>
+     </dof>
+    <dof type="r">
+	<!-- d3 -->
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>6.0e+7</maxEffort>
+        <Kp>0</Kp>
+        <Kd>0</Kd>
+        <draggerScale>20</draggerScale>
+     </dof>
+    <chain>
+		
+	    	<transform>
+			<translation> 0 0 0</translation>
+		    <rotationMatrix>0 0.2019 0.9794 0 -0.9794 0.2019 1.0000 0 0</rotationMatrix>
+		</transform>
+        <joint type="Revolute">
+            <theta>d0+101.4909</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-180</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1600</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+258.51</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-180</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1600</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2+342</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-180</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1000</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3+90</theta>
+            <d>0</d>
+            <a>68</a>
+            <alpha>0</alpha>
+            <minValue>-180</minValue>
+            <maxValue>180</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>1000</springStiffness>
+        </joint>
+
+	<link dynamicJointType="Revolute">sphere.xml</link>
+	<link dynamicJointType="Revolute" >columbia_proximal.xml</link> 
+	<link dynamicJointType="Revolute">sphere.xml</link>	
+	<link dynamicJointType="Revolute">sphere.xml</link>
+    </chain>
+    <approachDirection>
+       	<referenceLocation>0 0 0</referenceLocation>
+        <direction>1 0 0</direction>
+    </approachDirection>
+    
+</robot>

@@ -1,0 +1,66 @@
+#Inventor V2.0 ascii
+#material metal
+#mass 100000
+#cog 0.0 0.0 -100.0
+
+#inertia_matrix
+#3540.1 0.0  0.0
+#0.0 3350.10 -42.614
+#0.0 -42.614 1056.9
+
+Separator {
+    Material {
+          diffuseColor    .645 .408 .284
+    }
+    Rotation {
+	rotation 1 0 0 1.5707863
+    }
+    Separator {
+	Translation {
+	    translation 0 -352.35 0
+	 }
+        Cylinder {
+	    radius 90.932
+   	    height 526.9
+        }
+    }
+    Separator {
+	Translation {
+	    translation 0 -614.58324 0
+        }
+	Cone {
+	    parts 		SIDES
+	    bottomRadius	172
+	    height		42.43352
+	}
+    }
+    Separator {
+	Translation {
+	    translation 0 -660.8 0
+	}
+	Cylinder {
+	    radius	172
+	    height	50
+	}
+    }
+    Separator {
+	Translation {
+	    translation -115 -635.8 0
+	}
+	Cube {
+	    width	230
+	    height	100
+	    depth	120
+	}
+    }
+    Separator {
+	Translation {
+	    translation -160 -498.3 0
+	}
+	Cylinder {
+	    radius	50
+	    height	175
+	}
+    }
+    
+}

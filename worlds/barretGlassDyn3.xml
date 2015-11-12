@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/simpleFloor.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0.0052816 +324.641 +14.9735]</fullTransform>
+		</transform>
+	</obstacle>
+	<obstacle>
+		<filename>models/obstacles/puma_stand.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 -1]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.996 -0.0781588 +0.0111872 +0.0418439)[+548.568 +575.733 -340.346]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>models/robots/Puma560/Puma560.xml</filename>
+		<dofValues>+1.85318 +0.43586 -3.20326 +0.00906244 +1.06262 +0.218149 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<robot>
+		<filename>models/robots/Barrett/Barrett5.xml</filename>
+		<dofValues>+4.98626e-06 +0.604536 +0 +0 +0.570903 +0 +0 +0.51351 +0 +0 </dofValues>
+		<transform>
+			<fullTransform>(+0.336957 -0.546245 +0.518085 +0.565388)[-51.6928 +717.87 -250.424]</fullTransform>
+		</transform>
+	</robot>
+	<connection>
+		<parentRobot>+0</parentRobot>
+		<parentChain>+0</parentChain>
+		<childRobot>+1</childRobot>
+		<mountFilename>models/robots/Barrett/iv/barrettmount.xml</mountFilename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +175.05]</fullTransform>
+		</transform>
+	</connection>
+	<camera>
+		<position>+5476.65 +597.679 -134.227</position>
+		<orientation>+0.55156 +0.406425 +0.629839 +0.365929</orientation>
+		<focalDistance>+5519.52</focalDistance>
+	</camera>
+</world>

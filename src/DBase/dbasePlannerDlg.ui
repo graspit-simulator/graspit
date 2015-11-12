@@ -1,0 +1,513 @@
+<ui version="4.0" >
+ <class>DBasePlannerDlgUI</class>
+ <widget class="QWidget" name="DBasePlannerDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>451</width>
+    <height>611</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>CGDB - Planner</string>
+  </property>
+  <widget class="QGroupBox" name="neighborGeneratorGroup" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>411</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Neighbor Generator</string>
+   </property>
+   <widget class="QPushButton" name="getNeighborButton" >
+    <property name="geometry" >
+     <rect>
+      <x>140</x>
+      <y>69</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Get Neighbors</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="distanceFunctionComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>40</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="objectGraph" >
+    <property name="geometry" >
+     <rect>
+      <x>228</x>
+      <y>16</y>
+      <width>176</width>
+      <height>132</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="neighborComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>110</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="numOfNeighborsSpinBox" >
+    <property name="geometry" >
+     <rect>
+      <x>89</x>
+      <y>73</y>
+      <width>41</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum" >
+     <number>1</number>
+    </property>
+    <property name="maximum" >
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="numOfNbrLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>78</y>
+      <width>70</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Num. of Nbrs.</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="distanceFunctionLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>42</y>
+      <width>70</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Dis. Func.</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="NeighborsLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>113</y>
+      <width>70</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Neighbors</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="graspsGroup" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>333</y>
+     <width>411</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Selected Grasps</string>
+   </property>
+   <widget class="QPushButton" name="previousGraspButton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>41</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>&lt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextGraspButton" >
+    <property name="geometry" >
+     <rect>
+      <x>130</x>
+      <y>60</y>
+      <width>41</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>></string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="graspIndexLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>70</x>
+      <y>60</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>0/0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="originalEpsilonQualityLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>240</x>
+      <y>50</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Epsilon Quality: -1.0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="originalVolumeQualityLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>240</x>
+      <y>80</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Volume Quality: -1.0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="seeNeighborCheckBox" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>19</y>
+      <width>140</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>see neighbor in GraspIt</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="originalGraspRadioButton" >
+    <property name="geometry" >
+     <rect>
+      <x>170</x>
+      <y>20</y>
+      <width>130</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>aligned original grasp</string>
+    </property>
+    <property name="checked" >
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="testedGraspRadioButton" >
+    <property name="geometry" >
+     <rect>
+      <x>300</x>
+      <y>20</y>
+      <width>82</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>tested grasp</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="exitButton" >
+   <property name="geometry" >
+    <rect>
+     <x>340</x>
+     <y>575</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="graspRankingGroup" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>242</y>
+     <width>411</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Grasp Ranking</string>
+   </property>
+   <widget class="QComboBox" name="rankingMethodComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>95</x>
+      <y>50</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text" >
+      <string>No ranking</string>
+     </property>
+    </item>
+    <item>
+     <property name="text" >
+      <string>Across neighbors</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="rankingMethodLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>55</y>
+      <width>90</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Ranking Method</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="rankGraspsButton" >
+    <property name="geometry" >
+     <rect>
+      <x>235</x>
+      <y>50</y>
+      <width>90</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Rank Grasps</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="retrieveGraspsButton" >
+    <property name="geometry" >
+     <rect>
+      <x>95</x>
+      <y>20</y>
+      <width>90</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Retrieve Grasps</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="rankingMethodLabel_2" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>24</y>
+      <width>90</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Retrival</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="executionGroup" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>456</y>
+     <width>411</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Grasp Execution</string>
+   </property>
+   <widget class="QComboBox" name="executionTypeComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text" >
+      <string>Static</string>
+     </property>
+    </item>
+    <item>
+     <property name="text" >
+      <string>Dynamic</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="executeButton" >
+    <property name="geometry" >
+     <rect>
+      <x>123</x>
+      <y>30</y>
+      <width>81</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Execute</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="graspRangeComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text" >
+      <string>Test current</string>
+     </property>
+    </item>
+    <item>
+     <property name="text" >
+      <string>Test all</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="testedVolumeQualityLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>240</x>
+      <y>66</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Volume Quality: -1.0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="testedEpsilonQualityLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>240</x>
+      <y>30</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Epsilon Quality: -1.0</string>
+    </property>
+    <property name="alignment" >
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="createGWSButton" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>575</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>GWS</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="alignmentMethodGroup" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>183</y>
+     <width>411</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Alignments</string>
+   </property>
+   <widget class="QComboBox" name="alignmentMethodComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text" >
+      <string>TRIMESH_LIB_PCA</string>
+     </property>
+    </item>
+    <item>
+     <property name="text" >
+      <string>SIFT_PI_ICP_FULL</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="alignmentMethodLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>23</y>
+      <width>90</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Alignment method</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
