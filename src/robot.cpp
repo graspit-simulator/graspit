@@ -1623,6 +1623,7 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 	double *newVals = new double[numDOF];
 
 	for (i=0;i<numDOF;i++) {
+        desiredVals[i] = std::max(dofVec[i]->getMin(), std::min(desiredVals[i], dofVec[i]->getMax()));
 		if (!desiredSteps || desiredSteps[i] == WorldElement::ONE_STEP ) {
 			stepSize[i] = desiredVals[i] - dofVec[i]->getVal();
 		} else if (desiredSteps[i]!=0.0) {

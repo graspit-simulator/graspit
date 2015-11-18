@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>wood</material>
+    <mass>200</mass>
+    <cog>-17.58 -15.10 0.000009302</cog>
+    <inertia_matrix>419.778 -370.501 0 -370.501 801.547 0 0 0 1121.76</inertia_matrix>
+    <geometryFile>link1.iv</geometryFile>
+</root>
