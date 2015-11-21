@@ -1,4 +1,4 @@
-# Linux-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
+    # Linux-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
 
 LIBS += $$ADDITIONAL_LINK_FLAGS
 
@@ -75,7 +75,8 @@ cgal_qp {
 }
 
 boost {
-	error("Boost linking only tested under Windows")
+
+    LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_system
 }
 
 hardwarelib {

@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
-#include <iostream>       // std::cout
-
+#include <iostream>
 #include <QString>
+#include <pthread.h>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
+
+#include <Inventor/Qt/SoQt.h>
 
 #include "graspitGUI.h"
 #include <graspitApp.h>
@@ -12,30 +16,63 @@
 #include "quality.h"
 #include "robot.h"
 #include "qmDlg.h"
-#include <pthread.h>
+#include "grasp.h"
 
-#include <Inventor/Qt/SoQt.h>
+boost::mutex mtx_;
 
+void *exit_graspit( void *ptr );
+void *run_test(void *ptr );
 
-void *foo( void *ptr );
-
-void *foo(void *ptr )
+void *exit_graspit(void *ptr )
 {
+  //sleep a moment to ensure that start is called first
+  sleep(3);
 
-    GraspItGUI *gui;
+  //hang here until tests are finished and mtx is released.
+  boost::lock_guard<boost::mutex> guard(mtx_);
+
+  GraspItGUI *gui;
   gui = (GraspItGUI *) ptr;
-
-  std::cout << "Sleeping before killing mainLoop" << std::endl;
-  sleep(10);
-
-  std::cout << "about to  kill mainloop" << std::endl;
 
   gui->exitMainLoop();
 
+  return NULL;
 }
 
 
-TEST(SIMPLE_TEST, EXAMPLE_TEST) {
+void *run_test(void *ptr )
+{
+  boost::lock_guard<boost::mutex> guard(mtx_);
+
+  PlannerDlg *dlg;
+  dlg = (PlannerDlg *) ptr;
+
+  dlg->testGrasps();
+  while(!dlg->ShowButton->isEnabled())
+  {
+      sleep(3);
+  }
+
+  Grasp *grasp=graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+
+  QString fileName = QString("models/objects/mug.xml");
+  EXPECT_STREQ(grasp->getObject()->getFilename().toStdString().c_str(), fileName.toStdString().c_str());
+
+  std::cout << "Grasp has " << grasp->getNumContacts() << " contacts" << std::endl;
+  EXPECT_GT(grasp->getNumContacts(), 0);
+
+  std::cout << "Grasp has quality measure " << grasp->getQM(0)->evaluate() << std::endl;
+  EXPECT_GT(grasp->getQM(0)->evaluate(), 0);
+
+  dlg->close();
+  sleep(1);
+
+  return NULL;
+}
+
+
+
+TEST(TEST_PLANNER, TEST_VALID_GRASP_FOUND) {
   int argc = 0;
   GraspItApp app(argc, NULL);
   GraspItGUI gui(0, NULL);
@@ -64,16 +101,18 @@ TEST(SIMPLE_TEST, EXAMPLE_TEST) {
 
   dlg->generateGrasps();
   dlg->visualizeBox->setChecked(true);
-//  dlg->testGrasps();
-//  dlg->showGrasp();
 
   pthread_t thread1;
-  int iret1 = pthread_create( &thread1, NULL, foo, (GraspItGUI*) &gui);
+  pthread_t thread2;
+  int iret2 = pthread_create( &thread1, NULL, run_test, (PlannerDlg*) dlg);
+  int iret1 = pthread_create( &thread2, NULL, exit_graspit, (GraspItGUI*) &gui);
 
   gui.startMainLoop();
 
-
   pthread_join( thread1, NULL);
+  pthread_join( thread2, NULL);
+  Q_UNUSED(iret1);
+  Q_UNUSED(iret2);
 
 }
 

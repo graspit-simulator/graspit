@@ -36,7 +36,7 @@ LAPACK = clapack
 #CONFIG += cgal_qp
 
 #enable linking against boost (must be installed separately)
-#CONFIG += boost
+CONFIG += boost
 
 #------------------system-specific libraries---------------
 CONFIG +=  $$COLLISION $$LAPACK
