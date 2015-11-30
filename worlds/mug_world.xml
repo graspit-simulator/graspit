@@ -9,12 +9,12 @@
 	<graspableBody>
 		<filename>models/objects/glass.xml</filename>
 		<transform>
-			<fullTransform>(+0.682159 +0.680408 -0.188618 -0.190073)[-82.1495 +66.4282 -214.414]</fullTransform>
+			<fullTransform>(+0.682159 +0.680408 -0.188618 -0.190073)[-125.641 -5.77075 -214.26]</fullTransform>
 		</transform>
 	</graspableBody>
 	<camera>
-		<position>+221.131 -933.558 +170.197</position>
-		<orientation>+0.519692 +0.0892571 +0.0983058 +0.843973</orientation>
+		<position>+256.175 -939.847 +135.61</position>
+		<orientation>+0.533214 +0.0947655 +0.118146 +0.832313</orientation>
 		<focalDistance>+1133.94</focalDistance>
 	</camera>
 </world>
