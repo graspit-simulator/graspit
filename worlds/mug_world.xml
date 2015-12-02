@@ -13,8 +13,8 @@
 		</transform>
 	</graspableBody>
 	<camera>
-		<position>+256.175 -939.847 +135.61</position>
-		<orientation>+0.533214 +0.0947655 +0.118146 +0.832313</orientation>
-		<focalDistance>+1133.94</focalDistance>
+		<position>-86.9672 -644.505 +11.5871</position>
+		<orientation>+0.577806 +0.00435412 +0.0249081 +0.815782</orientation>
+		<focalDistance>+760.103</focalDistance>
 	</camera>
 </world>
