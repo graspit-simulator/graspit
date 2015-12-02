@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<world>
+	<obstacle>
+		<filename>models/obstacles/table.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[-94.0106 -532.444 +200]</fullTransform>
+		</transform>
+	</obstacle>
+	<graspableBody>
+		<filename>models/objects/glass.xml</filename>
+		<transform>
+			<fullTransform>(+0.682159 +0.680408 -0.188618 -0.190073)[-125.641 -5.77075 -214.26]</fullTransform>
+		</transform>
+	</graspableBody>
+	<camera>
+		<position>-86.9672 -644.505 +11.5871</position>
+		<orientation>+0.577806 +0.00435412 +0.0249081 +0.815782</orientation>
+		<focalDistance>+760.103</focalDistance>
+	</camera>
+</world>
