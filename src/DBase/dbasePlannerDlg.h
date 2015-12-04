@@ -128,7 +128,7 @@ public:
 	}
 	~DBasePlannerDlg(){destroy();}
 
-public slots:
+public Q_SLOTS:
 	//! Button events
 	void exitButton_clicked();
 	void getNeighborButton_clicked();

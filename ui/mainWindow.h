@@ -28,7 +28,7 @@
 //
 
 /*! \file 
-  \brief Implements the UI functions and slots for the main window. 
+  \brief Implements the UI functions and Q_SLOTS for the main window. 
  */
 
 /*!
@@ -76,7 +76,7 @@ public:
 	void setMainWorld( World *w );
         World* getMainWorld(){return world;}                                     
 
-public slots:
+public Q_SLOTS:
 	//-------------
 	void fileNew();
 	void fileOpen();

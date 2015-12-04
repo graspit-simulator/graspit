@@ -56,7 +56,7 @@ class LoopPlanner : public SimAnnPlanner
   float mSaveThreshold;
   //! Places the best solutions currently available in the avoid list
   virtual void resetParameters();
-signals:
+Q_SIGNALS:
   //! Emmitted after a full loop is completed
   void loopUpdate();
   

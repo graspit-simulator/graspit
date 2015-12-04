@@ -55,7 +55,7 @@ public:
     //! Holds the set of indexes of the coordinates that are currently fixed.
     std::set<int> whichFixed;
 
-public slots:
+public Q_SLOTS:
     virtual void coordBoxClicked( int buttonNum );
 
 protected:

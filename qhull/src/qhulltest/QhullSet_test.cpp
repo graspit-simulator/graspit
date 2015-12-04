@@ -24,8 +24,8 @@ class QhullSet_test : public RoadTest
 {
     Q_OBJECT
 
-#//Test slots
-private slots:
+#//Test Q_SLOTS
+private Q_SLOTS:
     void cleanup();
     void t_qhullsetbase();
     void t_convert();

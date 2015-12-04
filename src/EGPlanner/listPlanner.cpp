@@ -166,7 +166,7 @@ ListPlanner::mainLoop()
 	//advance the planning iterator
 	mPlanningIterator++;
 	mCurrentStep++;
-	emit update();
+	Q_EMIT update();
 	PRINT_STAT(mOut, std::endl);
 }
 

@@ -26,8 +26,8 @@ class UsingLibQhull_test : public RoadTest
 {
     Q_OBJECT
 
-#//Test slots
-private slots:
+#//Test Q_SLOTS
+private Q_SLOTS:
     void cleanup();
     void t_classMembers();
     void t_globalPoints();

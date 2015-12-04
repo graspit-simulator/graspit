@@ -148,7 +148,7 @@ protected:
 	//! Pure abstract function to be written in all subclasses. This is where most of the real planning is done.
 	virtual void mainLoop()=0;
 
-signals:
+Q_SIGNALS:
 	//! To be emitted during the search as a measure of progress
 	void update();
 	//! To be emitted when planner stops

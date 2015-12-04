@@ -75,7 +75,7 @@ public:
   ~GraspPlanningTask();
   //! Loads the hand and the object, initializes and starts a loop planner
   virtual void start();
-public slots:
+public Q_SLOTS:
   //! Connected to the loopUpdate() signal of the planner
   void plannerLoopUpdate();
   //! Connected to the complete() signal of the planner

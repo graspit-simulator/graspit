@@ -114,7 +114,7 @@ private:
 		true.
 	*/
 	bool checkHandSelection();
-private slots:
+private Q_SLOTS:
 	void captureButtonClicked();
 	void saveToFileButtonClicked();
 	void saveToDBaseButtonClicked();
@@ -131,7 +131,7 @@ public:
 		QObject::connect(exitButton, SIGNAL(clicked()), this, SLOT(exitButtonClicked()));
 	}
 	~GraspCaptureDlg();
-public slots:
+public Q_SLOTS:
 	void updateQuality();
 };
 

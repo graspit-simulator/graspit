@@ -371,7 +371,7 @@ stop after qh_JOGGLEmaxretry attempts
   >--------------------------------</a><a name="HASHfactor">-</a>
 
   qh_HASHfactor
-    total hash slots / used hash slots.  Must be at least 1.1.
+    total hash Q_SLOTS / used hash Q_SLOTS.  Must be at least 1.1.
 
   notes:
     =2 for at worst 50% occupancy for qh hash_table and normally 25% occupancy

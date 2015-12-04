@@ -55,7 +55,7 @@ private:
 	QDialog *dlgImpl;
 	void init();
 
-private slots:
+private Q_SLOTS:
 	void checkCOFEntry( int row, int col );
 	void saveCurrentCOF( int row, int col );
 	void saveCurrentKCOF( int row, int col );

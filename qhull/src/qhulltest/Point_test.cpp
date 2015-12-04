@@ -21,8 +21,8 @@ class Point_test : public RoadTest
 {
     Q_OBJECT
 
-#//Test slots
-private slots:
+#//Test Q_SLOTS
+private Q_SLOTS:
     void initTestCase();
     void t_construct();
     void t_getset();

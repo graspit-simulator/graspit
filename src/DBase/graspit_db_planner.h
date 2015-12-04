@@ -86,7 +86,7 @@ private:
 	//! Dynamic test
 	bool testGraspDynamic(DynamicCode *code);
 
-public slots:
+public Q_SLOTS:
 	void dynamicsError(const char*);
 
 public:

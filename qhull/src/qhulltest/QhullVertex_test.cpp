@@ -30,8 +30,8 @@ class QhullVertex_test : public RoadTest
 {
     Q_OBJECT
 
-#//Test slots
-private slots:
+#//Test Q_SLOTS
+private Q_SLOTS:
     void cleanup();
     void t_constructConvert();
     void t_getSet();

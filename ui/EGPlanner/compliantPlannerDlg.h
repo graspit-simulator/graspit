@@ -121,7 +121,7 @@ public:
 	}
 	~CompliantPlannerDlg();
 
-public slots:
+public Q_SLOTS:
 	void generateButtonClicked();
 	void testButtonClicked();
 	void testOneButtonClicked();

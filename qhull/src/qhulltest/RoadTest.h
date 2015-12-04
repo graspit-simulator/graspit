@@ -31,7 +31,7 @@ class Name_test : public RoadTest
 {
     Q_OBJECT
 #//Test slot
-private slots:
+private Q_SLOTS:
     void t_name();
     //Executed before any test
     void initTestCase();
@@ -63,8 +63,8 @@ protected:
     static int          s_test_fail; ///! Number of failed tests
     static QStringList  s_failed_tests; ///! List of failed tests
 
-#//!\name Test slots
-public slots:
+#//!\name Test Q_SLOTS
+public Q_SLOTS:
     void cleanup();
 
 public:
