@@ -296,13 +296,13 @@ void qh_setcompact(setT *set) {
   >-------------------------------<a name="setcopy">-</a>
 
   qh_setcopy( set, extra )
-    make a copy of a sorted or unsorted set with extra Q_SLOTS
+    make a copy of a sorted or unsorted set with extra slots
 
   returns:
     new set
 
   design:
-    create a newset with extra Q_SLOTS
+    create a newset with extra slots
     copy the elements to the newset
 
 */

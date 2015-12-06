@@ -32,8 +32,8 @@ class QhullFacet_test : public RoadTest
 {
     Q_OBJECT
 
-#//Test Q_SLOTS
-private Q_SLOTS:
+#//Test slots
+private slots:
     void cleanup();
     void t_constructConvert();
     void t_getSet();

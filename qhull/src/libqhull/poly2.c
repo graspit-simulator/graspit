@@ -2236,11 +2236,11 @@ vertexT *qh_nearvertex(facetT *facet, pointT *point, realT *bestdistp) {
   >-------------------------------</a><a name="newhashtable">-</a>
 
   qh_newhashtable( newsize )
-    returns size of qh.hash_table of at least newsize Q_SLOTS
+    returns size of qh.hash_table of at least newsize slots
 
   notes:
     assumes qh.hash_table is NULL
-    qh_HASHfactor determines the number of extra Q_SLOTS
+    qh_HASHfactor determines the number of extra slots
     size is not divisible by 2, 3, or 5
 */
 int qh_newhashtable(int newsize) {
