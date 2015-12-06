@@ -66,7 +66,7 @@ private:
 	//! A list of grasps for a dbase model, retrieved from the DBMgr
 	std::vector<db_planner::Grasp*> mGraspList;
 	//! An index for the current grasp shown on the screen
-	int mCurrentFrame;
+    unsigned int mCurrentFrame;
 	//! Helper variable to disable the modelChanged trigger
 	bool inModelConstruction;
 

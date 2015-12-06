@@ -176,7 +176,7 @@ void DBasePlannerDlg::rankGraspsButton_clicked(){
 	setGroupBoxEnabled(true, true, true, true, true);
 	//show the first grasp of the retrieved list
 	mCurrentOriginalGrasp = 0;
-	if(mCurrentOriginalGrasp < (int)mOriginalGrasps.size())
+    if(mCurrentOriginalGrasp < mOriginalGrasps.size())
 		showGrasp(mOriginalGrasps[mCurrentOriginalGrasp]);
 	updateOriginalGraspInfo();
 }
@@ -254,15 +254,22 @@ void DBasePlannerDlg::updateTestedGraspInfo(){
 }
 
 // given a grasp list and a current position index i, show the previous grasp before i
-void DBasePlannerDlg::previousGrasp(int& i, std::vector<db_planner::Grasp*> graspList) {
+void DBasePlannerDlg::previousGrasp(unsigned int& i, std::vector<db_planner::Grasp*> graspList) {
 	if (graspList.empty()) return;
-	i --;
-	if (i < 0) i = graspList.size() - 1;
+
+    if (i == 0)
+    {
+        i = graspList.size() - 1;
+    }
+    else
+    {
+        i --;
+    }
 	showGrasp(graspList[i]);
 }
 
 // given a grasp list and a current position index i, show the next grasp after i
-void DBasePlannerDlg::nextGrasp(int& i, std::vector<db_planner::Grasp*> graspList){
+void DBasePlannerDlg::nextGrasp(unsigned int& i, std::vector<db_planner::Grasp*> graspList){
 	if (graspList.empty()) return;
 	i ++;
 	if (i == graspList.size()) i = 0;
@@ -333,14 +340,14 @@ void DBasePlannerDlg::neighborCheckBoxChanged(){
 
 // trigger when we choose to show the original grasp
 void DBasePlannerDlg::originalGraspRadioButton_clicked(){
-	if(mCurrentOriginalGrasp < (int)mOriginalGrasps.size())
+    if(mCurrentOriginalGrasp < mOriginalGrasps.size())
 		showGrasp(mOriginalGrasps[mCurrentOriginalGrasp]);
 	updateOriginalGraspInfo();
 }
 
 // trigger when we choose to show the tested grasp
 void DBasePlannerDlg::testedGraspRadioButton_clicked(){
-	if(mCurrentTestedGrasp < (int) mTestedGrasps.size())
+    if(mCurrentTestedGrasp < mTestedGrasps.size())
 		showGrasp(mTestedGrasps[mCurrentTestedGrasp]);
 	updateTestedGraspInfo();
 }
