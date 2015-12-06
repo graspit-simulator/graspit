@@ -28,8 +28,8 @@ class PointCoordinates_test : public RoadTest
 {
     Q_OBJECT
 
-#//Test Q_SLOTS
-private Q_SLOTS:
+#//Test slots
+private slots:
     void t_construct();
     void t_convert();
     void t_getset();
