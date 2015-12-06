@@ -58,7 +58,7 @@ public:
 		setupUi(this);
 		init();
 	}
-public slots:
+public Q_SLOTS:
 	void selectQMType(const QString &typeStr);
 	void updateSettingsBox();
 	void addEditQM();

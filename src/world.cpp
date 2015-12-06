@@ -446,7 +446,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
 					else currentHand = NULL;
 				}
 				DBGP("removed hand " << ((Robot *)e)->getName() << " from world");  
-				emit handRemoved();
+				Q_EMIT handRemoved();
 				break;
 			}
 		}
@@ -466,7 +466,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
 		IVRoot->removeChild(idx);
 	if (!deleteElement) e->getIVRoot()->unrefNoDelete();
 
-	emit numElementsChanged();
+	Q_EMIT numElementsChanged();
 	modified = true;
 }
 
@@ -898,7 +898,7 @@ World::addBody(Body *newBody)
 	}
 	IVRoot->addChild(newBody->getIVRoot());
 	modified = true;
-	emit numElementsChanged();
+	Q_EMIT numElementsChanged();
 }
 
 /*! Adds a robot link. No need to add it to scene graph, since the robot 
@@ -1011,7 +1011,7 @@ World::addRobot(Robot *robot, bool addToScene)
 	}
 
 	modified = true;
-	emit numElementsChanged();
+	Q_EMIT numElementsChanged();
 }
 
 
@@ -1142,7 +1142,7 @@ World::selectElement(WorldElement *e)
 	DBGP("selected elements "<<numSelectedElements);
 	DBGP("selected bodies "<<numSelectedBodies);
 
-	emit selectionsChanged();
+	Q_EMIT selectionsChanged();
 }
 
 /*! Deselects a world element. If the element is a Robot, also deselects all of 
@@ -1175,7 +1175,7 @@ World::deselectElement(WorldElement *e)
 	numSelectedBodies = selectedBodyVec.size();
 	DBGP("selected elements "<<numSelectedElements);
 	DBGP("selected bodies "<<numSelectedBodies);
-	emit selectionsChanged();
+	Q_EMIT selectionsChanged();
 }
 
 /*! Clears the list of selected element and deselects all */
@@ -1187,7 +1187,7 @@ World::deselectAll()
 
 	numSelectedElements = numSelectedBodyElements = numSelectedRobotElements = 0;
 	numSelectedBodies = 0;
-	emit selectionsChanged();
+	Q_EMIT selectionsChanged();
 }
 
 /*! Checks whether an element is currently selected by looking in the 
@@ -1562,7 +1562,7 @@ World::updateGrasps()
 		}
 	}
 	if (graspChanged) {
-		emit graspsUpdated();
+		Q_EMIT graspsUpdated();
 	}
 }
 
@@ -1959,7 +1959,7 @@ World::moveDynamicBodies(double timeStep)
           if ( robotVec[i]->inherits("HumanHand") ) ((HumanHand*)robotVec[i])->updateTendonGeometry();
           robotVec[i]->emitConfigChange();
 	}
-	emit tendonDetailsChanged();
+	Q_EMIT tendonDetailsChanged();
 
 	if (contactTime<1.0E-7) return -1.0;
 	return contactTime;
@@ -2120,7 +2120,7 @@ World::computeNewVelocities(double timeStep)
 
 	*/
 
-	emit dynamicStepTaken();
+	Q_EMIT dynamicStepTaken();
 	return 0;
 }
 
@@ -2150,7 +2150,7 @@ World::stepDynamics()
 	double actualTimeStep = moveDynamicBodies(dynamicsTimeStep);
 	if (actualTimeStep<0) {
 		turnOffDynamics();
-		emit dynamicsError("Timestep failsafe reached.");
+		Q_EMIT dynamicsError("Timestep failsafe reached.");
 		return;
 	}
 
@@ -2160,7 +2160,7 @@ World::stepDynamics()
 	}
 
 	if (computeNewVelocities(actualTimeStep)) {
-		emit dynamicsError("LCP could not be solved.");
+		Q_EMIT dynamicsError("LCP could not be solved.");
 		return;
 	} 
 	if (idleSensor) idleSensor->schedule();
@@ -2179,7 +2179,7 @@ void World::selectTendon(Tendon *t)
 	//so we can populate the drop-down tendon list in the GUI
 	if ( getCurrentHand() != (Hand*)selectedTendon->getRobot() ) setCurrentHand( (Hand*)t->getRobot() );
 
-	emit tendonSelectionChanged();
+	Q_EMIT tendonSelectionChanged();
 }
 
 void World::selectTendon(int i)
@@ -2211,7 +2211,7 @@ void World::selectTendon(int i)
 	isTendonSelected = true;
 	selectedTendon = ((HumanHand*)currentHand)->getTendon(i);
 	selectedTendon->select();
-	emit tendonSelectionChanged();
+	Q_EMIT tendonSelectionChanged();
 }
 
 void World::deselectTendon()
@@ -2220,7 +2220,7 @@ void World::deselectTendon()
 	if (selectedTendon)
 		selectedTendon->deselect();
 	selectedTendon = NULL;
-	emit tendonSelectionChanged();
+	Q_EMIT tendonSelectionChanged();
 }
 
 int World::getCurrentHandNumberTendons()

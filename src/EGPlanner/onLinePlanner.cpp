@@ -374,7 +374,7 @@ OnLinePlanner::graspLoop()
 		}
 	}
 
-	if (mCurrentStep % 100 == 0) emit update();
+	if (mCurrentStep % 100 == 0) Q_EMIT update();
 	render();
 	//DBGP("Grasp loop done");
 }

@@ -230,7 +230,7 @@ class IVmgr : public QWidget {
   //! static callback routine for pick events (before selections or deselections)
   static SoPath *pickFilterCB(void *,const SoPickedPoint *pick);
 
-public slots:
+public Q_SLOTS:
   void drawDynamicForces();
   void drawWorstCaseWrenches();
   void drawUnbalancedForces();

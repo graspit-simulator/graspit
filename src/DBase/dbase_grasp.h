@@ -84,7 +84,7 @@ private:
 	void writeSolutionsToFile(FILE *f);
 
 
-public slots:
+public Q_SLOTS:
 	//this slot gets called every time the inner planner calls update
 	void plannerUpdate();
 	//this one gets called when the inner planner stops

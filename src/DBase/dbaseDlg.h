@@ -119,7 +119,7 @@ public:
 	}
 	~DBaseDlg(){destroy();}
 
-public slots:
+public Q_SLOTS:
 	//! Button events
 	void connectButton_clicked();
 	void exitButton_clicked();

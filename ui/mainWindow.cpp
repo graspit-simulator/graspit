@@ -1326,7 +1326,7 @@ void MainWindow::tendonNamesBoxActivated( int i)
   } else {
     world->deselectTendon();
   }
-  //both of these automatically emit tendonSelectionChanged
+  //both of these automatically Q_EMIT tendonSelectionChanged
 }
 
 

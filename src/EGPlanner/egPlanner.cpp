@@ -161,7 +161,7 @@ EGPlanner::resetPlanner()
 	mProfileInstance->reset();
 
 	setState(READY);
-	if (!mMultiThread) emit update();
+	if (!mMultiThread) Q_EMIT update();
 	return true;
 }
 
@@ -179,7 +179,7 @@ EGPlanner::checkTerminationConditions()
 			resetParameters();
 		}
 		if (!mMultiThread) {
-			emit update();
+			Q_EMIT update();
 		}
 	} else if (mMaxTime != -1 ) {
 		//check time limit
@@ -190,7 +190,7 @@ EGPlanner::checkTerminationConditions()
 		}
 	}
 	if (termination) {
-		emit complete();
+		Q_EMIT complete();
 	}
 	return termination;
 }
@@ -405,7 +405,7 @@ EGPlanner::pausePlanner()
 	setState(READY);
 	PROF_STOP_TIMER(EG_PLANNER);
 	PROF_PRINT_ALL;
-	if (!mMultiThread) emit complete();
+	if (!mMultiThread) Q_EMIT complete();
 }
 
 void

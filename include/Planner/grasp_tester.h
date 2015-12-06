@@ -210,7 +210,7 @@ private:
   static void testItCB(void *,SoSensor *sensor);
   void testIt();
   
-signals:
+Q_SIGNALS:
   /*! This signal is emitted after the last grasp has been tested. */
   void testingComplete();
   

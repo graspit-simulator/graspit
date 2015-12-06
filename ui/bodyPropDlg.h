@@ -70,7 +70,7 @@ public:
 		setupUi(this);
 		init();
 	}
-public slots:
+public Q_SLOTS:
 	void setTransparency( int val );
 	void setShowAxes( int state);
 	void setShowFC( int state );

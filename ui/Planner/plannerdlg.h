@@ -82,7 +82,7 @@ public:
 		init();
 	}
 	~PlannerDlg(){destroy();}
-public slots:
+public Q_SLOTS:
 	void generateGrasps();
 	void showGrasp();
 	void newQM();
