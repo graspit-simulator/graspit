@@ -3,7 +3,7 @@
 #include <QString>
 #include <pthread.h>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp>
+#include <boost/thread.hpp>
 
 #include <Inventor/Qt/SoQt.h>
 
