@@ -104,7 +104,8 @@ HEADERS	+= include/barrett.h \
 	include/EGPlanner/onLineGraspInterface.h \
 	include/EGPlanner/listPlanner.h \
 	include/FitParabola.h \
-	include/shadow.h
+        include/shadow.h \
+        include/graspitParser.h
 
 SOURCES	+= src/arch.cpp \
 	src/barrett.cpp \
@@ -179,7 +180,8 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/timeTest.cpp \
 	src/EGPlanner/graspTesterThread.cpp \
 	src/EGPlanner/onLineGraspInterface.cpp \
-	src/EGPlanner/listPlanner.cpp 
+        src/EGPlanner/listPlanner.cpp \
+        src/graspitParser.cpp
 
 #--------------------------------------- Implementations of the collision interface ---------------------------------
 
@@ -295,6 +297,14 @@ IMAGES	= src/images/play.xpm \
 	src/images/editcopy \
 	src/images/editpaste \
 	src/images/searchfind
+
+#-------------------------------------- cpp-argparse ---------------------------------------------------
+
+SOURCES += cpp-argparse/OptionParser.cpp
+
+HEADERS += cpp-argparse/OptionParser.h
+
+INCLUDEPATH += cpp-argparse
 
 #-------------------------------------- The TinyXML XML parser ---------------------------------------------------
 
