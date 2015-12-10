@@ -532,8 +532,15 @@ void DBaseDlg::nextGrasp() {
 //go to see the previous grasp and show the corresponding image
 void DBaseDlg::previousGrasp() {
 	if (mGraspList.empty()) return;
-	mCurrentFrame --;
-	if (mCurrentFrame < 0) mCurrentFrame = mGraspList.size() - 1;
+
+    if (mCurrentFrame == 0)
+    {
+        mCurrentFrame = mGraspList.size() - 1;
+    }
+    else
+    {
+        mCurrentFrame --;
+    }
 	showGrasp(mCurrentFrame);
 }
 

@@ -86,7 +86,14 @@ class LoadModelFunctor {
   bool initialized_;
  public:
    LoadModelFunctor(const Table& table, const string& model_root) 
-       : table_(table), model_root_(model_root) {
+       : table_(table), model_root_(model_root),
+         model_name_column_(-1),
+         thumbnail_path_column_(-1),
+         scale_column_(-1),
+         tags_column_(-1),
+         grasping_rescale_column_(-1),
+         geometry_path_column_(-1)
+   {
      initialized_ = 
          table_.GetColumnIndex("model_name", &model_name_column_) &&
          table_.GetColumnIndex("thumbnail_path", &thumbnail_path_column_) &&

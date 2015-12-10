@@ -139,6 +139,7 @@ class Grasp {
 class GraspAllocator {
 public:
 	virtual Grasp* Get() const = 0;
+    virtual ~GraspAllocator(){}
 };
 
 }
