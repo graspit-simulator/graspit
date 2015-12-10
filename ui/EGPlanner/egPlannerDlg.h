@@ -86,7 +86,7 @@ public:
 	}
 	~EigenGraspPlannerDlg(){destroy();}
 
-public slots:
+public Q_SLOTS:
 	void exitButton_clicked();
 	void setMembers( Hand *h, GraspableBody *b );
 	void variableInputChanged();

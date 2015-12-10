@@ -66,6 +66,7 @@ public:
   coordinates(coordinates* c);
   coordinates(vec3 v);
   coordinates();
+  virtual ~coordinates(){};
   
   virtual coord_system_type    get_coord_system_type();
   virtual void                 set_coord_system_type(coord_system_type);

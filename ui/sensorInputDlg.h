@@ -120,7 +120,7 @@ private:
 	//! Helper function that reads in a raw bird transform and returns it as a GraspIt transf.
 	transf SensorInputDlg::getBirdTran(int b);
 
-private slots:
+private Q_SLOTS:
 	//! Resets all relative positions that new flock positions are computed relative to
 	void resetFlock();
 
@@ -137,7 +137,7 @@ public:
 		init(w);
 	}
 
-public slots:
+public Q_SLOTS:
 	//! Stops the timers and cleans up
 	void exitButton_clicked();
 	//! Starts or stops the Cyberglove use

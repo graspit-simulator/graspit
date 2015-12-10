@@ -90,7 +90,7 @@ public:
 	}
 	~ContactExaminerDlg(){destroy();}
 
-public slots:
+public Q_SLOTS:
 
 	void markButton_clicked();
 	void loadButton_clicked();

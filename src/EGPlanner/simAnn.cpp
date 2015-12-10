@@ -240,7 +240,7 @@ void
 SimAnn::variableNeighbor(VariableSet *set, double T, VariableSet *target)
 {
 	SearchVariable *var;
-	double v,tv,conf;
+	double v,tv=0,conf=0;
 	for (int i=0; i<set->getNumVariables(); i++) {
 		var = set->getVariable(i);
 		if ( var->isFixed() ) continue;

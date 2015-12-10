@@ -26,6 +26,7 @@
 #include "collisionModel.h"
 
 #include <algorithm>
+#include <limits>
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -594,7 +595,8 @@ void SymSchur2(double a[3][3], int p, int q, double &c, double &s)
 void Jacobi(double a[3][3], double v[3][3])
 {
     int i, j, n, p, q;
-    double prevoff, c, s;
+    double prevoff = std::numeric_limits<double>::max();
+    double c, s;
     double J[3][3], tmp1[3][3], tmp2[3][3];
 
     // Initialize v to identity matrix

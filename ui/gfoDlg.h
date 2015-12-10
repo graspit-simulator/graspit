@@ -75,7 +75,7 @@ private:
 public:
   GFODlg(MainWindow *mw, Hand *h, QWidget *parent=0);
   ~GFODlg();
-public slots:
+public Q_SLOTS:
   void exitButtonClicked(){QDialog::accept();}
   void optimizationOnBoxClicked();
   //! Performs the optimization routine after each hand config change

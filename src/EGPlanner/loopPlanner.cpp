@@ -74,7 +74,7 @@ void LoopPlanner::resetParameters()
     }
   }
   SimAnnPlanner::resetParameters();
-  emit loopUpdate();
+  Q_EMIT loopUpdate();
 }
 
 const GraspPlanningState* 

@@ -119,7 +119,7 @@ public:
 	~EigenGraspDlg(){destroy();}
 	int setWorld( World *w );
 
-public slots:
+public Q_SLOTS:
 	void eigenGraspChanged();
 	void fixBoxChanged();
 	void saveButton_clicked();

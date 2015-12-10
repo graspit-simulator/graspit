@@ -69,7 +69,7 @@ public:
 		init();
 	}
 
-public slots:
+public Q_SLOTS:
 	void prevPose();
 	void nextPose();
 	void record();

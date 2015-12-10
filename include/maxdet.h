@@ -67,8 +67,8 @@
 
 void mydlascl(double from,double to,int m,int n,double *A);
 
-void disp_imat(FILE* fp, int* ip, int r, int c, int att);
-void disp_mat(FILE* fp, double* dp,int r, int c, int att);
+void disp_imat(FILE* fp, int* ip, int r, int c);
+void disp_mat(FILE* fp, double* dp,int r, int c);
 /* double inprd(double *X, double *Z, int L, int* blck_szs); */
 double eig_val(double*sig, double* ap, int L, int* blck_szs, int Npd, double* work);
 

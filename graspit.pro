@@ -42,6 +42,7 @@ LAPACK = clapack
 CONFIG +=  $$COLLISION $$LAPACK
 
 DEFINES += GRASPIT_EXPORTS
+DEFINES += QT_NO_KEYWORDS
 
 graspitdbg {
     CONFIG += debug

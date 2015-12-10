@@ -257,13 +257,13 @@ GuidedPlanner::mainLoop()
 	render();
 
 	if (mCurrentStep % 100 == 0) {
-		emit update();
+		Q_EMIT update();
 		checkChildren();
 	}
 }
 
 /*! Deletes any children that are done. If there are seeds available and
-	emtpty children slots it also fires of new children. If a new child
+	emtpty children Q_SLOTS it also fires of new children. If a new child
 	is fired and the main planner is still in the area, the main planner 
 	is also reset so it goes plan somewhere else.
 */

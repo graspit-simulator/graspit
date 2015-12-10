@@ -626,7 +626,6 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
   PlyFile *plyfile;
   int nwords;
   char **words;
-  int found_format = 0;
   char **elist;
   PlyElement *elem;
   char *orig_line;
@@ -672,7 +671,6 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
       else
         return (NULL);
       plyfile->version = (float)atof (words[2]);
-      found_format = 1;
     }
     else if (equal_strings (words[0], "element"))
       add_element (plyfile, words, nwords);
@@ -1431,7 +1429,7 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
   char **words;
   int nwords;
   int which_word;
-  char *elem_data,*item;
+  char *elem_data,*item=NULL;
   char *item_ptr;
   int item_size;
   int int_val;
@@ -1441,7 +1439,7 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
   int store_it;
   char **store_array;
   char *orig_line;
-  char *other_data;
+  char *other_data=NULL;
   int other_flag;
 
   /* the kind of element we're reading currently */
@@ -1564,7 +1562,7 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
   PlyProperty *prop;
   FILE *fp = plyfile->fp;
   char *elem_data;
-  char *item;
+  char *item=NULL;
   char *item_ptr;
   int item_size;
   int int_val;
@@ -1573,7 +1571,7 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
   int list_count;
   int store_it;
   char **store_array;
-  char *other_data;
+  char *other_data=NULL;
   int other_flag;
 
   /* the kind of element we're reading currently */

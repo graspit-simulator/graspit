@@ -434,7 +434,7 @@ grasp_tester::testIt()
  
 	PROF_STOP_TIMER(TOTAL_PLANNER);
 	PROF_PRINT_ALL;
-    emit testingComplete();
+    Q_EMIT testingComplete();
     
   }
   if (idleSensor != NULL)

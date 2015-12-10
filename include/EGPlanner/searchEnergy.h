@@ -97,7 +97,7 @@ protected:
 	mutable vec3 mMaxUnbalancedForce;
 	//! Used by dynamic energy to keep track of the dynamic autograsp
 	mutable bool mDynamicsError;
-private slots:
+private Q_SLOTS:
 	//! Called to compute compliant force balances during autograsp
 	void autoGraspStep(int numCols, bool &stopRequest) const;
 	//!Called to warn of a dynamics error in dynamic quality

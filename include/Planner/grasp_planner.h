@@ -231,7 +231,7 @@ private:
  * private methods
  */
 
-  SoPathList searchPrimitives(GraspableBody*);
+  SoPathList searchPrimitives();
 
     /* Takes prasp list with local cartesian coordinates
        and changes these to global. */

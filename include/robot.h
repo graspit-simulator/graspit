@@ -97,7 +97,7 @@ class TiXmlElement;
 class Robot : public WorldElement {
   Q_OBJECT
 
-signals:
+Q_SIGNALS:
   //! This signal informs that dof values have changed
   void configurationChanged();
 
@@ -513,14 +513,14 @@ protected:
   //! Tells us how far along the approach direction a given object is, within a certain limit
   double getApproachDistance(Body *object, double maxDist);
 
-  //---------------------------emit signals-----------------------------------------
+  //---------------------------Q_EMIT Q_SIGNALS-----------------------------------------
 
   //! Emits the configuration changed signal
-  void emitConfigChange(){emit configurationChanged();}
+  void emitConfigChange(){Q_EMIT configurationChanged();}
   //! Emits the user interaction start signal
-  void emitUserInteractionStart(){emit userInteractionStart();}
+  void emitUserInteractionStart(){Q_EMIT userInteractionStart();}
   //! Emits the user interaction ended signal
-  void emitUserInteractionEnd(){emit userInteractionEnd();}
+  void emitUserInteractionEnd(){Q_EMIT userInteractionEnd();}
 
   static const double AUTO_GRASP_TIME_STEP;
 };

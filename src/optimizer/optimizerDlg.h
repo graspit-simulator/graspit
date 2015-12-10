@@ -29,7 +29,7 @@ private:
 	World *mWorld;
 public:
 	OptimizerDlg(World *w, QWidget *parent=0);
-public slots:
+public Q_SLOTS:
 	void torqueButtonClicked();
 	void exitButtonClicked(){QDialog::accept();}
 };

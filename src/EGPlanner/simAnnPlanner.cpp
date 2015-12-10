@@ -137,6 +137,6 @@ SimAnnPlanner::mainLoop()
 	}
 	render();
 	mCurrentStep = mSimAnn->getCurrentStep();
-	if (mCurrentStep % 100 == 0 && !mMultiThread) emit update();
+	if (mCurrentStep % 100 == 0 && !mMultiThread) Q_EMIT update();
 	if (mMaxSteps == 200) {DBGP("Child at " << mCurrentStep << " steps");}
 }
