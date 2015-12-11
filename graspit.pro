@@ -8,7 +8,7 @@ LANGUAGE	= C++
 #-------------------------options--------------------------
 
 #comment out this line for compiling graspit tests.
-#CONFIG += graspit_test
+CONFIG += graspit_test
 
 #comment out this line for compiling in Release mode
 #usually, compiling in Release mode delivers a significant gain in performance
@@ -68,6 +68,7 @@ graspit_test{
 	SOURCES += test/simple_test.cpp
 	LIBS += -L/usr/lib/ -lgtest
         TARGET = graspit-test
+        QMAKE_CXXFLAGS += -std=c++0x
 }else{
 	SOURCES += src/main.cpp
 }
