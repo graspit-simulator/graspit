@@ -7,7 +7,7 @@ LANGUAGE	= C++
 
 #-------------------------options--------------------------
 
-#comment out this line for compiling graspit tests.
+#uncomment this line for compiling graspit tests.
 #CONFIG += graspit_test
 
 #comment out this line for compiling in Release mode
