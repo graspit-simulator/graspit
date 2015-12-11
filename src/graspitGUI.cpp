@@ -37,8 +37,8 @@
   #include <unistd.h>
 #endif
 
-#include "graspitGUI.h"
 #include "graspitParser.h"
+#include "graspitGUI.h"
 #include "mainWindow.h"
 #include "ivmgr.h"
 #include "world.h"
@@ -146,8 +146,9 @@ GraspItGUI::processArgs(int argc, char** argv)
 
     int errorFlag=0;
 
-    GraspitParser *parser = new GraspitParser();
-    Values& options = parser->parseArgs(argc, argv);
+    GraspitParser *graspitParser = new GraspitParser();
+    graspitParser->parseArgs(argc, argv);
+    cmdline::parser *args = graspitParser->parseArgs(argc, argv);
 
     //Ensure that $GRASPIT is set.
     QString graspitRoot = QString(getenv("GRASPIT"));
@@ -156,16 +157,19 @@ GraspItGUI::processArgs(int argc, char** argv)
         return FAILURE;
     }
 
-    //load plugins
-    for (Values::iterator it = options.all("plugin").begin(); it != options.all("plugin").end(); ++it)
+    if(args->exist("plugin"))
     {
-        std::cout << "Loading Plugin: "<< *it;
-        PluginCreator* creator = PluginCreator::loadFromLibrary(*it);
-        if (creator)
+        QString plugins_arg_string = QString::fromStdString(args->get<std::string>("plugin"));
+        QStringList plugins_list = plugins_arg_string.split(',');
+        for(int i=0; i < plugins_list.size(); i++)
         {
-          mPluginCreators.push_back(creator);
-        } else {
-          DBGA("Failed to load plugin: " << *it);
+            std::cout << "Loading Plugin: "<< plugins_list.at(i).toStdString().c_str();
+            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString());
+            if (creator){
+              mPluginCreators.push_back(creator);
+            } else {
+              DBGA("Failed to load plugin: " << plugins_list.at(i).toStdString());
+            }
         }
     }
 
@@ -202,12 +206,12 @@ GraspItGUI::processArgs(int argc, char** argv)
       }
 #endif
   }
-
+ 
 #ifdef Q_WS_X11
 
-  if (options.is_set("world"))
+  if (args->exist("world"))
   {
-      QString filename = graspitRoot + QString("/worlds/") + QString(options.get("world")) + QString(".xml");
+      QString filename = graspitRoot + QString("/worlds/") + QString::fromStdString(args->get<std::string>("world")) + QString(".xml");
       if (ivmgr->getWorld()->load(filename)==FAILURE){
           ++errorFlag;
       }
@@ -216,24 +220,24 @@ GraspItGUI::processArgs(int argc, char** argv)
       }
   }
 
-  if (options.is_set("robot"))
+  if (args->exist("robot"))
   {
       QString filename = graspitRoot +
               QString("/models/robots/") +
-              QString(options.get("robot")) +
+              QString::fromStdString(args->get<std::string>("robot")) +
               QString("/")+
-              QString(options.get("robot")) +
+              QString::fromStdString(args->get<std::string>("robot")) +
               QString(".xml");
       if (ivmgr->getWorld()->importRobot(filename)==NULL){
           ++errorFlag;
       }
   }
 
-  if (options.is_set("obstacle"))
+  if (args->exist("obstacle"))
   {
       QString filename = graspitRoot +
               QString("/models/obstacles/") +
-              QString(options.get("obstacle")) +
+              QString::fromStdString(args->get<std::string>("obstacle")) +
               QString(".iv");
 
       if (!ivmgr->getWorld()->importBody("Body",filename))
@@ -242,11 +246,11 @@ GraspItGUI::processArgs(int argc, char** argv)
       }
   }
 
-  if (options.is_set("object"))
+  if (args->exist("object"))
   {
       QString filename = graspitRoot +
               QString("/models/objects/") +
-              QString(options.get("object")) +
+              QString::fromStdString(args->get<std::string>("object")) +
               QString(".iv");
 
       if (!ivmgr->getWorld()->importBody("GraspableBody",filename))
@@ -258,11 +262,10 @@ GraspItGUI::processArgs(int argc, char** argv)
   if (errorFlag)
   {
       std::cerr << "Failed to Parse args." << std::endl;
-      std::cerr << parser->usage << std::endl;
       return FAILURE;
   }
 
-#endif // Q_WS_X11
+ #endif // Q_WS_X11
   return SUCCESS;
 }
 

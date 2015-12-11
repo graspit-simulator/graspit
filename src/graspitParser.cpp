@@ -1,6 +1,6 @@
 #include "graspitParser.h"
 
-const std::string GraspitParser::usage = "Usage: graspit [-w worldname] [-r robotname] [-o objectname] [-b obstaclename] [-p pluginname]";
+using namespace std;
 
 const std::string GraspitParser::version =
         "GraspIt!\n"
@@ -20,56 +20,88 @@ const std::string GraspitParser::version =
         "You should have received a copy of the GNU General Public License\n"
         "along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.\n";
 
-const std::string GraspitParser::description =
-         "Possible valid arguments\n"
-         "graspit -w plannerMug\n"
-         "graspit -b table -r Barrett\n"
-         "graspit -b table -r Barrett -p helloworld\n";
+const std::string GraspitParser::footer =
+        "\n\n"
+        "Environment Variables:\n"
+        "GRASPIT\n"
+        "\t models, and worlds are loaded relative to this path,\n"
+        "\t normally should be set to directory containing the \n"
+        "\t subfolders worlds and models\n"
+        "GRASPIT_PLUGIN_DIR\n"
+        "\t point to director containined plugin libs, if using ros plugins\n"
+        "\t then normally should be set to my_ros_wkspace/devel/lib\n";
 
-const std::string GraspitParser::epilog = "Please remember to set the GRASPIT environment variable to a valid directory "
-         "normally the source directory where graspit was installed.  On Linux this can be done by navigating to the correct "
-         "directory and running \n\"export GRASPIT=$PWD\"\nIf your are using plugins, then remember to set GRASPIT_PLUGIN_DIR as well.\n\n";
-
-const std::string GraspitParser::plugin_help = "Name of plugin to load, multiple plugins may be loaded by multiple -p args.\n"
-         "Ex: graspit -p helloworld\n"
-         "would load the helloworld plugin";
+const std::string GraspitParser::plugin_help =
+        "Name of plugin to load, multiple plugins may be loaded"
+        "\n\t\t\t seperated by comma."
+        "\n\t\t\t Ex: graspit -p plugin1,plugin2"
+        "\n\t\t\t would load plugin1 and plugin2"
+        "\n\t\t\t";
 
 const std::string GraspitParser::world_help =
-         "World file to load from $GRASPIT/worlds.\n"
-         "Ex: --world myworld\n"
-         "would load $GRASPIT/worlds/myworld.xml";
+         "World file to load from $GRASPIT/worlds."
+         "\n\t\t\t Ex: --world myworld"
+         "\n\t\t\t would load $GRASPIT/worlds/myworld.xml"
+         "\n\t\t\t";
 
-const std::string GraspitParser::object_help = "Name of object to load from $GRASPIT/models/objects/ imported as a GraspableBody\n"
-         "Ex: graspit -o mug\n"
-         "would load $GRASPIT/models/objects/mug.xml";
+const std::string GraspitParser::object_help =
+        "Name of object to load from $GRASPIT/models/objects/"
+        "\n\t\t\t imported as a GraspableBody"
+        "\n\t\t\t Ex: graspit -o mug"
+        "\n\t\t\t would load $GRASPIT/models/objects/mug.xml"
+        "\n\t\t\t";
 
-const std::string GraspitParser::obstacle_help = "Name of obstacle to load from $GRASPIT/models/obstacles/, imported as a Body.\n"
-        "Ex: graspit -b table\n"
-        "would load $GRASPIT/models/obstacles/table.xml";
+const std::string GraspitParser::obstacle_help =
+        "Name of obstacle to load from $GRASPIT/models/obstacles/,"
+        "\n\t\t\t imported as a Body."
+        "\n\t\t\t Ex: graspit -o table"
+        "\n\t\t\t would load $GRASPIT/models/obstacles/table.xml"
+        "\n\t\t\t";
 
-const std::string GraspitParser::robot_help = "Name of robot to load, from $GRASPIT/models/robots.  The robot directory must have an xml file of the same name"
-         "as the folder.  For example $GRASPIT/models/robots/Barrett has a matching Barrett.xml file inside of it.\n"
-         "Ex: graspit -r Barrett\n"
-         "would load $GRASPIT/models/robots/Barrett/Barrett.xml";
+const std::string GraspitParser::robot_help =
+        "Name of robot to load, from $GRASPIT/models/robots."
+        "\n\t\t\t The robot directory must have an xml file of the same name"
+        "\n\t\t\t as the folder.  For example $GRASPIT/models/robots/Barrett "
+        "\n\t\t\t has a matching Barrett.xml file inside of it."
+        "\n\t\t\t Ex: graspit -r Barrett"
+        "\n\t\t\t would load $GRASPIT/models/robots/Barrett/Barrett.xml"
+        "\n\t\t\t";
 
 GraspitParser::GraspitParser()
 {
-     parser = optparse::OptionParser()
-             .usage(usage)
-             .version(version)
-             .description(description)
-             .epilog(epilog);
 
-    parser.add_option("-p", "--plugin").action("append").help(plugin_help);
-    parser.add_option("-w", "--world").help(world_help);
-    parser.add_option("-o", "--object").help(object_help);
-    parser.add_option("-b", "--obstacle").help(obstacle_help);
-    parser.add_option("-r", "--robot").help(robot_help);
+    bool is_required_arg = false;
+
+    parser = new cmdline::parser();
+
+    parser->add("help", 'h', "Print this message" );
+    parser->add<string>("plugin", 'p', plugin_help,  is_required_arg);
+    parser->add<string>("world", 'w', world_help,  is_required_arg);
+    parser->add<string>("object", 'o', object_help,  is_required_arg);
+    parser->add<string>("obstacle", 'b', obstacle_help,  is_required_arg);
+    parser->add<string>("robot", 'r', robot_help,  is_required_arg);
+    parser->add<string>("version", 'v', "print GraspIt! version",  is_required_arg);
+
+    parser->footer(footer);
+
 }
 
-Values& GraspitParser::parseArgs(int argc, char *argv[])
+cmdline::parser* GraspitParser::parseArgs(int argc, char *argv[])
 {
-    return  parser.parse_args(argc, argv);
+    parser->parse(argc, argv);
+
+    if(parser->exist("help"))
+    {
+            std::cerr << parser->usage();
+            exit(0);
+    }
+    if(parser->exist("version"))
+    {
+            std::cerr << version << std::endl;
+            exit(0);
+    }
+
+    return  parser;
 }
 
 

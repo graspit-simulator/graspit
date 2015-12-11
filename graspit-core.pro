@@ -298,13 +298,11 @@ IMAGES	= src/images/play.xpm \
 	src/images/editpaste \
 	src/images/searchfind
 
-#-------------------------------------- cpp-argparse ---------------------------------------------------
+#-------------------------------------- cmdline ---------------------------------------------------
 
-SOURCES += cpp-argparse/OptionParser.cpp
+HEADERS += cmdline/cmdline.h
 
-HEADERS += cpp-argparse/OptionParser.h
-
-INCLUDEPATH += cpp-argparse
+INCLUDEPATH += cmdline
 
 #-------------------------------------- The TinyXML XML parser ---------------------------------------------------
 
