@@ -1,7 +1,5 @@
 #include "graspitParser.h"
 
-using namespace std;
-
 const std::string GraspitParser::version =
         "GraspIt!\n"
         "Copyright (C) 2002-2009  Columbia University in the City of New York.\n"
@@ -75,12 +73,12 @@ GraspitParser::GraspitParser()
     parser = new cmdline::parser();
 
     parser->add("help", 'h', "Print this message" );
-    parser->add<string>("plugin", 'p', plugin_help,  is_required_arg);
-    parser->add<string>("world", 'w', world_help,  is_required_arg);
-    parser->add<string>("object", 'o', object_help,  is_required_arg);
-    parser->add<string>("obstacle", 'b', obstacle_help,  is_required_arg);
-    parser->add<string>("robot", 'r', robot_help,  is_required_arg);
-    parser->add<string>("version", 'v', "print GraspIt! version",  is_required_arg);
+    parser->add<std::string>("plugin", 'p', plugin_help,  is_required_arg);
+    parser->add<std::string>("world", 'w', world_help,  is_required_arg);
+    parser->add<std::string>("object", 'o', object_help,  is_required_arg);
+    parser->add<std::string>("obstacle", 'b', obstacle_help,  is_required_arg);
+    parser->add<std::string>("robot", 'r', robot_help,  is_required_arg);
+    parser->add<std::string>("version", 'v', "print GraspIt! version",  is_required_arg);
 
     parser->footer(footer);
 
