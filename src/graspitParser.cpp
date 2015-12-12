@@ -29,6 +29,9 @@ const std::string GraspitParser::footer =
         "\t point to director containined plugin libs, if using ros plugins\n"
         "\t then normally should be set to my_ros_wkspace/devel/lib\n";
 
+const std::string GraspitParser::help_help =
+        "Print this message\n";
+
 const std::string GraspitParser::plugin_help =
         "Name of plugin to load, multiple plugins may be loaded"
         "\n\t\t\t seperated by comma."
@@ -65,6 +68,9 @@ const std::string GraspitParser::robot_help =
         "\n\t\t\t would load $GRASPIT/models/robots/Barrett/Barrett.xml"
         "\n\t\t\t";
 
+const std::string GraspitParser::version_help =
+        "print GraspIt! version\n";
+
 GraspitParser::GraspitParser()
 {
 
@@ -72,16 +78,21 @@ GraspitParser::GraspitParser()
 
     parser = new cmdline::parser();
 
-    parser->add("help", 'h', "Print this message" );
+    parser->add("help", 'h', help_help);
     parser->add<std::string>("plugin", 'p', plugin_help,  is_required_arg);
     parser->add<std::string>("world", 'w', world_help,  is_required_arg);
     parser->add<std::string>("object", 'o', object_help,  is_required_arg);
     parser->add<std::string>("obstacle", 'b', obstacle_help,  is_required_arg);
     parser->add<std::string>("robot", 'r', robot_help,  is_required_arg);
-    parser->add<std::string>("version", 'v', "print GraspIt! version",  is_required_arg);
+    parser->add("version", 'v', version_help);
 
     parser->footer(footer);
 
+}
+
+GraspitParser::~GraspitParser()
+{
+    delete parser;
 }
 
 cmdline::parser* GraspitParser::parseArgs(int argc, char *argv[])
