@@ -7,6 +7,9 @@ LANGUAGE	= C++
 
 #-------------------------options--------------------------
 
+#uncomment this line for compiling graspit tests.
+#CONFIG += graspit_test
+
 #comment out this line for compiling in Release mode
 #usually, compiling in Release mode delivers a significant gain in performance
 #in MS Visual Studio *also* set the project mode to Release
@@ -58,5 +61,4 @@ win32 {
 }
 
 #------------------GraspIt! core files---------------------
-
 include(graspit-core.pro)

@@ -130,7 +130,6 @@ SOURCES	+= src/arch.cpp \
 	src/joint.cpp \
 	src/kinematicChain.cpp \
 	src/lmiOptimizer.cpp \
-	src/main.cpp \
 	src/material.cpp \
 	src/matvec.cpp \
 	src/matvecIO.cpp \
@@ -180,6 +179,12 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/graspTesterThread.cpp \
 	src/EGPlanner/onLineGraspInterface.cpp \
 	src/EGPlanner/listPlanner.cpp 
+
+graspit_test{
+}
+else{
+    SOURCES += src/main.cpp
+}
 
 #--------------------------------------- Implementations of the collision interface ---------------------------------
 
