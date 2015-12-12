@@ -180,6 +180,12 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/onLineGraspInterface.cpp \
 	src/EGPlanner/listPlanner.cpp 
 
+graspit_test{
+}
+else{
+    SOURCES += src/main.cpp
+}
+
 #--------------------------------------- Implementations of the collision interface ---------------------------------
 
 pqp_collision {

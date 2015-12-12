@@ -57,6 +57,10 @@ DEFINES 	+= _CRT_SECURE_NO_DEPRECATE
 
 #------------------------------------ add-ons --------------------------------------------
 
+graspit_test{
+    error("tests not available in Windows. Disable the graspit_test option in graspit.pro")
+}
+
 cgdb {
         graspit_ros {        
                 error("ROS not available in Windows. Disable the graspit_ros option in graspit.pro")

@@ -62,15 +62,3 @@ win32 {
 
 #------------------GraspIt! core files---------------------
 include(graspit-core.pro)
-
-graspit_test{
-	INCLUDEPATH += test/
-	SOURCES += test/simple_test.cpp
-	LIBS += -L/usr/lib/ -lgtest
-        TARGET = graspit-test
-        QMAKE_CXXFLAGS += -std=c++0x
-}else{
-	SOURCES += src/main.cpp
-}
-
-
