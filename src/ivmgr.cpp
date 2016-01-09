@@ -1628,7 +1628,16 @@ IVmgr::saveCameraPos()
   
   myViewer->getCamera()->position.getValue().getValue(x,y,z);
   myViewer->getCamera()->orientation.getValue().getValue(q1,q2,q3,q4);
+
+  // change locale to make sure all floats in the files read (e.g. with fscanf) are 
+  // expected to have a "dot" floating point (not comma). Backup previous locale setting
+  // first in order to restore current setting below.
+  std::locale usLocale("en_US.UTF-8");
+  std::locale previousLocale=std::locale::global(usLocale);
+  
   fprintf(camerafp,"%f %f %f %f %f %f %f\n",x,y,z,q1,q2,q3,q4);  
+
+  std::locale::global(previousLocale);
 }
 
 /*!
@@ -1641,10 +1650,19 @@ IVmgr::restoreCameraPos()
   float x,y,z;
   float q1,q2,q3,q4;
  
+  // change locale to make sure all floats in the files read (e.g. with fscanf) are 
+  // expected to have a "dot" floating point (not comma). Backup previous locale setting
+  // first in order to restore current setting below.
+  std::locale usLocale("en_US.UTF-8");
+  std::locale previousLocale=std::locale::global(usLocale);
+ 
   if(fscanf(camerafp,"%f %f %f %f %f %f %f\n",&x,&y,&z,&q1,&q2,&q3,&q4) <= 0) {
     DBGA("restoreCameraPos - Failed to read camera pose");
     return;
   }  
+  
+  std::locale::global(previousLocale);
+  
   myViewer->getCamera()->position.setValue(x,y,z);
   myViewer->getCamera()->orientation.setValue(q1,q2,q3,q4);
 }
