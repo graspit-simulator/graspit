@@ -44,12 +44,11 @@ PluginCreator::~PluginCreator()
   dlclose(mLibraryHandle);
 }
 
-Plugin* PluginCreator::createPlugin(std::string args)
+Plugin* PluginCreator::createPlugin(int argc, char** argv)
 {	
   Plugin* plugin = (*mCreatePluginFctn)(); 
-  args = args;
   if (!plugin) return NULL;
-  if (plugin->init(0,NULL) != SUCCESS) {
+  if (plugin->init(argc, argv) != SUCCESS) {
     DBGA("Failed to initialize new plugin of type " << mType);
     delete plugin;
     return NULL;
@@ -57,7 +56,7 @@ Plugin* PluginCreator::createPlugin(std::string args)
   return plugin;
 }
 
-PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
+PluginCreator* PluginCreator::loadFromLibrary(std::string libName, int argc, char** argv)
 {
   QString filename = QString::fromStdString(libName);
   //append library suffix if it does not already have it
@@ -135,7 +134,6 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
 
   //create the PluginCreator and push it back
   bool autoStart = true;
-  std::string defaultArgs;
-  PluginCreator *creator = new PluginCreator(handle, createPluginFctn, autoStart, type, defaultArgs);
+  PluginCreator *creator = new PluginCreator(handle, createPluginFctn, autoStart, type, argc, argv);
   return creator;
 }

@@ -164,7 +164,7 @@ GraspItGUI::processArgs(int argc, char** argv)
         for(int i=0; i < plugins_list.size(); i++)
         {
             std::cout << "Loading Plugin: "<< plugins_list.at(i).toStdString().c_str();
-            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString());
+            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString(), argc, argv);
             if (creator){
               mPluginCreators.push_back(creator);
             } else {
@@ -180,7 +180,7 @@ GraspItGUI::processArgs(int argc, char** argv)
         std::cout << "plugin creator autostart " << mPluginCreators[i]->autoStart() << std::endl;
         if (mPluginCreators[i]->autoStart())
         {
-            startPlugin(mPluginCreators[i], mPluginCreators[i]->defaultArgs());
+            startPlugin(mPluginCreators[i], argc, argv);
         }
     }
 
@@ -303,9 +303,9 @@ GraspItGUI::sensorCB(void*, SoSensor*)
 }
 
 void 
-GraspItGUI::startPlugin(PluginCreator* creator, std::string args)
+GraspItGUI::startPlugin(PluginCreator* creator, int argc, char** argv)
 {
-  Plugin *plugin = creator->createPlugin(args);
+  Plugin *plugin = creator->createPlugin(argc,argv);
   if (plugin) mActivePlugins.push_back( std::pair<Plugin*, std::string>(plugin, creator->type()) );
   if (!mActivePlugins.empty()) {
     mPluginSensor->schedule();
