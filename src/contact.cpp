@@ -55,10 +55,6 @@
 //#define GRASPITDBG
 #include "debug.h"
 
-// add locale in order to back up existing locale settings and force them to US
-// when using fprintff and scanf commands
-#include <locale.h>
-
 const double Contact::THRESHOLD = 0.1;
 const double Contact::INHERITANCE_THRESHOLD = 1;
 const double Contact::INHERITANCE_ANGULAR_THRESHOLD = 0.984; //cosine of 10 degrees
@@ -1472,13 +1468,6 @@ VirtualContact::mark(bool m)
 void
 VirtualContact::writeToFile(FILE *fp)
 {
-
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	//finger and link number
 	fprintf(fp,"%d %d\n",mFingerNum, mLinkNum);
 
@@ -1506,8 +1495,6 @@ VirtualContact::writeToFile(FILE *fp)
 
 	//cof
 	fprintf(fp,"%f\n",cof);
-
-    std::locale::global(previousLocale);
 }
 
 /*! Loads all the info for this contact from a file previously written
@@ -1516,25 +1503,16 @@ VirtualContact::writeToFile(FILE *fp)
 void
 VirtualContact::readFromFile(FILE *fp)
 {
-
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	float v,x,y,z;
 
 	//finger and link number
 	if ( fscanf(fp,"%d %d",&mFingerNum, &mLinkNum) <= 0){
 	  DBGA("VirtualContact::readFromFile - Failed to read fingernumber or link number");
-      std::locale::global(previousLocale);
 	  return;
 	}
 	//numFrictionEdges
 	if (fscanf(fp,"%d",&numFrictionEdges) <= 0){
 	    DBGA("VirtualContact::readFromFile - Failed to read number of virtual contacts");
-        std::locale::global(previousLocale);
 	    return;
 	  }
 
@@ -1543,7 +1521,6 @@ VirtualContact::readFromFile(FILE *fp)
 		for (int j=0; j<6; j++) {
 		  if(fscanf(fp,"%f",&v) <= 0){
 		    DBGA("VirtualContact::readFromFile - Failed to read number of friction edges");
-            std::locale::global(previousLocale);
 		    return;
 		  };
 			frictionEdges[6*i+j] = v;
@@ -1553,7 +1530,6 @@ VirtualContact::readFromFile(FILE *fp)
 	//loc
 	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0){
 	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact location");
-     std::locale::global(previousLocale);
 	 return;
 	}
 	loc = position(x,y,z);
@@ -1575,7 +1551,6 @@ VirtualContact::readFromFile(FILE *fp)
 	//normal
 	if( fscanf(fp,"%f %f %f",&x, &y, &z) <= 0){
 	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
-     std::locale::global(previousLocale);
 	 return;
 	}
 	normal.set(x,y,z);
@@ -1583,11 +1558,9 @@ VirtualContact::readFromFile(FILE *fp)
 	//cof
 	if( fscanf(fp,"%f",&v) <= 0){ 
 	DBGA("VirtualContact::readFromFile - Failed to read virtual contact friction");
-    std::locale::global(previousLocale);
 	return;
 	}
 	cof = v;
-    std::locale::global(previousLocale);
 }
 
 /*! Sets objDistance to be the vector from the contact to the closest
@@ -1617,19 +1590,11 @@ VirtualContactOnObject::~VirtualContactOnObject()
 void
 VirtualContactOnObject::readFromFile(FILE *fp)
 {
-
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	float w,x,y,z;
 
 	//numFCVectors
 	if(fscanf(fp,"%d",&numFrictionEdges) <= 0) {
 	  DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction vectors");
-      std::locale::global(previousLocale);
 	  return; 
 	}
 
@@ -1638,7 +1603,6 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 		for (int j=0; j<6; j++) {
 		  if (fscanf(fp,"%f",&w) <= 0) {
 		    DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction edges");
-            std::locale::global(previousLocale);
 		    return; 
 		  }
 		    
@@ -1653,7 +1617,6 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	vec3 t;
 	if(fscanf(fp,"%f %f %f %f",&w,&x,&y,&z) <= 0) {
 	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact location");
-      std::locale::global(previousLocale);
 	  return;
 	}
 	
@@ -1661,7 +1624,6 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	q.set(w,x,y,z);
 	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
 	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact orientation");
-      std::locale::global(previousLocale);
 	  return;
 	}
 	
@@ -1672,7 +1634,6 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	//normal
 	if(fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
 	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
-      std::locale::global(previousLocale);
 	  return;
 	}
 
@@ -1681,11 +1642,9 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	//cof
 	if(fscanf(fp,"%f",&w) <= 0) {
 	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
-      std::locale::global(previousLocale);
 	  return;
 	}
 	cof = w;
-    std::locale::global(previousLocale);
 }
 
 #ifdef ARIZONA_PROJECT_ENABLED
@@ -1693,24 +1652,16 @@ void
 VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int index, bool flipNormal)
 {
 	
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	float v;
 	FILE *fp = fopen(file.latin1(), "r");
 	if (!fp) {
 		fprintf(stderr,"Could not open filename %s\n",file.latin1());
-        std::locale::global(previousLocale);
 		return;
 	}
 
 	//numFCVectors
 	if(fscanf(fp,"%d",&numFrictionEdges) <= 0) {
 	  DBGA("VirtualContactOnObject::readFromRawData - Failed to read virtual contact orientation");
-      std::locale::global(previousLocale);
 	  return; 
 	}
 
@@ -1720,7 +1671,6 @@ VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int in
 		  if(fscanf(fp,"%f",&v) <= 0) 
 		    {
 		      DBGA("VirtualContactOnObject::readFromRawData - Failed to read number of friction edges for virtual contacts");
-              std::locale::global(previousLocale);
 		      return; 
 		    }
 		  frictionEdges[6*i+j] = v;
@@ -1745,21 +1695,12 @@ VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int in
 	cof = 0.5;
 
 	fclose(fp);
-    std::locale::global(previousLocale);
 	
 }
 #endif
 
 void
 VirtualContactOnObject::writeToFile(FILE *fp){
-
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
-
 	//numFrictionEdges
 	fprintf(fp,"%d\n",numFrictionEdges);
 
@@ -1781,5 +1722,4 @@ VirtualContactOnObject::writeToFile(FILE *fp){
 
 	//cof
 	fprintf(fp,"%f\n",cof);
-    std::locale::global(previousLocale);
 }

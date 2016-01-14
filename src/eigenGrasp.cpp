@@ -38,11 +38,6 @@
 
 #include "debug.h"
 
-
-// add locale in order to back up existing locale settings and force them to US
-// when using fprintf and scanf commands
-#include <locale.h>
-
 /*! The eigengrasp is initialized to all 0s*/
 EigenGrasp::EigenGrasp(int size, double e)
 {
@@ -108,7 +103,7 @@ EigenGrasp::normalize()
 void 
 EigenGrasp::writeToFile(TiXmlElement *ep)
 {
-    TiXmlElement * EigenValue = new TiXmlElement( "EigenValue" );  
+    	TiXmlElement * EigenValue = new TiXmlElement( "EigenValue" );  
 	EigenValue->SetDoubleAttribute("value",mEigenValue);
 	ep->LinkEndChild( EigenValue );  
 	
@@ -135,46 +130,29 @@ EigenGrasp::writeToFile(TiXmlElement *ep)
 void
 EigenGrasp::writeToFile(FILE *fp)
 {
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	fprintf(fp,"%f\n",mEigenValue);
 	for (int i=0; i<mSize; i++) {
 		fprintf(fp,"%f ", mVals[i]);
 	}
 	fprintf(fp,"\n");
-
-    std::locale::global(previousLocale);
 }
 
 void 
 EigenGrasp::readFromFile(FILE *fp)
 {
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	float v;
 	if (fscanf(fp,"%f",&v) <= 0) {
 	  DBGA("EigenGrasp::readFromFile - failed to read eigenvalue");
-      std::locale::global(previousLocale);
 	  return;
 	}
 	mEigenValue = v;
 	for (int i=0; i<mSize; i++) {
 	  if(fscanf(fp,"%f",&v) <= 0) {
 	    DBGA("EigenGrasp::readFromFile - failed to read eigenvector");
-        std::locale::global(previousLocale);
 	    return;
 	  }
 		mVals[i] = v;
 	}
-    std::locale::global(previousLocale);
 }
 
 int

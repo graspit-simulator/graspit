@@ -44,12 +44,6 @@
 //#define GRASPITDBG
 #include "debug.h"
 
-
-// add locale in order to back up existing locale settings and force them to US
-// when using fprintf and scanf commands
-#include <locale.h>
-
-
 SearchVariable::SearchVariable(QString name, double min, double max, double maxJump, bool circular)
 {
 	mName = name;
@@ -228,41 +222,23 @@ VariableSet::removeParameter(QString name)
 void 
 VariableSet::writeToFile(FILE *fp) const
 {
-
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	fprintf(fp,"%d ",getType());
 	for (int i=0; i<getNumVariables(); i++)
 		fprintf(fp,"%f ",mVariables[i]->getValue() );
 	fprintf(fp,"\n");
-
-    std::locale::global(previousLocale);
 }
 
 bool 
 VariableSet::readFromFile(FILE *fp)
 {
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
-
 	//read the type first and check against my own
 	int type;
 	if( fscanf(fp,"%d",&type) <= 0) {
 	  DBGA("VariableSet::readFromFile - failed to get variable set type");
-      std::locale::global(previousLocale);
 	  return false;
 	}
 	if (type != getType()) {
 		fprintf(stderr,"Wrong type %d in state file (%d expected)\n",type,getType());
-        std::locale::global(previousLocale);
 		return false;
 	}
 
@@ -271,7 +247,6 @@ VariableSet::readFromFile(FILE *fp)
 	float v;
 	if (!fgets(line, 10000, fp)) {
 		fprintf(stderr,"Failed to read data from file!\n");
-        std::locale::global(previousLocale);
 		return false;
 	}
 	// should really learn how to use streams instead of these hacks...
@@ -280,7 +255,6 @@ VariableSet::readFromFile(FILE *fp)
 	for (int i=0; i<getNumVariables(); i++) {
 		if ( line[offset]=='\0' ) {
 			fprintf(stderr,"Line to short to read all state variables\n");
-            std::locale::global(previousLocale);
 			return false;
 		}
 		while( isspace(*(line+offset)) ) offset++;
@@ -288,7 +262,6 @@ VariableSet::readFromFile(FILE *fp)
 		mVariables[i]->setValue(v);
 		while( !isspace(*(line+offset)) ) offset++;
 	}
-    std::locale::global(previousLocale);
 	return true;
 }
 
@@ -342,20 +315,12 @@ VariableSet::distance(const VariableSet *s) const
 void
 VariableSet::print() const
 {
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	fprintf(stderr,"\n");
 	fprintf(stderr,"Type: %d\n",getType());
 	for (int i=0; i<getNumVariables(); i++) {
 		fprintf(stderr,"%s = %.2f; ",mVariables[i]->getName().latin1(),mVariables[i]->getValue());
 	}
 	fprintf(stderr,"\n");
-
-    std::locale::global(previousLocale);
 }
 //------------------------------- POSTURE STATES -----------------------------------
 PostureState* PostureState::createInstance(StateType type, const Hand *h)
@@ -507,55 +472,30 @@ void HandObjectState::setRefTran(transf t, bool sticky)
 
 bool HandObjectState::readFromFile(FILE *fp)
 {
-
-    // change locale to make sure all floats in the files read (e.g. with fscanf) are 
-    // expected to have a "dot" floating point (not comma). Backup previous locale setting
-    // first in order to restore current setting below.
-    std::locale usLocale("en_US.UTF-8");
-    std::locale previousLocale=std::locale::global(usLocale);
-
 	//this whole read-write system is one big hack.
 	int type; fpos_t pos;
 	fgetpos(fp,&pos);
-	if (!fscanf(fp,"%d",&type)) { 
-        std::locale::global(previousLocale);
-        return false;
-    }
-
+	if (!fscanf(fp,"%d",&type)) return false;
 	DBGP("Pose type: " << type);
-	if ( (StateType)type != POSE_DOF && (StateType)type != POSE_EIGEN ) {
-        std::locale::global(previousLocale);
-        return false;
-    }
-
+	if ( (StateType)type != POSE_DOF && (StateType)type != POSE_EIGEN ) return false;
 	if ( type != mPosture->getType() ) {
 		setPostureType((StateType)type);
 	}
 	fsetpos(fp,&pos);
 	if ( !mPosture->readFromFile(fp) ) {
 		DBGA("Failed");
-        std::locale::global(previousLocale);
 		return false;
 	}
 	fgetpos(fp,&pos);
-	if (!fscanf(fp,"%d",&type)) {
-        std::locale::global(previousLocale);
-        return false;
-    }
+	if (!fscanf(fp,"%d",&type)) return false;
 	DBGP("Space type: " << type);
 	if ( (StateType)type != SPACE_COMPLETE && (StateType)type != SPACE_APPROACH &&
-		 (StateType)type != SPACE_AXIS_ANGLE && (StateType)type != SPACE_ELLIPSOID ) {
-        std::locale::global(previousLocale);
-        return false;
-    }
+		 (StateType)type != SPACE_AXIS_ANGLE && (StateType)type != SPACE_ELLIPSOID ) return false;
 	if ( type != mPosition->getType() ) {
 		setPositionType((StateType)type);
 	}
 	fsetpos(fp,&pos);
-    
-    std::locale::global(previousLocale);
-	
-    if ( !mPosition->readFromFile(fp) ) return false;
+	if ( !mPosition->readFromFile(fp) ) return false;
 	return true;
 }
 

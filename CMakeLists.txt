@@ -17,11 +17,9 @@ find_package(LAPACK REQUIRED)
 
 SET( QT_USE_QT3SUPPORT TRUE )
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
+
 # include QT_USE_FILE is needed.
 include (${QT_USE_FILE})
-
-# message ("_________________________________________")
-# message (${QT_USE_FILE})
 
 set (GSRC ${PROJECT_SOURCE_DIR})
 
@@ -110,8 +108,8 @@ set (GSRC ${PROJECT_SOURCE_DIR})
 set (PQP_COLLISION false)
 
 set (GRASPIT_DEFINES 
-    #-DGRASPIT_RELEASE 
-    -DGRASPIT_DEBUG 
+    -DGRASPIT_RELEASE 
+    #-DGRASPIT_DEBUG 
     -DGRASPIT_EXPORTS)
 
 #--------------------------------------- Core sources ---------------------------------
@@ -152,8 +150,6 @@ set (GRASPIT_HEADERS
 	${GSRC}/include/gws.h 
 	${GSRC}/include/gwsprojection.h 
 	${GSRC}/include/ivmgr.h 
-#	${GSRC}/include/ivmgr_nogui.h 
-#	${GSRC}/include/ivmgr_abstract.h 
 	${GSRC}/include/jacobian.h 
 	${GSRC}/include/joint.h 
 	${GSRC}/include/kinematicChain.h 
@@ -249,7 +245,6 @@ set (MOC_HEADERS
 
 
 set (GRASPIT_CORE_SOURCES
-#    ${GSRC}/src/debug.cpp 
     ${GSRC}/src/graspitParser.cpp 
     ${GSRC}/src/arch.cpp 
 	${GSRC}/src/barrett.cpp 
@@ -271,7 +266,6 @@ set (GRASPIT_CORE_SOURCES
 	${GSRC}/src/gwsprojection.cpp 
 	${GSRC}/src/humanHand.cpp 
 	${GSRC}/src/ivmgr.cpp 
-#	${GSRC}/src/ivmgr_nogui.cpp 
 	${GSRC}/src/jacobian.cpp 
 	${GSRC}/src/joint.cpp 
 	${GSRC}/src/kinematicChain.cpp 
@@ -580,19 +574,13 @@ set (GRASPIT_DEVEL_UI_DIRNAME ui)
 set (GRASPIT_DEVEL_UI_PATH ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${GRASPIT_DEVEL_UI_DIRNAME})
 file(MAKE_DIRECTORY ${GRASPIT_DEVEL_UI_PATH})
 
-#message("____________________________")
-#message(${CATKIN_DEVEL_PREFIX})
-#message(${CMAKE_PREFIX_PATH})
-
 ## Make Qt Moc files of GraspIT
-# QT4_ADD_RESOURCES(RCC_OUTFILES ${PROJECT_SOURCE_DIR}/icons.qrc)
 set (OLD_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set (CMAKE_CURRENT_BINARY_DIR ${GRASPIT_DEVEL_UI_PATH}) #artificially changing output location for UI files
 QT4_WRAP_UI(UI_OUTFILES ${GRASPIT_FORMS})
 set (CMAKE_CURRENT_BINARY_DIR ${OLD_CMAKE_CURRENT_BINARY_DIR})
 
 QT4_WRAP_CPP(MOC_OUTFILES ${MOC_HEADERS})
-     
 
 set (GRASPIT_INCLUDES 
      ${GRASPIT_INCLUDES}
@@ -610,11 +598,8 @@ set (GRASPIT_INCLUDES
 # include_directories(include)
 include_directories(
     ${GRASPIT_INCLUDES}
-#    ${CMAKE_CURRENT_BINARY_DIR}
-#    ${CMAKE_CURRENT_SOURCE_DIR} 
     ${catkin_INCLUDES}
 )
-
 
 
 ###################################
@@ -634,7 +619,6 @@ catkin_package(
 )
 
 
-
 ############
 ## Build  ## 
 ############
@@ -649,7 +633,6 @@ add_library(graspit
 	${GRASPIT_FORM_SOURCES}    
     ${UI_OUTFILES}
     ${MOC_OUTFILES}
-#    ${RCC_OUTFILES}
 )
 
 ## Add cmake target dependencies of the library
