@@ -1,19 +1,51 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(graspit)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-#find_package(catkin REQUIRED COMPONENTS
-#  roscpp
-#  std_msgs
-#)
 
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
+####################################
+## Define graspit variables ####### 
+####################################
 
-find_package (Qhull REQUIRED)
+# main source directory
+set (GSRC ${PROJECT_SOURCE_DIR})
+
+# if defined to false, the in-build collision in graspit is used instead.
+set (PQP_COLLISION false)
+
+# compile CGDB sources
+set (CGDB true)
+
+# compile PLY sources
+set (PLY true)
+
+set (GRASPIT_DEFINES 
+    -DGRASPIT_RELEASE  
+    #-DGRASPIT_DEBUG 
+    -DGRASPIT_EXPORTS)
+
+####################################
+## Find packages             ####### 
+####################################
+
+
+# catkin is optional, and only to be used when added 
+# as ROS package and compiling with catkin_make. 
+# CATKIN_DEVEL_PREFIX is only defined if building with catkin
+# TODO: Would be nicer to use another variable here like
+# BUILDING_WITH_CATKIN if something like that exists?
+if (CATKIN_DEVEL_PREFIX)
+    message("Building graspit with catkin.")
+    find_package(catkin) 
+else (CATKIN_DEVEL_PREFIX)
+    message("Building graspit without catkin.")
+endif (CATKIN_DEVEL_PREFIX) 
+
+set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
+
+find_package(Qhull REQUIRED)
 find_package(SoQt4 REQUIRED)
 find_package(LAPACK REQUIRED)
+
 
 SET( QT_USE_QT3SUPPORT TRUE )
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
@@ -21,102 +53,11 @@ find_package(Qt4 COMPONENTS QtCore REQUIRED)
 # include QT_USE_FILE is needed.
 include (${QT_USE_FILE})
 
-set (GSRC ${PROJECT_SOURCE_DIR})
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
-## * In the file package.xml:
-##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
-##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
-## * In this file (CMakeLists.txt):
-##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
-##     catkin_package(CATKIN_DEPENDS ...)
-##   * uncomment the add_*_files sections below as needed
-##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
-
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
-
-################################################
-## Declare ROS dynamic reconfigure parameters ##
-################################################
-
-## To declare and build dynamic reconfigure parameters within this
-## package, follow these steps:
-## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
-## * In this file (CMakeLists.txt):
-##   * add "dynamic_reconfigure" to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * uncomment the "generate_dynamic_reconfigure_options" section below
-##     and list every .cfg file to be processed
-
-## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
-
-
-####################################
-## Define graspit variables ####### 
-####################################
-
-# if defined to false, the in-build collision in graspit is used instead.
-set (PQP_COLLISION false)
-
-set (GRASPIT_DEFINES 
-    -DGRASPIT_RELEASE 
-    #-DGRASPIT_DEBUG 
-    -DGRASPIT_EXPORTS)
-
 #--------------------------------------- Core sources ---------------------------------
 
 set (GRASPIT_INCLUDES
   ${GSRC}
-  ${GSRC}/include
+  ${GSRC}/include/
   ${GSRC}/include/math
   ${GSRC}/include/EGPlanner
   ${GSRC}/include/Planner
@@ -131,8 +72,11 @@ set (GRASPIT_INCLUDES
 )
 
 
-set (GRASPIT_HEADERS
-    ${GSRC}/cmdline/cmdline.h 
+# all headers which are directly under the 
+# include directory and should be included
+# in the installation should be listed in the
+# variable GRASPIT_INCLUDEDIR_HEADERS
+set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspitParser.h 
     ${GSRC}/include/barrett.h 
 	${GSRC}/include/body.h 
@@ -187,9 +131,6 @@ set (GRASPIT_HEADERS
 	${GSRC}/include/graspitApp.h 
 	${GSRC}/include/dynJoint.h 
 	${GSRC}/include/arch.h 
-	${GSRC}/include/math/matrix.h 
-	${GSRC}/src/Collision/collisionInterface.h 
-	${GSRC}/src/Collision/collisionStructures.h 
 	${GSRC}/include/Planner/grasp_visualization.h 
 	${GSRC}/include/Planner/grasp_tester.h 
 	${GSRC}/include/Planner/grasp_preshape.h 
@@ -218,8 +159,119 @@ set (GRASPIT_HEADERS
 )
 
 
+# all headers which are in the  cmdline
+# directory and should be included
+# in the installation should be listed in the
+# variable GRASPIT_CMDLINE_HEADERS
+set (GRASPIT_CMDLINE_HEADERS
+    ${GSRC}/cmdline/cmdline.h 
+)
+	
+# all headers which are in the src/Collision 
+# directory and should be included
+# in the installation should be listed in the
+# variable GRASPIT_SRC_COLLISION_HEADERS
+set (GRASPIT_SRC_COLLISION_HEADERS
+    ${GSRC}/src/Collision/collisionInterface.h 
+	${GSRC}/src/Collision/collisionStructures.h 
+)
+	
+
+# all headers which are in the include/math 
+# directory and should be included
+# in the installation should be listed in the
+# variable GRASPIT_INCLUDE_MATH_HEADERS
+set (GRASPIT_INCLUDE_MATH_HEADERS
+    ${GSRC}/include/math/matrix.h 
+)
+
+
+if (CGDB)  
+    set(CGDB_HEADERS
+        src/DBase/graspit_db_model.h 
+        src/DBase/graspit_db_grasp.h 
+        src/DBase/graspit_db_planner.h 
+        src/DBase/taskDispatcher.h 
+        src/DBase/preGraspCheckTask.h 
+        src/DBase/graspClusteringTask.h 
+        src/DBase/graspTransferCheckTask.h 
+        src/DBase/tableCheckTask.h 
+        src/DBase/compliantGraspCopyTask.h 
+    )
+    set(CGDB_MOC_HEADERS
+        src/DBase/dbaseDlg.h 
+        src/DBase/dbasePlannerDlg.h 
+        src/DBase/dbase_grasp.h 
+        src/DBase/graspit_db_planner.h 
+        src/DBase/graspPlanningTask.h 
+    )
+
+    set(CGDB_PLANNER_HEADERS
+        src/DBase/DBPlanner/grasp.h 
+        src/DBase/DBPlanner/model.h 
+        src/DBase/DBPlanner/db_manager.h 
+        src/DBase/DBPlanner/database.h 
+        src/DBase/DBPlanner/sql_database_manager.h 
+        src/DBase/DBPlanner/task.h 
+    )
+
+    set(CGDB_SOURCES
+        src/DBase/dbaseDlg.cpp 
+        src/DBase/dbasePlannerDlg.cpp 
+        src/DBase/dbase_grasp.cpp 
+        src/DBase/graspit_db_model.cpp 
+        src/DBase/graspit_db_grasp.cpp 
+        src/DBase/DBPlanner/database.cpp 
+        src/DBase/DBPlanner/sql_database_manager.cpp 
+        src/DBase/graspit_db_planner.cpp 
+        src/DBase/taskDispatcher.cpp 
+        src/DBase/graspPlanningTask.cpp 
+        src/DBase/preGraspCheckTask.cpp 
+        src/DBase/graspClusteringTask.cpp 
+        src/DBase/graspTransferCheckTask.cpp 
+        src/DBase/tableCheckTask.cpp 
+        src/DBase/compliantGraspCopyTask.cpp 
+    )
+    set(CGDB_FORMS 
+        src/DBase/dbaseDlg.ui
+        src/DBase/dbasePlannerDlg.ui
+    )
+
+    # you can also define BATCH_PROCESSING in order to supress error output which requires user attention
+    set (GRASPIT_DEFINES 
+        ${GRASPIT_DEFINES}
+        -DCGDB_ENABLED 
+        -DBATCH_PROCESSING
+    )
+
+    set (GRASPIT_CGDB_INCLUDES
+        ${GSRC}/src/
+        ${GSRC}/src/DBase/
+        ${GSRC}/src/DBase/DBPlanner/
+    )
+endif (CGDB)  
+
+if (PLY)
+    set (PLY_HEADERS
+        ply/ply.h
+        ply/mesh_loader.h
+    )
+
+    set (PLY_SOURCES
+        ply/ply.c
+        ply/mesh_loader.cpp
+    )
+    set (GRASPIT_DEFINES 
+        ${GRASPIT_DEFINES}
+        -DPLY_READER
+    )
+    set (GRASPIT_PLY_INCLUDES
+        ${GSRC}/ply
+    )
+endif (PLY)
+
+
 set (MOC_HEADERS
-    ${MOC_HEADERS}
 	${GSRC}/include/body.h
 	${GSRC}/include/robot.h
 	${GSRC}/include/world.h
@@ -241,6 +293,7 @@ set (MOC_HEADERS
 	${GSRC}/include/robotiq.h
 	${GSRC}/include/mcGrip.h
 	${GSRC}/include/ivmgr.h
+    ${CGDB_MOC_HEADERS}
 ) 
 
 
@@ -338,8 +391,7 @@ if (PQP_COLLISION)
     	${GSRC}/PQP-VCOLLIDE/include 
         ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src 
         ${GSRC}/PQP-VCOLLIDE/ivcollide)
-	set (GRASPIT_HEADERS 
-        ${GRASPIT_HEADERS} 
+	set (COLLISION_PQP_HEADERS 
         ${GSRC}/src/Collision/PQP/PQPCollision.h)
     set (GRASPIT_COLLISION_SOURCES
         ${GSRC}/src/Collision/PQP/PQPCollision.cpp 
@@ -361,8 +413,7 @@ else (PQP_COLLISION)
     set (GRASPIT_INCLUDES
         ${GRASPIT_INCLUDES}
 	    ${GSRC}/src/Collision/Graspit)
-	set (GRASPIT_HEADERS 
-        ${GRASPIT_HEADERS} 
+	set (COLLISION_GRASPIT_HEADERS 
         ${GSRC}/src/Collision/Graspit/collisionModel.h 
         ${GSRC}/src/Collision/Graspit/collisionAlgorithms.h 
         ${GSRC}/src/Collision/Graspit/collisionAlgorithms_inl.h 
@@ -378,11 +429,17 @@ endif (PQP_COLLISION)
 
 #--------------------------------------- User interface: main window and dialogs ---------------------------------
 
-set (GRASPIT_INCLUDES
-    ${GRASPIT_INCLUDES}
+set (GRASPIT_UI_INCLUDES
     ${GSRC}/ui 
     ${GSRC}/ui/Planner 
     ${GSRC}/ui/EGPlanner
+)
+
+set (GRASPIT_INCLUDES
+    ${GRASPIT_INCLUDES}
+    ${GRASPIT_UI_INCLUDES}
+    ${GRASPIT_CGDB_INCLUDES}
+    ${GRASPIT_PLY_INCLUDES}
 )
 
 set (GRASPIT_FORMS
@@ -490,8 +547,6 @@ set (GRASPIT_IMAGES
     ${GSRC}/src/images/searchfind
 )
 
-#message ("*****************************************")
-#message (${GRASPIT_IMAGES})
 
 #-------------------------------------- The TinyXML XML parser ---------------------------------------------------
 
@@ -499,8 +554,7 @@ set (GRASPIT_INCLUDES
     ${GRASPIT_INCLUDES}
     ${GSRC}/tinyxml
 )
-set (GRASPIT_HEADERS 
-    ${GRASPIT_HEADERS} 
+set (TINYXML_HEADERS 
     ${GSRC}/tinyxml/tinyxml.h 
     ${GSRC}/tinyxml/tinystr.h
 )
@@ -517,8 +571,7 @@ set (GRASPIT_INCLUDES
     ${GRASPIT_INCLUDES}
     ${GSRC}/src/optimizer
 )
-set (GRASPIT_HEADERS 
-    ${GRASPIT_HEADERS} 
+set (OPTIMIZER_HEADERS 
     ${GSRC}/src/optimizer/optimizerDlg.h
 )
 
@@ -526,17 +579,16 @@ set (GRASPIT_OPTIMIZER_SOURCES
     ${GSRC}/src/optimizer/optimizerDlg.cpp
 )
 
-set (GRASPIT_FORMS
-    ${GRASPIT_FORMS}
+set (OPTIMIZER_FORMS
     ${GSRC}/src/optimizer/optimizerDlg.ui)
 
-if (CGDB)  # for colombia grasp data base, but this is not elsewhere included in this cmakefile yet.
+if (CGDB)  
     set (GRASPIT_OPTIMIZER_SOURCES
         ${GRASPIT_OPTIMIZER_SOURCES}
         ${GSRC}/src/optimizer/eigenTorques.cpp)
 
-    set (GRASPIT_HEADERS 
-        ${GRASPIT_HEADERS} 
+    set (OPTIMIZER_HEADERS 
+        ${OPTIMIZER_HEADERS} 
         ${GSRC}/src/optimizer/eigenTorques.h
 )
 endif (CGDB)    
@@ -548,9 +600,10 @@ set (MOC_HEADERS
 
 
 
-########################
-## Generate Qt files  ## 
-########################
+##########################################
+## Generate Qt files for the icon sets  ## 
+##########################################
+
 
 # Custom command to create an image collection with uic3 (it has to be uic3, not uic) like this: 
 # uic3 -embed graspit -o qt_image_collection.cpp path_to_my_images/*
@@ -564,27 +617,46 @@ ADD_CUSTOM_COMMAND(OUTPUT
              -embed graspit ${GRASPIT_IMAGES} 
     DEPENDS ${GRASPIT_IMAGES})
 
-SET(GRASPIT_FORM_SOURCES 
-    ${GRASPIT_FORM_SOURCES}     
+SET(GRASPIT_IMAGE_SOURCES 
     ${CMAKE_CURRENT_BINARY_DIR}/qt_image_collection.cpp)
-     
 
-#set (GRASPIT_DEVEL_PATH ${CMAKE_CURRENT_BINARY_DIR})
-set (GRASPIT_DEVEL_UI_DIRNAME ui)
-set (GRASPIT_DEVEL_UI_PATH ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${GRASPIT_DEVEL_UI_DIRNAME})
-file(MAKE_DIRECTORY ${GRASPIT_DEVEL_UI_PATH})
-
+################################
 ## Make Qt Moc files of GraspIT
-set (OLD_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set (CMAKE_CURRENT_BINARY_DIR ${GRASPIT_DEVEL_UI_PATH}) #artificially changing output location for UI files
-QT4_WRAP_UI(UI_OUTFILES ${GRASPIT_FORMS})
-set (CMAKE_CURRENT_BINARY_DIR ${OLD_CMAKE_CURRENT_BINARY_DIR})
+################################
+
+set (ALL_GRASPIT_FORMS
+    ${GRASPIT_FORMS}
+    ${CGDB_FORMS}
+    ${OPTIMIZER_FORMS}
+)
+
+set (GRASPIT_UI_INCLUDE_DIRNAME ui)
+
+# we will need to create a special folder named GRASPIT_UI_INCLUDE_DIRNAME
+# into which to generate the UI files, so that they can be included from
+# the graspit header files with the right prefix.
+if (catkin_FOUND) 
+    set (GRASPIT_UI_INCLUDE_PATH ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
+else (catkin_FOUND) 
+    set (GRASPIT_UI_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
+endif (catkin_FOUND) 
+    
+file(MAKE_DIRECTORY ${GRASPIT_UI_INCLUDE_PATH})
+
+set (OLD_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}) # backup current binary dir
+set (CMAKE_CURRENT_BINARY_DIR ${GRASPIT_UI_INCLUDE_PATH}) #artificially changing output location for UI files
+
+QT4_WRAP_UI(UI_OUTFILES ${ALL_GRASPIT_FORMS}) # generate UI outfiles (will use CMAKE_CURRENT_BINARY_DIR)
+
+set (CMAKE_CURRENT_BINARY_DIR ${OLD_CMAKE_CURRENT_BINARY_DIR}) # restore current binary dir
 
 QT4_WRAP_CPP(MOC_OUTFILES ${MOC_HEADERS})
 
+
+# add Qt stuff to the includes
 set (GRASPIT_INCLUDES 
      ${GRASPIT_INCLUDES}
-     ${GRASPIT_DEVEL_UI_PATH}
+     ${GRASPIT_UI_INCLUDE_PATH}
      ${SOQT_INCLUDE_DIRS}
      ${QT_INCLUDES}
      ${QT_INCLUDE_DIR}
@@ -592,31 +664,34 @@ set (GRASPIT_INCLUDES
      ${QHULL_INCLUDE_DIRS}
 )
 
+if (catkin_FOUND) 
+    set (GRASPIT_INCLUDES ${GRASPIT_INCLUDES} ${catkin_INCLUDES})
+    set (${PROJECT_NAME}_EXPORTED_TARGETS ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+endif (catkin_FOUND) 
 
 ## Specify additional locations of header files
-## Your package locations should be listed before other locations
-# include_directories(include)
 include_directories(
     ${GRASPIT_INCLUDES}
-    ${catkin_INCLUDES}
 )
 
 
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  INCLUDE_DIRS ${GSRC}/include ${GRASPIT_INCLUDES}  
-  LIBRARIES graspit
-#  CATKIN_DEPENDS roscpp std_msgs
-  DEPENDS ${QT_LIBRARIES} ${QT_QT3SUPPORT_LIBRARY} ${QHULL_LIBRARIES} ${SOQT_LIBRARY}
-)
+if (catkin_FOUND) 
+    ###################################
+    ## catkin specific configuration ##
+    ###################################
+    ## The catkin_package macro generates cmake config files for your package
+    ## Declare things to be passed to dependent projects
+    ## INCLUDE_DIRS: uncomment this if you package contains header files
+    ## LIBRARIES: libraries you create in this project that dependent projects also need
+    ## CATKIN_DEPENDS: catkin_packages dependent projects also need
+    ## DEPENDS: system dependencies of this project that dependent projects also need
+    catkin_package(
+      INCLUDE_DIRS ${GSRC}/include ${GRASPIT_INCLUDES}  
+      LIBRARIES graspit
+      #  CATKIN_DEPENDS 
+      DEPENDS ${QT_LIBRARIES} ${QT_QT3SUPPORT_LIBRARY} ${QHULL_LIBRARIES} ${SOQT_LIBRARY}
+    )
+endif (catkin_FOUND) 
 
 
 ############
@@ -626,51 +701,81 @@ catkin_package(
 add_definitions(${GRASPIT_DEFINES} -g)
 
 ## Declare a C++ library
-add_library(graspit 
+add_library(graspit SHARED 
 	${GRASPIT_CORE_SOURCES}    
+	${CGDB_SOURCES}    
+	${PLY_SOURCES}    
 	${GRASPIT_COLLISION_SOURCES}    
 	${GRASPIT_OPTIMIZER_SOURCES}    
 	${GRASPIT_FORM_SOURCES}    
+    ${GRASPIT_IMAGE_SOURCES}
     ${UI_OUTFILES}
     ${MOC_OUTFILES}
 )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(graspit ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(graspit ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-## Declare a C++ executable
+## Make simulator executable
 add_executable(graspit_simulator 
     ${GSRC}/src/main.cpp
 )
 
+## TODO @Jake @Matei simple_test.cpp requires C++11 but
+## I get compiler issues when using it on the main source.
+## Should we fix compiler issues and use C++11 for everything?
+## Or separate out simple_test.cpp into another project and
+## link the non-c++11 graspit library?
+## add_definitions(-std=c++11)
+
+## Make test executable
+#add_executable(graspit_simple_test 
+#    ${GSRC}/test/simple_test.cpp
+#)
+
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(graspit_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(graspit_simulator ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
 
 ## Specify libraries to link a library or executable target against
+
 target_link_libraries(graspit
-   ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
    ${QT_QT3SUPPORT_LIBRARY}
    ${QHULL_LIBRARIES}
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
 )
+
 target_link_libraries(graspit_simulator
-   ${catkin_LIBRARIES}
    graspit 
 )
 
+#target_link_libraries(graspit_simple_test
+#   graspit 
+#)
 
 
 #############
 ## Install ##
 #############
 
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+if (catkin_FOUND) 
+    # all install targets should use catkin DESTINATION variables
+    # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+    set ( INCLUDE_DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+    set ( LIB_DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+    set ( BIN_DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+    set ( SHARE_DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+else (catkin_FOUND) 
+    set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/)
+    set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
+    set ( BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
+    set ( SHARE_DESTINATION ${CMAKE_INSTALL_PREFIX}/share/)
+endif (catkin_FOUND) 
+
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
@@ -680,36 +785,69 @@ target_link_libraries(graspit_simulator
 # )
 
 ## Mark executables and/or libraries for installation
-#install(TARGETS graspit graspit_simulator
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#)
+install(TARGETS graspit graspit_simulator
+   ARCHIVE DESTINATION ${LIB_DESTINATION}
+   LIBRARY DESTINATION ${LIB_DESTINATION}
+   RUNTIME DESTINATION ${BIN_DESTINATION}
+)
 
-## Mark cpp header files for installation
-#install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-#)
+install(FILES
+    ${GRASPIT_INCLUDEDIR_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}
+)
 
-#install(FILES
-#    ${GRASPIT_HEADERS}
-#    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#)
+install(FILES
+    ${GRASPIT_CMDLINE_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}/cmdline
+)
 
-# XXX still check this here, not tested yet
-#install(FILES
-#    ${UI_OUTFILES}
-#    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/${PROJECT_NAME}/${GRASPIT_DEVEL_UI_DIRNAME}
-#)
+install(FILES
+    ${GRASPIT_SRC_COLLISION_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}/Collision
+)
+
+install(FILES
+    ${GRASPIT_INCLUDE_MATH_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}/math
+)
+
+install(FILES
+    ${OPTIMIZER_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}/optimizer
+)
+
+install(FILES
+    ${UI_OUTFILES}
+    DESTINATION ${INCLUDE_DESTINATION}/${GRASPIT_UI_INCLUDE_DIRNAME}
+)
+
+if (CGDB)
+    install(FILES
+        ${CGDB_HEADERS}
+        DESTINATION ${INCLUDE_DESTINATION}/DBase/
+    )
+    install(FILES
+        ${CGDB_PLANNER_HEADERS}
+        DESTINATION ${INCLUDE_DESTINATION}/DBase/DBPlanner/
+    )
+endif (CGDB)
+
+if (PLY)
+    install(FILES
+        ${PLY_HEADERS}
+        DESTINATION ${INCLUDE_DESTINATION}/ply/
+    )
+endif (PLY)
+
+ 
 
 
-## Mark other files for installation (e.g. launch and bag files, etc.)
+
+## Mark other files for installation
 # install(FILES
 #   # myfile1
 #   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#   DESTINATION ${SHARE_DESTINATION}
 # )
 
 #############
@@ -717,10 +855,13 @@ target_link_libraries(graspit_simulator
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_graspit.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+# if (catkin_FOUND) 
+#    catkin_add_gtest(${PROJECT_NAME}-test test/test_graspit.cpp)
+#    if(TARGET ${PROJECT_NAME}-test)
+#      target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+#    endif()
+#
+#   # Add folders to be run by python nosetests
+#   catkin_add_nosetests(test)
+# endif (catkin_FOUND) 
 
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
