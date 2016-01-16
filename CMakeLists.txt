@@ -815,6 +815,15 @@ install(FILES
     DESTINATION ${INCLUDE_DESTINATION}/EGPlanner
 )
 
+if (PQP_COLLISION)
+    install(FILES
+        ${GRASPIT_INCLUDEDIR_HEADERS}
+        ${COLLISION_PQP_HEADERS}
+        DESTINATION ${INCLUDE_DESTINATION}/Collision/PQP
+    )
+endif (PQP_COLLISION)
+
+
 install(FILES
     ${GRASPIT_SRC_COLLISION_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/Collision
@@ -852,9 +861,6 @@ if (PLY)
         DESTINATION ${INCLUDE_DESTINATION}/ply/
     )
 endif (PLY)
-
- 
-
 
 
 ## Mark other files for installation
