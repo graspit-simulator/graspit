@@ -135,12 +135,5 @@
         <direction>0 0 1</direction>
     </approachDirection>
     <eigenGrasps>eigen/barrett_eigen.xml</eigenGrasps>
-    <flockOfBirds number="1">
-        <transform>
-            <translation>0.0 -60 -35</translation>
-            <rotation>90 z</rotation>
-            <rotation>30 y</rotation>
-        </transform>
-    </flockOfBirds>
     <virtualContacts>virtual/all_16_contacts.vgr</virtualContacts>
 </robot>
