@@ -24,8 +24,15 @@ find_file(QHULL_HEADER
           HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}" "${QHULL_INCLUDE_DIR}"
           PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
           PATH_SUFFIXES qhull src/libqhull libqhull include)
-
 set(QHULL_HEADER "${QHULL_HEADER}" CACHE INTERNAL "QHull header" FORCE )
+
+
+find_file(QHULL_A_HEADER
+          NAMES qhull_a.h
+          HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}" "${QHULL_INCLUDE_DIR}"
+          PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
+          PATH_SUFFIXES qhull include)
+set(QHULL_A_HEADER "${QHULL_A_HEADER}" CACHE INTERNAL "qhull_a.h file" FORCE )
 
 if(QHULL_HEADER)
   get_filename_component(qhull_header ${QHULL_HEADER} NAME_WE)
@@ -41,7 +48,14 @@ else(QHULL_HEADER)
   set(QHULL_INCLUDE_DIR "QHULL_INCLUDE_DIR-NOTFOUND")
 endif(QHULL_HEADER)
 
+if(QHULL_A_HEADER)
+    get_filename_component(QHULL_A_INCLUDE_DIR ${QHULL_A_HEADER} PATH)
+else(QHULL_A_HEADER)
+  set(QHULL_A_INCLUDE_DIR "QHULL_A_INCLUDE_DIR-NOTFOUND")
+endif(QHULL_A_HEADER)
+
 set(QHULL_INCLUDE_DIR "${QHULL_INCLUDE_DIR}" CACHE PATH "QHull include dir." FORCE)
+set(QHULL_A_INCLUDE_DIR "${QHULL_A_INCLUDE_DIR}" CACHE PATH "qhull_a.h include dir." FORCE)
 
 find_library(QHULL_LIBRARY 
              NAMES ${QHULL_RELEASE_NAME}
@@ -59,7 +73,11 @@ if(NOT QHULL_LIBRARY_DEBUG)
   set(QHULL_LIBRARY_DEBUG ${QHULL_LIBRARY})
 endif(NOT QHULL_LIBRARY_DEBUG)
 
-set(QHULL_INCLUDE_DIRS "${QHULL_INCLUDE_DIR}/qhull;${QHULL_INCLUDE_DIR}")
+set(QHULL_INCLUDE_DIRS 
+   ${QHULL_INCLUDE_DIR}
+   ${QHULL_A_INCLUDE_DIR}
+)
+
 set(QHULL_LIBRARIES optimized ${QHULL_LIBRARY} debug ${QHULL_LIBRARY_DEBUG})
 
 include(FindPackageHandleStandardArgs)
