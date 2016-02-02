@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+	<geometryScaling>1000</geometryScaling>
+	<geometryFile type="Inventor">mico_finger_distal_link_remeshed_manually.iv</geometryFile>
+	<material>rubber</material>
+</root>

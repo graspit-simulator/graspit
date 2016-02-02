@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>mico_hand_link.xml</palm>
+    <dof type="r">
+              <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+
+
+    <chain>
+        <transform>
+	<translation>-13.746 30.948 -111.07</translation>
+	<rotation>-90 y</rotation>	  
+        </transform>
+
+        <joint type="Revolute">
+            <theta>d0+143</theta>
+            <d>0</d>
+            <a>44.1015</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>140</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0.0</d>
+            <a>0.0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>140</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">mico_finger_proximal_link.xml</link>
+        <link dynamicJointType="Revolute">mico_finger_distal_link.xml</link>
+    </chain>
+
+    <chain>
+        <transform>
+	<translation>8.5 -30.948 -111.07</translation>
+	<rotation>90 y</rotation>	  
+        </transform>
+
+        <joint type="Revolute">
+            <theta>d2+-37</theta>
+            <d>0</d>
+            <a>44.1015</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>140</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0.0</d>
+            <a>0.0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>140</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">mico_finger_proximal_link.xml</link>
+        <link dynamicJointType="Revolute">mico_finger_distal_link.xml</link>
+    </chain>
+
+    <approachDirection>
+        <referenceLocation>0 0 -112.0</referenceLocation>
+        <direction>0 0 -1</direction>
+    </approachDirection>
+<virtualContacts>virtual/gripper_contacts.vgr</virtualContacts>
+
+</robot>
