@@ -20,12 +20,11 @@ UI_DIR = ui
 
 # ---------------------- Graspit source code ----------------------------------------------
 
-INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner
+INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots ui ui/Planner ui/EGPlanner
 
-DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner
+DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots ui ui/Planner ui/EGPlanner
 
-HEADERS	+= include/barrett.h \
-	include/body.h \
+HEADERS	+= include/body.h \
 	include/bBox.h \
 	include/bbox_inl.h \
 	include/contact.h \
@@ -48,20 +47,12 @@ HEADERS	+= include/barrett.h \
 	include/matvec3D.h \
 	include/matvecIO.h \
 	include/maxdet.h \
-	include/mcGrip.h \
 	include/mytools.h \
 	include/profiling.h \
-	include/puma560.h \
 	include/qhull_mutex.h \
 	include/quality.h \
         include/plugin.h \
-	include/pr2Gripper.h \
-	include/m7.h \
-	include/m7tool.h \
-	include/robonaut.h \
 	include/robot.h \
-	include/robotiq.h \
-	include/humanHand.h \
 	include/SoArrow.h \
 	include/SoComplexShape.h \
 	include/SoTorquePointer.h \
@@ -103,12 +94,20 @@ HEADERS	+= include/barrett.h \
 	include/EGPlanner/graspTesterThread.h \
 	include/EGPlanner/onLineGraspInterface.h \
 	include/EGPlanner/listPlanner.h \
+	include/robots/shadow.h \
+	include/robots/robotiq.h \
+	include/robots/humanHand.h \
+	include/robots/mcGrip.h \
+	include/robots/puma560.h \
+	include/robots/pr2Gripper.h \
+	include/robots/m7.h \
+	include/robots/m7tool.h \
+	include/robots/robonaut.h \
+	include/robots/barrett.h \
 	include/FitParabola.h \
-        include/shadow.h \
         include/graspitParser.h
 
 SOURCES	+= src/arch.cpp \
-	src/barrett.cpp \
 	src/bBox.cpp \
 	src/body.cpp \
 	src/contact.cpp \
@@ -125,7 +124,6 @@ SOURCES	+= src/arch.cpp \
 	src/graspRecord.cpp \
 	src/gws.cpp \
 	src/gwsprojection.cpp \
-	src/humanHand.cpp \
 	src/ivmgr.cpp \
 	src/jacobian.cpp \
 	src/joint.cpp \
@@ -135,20 +133,12 @@ SOURCES	+= src/arch.cpp \
 	src/matvec.cpp \
 	src/matvecIO.cpp \
 	src/maxdet_src.cpp \
-	src/mcGrip.cpp \
 	src/mytools.cpp \
 	src/profiling.cpp \
-	src/pr2Gripper.cpp \
-	src/m7.cpp \
-	src/m7tool.cpp \
         src/plugin.cpp \
-	src/puma560.cpp \
 	src/quality.cpp \
-	src/robonaut.cpp \
 	src/robot.cpp \
-	src/robotiq.cpp \
 	src/scanSimulator.cpp \
-	src/shadow.cpp \
 	src/SoArrow.cpp \
 	src/SoComplexShape.cpp \
 	src/SoTorquePointer.cpp \	
@@ -180,6 +170,16 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/graspTesterThread.cpp \
 	src/EGPlanner/onLineGraspInterface.cpp \
         src/EGPlanner/listPlanner.cpp \
+	src/robots/shadow.cpp \
+	src/robots/robotiq.cpp \
+	src/robots/humanHand.cpp \
+	src/robots/mcGrip.cpp \
+	src/robots/puma560.cpp \
+	src/robots/pr2Gripper.cpp \
+	src/robots/m7.cpp \
+	src/robots/m7tool.cpp \
+	src/robots/robonaut.cpp \
+	src/robots/barrett.cpp \
         src/graspitParser.cpp
 
 graspit_test{
