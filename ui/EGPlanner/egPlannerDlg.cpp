@@ -68,7 +68,7 @@ void EigenGraspPlannerDlg::init()
  energyBox->insertItem("Contacts AND Quality");
  energyBox->insertItem("Autograsp Quality");
  energyBox->insertItem("Guided Autograsp");
- energyBox->setCurrentItem(0);
+ energyBox->setCurrentItem(2);
 
  plannerTypeBox->insertItem("Sim. Ann.");
  plannerTypeBox->insertItem("Loop");
@@ -384,8 +384,8 @@ void EigenGraspPlannerDlg::updateResults(bool render)
  nStr.setNum(mPlanner->getCurrentStep());
  currentStepLabel->setText(QString("Current step: ") + nStr);
 
- nStr.setNum(mPlanner->getRunningTime(),'f',0);
- timeLabel->setText(QString("Time used: ") + nStr + QString(" sec."));
+ nStr.setNum(mPlanner->getRunningTime(),'f',3);
+ timeLabel->setText(QString("Time used: ") + nStr + QString(" sec"));
 
  int d = mPlanner->getListSize();
  int rank, size, iteration; double energy;
