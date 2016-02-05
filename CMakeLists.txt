@@ -31,8 +31,6 @@ set (GRASPIT_DEFINES
 # catkin is optional, and only to be used when added 
 # as ROS package and compiling with catkin_make. 
 # CATKIN_DEVEL_PREFIX is only defined if building with catkin
-# TODO: Would be nicer to use another variable here like
-# BUILDING_WITH_CATKIN if something like that exists?
 if (CATKIN_DEVEL_PREFIX)
     message("Building graspit with catkin.")
     find_package(catkin) 
@@ -50,7 +48,6 @@ find_package(LAPACK REQUIRED)
 SET( QT_USE_QT3SUPPORT TRUE )
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 
-# include QT_USE_FILE is needed.
 include (${QT_USE_FILE})
 
 #--------------------------------------- Core sources ---------------------------------
@@ -63,9 +60,9 @@ set (GRASPIT_INCLUDES
   ${GSRC}/include/Planner
   ${GSRC}/src/Collision
   ${GSRC}/cmdline
-  # following only has to be included because of Pr2Gripper!
   ${GSRC}/ui
-  # following needs to be included because basic files wouldn't compile without main window
+  # following needs to be included because basic
+  # files wouldn't compile without main window
   ${GSRC}/ui/Planner
   ${GSRC}/ui/EGPlanner
   ${GSRC}/src/optimizer
@@ -79,87 +76,87 @@ set (GRASPIT_INCLUDES
 set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspitParser.h 
     ${GSRC}/include/barrett.h 
-	${GSRC}/include/body.h 
-	${GSRC}/include/bBox.h 
-	${GSRC}/include/bbox_inl.h 
-	${GSRC}/include/contact.h 
-	${GSRC}/include/contactSetting.h 
-	${GSRC}/include/debug.h 
-	${GSRC}/include/dof.h 
-	${GSRC}/include/dynamics.h 
-	${GSRC}/include/eigenGrasp.h 
-	${GSRC}/include/gloveInterface.h 
-	${GSRC}/include/grasp.h 
-	${GSRC}/include/graspRecord.h 
-	${GSRC}/include/gws.h 
-	${GSRC}/include/gwsprojection.h 
-	${GSRC}/include/ivmgr.h 
-	${GSRC}/include/jacobian.h 
-	${GSRC}/include/joint.h 
-	${GSRC}/include/kinematicChain.h 
-	${GSRC}/include/lmiOptimizer.h 
-	${GSRC}/include/material.h 
-	${GSRC}/include/matvec3D.h 
-	${GSRC}/include/matvecIO.h 
-	${GSRC}/include/maxdet.h 
-	${GSRC}/include/mcGrip.h 
-	${GSRC}/include/mytools.h 
-	${GSRC}/include/profiling.h 
-	${GSRC}/include/puma560.h 
-	${GSRC}/include/qhull_mutex.h 
-	${GSRC}/include/quality.h 
+    ${GSRC}/include/body.h 
+    ${GSRC}/include/bBox.h 
+    ${GSRC}/include/bbox_inl.h 
+    ${GSRC}/include/contact.h 
+    ${GSRC}/include/contactSetting.h 
+    ${GSRC}/include/debug.h 
+    ${GSRC}/include/dof.h 
+    ${GSRC}/include/dynamics.h 
+    ${GSRC}/include/eigenGrasp.h 
+    ${GSRC}/include/gloveInterface.h 
+    ${GSRC}/include/grasp.h 
+    ${GSRC}/include/graspRecord.h 
+    ${GSRC}/include/gws.h 
+    ${GSRC}/include/gwsprojection.h 
+    ${GSRC}/include/ivmgr.h 
+    ${GSRC}/include/jacobian.h 
+    ${GSRC}/include/joint.h 
+    ${GSRC}/include/kinematicChain.h 
+    ${GSRC}/include/lmiOptimizer.h 
+    ${GSRC}/include/material.h 
+    ${GSRC}/include/matvec3D.h 
+    ${GSRC}/include/matvecIO.h 
+    ${GSRC}/include/maxdet.h 
+    ${GSRC}/include/mcGrip.h 
+    ${GSRC}/include/mytools.h 
+    ${GSRC}/include/profiling.h 
+    ${GSRC}/include/puma560.h 
+    ${GSRC}/include/qhull_mutex.h 
+    ${GSRC}/include/quality.h 
     ${GSRC}/include/plugin.h 
-	${GSRC}/include/pr2Gripper.h 
-	${GSRC}/include/m7.h 
-	${GSRC}/include/m7tool.h 
-	${GSRC}/include/robonaut.h 
-	${GSRC}/include/robot.h 
-	${GSRC}/include/robotiq.h 
-	${GSRC}/include/humanHand.h 
-	${GSRC}/include/SoArrow.h 
-	${GSRC}/include/SoComplexShape.h 
-	${GSRC}/include/SoTorquePointer.h 
-	${GSRC}/include/scanSimulator.h 
-	${GSRC}/include/timer_calls.h 
-	${GSRC}/include/triangle_inl.h 
-	${GSRC}/include/triangle.h 
-	${GSRC}/include/worldElement.h 
-	${GSRC}/include/worldElementFactory.h 
-	${GSRC}/include/world.h 
-	${GSRC}/include/graspitGUI.h 
-	${GSRC}/include/graspitServer.h 
-	${GSRC}/include/graspitApp.h 
-	${GSRC}/include/dynJoint.h 
-	${GSRC}/include/arch.h
-	${GSRC}/include/FitParabola.h 
-	${GSRC}/include/shadow.h
+    ${GSRC}/include/pr2Gripper.h 
+    ${GSRC}/include/m7.h 
+    ${GSRC}/include/m7tool.h 
+    ${GSRC}/include/robonaut.h 
+    ${GSRC}/include/robot.h 
+    ${GSRC}/include/robotiq.h 
+    ${GSRC}/include/humanHand.h 
+    ${GSRC}/include/SoArrow.h 
+    ${GSRC}/include/SoComplexShape.h 
+    ${GSRC}/include/SoTorquePointer.h 
+    ${GSRC}/include/scanSimulator.h 
+    ${GSRC}/include/timer_calls.h 
+    ${GSRC}/include/triangle_inl.h 
+    ${GSRC}/include/triangle.h 
+    ${GSRC}/include/worldElement.h 
+    ${GSRC}/include/worldElementFactory.h 
+    ${GSRC}/include/world.h 
+    ${GSRC}/include/graspitGUI.h 
+    ${GSRC}/include/graspitServer.h 
+    ${GSRC}/include/graspitApp.h 
+    ${GSRC}/include/dynJoint.h 
+    ${GSRC}/include/arch.h
+    ${GSRC}/include/FitParabola.h 
+    ${GSRC}/include/shadow.h
 )
 set (GRASPIT_PLANNER_HEADERS
-	${GSRC}/include/Planner/grasp_visualization.h 
-	${GSRC}/include/Planner/grasp_tester.h 
-	${GSRC}/include/Planner/grasp_preshape.h 
-	${GSRC}/include/Planner/grasp_presenter.h 
-	${GSRC}/include/Planner/grasp_planner.h 
-	${GSRC}/include/Planner/grasp_manager.h 
-	${GSRC}/include/Planner/grasp_grasps.h 
-	${GSRC}/include/Planner/grasp_directions.h 
-	${GSRC}/include/Planner/grasp_coordinates.h 
+    ${GSRC}/include/Planner/grasp_visualization.h 
+    ${GSRC}/include/Planner/grasp_tester.h 
+    ${GSRC}/include/Planner/grasp_preshape.h 
+    ${GSRC}/include/Planner/grasp_presenter.h 
+    ${GSRC}/include/Planner/grasp_planner.h 
+    ${GSRC}/include/Planner/grasp_manager.h 
+    ${GSRC}/include/Planner/grasp_grasps.h 
+    ${GSRC}/include/Planner/grasp_directions.h 
+    ${GSRC}/include/Planner/grasp_coordinates.h 
 )
 set (GRASPIT_EGPLANNER_HEADERS
-	${GSRC}/include/EGPlanner/search.h 
-	${GSRC}/include/EGPlanner/simAnn.h 
-	${GSRC}/include/EGPlanner/searchState.h 
-	${GSRC}/include/EGPlanner/searchStateImpl.h 
-	${GSRC}/include/EGPlanner/searchEnergy.h 
-	${GSRC}/include/EGPlanner/onLinePlanner.h 
-	${GSRC}/include/EGPlanner/egPlanner.h 
-	${GSRC}/include/EGPlanner/simAnnPlanner.h 
-	${GSRC}/include/EGPlanner/guidedPlanner.h 
-	${GSRC}/include/EGPlanner/loopPlanner.h 
-	${GSRC}/include/EGPlanner/timeTest.h 
-	${GSRC}/include/EGPlanner/graspTesterThread.h 
-	${GSRC}/include/EGPlanner/onLineGraspInterface.h 
-	${GSRC}/include/EGPlanner/listPlanner.h 
+    ${GSRC}/include/EGPlanner/search.h 
+    ${GSRC}/include/EGPlanner/simAnn.h 
+    ${GSRC}/include/EGPlanner/searchState.h 
+    ${GSRC}/include/EGPlanner/searchStateImpl.h 
+    ${GSRC}/include/EGPlanner/searchEnergy.h 
+    ${GSRC}/include/EGPlanner/onLinePlanner.h 
+    ${GSRC}/include/EGPlanner/egPlanner.h 
+    ${GSRC}/include/EGPlanner/simAnnPlanner.h 
+    ${GSRC}/include/EGPlanner/guidedPlanner.h 
+    ${GSRC}/include/EGPlanner/loopPlanner.h 
+    ${GSRC}/include/EGPlanner/timeTest.h 
+    ${GSRC}/include/EGPlanner/graspTesterThread.h 
+    ${GSRC}/include/EGPlanner/onLineGraspInterface.h 
+    ${GSRC}/include/EGPlanner/listPlanner.h 
 )
 
 
@@ -304,78 +301,78 @@ set (MOC_HEADERS
 set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/graspitParser.cpp 
     ${GSRC}/src/arch.cpp 
-	${GSRC}/src/barrett.cpp 
-	${GSRC}/src/bBox.cpp 
-	${GSRC}/src/body.cpp 
-	${GSRC}/src/contact.cpp 
-	${GSRC}/src/contactSetting.cpp 
-	${GSRC}/src/dof.cpp 
-	${GSRC}/src/dynamics.cpp 
-	${GSRC}/src/dynJoint.cpp 
-	${GSRC}/src/eigenGrasp.cpp 
-	${GSRC}/src/gloveInterface.cpp 
-	${GSRC}/src/grasp.cpp 
-	${GSRC}/src/graspitGUI.cpp 
-	${GSRC}/src/graspitServer.cpp 
-	${GSRC}/src/graspitApp.cpp 
-	${GSRC}/src/graspRecord.cpp 
-	${GSRC}/src/gws.cpp 
-	${GSRC}/src/gwsprojection.cpp 
-	${GSRC}/src/humanHand.cpp 
-	${GSRC}/src/ivmgr.cpp 
-	${GSRC}/src/jacobian.cpp 
-	${GSRC}/src/joint.cpp 
-	${GSRC}/src/kinematicChain.cpp 
-	${GSRC}/src/lmiOptimizer.cpp 
-	${GSRC}/src/material.cpp 
-	${GSRC}/src/matvec.cpp 
-	${GSRC}/src/matvecIO.cpp 
-	${GSRC}/src/maxdet_src.cpp 
-	${GSRC}/src/mcGrip.cpp 
-	${GSRC}/src/mytools.cpp 
-	${GSRC}/src/profiling.cpp 
-	${GSRC}/src/pr2Gripper.cpp 
-	${GSRC}/src/m7.cpp 
-	${GSRC}/src/m7tool.cpp 
+    ${GSRC}/src/barrett.cpp 
+    ${GSRC}/src/bBox.cpp 
+    ${GSRC}/src/body.cpp 
+    ${GSRC}/src/contact.cpp 
+    ${GSRC}/src/contactSetting.cpp 
+    ${GSRC}/src/dof.cpp 
+    ${GSRC}/src/dynamics.cpp 
+    ${GSRC}/src/dynJoint.cpp 
+    ${GSRC}/src/eigenGrasp.cpp 
+    ${GSRC}/src/gloveInterface.cpp 
+    ${GSRC}/src/grasp.cpp 
+    ${GSRC}/src/graspitGUI.cpp 
+    ${GSRC}/src/graspitServer.cpp 
+    ${GSRC}/src/graspitApp.cpp 
+    ${GSRC}/src/graspRecord.cpp 
+    ${GSRC}/src/gws.cpp 
+    ${GSRC}/src/gwsprojection.cpp 
+    ${GSRC}/src/humanHand.cpp 
+    ${GSRC}/src/ivmgr.cpp 
+    ${GSRC}/src/jacobian.cpp 
+    ${GSRC}/src/joint.cpp 
+    ${GSRC}/src/kinematicChain.cpp 
+    ${GSRC}/src/lmiOptimizer.cpp 
+    ${GSRC}/src/material.cpp 
+    ${GSRC}/src/matvec.cpp 
+    ${GSRC}/src/matvecIO.cpp 
+    ${GSRC}/src/maxdet_src.cpp 
+    ${GSRC}/src/mcGrip.cpp 
+    ${GSRC}/src/mytools.cpp 
+    ${GSRC}/src/profiling.cpp 
+    ${GSRC}/src/pr2Gripper.cpp 
+    ${GSRC}/src/m7.cpp 
+    ${GSRC}/src/m7tool.cpp 
     ${GSRC}/src/plugin.cpp 
-	${GSRC}/src/puma560.cpp 
-	${GSRC}/src/quality.cpp 
-	${GSRC}/src/robonaut.cpp 
-	${GSRC}/src/robot.cpp 
-	${GSRC}/src/robotiq.cpp 
-	${GSRC}/src/scanSimulator.cpp 
-	${GSRC}/src/shadow.cpp 
-	${GSRC}/src/SoArrow.cpp 
-	${GSRC}/src/SoComplexShape.cpp 
-	${GSRC}/src/SoTorquePointer.cpp 	
-	${GSRC}/src/triangle.cpp 
-	${GSRC}/src/world.cpp 
-	${GSRC}/src/worldElement.cpp 
-	${GSRC}/src/worldElementFactory.cpp 
-	${GSRC}/src/math/matrix.cpp 
-	${GSRC}/src/Collision/collisionInterface.cpp 
-	${GSRC}/src/Planner/grasp_visualization.cpp 
-	${GSRC}/src/Planner/grasp_tester.cpp 
-	${GSRC}/src/Planner/grasp_preshape.cpp 
-	${GSRC}/src/Planner/grasp_presenter.cpp 
-	${GSRC}/src/Planner/grasp_planner.cpp 
-	${GSRC}/src/Planner/grasp_manager.cpp 
-	${GSRC}/src/Planner/grasp_grasps.cpp 
-	${GSRC}/src/Planner/grasp_directions.cpp 
-	${GSRC}/src/Planner/grasp_coordinates.cpp 
-	${GSRC}/src/EGPlanner/simAnn.cpp 
-	${GSRC}/src/EGPlanner/searchState.cpp 
-	${GSRC}/src/EGPlanner/searchStateImpl.cpp 
-	${GSRC}/src/EGPlanner/searchEnergy.cpp 
-	${GSRC}/src/EGPlanner/onLinePlanner.cpp 
-	${GSRC}/src/EGPlanner/egPlanner.cpp 
-	${GSRC}/src/EGPlanner/simAnnPlanner.cpp 
-	${GSRC}/src/EGPlanner/guidedPlanner.cpp 
-	${GSRC}/src/EGPlanner/loopPlanner.cpp 
-	${GSRC}/src/EGPlanner/timeTest.cpp 
-	${GSRC}/src/EGPlanner/graspTesterThread.cpp 
-	${GSRC}/src/EGPlanner/onLineGraspInterface.cpp 
-	${GSRC}/src/EGPlanner/listPlanner.cpp 
+    ${GSRC}/src/puma560.cpp 
+    ${GSRC}/src/quality.cpp 
+    ${GSRC}/src/robonaut.cpp 
+    ${GSRC}/src/robot.cpp 
+    ${GSRC}/src/robotiq.cpp 
+    ${GSRC}/src/scanSimulator.cpp 
+    ${GSRC}/src/shadow.cpp 
+    ${GSRC}/src/SoArrow.cpp 
+    ${GSRC}/src/SoComplexShape.cpp 
+    ${GSRC}/src/SoTorquePointer.cpp 	
+    ${GSRC}/src/triangle.cpp 
+    ${GSRC}/src/world.cpp 
+    ${GSRC}/src/worldElement.cpp 
+    ${GSRC}/src/worldElementFactory.cpp 
+    ${GSRC}/src/math/matrix.cpp 
+    ${GSRC}/src/Collision/collisionInterface.cpp 
+    ${GSRC}/src/Planner/grasp_visualization.cpp 
+    ${GSRC}/src/Planner/grasp_tester.cpp 
+    ${GSRC}/src/Planner/grasp_preshape.cpp 
+    ${GSRC}/src/Planner/grasp_presenter.cpp 
+    ${GSRC}/src/Planner/grasp_planner.cpp 
+    ${GSRC}/src/Planner/grasp_manager.cpp 
+    ${GSRC}/src/Planner/grasp_grasps.cpp 
+    ${GSRC}/src/Planner/grasp_directions.cpp 
+    ${GSRC}/src/Planner/grasp_coordinates.cpp 
+    ${GSRC}/src/EGPlanner/simAnn.cpp 
+    ${GSRC}/src/EGPlanner/searchState.cpp 
+    ${GSRC}/src/EGPlanner/searchStateImpl.cpp 
+    ${GSRC}/src/EGPlanner/searchEnergy.cpp 
+    ${GSRC}/src/EGPlanner/onLinePlanner.cpp 
+    ${GSRC}/src/EGPlanner/egPlanner.cpp 
+    ${GSRC}/src/EGPlanner/simAnnPlanner.cpp 
+    ${GSRC}/src/EGPlanner/guidedPlanner.cpp 
+    ${GSRC}/src/EGPlanner/loopPlanner.cpp 
+    ${GSRC}/src/EGPlanner/timeTest.cpp 
+    ${GSRC}/src/EGPlanner/graspTesterThread.cpp 
+    ${GSRC}/src/EGPlanner/onLineGraspInterface.cpp 
+    ${GSRC}/src/EGPlanner/listPlanner.cpp 
 )
 
 #--------------------------------------- Collision library ---------------------------------
