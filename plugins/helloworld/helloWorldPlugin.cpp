@@ -40,15 +40,19 @@ HelloWorldPlugin::~HelloWorldPlugin()
   std::cerr << "Hello world plugin destroyed\n";
 }
 
-int HelloWorldPlugin::init(int, char**)
+int HelloWorldPlugin::init(int argc, char** argv)
 {
-  std::cerr << "Hello world plugin initialized\n";
+  std::cerr << "Hello world plugin initialized with args:\n";
+  for(int i=0; i < argc; i++)
+    {
+      std::cerr << argv[i] << std::endl;
+    }
   return 0;
 }
 
 int HelloWorldPlugin::mainLoop()
 {
-	std::cout << "hello world \n";
+  std::cout << "hello world \n";
   return 0;
 }
 

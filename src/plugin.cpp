@@ -44,12 +44,27 @@ PluginCreator::~PluginCreator()
   dlclose(mLibraryHandle);
 }
 
-Plugin* PluginCreator::createPlugin(std::string args)
-{	
+
+Plugin* PluginCreator::createPlugin(int argc, char** argv)
+{
   Plugin* plugin = (*mCreatePluginFctn)(); 
-  args = args;
-  if (!plugin) return NULL;
-  if (plugin->init(0,NULL) != SUCCESS) {
+  if (!plugin)
+  {
+      return NULL;
+  }
+
+  //make copy of argv, so plugins cannot interfere with each other.
+  char ** argv_copy = new char*[argc+1];
+  for(int i=0; i < argc; i++)
+  {
+      int len = strlen(argv[i] + 1);
+      argv_copy[i] = new char[len];
+      strcpy(argv_copy[i], argv[i]);
+  }
+  argv_copy[argc] = NULL;
+
+  if (plugin->init(argc, argv_copy) != SUCCESS)
+  {
     DBGA("Failed to initialize new plugin of type " << mType);
     delete plugin;
     return NULL;
@@ -135,7 +150,6 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
 
   //create the PluginCreator and push it back
   bool autoStart = true;
-  std::string defaultArgs;
-  PluginCreator *creator = new PluginCreator(handle, createPluginFctn, autoStart, type, defaultArgs);
+  PluginCreator *creator = new PluginCreator(handle, createPluginFctn, autoStart, type);
   return creator;
 }

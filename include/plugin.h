@@ -52,24 +52,22 @@ private:
 
   bool mAutoStart;
   std::string mType;
-  std::string mDefaultArgs;
+
 public:
   PluginCreator(void* libraryHandle, CreatePluginFctn createPluginFctn,
-                bool autoStart, std::string type, std::string defaultArgs) : 
+                bool autoStart, std::string type) :
     mLibraryHandle(libraryHandle),
     mCreatePluginFctn(createPluginFctn),
     mAutoStart(autoStart),
-    mType(type),
-    mDefaultArgs(defaultArgs) 
+    mType(type)
   {}
   
   ~PluginCreator();
 
-  Plugin* createPlugin(std::string args);
+  Plugin* createPlugin(int argc, char** argv);
   
   bool autoStart() const {return mAutoStart;}
   std::string type() const {return mType;}
-  std::string defaultArgs() const {return mDefaultArgs;}
 
   static PluginCreator* loadFromLibrary(std::string libName);
 };
