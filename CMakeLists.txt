@@ -18,6 +18,8 @@ set (CGDB true)
 # compile PLY sources
 set (PLY true)
 
+set (BUILD_TESTS false)
+
 set (GRASPIT_DEFINES 
     -DGRASPIT_RELEASE  
     #-DGRASPIT_DEBUG 
@@ -723,22 +725,11 @@ add_executable(graspit_simulator
     ${GSRC}/src/main.cpp
 )
 
-## TODO @Jake @Matei simple_test.cpp requires C++11 but
-## I get compiler issues when using it on the main source.
-## Should we fix compiler issues and use C++11 for everything?
-## Or separate out simple_test.cpp into another project and
-## link the non-c++11 graspit library?
-## add_definitions(-std=c++11)
 
-## Make test executable
-#add_executable(graspit_simple_test 
-#    ${GSRC}/test/simple_test.cpp
-#)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(graspit_simulator ${${PROJECT_NAME}_EXPORTED_TARGETS})
-
 
 ## Specify libraries to link a library or executable target against
 
@@ -753,11 +744,6 @@ target_link_libraries(graspit
 target_link_libraries(graspit_simulator
    graspit 
 )
-
-#target_link_libraries(graspit_simple_test
-#   graspit 
-#)
-
 
 #############
 ## Install ##
@@ -871,14 +857,23 @@ endif (PLY)
 ## Testing ##
 #############
 
-## Add gtest based cpp test target and link libraries
-# if (catkin_FOUND) 
-#    catkin_add_gtest(${PROJECT_NAME}-test test/test_graspit.cpp)
-#    if(TARGET ${PROJECT_NAME}-test)
-#      target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-#    endif()
-#
-#   # Add folders to be run by python nosetests
-#   catkin_add_nosetests(test)
-# endif (catkin_FOUND) 
+if(BUILD_TESTS)
 
+enable_testing()
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_definitions(-std=c++11)
+
+# Make test executable
+add_executable(graspit_simple_test
+    ${GSRC}/test/simple_test.cpp
+)
+
+add_dependencies(graspit_simple_test googletest)
+
+target_link_libraries(graspit_simple_test
+   graspit
+   ${GTEST_BOTH_LIBRARIES}
+)
+
+endif(BUILD_TESTS)
