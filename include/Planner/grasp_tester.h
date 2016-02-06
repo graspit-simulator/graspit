@@ -57,7 +57,7 @@
 
 #include <vector>
 
-#include "matvec3D.h"
+#include "include/matvec3D.h"
 #include "collisionStructures.h"
 #include "grasp_directions.h"
 #include "grasp_preshape.h"
