@@ -52,17 +52,14 @@ private:
 
   bool mAutoStart;
   std::string mType;
-  int argc;
-  char** argv;
+
 public:
   PluginCreator(void* libraryHandle, CreatePluginFctn createPluginFctn,
-                bool autoStart, std::string type, int argc, char** argv) :
+                bool autoStart, std::string type) :
     mLibraryHandle(libraryHandle),
     mCreatePluginFctn(createPluginFctn),
     mAutoStart(autoStart),
-    mType(type),
-    argc(argc),
-    argv(argv)
+    mType(type)
   {}
   
   ~PluginCreator();
@@ -72,7 +69,7 @@ public:
   bool autoStart() const {return mAutoStart;}
   std::string type() const {return mType;}
 
-  static PluginCreator* loadFromLibrary(std::string libName, int argc, char** argv);
+  static PluginCreator* loadFromLibrary(std::string libName);
 };
 
 

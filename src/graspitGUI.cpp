@@ -164,7 +164,7 @@ GraspItGUI::processArgs(int argc, char** argv)
         for(int i=0; i < plugins_list.size(); i++)
         {
             std::cout << "Loading Plugin: "<< plugins_list.at(i).toStdString().c_str();
-            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString(), argc, argv);
+            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString());
             if (creator){
               mPluginCreators.push_back(creator);
             } else {
