@@ -382,11 +382,6 @@ if (PQP_COLLISION)
 	set(GRASPIT_DEFINES 
         ${GRASPIT_DEFINES}
          -DPQP_COLLISION)
-    #set (GRASPIT_INCLUDES 
-    #    ${GRASPIT_INCLUDES} 
-    #    ${GSRC}/src/Collision/PQP PQP-VCOLLIDE/src 
-    #    ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src 
-    #    ${GSRC}/PQP-VCOLLIDE/ivcollide) 
     set (GRASPIT_INCLUDES
         ${GRASPIT_INCLUDES}
     	${GSRC}/PQP-VCOLLIDE/include 
@@ -551,8 +546,7 @@ set (GRASPIT_IMAGES
 
 #-------------------------------------- The TinyXML XML parser ---------------------------------------------------
 
-set (GRASPIT_INCLUDES
-    ${GRASPIT_INCLUDES}
+set (TINYXML_INCLUDES
     ${GSRC}/tinyxml
 )
 set (TINYXML_HEADERS 
@@ -673,6 +667,7 @@ endif (catkin_FOUND)
 ## Specify additional locations of header files
 include_directories(
     ${GRASPIT_INCLUDES}
+    ${TINYXML_INCLUDES}
 )
 
 
