@@ -53,19 +53,19 @@ include (${QT_USE_FILE})
 #--------------------------------------- Core sources ---------------------------------
 
 set (GRASPIT_INCLUDES
-  ${GSRC}
-  ${GSRC}/include/
-  ${GSRC}/include/math
-  ${GSRC}/include/EGPlanner
-  ${GSRC}/include/Planner
-  ${GSRC}/src/Collision
-  ${GSRC}/cmdline
-  ${GSRC}/ui
-  # following needs to be included because basic
-  # files wouldn't compile without main window
-  ${GSRC}/ui/Planner
-  ${GSRC}/ui/EGPlanner
-  ${GSRC}/src/optimizer
+    ${GSRC}
+    ${GSRC}/include/
+    ${GSRC}/include/math
+    ${GSRC}/include/EGPlanner
+    ${GSRC}/include/Planner
+    ${GSRC}/src/Collision
+    ${GSRC}/cmdline
+    ${GSRC}/ui
+    # following needs to be included because basic
+    # files wouldn't compile without main window
+    ${GSRC}/ui/Planner
+    ${GSRC}/ui/EGPlanner
+    ${GSRC}/src/optimizer
 )
 
 
@@ -174,7 +174,7 @@ set (GRASPIT_CMDLINE_HEADERS
 # variable GRASPIT_SRC_COLLISION_HEADERS
 set (GRASPIT_SRC_COLLISION_HEADERS
     ${GSRC}/src/Collision/collisionInterface.h 
-	${GSRC}/src/Collision/collisionStructures.h 
+    ${GSRC}/src/Collision/collisionStructures.h
 )
 	
 
@@ -257,7 +257,6 @@ if (PLY)
         ply/ply.h
         ply/mesh_loader.h
     )
-
     set (PLY_SOURCES
         ply/ply.c
         ply/mesh_loader.cpp
@@ -273,27 +272,27 @@ endif (PLY)
 
 
 set (MOC_HEADERS
-	${GSRC}/include/body.h
-	${GSRC}/include/robot.h
-	${GSRC}/include/world.h
-	${GSRC}/include/grasp.h
-	${GSRC}/include/worldElement.h
-	${GSRC}/include/graspitServer.h
-	${GSRC}/include/EGPlanner/egPlanner.h
-	${GSRC}/include/EGPlanner/simAnn.h
-	${GSRC}/include/EGPlanner/loopPlanner.h
-	${GSRC}/include/EGPlanner/searchEnergy.h
-	${GSRC}/include/EGPlanner/guidedPlanner.h
-	${GSRC}/include/Planner/grasp_tester.h
-	${GSRC}/include/humanHand.h
-	${GSRC}/include/m7tool.h
-	${GSRC}/include/m7.h
-	${GSRC}/include/barrett.h
-	${GSRC}/include/robonaut.h
-	${GSRC}/include/pr2Gripper.h
-	${GSRC}/include/robotiq.h
-	${GSRC}/include/mcGrip.h
-	${GSRC}/include/ivmgr.h
+    ${GSRC}/include/body.h
+    ${GSRC}/include/robot.h
+    ${GSRC}/include/world.h
+    ${GSRC}/include/grasp.h
+    ${GSRC}/include/worldElement.h
+    ${GSRC}/include/graspitServer.h
+    ${GSRC}/include/EGPlanner/egPlanner.h
+    ${GSRC}/include/EGPlanner/simAnn.h
+    ${GSRC}/include/EGPlanner/loopPlanner.h
+    ${GSRC}/include/EGPlanner/searchEnergy.h
+    ${GSRC}/include/EGPlanner/guidedPlanner.h
+    ${GSRC}/include/Planner/grasp_tester.h
+    ${GSRC}/include/humanHand.h
+    ${GSRC}/include/m7tool.h
+    ${GSRC}/include/m7.h
+    ${GSRC}/include/barrett.h
+    ${GSRC}/include/robonaut.h
+    ${GSRC}/include/pr2Gripper.h
+    ${GSRC}/include/robotiq.h
+    ${GSRC}/include/mcGrip.h
+    ${GSRC}/include/ivmgr.h
     ${CGDB_MOC_HEADERS}
 ) 
 
@@ -379,7 +378,7 @@ set (GRASPIT_CORE_SOURCES
 
 
 if (PQP_COLLISION) 
-	set(GRASPIT_DEFINES 
+    set (GRASPIT_DEFINES
         ${GRASPIT_DEFINES}
          -DPQP_COLLISION)
     set (GRASPIT_INCLUDES
@@ -387,29 +386,29 @@ if (PQP_COLLISION)
     	${GSRC}/PQP-VCOLLIDE/include 
         ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src 
         ${GSRC}/PQP-VCOLLIDE/ivcollide)
-	set (COLLISION_PQP_HEADERS 
+    set (COLLISION_PQP_HEADERS
         ${GSRC}/src/Collision/PQP/PQPCollision.h)
     set (GRASPIT_COLLISION_SOURCES
         ${GSRC}/src/Collision/PQP/PQPCollision.cpp 
-		${GSRC}/PQP-VCOLLIDE/src/VCollide.cpp 
-		${GSRC}/PQP-VCOLLIDE/src/VInternal.cpp 
-		${GSRC}/PQP-VCOLLIDE/src/NBody.cpp 
-		${GSRC}/PQP-VCOLLIDE/src/PairData.cpp 
-		${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/Build.cpp 
-		${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/BV.cpp 
-		${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/PQP.cpp 
-		${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/TriDist.cpp 
-		${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/Tri.cpp) 
+        ${GSRC}/PQP-VCOLLIDE/src/VCollide.cpp
+        ${GSRC}/PQP-VCOLLIDE/src/VInternal.cpp
+        ${GSRC}/PQP-VCOLLIDE/src/NBody.cpp
+        ${GSRC}/PQP-VCOLLIDE/src/PairData.cpp
+        ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/Build.cpp
+        ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/BV.cpp
+        ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/PQP.cpp
+        ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/TriDist.cpp
+        ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/Tri.cpp)
 
 else (PQP_COLLISION)
  
-	set(GRASPIT_DEFINES 
+    set (GRASPIT_DEFINES
         ${GRASPIT_DEFINES}
-	    -DGRASPIT_COLLISION)
+        -DGRASPIT_COLLISION)
     set (GRASPIT_INCLUDES
         ${GRASPIT_INCLUDES}
-	    ${GSRC}/src/Collision/Graspit)
-	set (COLLISION_GRASPIT_HEADERS 
+        ${GSRC}/src/Collision/Graspit)
+    set (COLLISION_GRASPIT_HEADERS
         ${GSRC}/src/Collision/Graspit/collisionModel.h 
         ${GSRC}/src/Collision/Graspit/collisionAlgorithms.h 
         ${GSRC}/src/Collision/Graspit/collisionAlgorithms_inl.h 
@@ -590,7 +589,7 @@ endif (CGDB)
 
 set (MOC_HEADERS
     ${MOC_HEADERS}
-	${GSRC}/src/optimizer/optimizerDlg.h
+    ${GSRC}/src/optimizer/optimizerDlg.h
 )
 
 
@@ -698,12 +697,12 @@ add_definitions(${GRASPIT_DEFINES} -g)
 
 ## Declare a C++ library
 add_library(graspit SHARED 
-	${GRASPIT_CORE_SOURCES}    
-	${CGDB_SOURCES}    
-	${PLY_SOURCES}    
-	${GRASPIT_COLLISION_SOURCES}    
-	${GRASPIT_OPTIMIZER_SOURCES}    
-	${GRASPIT_FORM_SOURCES}    
+    ${GRASPIT_CORE_SOURCES}
+    ${CGDB_SOURCES}
+    ${PLY_SOURCES}
+    ${GRASPIT_COLLISION_SOURCES}
+    ${GRASPIT_OPTIMIZER_SOURCES}
+    ${GRASPIT_FORM_SOURCES}
     ${GRASPIT_IMAGE_SOURCES}
     ${UI_OUTFILES}
     ${MOC_OUTFILES}
