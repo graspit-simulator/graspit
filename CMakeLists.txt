@@ -702,6 +702,7 @@ endif (catkin_FOUND)
 ############
 
 add_definitions(${GRASPIT_DEFINES} -g)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 ## Declare a C++ library
 add_library(graspit SHARED 
@@ -862,7 +863,6 @@ if(BUILD_TESTS)
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_definitions(-std=c++11)
 
 # Make test executable
 add_executable(graspit_simple_test

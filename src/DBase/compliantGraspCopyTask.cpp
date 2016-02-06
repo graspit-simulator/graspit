@@ -162,7 +162,7 @@ bool CompliantGraspCopyTask::checkStoreGrasp(const db_planner::Grasp *original)
   //create the new grasp as a copy of the old one
   //this should copy score and everything
   const GraspitDBGrasp *graspit_original = static_cast<const GraspitDBGrasp*>(original);
-  std::auto_ptr<GraspitDBGrasp> newGrasp(new GraspitDBGrasp(*graspit_original));
+  std::unique_ptr<GraspitDBGrasp> newGrasp(new GraspitDBGrasp(*graspit_original));
   //new grasp is a compliant copy of the old one
   newGrasp->SetCompliantCopy(true);
   newGrasp->SetCompliantOriginalId(original->GraspId());
