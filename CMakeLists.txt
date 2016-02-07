@@ -18,7 +18,7 @@ set (CGDB true)
 # compile PLY sources
 set (PLY true)
 
-set (BUILD_TESTS false)
+set (BUILD_TESTS true)
 
 set (GRASPIT_DEFINES 
     -DGRASPIT_RELEASE  
@@ -702,7 +702,6 @@ endif (catkin_FOUND)
 ############
 
 add_definitions(${GRASPIT_DEFINES} -g)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 ## Declare a C++ library
 add_library(graspit SHARED 
