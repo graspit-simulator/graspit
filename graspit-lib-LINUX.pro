@@ -39,7 +39,6 @@ graspit_test{
     SOURCES += test/simple_test.cpp
     LIBS += -L/usr/lib/ -lgtest
     TARGET = graspit-test
-    QMAKE_CXXFLAGS += -std=c++0x
 }
 
 cgdb {
