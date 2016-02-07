@@ -163,7 +163,7 @@ SparseMatrix::elem(int m, int n) const
 	else return it->second;
 }
 
-std::auto_ptr<double> 
+std::unique_ptr<double>
 SparseMatrix::getDataCopy() const
 {
 	double *data = new double[mRows * mCols];
@@ -175,7 +175,7 @@ SparseMatrix::getDataCopy() const
 		//silently assumes keys are generated mimicking column-major indexing
 		data[it->first] = it->second;
 	}
-	return std::auto_ptr<double>(data);
+    return std::unique_ptr<double>(data);
 }
 
 void 
@@ -319,12 +319,12 @@ Matrix::setFromRowMajor(const double *M)
 	}
 }
 
-std::auto_ptr<double>
+std::unique_ptr<double>
 Matrix::getDataCopy() const
 {
 	double *data = new double[mRows*mCols];
 	memcpy( data, mData, mRows*mCols*sizeof(double) );
-	return std::auto_ptr<double>(data);
+    return std::unique_ptr<double>(data);
 }
 
 void 
@@ -597,7 +597,7 @@ operator<<(std::ostream &os, const Matrix &m)
 void Matrix::print(FILE *fp, std::string name) const 
 {
   if (!name.empty()) fprintf(fp,"%s:\n",name.c_str());
-  std::auto_ptr<double> data = getDataCopy();
+  std::unique_ptr<double> data = getDataCopy();
   disp_mat(fp, data.get(), mRows, mCols);
 }
 
@@ -720,7 +720,7 @@ triangularSolve(Matrix &A, Matrix &B)
 	int info;
 	int *ipiv = new int[A.rows()];
         //make a copy of A as we don't want to change it
-	std::auto_ptr<double> Adata = A.getDataCopy();
+    std::unique_ptr<double> Adata = A.getDataCopy();
 	dgesv(A.rows(), B.cols(), Adata.get(), A.rows(),ipiv, 
 		  B.getDataPointer(), B.rows(), &info);
 	delete [] ipiv;
