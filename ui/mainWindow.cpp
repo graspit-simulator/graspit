@@ -49,9 +49,6 @@
 #include "quality.h"
 #include "graspitGUI.h"
 #include "humanHand.h"
-//#include "about.h"
-//#include "GeometryLibInterface/geometryLibDlgWrapper.h"
-//#include "rosWrapper.h"
 #include "arch.h"
 
 #include "debug.h"
