@@ -121,7 +121,6 @@ SOURCES	+= src/arch.cpp \
 	src/graspitGUI.cpp \
 	src/graspitServer.cpp \
 	src/graspitApp.cpp \
-	src/graspRecord.cpp \
 	src/gws.cpp \
 	src/gwsprojection.cpp \
 	src/humanHand.cpp \
