@@ -36,7 +36,6 @@ HEADERS	+= include/barrett.h \
 	include/eigenGrasp.h \
 	include/gloveInterface.h \
 	include/grasp.h \
-	include/graspRecord.h \
 	include/gws.h \
 	include/gwsprojection.h \
 	include/ivmgr.h \
