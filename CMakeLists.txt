@@ -713,6 +713,9 @@ set (GRASPIT_LIBRARY_SOURCES
 add_library(graspit SHARED
     ${GRASPIT_LIBRARY_SOURCES} 
 )
+# set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC): not recommended, but works
+# target_compile_definitions(graspit_static PRIVATE -fPIC): when compiling with catkin, has error "<command-line>:0:1: error: macro names must be identifiers"
+target_compile_options(graspit_static PRIVATE -fPIC)
 
 add_library(graspit_static STATIC 
     ${GRASPIT_LIBRARY_SOURCES} 
