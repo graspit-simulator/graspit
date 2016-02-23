@@ -20,6 +20,8 @@ set (PLY true)
 
 set (BUILD_TESTS true)
 
+set (BUILD_STATIC_LIB false)
+
 set (GRASPIT_DEFINES 
     -DGRASPIT_RELEASE  
     #-DGRASPIT_DEBUG 
@@ -709,17 +711,22 @@ set (GRASPIT_LIBRARY_SOURCES
     ${UI_OUTFILES}
     ${MOC_OUTFILES}
 )
+
 ## Declare a C++ library
 add_library(graspit SHARED
     ${GRASPIT_LIBRARY_SOURCES} 
 )
-# set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC): not recommended, but works
-# target_compile_definitions(graspit_static PRIVATE -fPIC): when compiling with catkin, has error "<command-line>:0:1: error: macro names must be identifiers"
-target_compile_options(graspit_static PRIVATE -fPIC)
 
-add_library(graspit_static STATIC 
-    ${GRASPIT_LIBRARY_SOURCES} 
-)
+
+if(BUILD_STATIC_LIB)
+    add_library(graspit_static STATIC 
+        ${GRASPIT_LIBRARY_SOURCES} 
+    )
+    # set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC): not recommended, but works
+    # target_compile_definitions(graspit_static PRIVATE -fPIC): when compiling with catkin, has error "<command-line>:0:1: error: macro names must be identifiers"
+    target_compile_options(graspit_static PRIVATE -fPIC)
+endif(BUILD_STATIC_LIB)
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -863,13 +870,15 @@ install(TARGETS
 install(EXPORT graspit-lib-targets
     DESTINATION ${LIB_DESTINATION})
 
-install(TARGETS
-    graspit_static 
-    EXPORT graspit-static-lib-targets
-    DESTINATION ${LIB_DESTINATION})
+if(BUILD_STATIC_LIB)
+    install(TARGETS
+        graspit_static 
+        EXPORT graspit-static-lib-targets
+        DESTINATION ${LIB_DESTINATION})
 
-install(EXPORT graspit-static-lib-targets
-    DESTINATION ${LIB_DESTINATION})
+    install(EXPORT graspit-static-lib-targets
+        DESTINATION ${LIB_DESTINATION})
+endif(BUILD_STATIC_LIB)
 
 
 #############
