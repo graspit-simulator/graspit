@@ -20,7 +20,9 @@ set (PLY true)
 
 set (BUILD_TESTS true)
 
-set (BUILD_STATIC_LIB false)
+if (NOT BUILD_STATIC_LIB)
+    set (BUILD_STATIC_LIB false)
+endif (NOT BUILD_STATIC_LIB)
 
 set (GRASPIT_DEFINES 
     -DGRASPIT_RELEASE  
