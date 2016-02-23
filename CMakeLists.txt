@@ -18,7 +18,9 @@ set (CGDB true)
 # compile PLY sources
 set (PLY true)
 
-set (BUILD_TESTS true)
+if (NOT BUILD_TESTS)
+    set (BUILD_TESTS true)
+endif (NOT BUILD_TESTS)
 
 if (NOT BUILD_STATIC_LIB)
     set (BUILD_STATIC_LIB false)
