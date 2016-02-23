@@ -2,7 +2,7 @@
 #include <iostream>
 #include <QString>
 #include <pthread.h>
-#include <mutex>
+#include <QMutex>
 #include <Inventor/Qt/SoQt.h>
 
 #include "graspitGUI.h"
@@ -16,7 +16,7 @@
 #include "qmDlg.h"
 #include "grasp.h"
 
-std::mutex mtx_;
+QMutex mtx_;
 
 void *exit_graspit( void *ptr );
 void *run_test(void *ptr );
@@ -27,7 +27,7 @@ void *exit_graspit(void *ptr )
   sleep(3);
 
   //hang here until tests are finished and mtx is released.
-  std::lock_guard<std::mutex> guard(mtx_);
+  QMutexLocker guard(&mtx_);
 
   GraspItGUI *gui;
   gui = (GraspItGUI *) ptr;
@@ -40,7 +40,7 @@ void *exit_graspit(void *ptr )
 
 void *run_test(void *ptr )
 {
-  std::lock_guard<std::mutex> guard(mtx_);
+  QMutexLocker guard(&mtx_);
 
   PlannerDlg *dlg;
   dlg = (PlannerDlg *) ptr;

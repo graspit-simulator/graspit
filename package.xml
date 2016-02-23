@@ -1,28 +1,43 @@
 <?xml version="1.0"?>
 <package>
-  <name>graspit</name>
-  <version>0.0.0</version>
-  <description>
-    Contains the original graspit source. This
-    package.xml file is only required if the source is to be
-    built with catkin. You can also build using cmake only, in which
-    case this file is not required.
-  </description>
+    <name>graspit</name>
+    <description>
+        This package builds the GraspIt! simulator, 
+        developed in the Robotics Lab at Columbia University.
+        This package.xml file is only required if the source is to be
+        built with catkin. You can also build using cmake only, in which
+        case this file is not required.
+    </description>
+    <author></author>
+    <license>GPL</license>
+    <maintainer email="matei.ciocarlie@columbia.com">Matei Ciocarlie</maintainer>
+    <version>0.3.2</version>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
-  <maintainer email="email@todo.com">TODO</maintainer>
+    <buildtool_depend>catkin</buildtool_depend>
 
+    <build_depend>libblas-dev</build_depend>
+    <build_depend>liblapack-dev</build_depend>
+    <build_depend>libqt4-dev</build_depend>
+    <build_depend>libqt4-opengl-dev</build_depend>
+    <build_depend>libqt4-sql-psql</build_depend>
+    <build_depend>libcoin80-dev</build_depend>
+    <build_depend>libsoqt4-dev</build_depend>
+    <build_depend>libqhull</build_depend>
+    <build_depend>subversion</build_depend>
 
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+    <build_depend>household_objects_database</build_depend>
 
-  <!-- Author tags are optional, mutiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintianers, but could be -->
-  <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+    <run_depend>libqt4</run_depend>
+    <run_depend>libqt4-opengl</run_depend>
+    <run_depend>libqt4-sql-psql</run_depend>
+    <run_depend>libqhull</run_depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
+    <!-- The following libraries do not have run-time version in rosdep:
+    <run_depend>libblas</run_depend>
+    <run_depend>liblapack</run_depend>
+    <run_depend>libcoin80</run_depend>
+    <run_depend>libsoqt4</run_depend>
+    -->
 
+    <run_depend>household_objects_database</run_depend>
 </package>
