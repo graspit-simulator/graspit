@@ -37,7 +37,7 @@
 #ifndef __GRASP_COORDINATES_H__
 #define __GRASP_COORDINATES_H__
 
-#include "matvec3D.h"
+#include "include/matvec3D.h"
 class coordinates;
 class cartesian_coordinates;
 class cylindrical_coordinates;

@@ -158,7 +158,7 @@ class GraspDirection;
 class SoPath;
 class SoSeparator;
 
-#include "matvec3D.h"
+#include "include/matvec3D.h"
 #include <Inventor/SoLists.h>
 #include <vector>
 typedef std::pair<Body *,Body *> BodyPair;

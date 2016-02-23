@@ -35,7 +35,7 @@ class Body;
 class SoSensor;
 
 #include <stdio.h>
-#include <matvec3D.h>
+#include "include/matvec3D.h"
 #include <vector>
 
 /*!	This class performs simulated annealing on a collection of variables 
