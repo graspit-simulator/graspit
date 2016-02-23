@@ -57,6 +57,7 @@ include (${QT_USE_FILE})
 set (GRASPIT_INCLUDES
     ${GSRC}
     ${GSRC}/include/
+    ${GSRC}/include/robots
     ${GSRC}/include/math
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/Planner
@@ -76,8 +77,18 @@ set (GRASPIT_INCLUDES
 # in the installation should be listed in the
 # variable GRASPIT_INCLUDEDIR_HEADERS
 set (GRASPIT_INCLUDEDIR_HEADERS
+    ${GSRC}/include/robots/barrett.h 
+    ${GSRC}/include/robots/pr2Gripper.h 
+    ${GSRC}/include/robots/m7.h 
+    ${GSRC}/include/robots/m7tool.h 
+    ${GSRC}/include/robots/robonaut.h 
+    ${GSRC}/include/robots/robotiq.h 
+    ${GSRC}/include/robots/humanHand.h 
+    ${GSRC}/include/robots/shadow.h
+    ${GSRC}/include/robots/mcGrip.h 
+    ${GSRC}/include/robots/puma560.h 
+    ${GSRC}/include/robot.h 
     ${GSRC}/include/graspitParser.h 
-    ${GSRC}/include/barrett.h 
     ${GSRC}/include/body.h 
     ${GSRC}/include/bBox.h 
     ${GSRC}/include/bbox_inl.h 
@@ -101,20 +112,11 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/matvec3D.h 
     ${GSRC}/include/matvecIO.h 
     ${GSRC}/include/maxdet.h 
-    ${GSRC}/include/mcGrip.h 
     ${GSRC}/include/mytools.h 
     ${GSRC}/include/profiling.h 
-    ${GSRC}/include/puma560.h 
     ${GSRC}/include/qhull_mutex.h 
     ${GSRC}/include/quality.h 
     ${GSRC}/include/plugin.h 
-    ${GSRC}/include/pr2Gripper.h 
-    ${GSRC}/include/m7.h 
-    ${GSRC}/include/m7tool.h 
-    ${GSRC}/include/robonaut.h 
-    ${GSRC}/include/robot.h 
-    ${GSRC}/include/robotiq.h 
-    ${GSRC}/include/humanHand.h 
     ${GSRC}/include/SoArrow.h 
     ${GSRC}/include/SoComplexShape.h 
     ${GSRC}/include/SoTorquePointer.h 
@@ -131,7 +133,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/dynJoint.h 
     ${GSRC}/include/arch.h
     ${GSRC}/include/FitParabola.h 
-    ${GSRC}/include/shadow.h
 )
 set (GRASPIT_PLANNER_HEADERS
     ${GSRC}/include/Planner/grasp_visualization.h 
@@ -280,21 +281,21 @@ set (MOC_HEADERS
     ${GSRC}/include/grasp.h
     ${GSRC}/include/worldElement.h
     ${GSRC}/include/graspitServer.h
+    ${GSRC}/include/ivmgr.h
     ${GSRC}/include/EGPlanner/egPlanner.h
     ${GSRC}/include/EGPlanner/simAnn.h
     ${GSRC}/include/EGPlanner/loopPlanner.h
     ${GSRC}/include/EGPlanner/searchEnergy.h
     ${GSRC}/include/EGPlanner/guidedPlanner.h
     ${GSRC}/include/Planner/grasp_tester.h
-    ${GSRC}/include/humanHand.h
-    ${GSRC}/include/m7tool.h
-    ${GSRC}/include/m7.h
-    ${GSRC}/include/barrett.h
-    ${GSRC}/include/robonaut.h
-    ${GSRC}/include/pr2Gripper.h
-    ${GSRC}/include/robotiq.h
-    ${GSRC}/include/mcGrip.h
-    ${GSRC}/include/ivmgr.h
+    ${GSRC}/include/robots/humanHand.h
+    ${GSRC}/include/robots/m7tool.h
+    ${GSRC}/include/robots/m7.h
+    ${GSRC}/include/robots/barrett.h
+    ${GSRC}/include/robots/robonaut.h
+    ${GSRC}/include/robots/pr2Gripper.h
+    ${GSRC}/include/robots/robotiq.h
+    ${GSRC}/include/robots/mcGrip.h
     ${CGDB_MOC_HEADERS}
 ) 
 
@@ -302,7 +303,16 @@ set (MOC_HEADERS
 set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/graspitParser.cpp 
     ${GSRC}/src/arch.cpp 
-    ${GSRC}/src/barrett.cpp 
+    ${GSRC}/src/robots/barrett.cpp 
+    ${GSRC}/src/robots/humanHand.cpp 
+    ${GSRC}/src/robots/m7.cpp 
+    ${GSRC}/src/robots/m7tool.cpp 
+    ${GSRC}/src/robots/mcGrip.cpp 
+    ${GSRC}/src/robots/pr2Gripper.cpp 
+    ${GSRC}/src/robots/puma560.cpp 
+    ${GSRC}/src/robots/robonaut.cpp 
+    ${GSRC}/src/robots/robotiq.cpp 
+    ${GSRC}/src/robots/shadow.cpp 
     ${GSRC}/src/bBox.cpp 
     ${GSRC}/src/body.cpp 
     ${GSRC}/src/contact.cpp 
@@ -319,7 +329,6 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/graspRecord.cpp 
     ${GSRC}/src/gws.cpp 
     ${GSRC}/src/gwsprojection.cpp 
-    ${GSRC}/src/humanHand.cpp 
     ${GSRC}/src/ivmgr.cpp 
     ${GSRC}/src/jacobian.cpp 
     ${GSRC}/src/joint.cpp 
@@ -329,20 +338,12 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/matvec.cpp 
     ${GSRC}/src/matvecIO.cpp 
     ${GSRC}/src/maxdet_src.cpp 
-    ${GSRC}/src/mcGrip.cpp 
     ${GSRC}/src/mytools.cpp 
     ${GSRC}/src/profiling.cpp 
-    ${GSRC}/src/pr2Gripper.cpp 
-    ${GSRC}/src/m7.cpp 
-    ${GSRC}/src/m7tool.cpp 
     ${GSRC}/src/plugin.cpp 
-    ${GSRC}/src/puma560.cpp 
     ${GSRC}/src/quality.cpp 
-    ${GSRC}/src/robonaut.cpp 
     ${GSRC}/src/robot.cpp 
-    ${GSRC}/src/robotiq.cpp 
     ${GSRC}/src/scanSimulator.cpp 
-    ${GSRC}/src/shadow.cpp 
     ${GSRC}/src/SoArrow.cpp 
     ${GSRC}/src/SoComplexShape.cpp 
     ${GSRC}/src/SoTorquePointer.cpp 	
@@ -697,8 +698,7 @@ endif (catkin_FOUND)
 
 add_definitions(${GRASPIT_DEFINES} -g)
 
-## Declare a C++ library
-add_library(graspit SHARED 
+set (GRASPIT_LIBRARY_SOURCES
     ${GRASPIT_CORE_SOURCES}
     ${CGDB_SOURCES}
     ${PLY_SOURCES}
@@ -708,6 +708,14 @@ add_library(graspit SHARED
     ${GRASPIT_IMAGE_SOURCES}
     ${UI_OUTFILES}
     ${MOC_OUTFILES}
+)
+## Declare a C++ library
+add_library(graspit SHARED
+    ${GRASPIT_LIBRARY_SOURCES} 
+)
+
+add_library(graspit_static STATIC 
+    ${GRASPIT_LIBRARY_SOURCES} 
 )
 
 ## Add cmake target dependencies of the library
@@ -719,20 +727,22 @@ add_executable(graspit_simulator
     ${GSRC}/src/main.cpp
 )
 
-
-
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(graspit_simulator ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-
-target_link_libraries(graspit
+set(GRASPIT_LINK_LIBRARIES
    ${QT_LIBRARIES}
    ${QT_QT3SUPPORT_LIBRARY}
    ${QHULL_LIBRARIES}
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
+)
+
+
+target_link_libraries(graspit
+   ${GRASPIT_LINK_LIBRARIES}
 )
 
 target_link_libraries(graspit_simulator
@@ -840,12 +850,24 @@ if (PLY)
 endif (PLY)
 
 
-## Mark other files for installation
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${SHARE_DESTINATION}
-# )
+# Generate and install configuration files for libraries:
+
+install(TARGETS
+    graspit 
+    EXPORT graspit-lib-targets
+    DESTINATION ${LIB_DESTINATION})
+
+install(EXPORT graspit-lib-targets
+    DESTINATION ${LIB_DESTINATION})
+
+install(TARGETS
+    graspit_static 
+    EXPORT graspit-static-lib-targets
+    DESTINATION ${LIB_DESTINATION})
+
+install(EXPORT graspit-static-lib-targets
+    DESTINATION ${LIB_DESTINATION})
+
 
 #############
 ## Testing ##
