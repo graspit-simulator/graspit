@@ -15,29 +15,26 @@
 
     <buildtool_depend>catkin</buildtool_depend>
 
+    <build_depend>libsoqt4-dev</build_depend>
+    <!--build_depend>household_objects_database</build_depend-->
+    <build_depend>libqt4</build_depend>
+    <build_depend>libqt4-dev</build_depend>
+    <build_depend>libqt4-opengl</build_depend>
+    <build_depend>libqt4-sql-psql</build_depend>
+    <build_depend>libqhull</build_depend>
+    <build_depend>libcoin80-dev</build_depend>
     <build_depend>libblas-dev</build_depend>
     <build_depend>liblapack-dev</build_depend>
-    <build_depend>libqt4-dev</build_depend>
-    <build_depend>libqt4-opengl-dev</build_depend>
-    <build_depend>libqt4-sql-psql</build_depend>
-    <build_depend>libcoin80-dev</build_depend>
-    <build_depend>libsoqt4-dev</build_depend>
-    <build_depend>libqhull</build_depend>
-    <build_depend>subversion</build_depend>
 
-    <build_depend>household_objects_database</build_depend>
-
+    <run_depend>libsoqt4-dev</run_depend>
+    <run_depend>household_objects_database</run_depend>
     <run_depend>libqt4</run_depend>
+    <run_depend>libqt4-dev</run_depend>
     <run_depend>libqt4-opengl</run_depend>
     <run_depend>libqt4-sql-psql</run_depend>
     <run_depend>libqhull</run_depend>
+    <run_depend>libcoin80-dev</run_depend>
+    <run_depend>libblas-dev</run_depend>
+    <run_depend>liblapack-dev</run_depend>
 
-    <!-- The following libraries do not have run-time version in rosdep:
-    <run_depend>libblas</run_depend>
-    <run_depend>liblapack</run_depend>
-    <run_depend>libcoin80</run_depend>
-    <run_depend>libsoqt4</run_depend>
-    -->
-
-    <run_depend>household_objects_database</run_depend>
 </package>
