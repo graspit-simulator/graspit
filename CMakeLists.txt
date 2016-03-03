@@ -114,8 +114,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/gws.h 
     ${GSRC}/include/gwsprojection.h 
     ${GSRC}/include/ivmgr.h 
-    ${GSRC}/include/ivmgr_abstract.h 
-    ${GSRC}/include/ivmgr_nogui.h 
     ${GSRC}/include/jacobian.h 
     ${GSRC}/include/joint.h 
     ${GSRC}/include/kinematicChain.h 
@@ -313,7 +311,6 @@ set (MOC_HEADERS
 
 
 set (GRASPIT_CORE_SOURCES
-    ${GSRC}/src/debug.cpp 
     ${GSRC}/src/graspitParser.cpp 
     ${GSRC}/src/arch.cpp 
     ${GSRC}/src/robots/barrett.cpp 
@@ -343,7 +340,6 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/gws.cpp 
     ${GSRC}/src/gwsprojection.cpp 
     ${GSRC}/src/ivmgr.cpp 
-    ${GSRC}/src/ivmgr_nogui.cpp 
     ${GSRC}/src/jacobian.cpp 
     ${GSRC}/src/joint.cpp 
     ${GSRC}/src/kinematicChain.cpp 
@@ -738,10 +734,18 @@ if(BUILD_STATIC_LIB)
     add_library(graspit_static STATIC 
         ${GRASPIT_LIBRARY_SOURCES} 
     )
-
-    # set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC): not recommended, but works
-    # target_compile_definitions(graspit_static PRIVATE -fPIC): when compiling with catkin, has error "<command-line>:0:1: error: macro names must be identifiers"
-    target_compile_options(graspit_static PRIVATE -fPIC)
+    if ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
+        message("Using target_compile_options with cmake version ${CMAKE_VERSION}")
+        target_compile_options(graspit_static PRIVATE -fPIC)  # does not work for bloom-release on saucy. Could 
+    else ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
+        message("Using target_compile_definitions with cmake version ${CMAKE_VERSION}")
+        # not recommended, but works with catkin:
+        set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC)
+        # This would be better, but when compiling with catkin (and on bloom prerelease), has error 
+        # "<command-line>:0:1: error: macro names must be identifiers":
+        # target_compile_definitions(graspit_static PUBLIC -fPIC)
+        # can look into this at some point, but for now this will work.
+    endif ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
 endif(BUILD_STATIC_LIB)
 
 
