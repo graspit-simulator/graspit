@@ -111,7 +111,7 @@ class GraspItGUI
   void processPlugins();
 
   //! Starts a plugin from the given creator
-  void startPlugin(PluginCreator* creator, std::string args);
+  void startPlugin(PluginCreator* creator, int argc, char** argv);
 
   //! Stops and deletes the specified plugin
   void stopPlugin(Plugin *plugin);
