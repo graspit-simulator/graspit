@@ -85,7 +85,6 @@ HEADERS	+= include/body.h \
 	include/EGPlanner/searchState.h \
 	include/EGPlanner/searchStateImpl.h \
         include/EGPlanner/energy/searchEnergy.h \
-        include/EGPlanner/energy/approachAutograspQualityEnergy.h \
         include/EGPlanner/energy/autograspQualityEnergy.h \
         include/EGPlanner/energy/compliantEnergy.h \
         include/EGPlanner/energy/contactEnergy.h \
@@ -171,7 +170,6 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/searchState.cpp \
 	src/EGPlanner/searchStateImpl.cpp \
         src/EGPlanner/energy/searchEnergy.cpp \
-        src/EGPlanner/energy/approachAutograspQualityEnergy.cpp \
         src/EGPlanner/energy/autograspQualityEnergy.cpp \
         src/EGPlanner/energy/compliantEnergy.cpp \
         src/EGPlanner/energy/contactEnergy.cpp \
