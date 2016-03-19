@@ -30,6 +30,7 @@
 #include "simAnn.h"
 #include "searchEnergy.h"
 #include "searchState.h"
+#include "energy/closureSearchEnergy.h"
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -39,7 +40,7 @@ LoopPlanner::LoopPlanner(Hand *h)
   mHand = h;
   init();
   mEnergyCalculator = new ClosureSearchEnergy();
-  mEnergyCalculator->setType(ENERGY_CONTACT_QUALITY);
+  mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
   ((ClosureSearchEnergy*)mEnergyCalculator)->setAvoidList( &mAvoidList );
   
   mSimAnn = new SimAnn();
