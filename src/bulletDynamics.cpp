@@ -213,6 +213,11 @@ void BulletDynamics::addRobot(Robot *robot)
           newjoint = new btHingeConstraint(*(btprevlink), *(btcurrentlink),
                                            btVector3(0 , 0 , 0), pivot2, 
 					   btVector3(0 , 0 , 1), linkpaxis);
+
+          std::cout << "Setting joint limits not sure if correct" << std::endl;
+          double max = robot->getChain(f)->getJoint(l-1)->getMax();
+          double min = robot->getChain(f)->getJoint(l-1)->getMin();
+          newjoint->setLimit(min, max);
         }
         // set the second parameter to be true, disable collision between two constrraint body
         mBtDynamicsWorld->addConstraint(newjoint , true);
@@ -344,13 +349,36 @@ void BulletDynamics::turnOffDynamics()
 
 
 void BulletDynamics::btApplyInternalWrench (Joint * activeJoint, double magnitude, std::map<Body*, btRigidBody*> btBodyMap) {
-   vec3 worldAxis=activeJoint->getWorldAxis();
-   btRigidBody* btPrevLink = btBodyMap.find(activeJoint->dynJoint->getPrevLink())->second;
-   btRigidBody* btNextLink = btBodyMap.find(activeJoint->dynJoint->getNextLink())->second;
-   btVector3 torquePrev(-magnitude*worldAxis.x(),-magnitude*worldAxis.y(), -magnitude*worldAxis.z()); 
-   btVector3 torqueNext(magnitude*worldAxis.x(),magnitude*worldAxis.y(), magnitude*worldAxis.z()); 
-   btPrevLink->applyTorque(torquePrev);
-   btNextLink->applyTorque(torqueNext);
+    if(activeJoint != NULL)
+    {
+        vec3 worldAxis=activeJoint->getWorldAxis();
+
+        if(activeJoint->hasDynJoint())
+        {
+            DynamicBody *db_prev = activeJoint->getDynJoint()->getPrevLink();
+            btRigidBody* btPrevLink = btBodyMap.find(db_prev)->second;
+            if(btPrevLink)
+            {
+                btVector3 torquePrev(-magnitude*worldAxis.x(),-magnitude*worldAxis.y(), -magnitude*worldAxis.z());
+                btPrevLink->applyTorque(torquePrev);
+            }
+
+        }
+
+
+        if (activeJoint->hasDynJoint())
+        {
+            DynamicBody *db_next = activeJoint->getDynJoint()->getNextLink();
+            btRigidBody* btNextLink = btBodyMap.find(db_next)->second;
+            if (btNextLink)
+            {
+                btVector3 torqueNext(magnitude*worldAxis.x(),magnitude*worldAxis.y(), magnitude*worldAxis.z());
+                btNextLink->applyTorque(torqueNext);
+            }
+        }
+
+    }
+
 }
 
 int BulletDynamics::stepDynamics()
@@ -408,16 +436,20 @@ int BulletDynamics::stepDynamics()
     for (int d=0;d<numDOF;d++) {
       DOF * dof=robot->getDOF(d);  
       dof->callController(timeStep);
-      //get the joint of that dof    
-      Joint *activeJoint = *(dof->getJointList().begin());
-      double magnitude=robot->getDOF(d)->getForce();  
-      printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(),dof->getDesiredForce());
+      for (unsigned int j_count = 0; j_count < dof->getJointList().size(); j_count ++)
+      {
+          Joint *joint = dof->getJointList().at(j_count);
+          double magnitude=robot->getDOF(d)->getForce();
 
-      //1. change torque(?) to torque(N.mm)
-      magnitude=magnitude/1e6;
-      printf("DOF: %d apply torque: %lf N.mm  \n",d, magnitude);
-      
-      btApplyInternalWrench( activeJoint,  magnitude,  btBodyMap);     
+          printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
+
+          //1. change torque(?) to torque(N.mm)
+          magnitude=magnitude/1e6;
+          printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, j_count, magnitude);
+
+          btApplyInternalWrench(joint,  magnitude,  btBodyMap);
+
+      }
     }
  // --------------------------add friction--------------------------------------------------
     for (int c = 0; c < robot->getNumChains(); c++) {

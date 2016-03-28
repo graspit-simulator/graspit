@@ -80,7 +80,7 @@ DOF::DOF(const DOF *original)
   of the DOF from the smallest range of the joint limits.
 */
 void
-DOF::initDOF(Robot *myRobot,const std::list<Joint *>& jList)
+DOF::initDOF(Robot *myRobot,const std::vector<Joint *>& jList)
 {
   owner = myRobot;  
   jointList = jList; // copy jList
@@ -96,7 +96,7 @@ void DOF::updateMinMax()
   DBGP("Joint 0 min "  << minq << " max " << maxq);
   if (maxq < minq) std::swap(maxq, minq);  
   DBGP("maxq " << maxq << " minq " << minq);
-  std::list<Joint *>::iterator j;
+  std::vector<Joint *>::iterator j;
   double testMin, testMax;
   DBGST(int num = 0;)
   for(j=++jointList.begin();j!=jointList.end();j++) {
@@ -226,15 +226,14 @@ DOF::PDPositionController(double timeStep)
 	}
 
 	double newForce;
-
 	newForce = Kp * error + Kv * (error-lastError)/timeStep;
 
-	DBGP("DOF " << getDOFNum() );
-	DBGP("setPoint ="<<setPoint<<" error ="<<error<<" edot = "<<(error-lastError));
-	DBGP("proportional: "<<error<<"*"<<Kp<<"="<<error*Kp);
-	DBGP("derivative: "<<Kv<<"*"<<(error-lastError)/timeStep);
-	DBGP("cap: "<<getMaxForce()*0.8 << " Force: "<<newForce);
-	DBGP("e " << error << " de " << error-lastError << " ts " << timeStep << " f " << newForce);
+    std::cout << "DOF " << getDOFNum() ;
+    std::cout << "setPoint ="<<setPoint<<" error ="<<error<<" edot = "<<(error-lastError);
+    std::cout << "proportional: "<<error<<"*"<<Kp<<"="<<error*Kp;
+    std::cout << "derivative: "<<Kv<<"*"<<(error-lastError)/timeStep;
+    std::cout << "cap: "<<getMaxForce()*0.8 << " Force: "<<newForce;
+    std::cout << "e " << error << " de " << error-lastError << " ts " << timeStep << " f " << newForce << std::endl;
 	return newForce;
 }
 
@@ -317,7 +316,7 @@ RigidDOF::getClosestJointLimit(int *direction)
 	bool firstTime = true;
 	double closestLimit = 0.0;
 	*direction = 0.0;
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	for (j=jointList.begin(); j!=jointList.end(); j++) {
 		double val = (*j)->getVal();
 		double maxError = val - (*j)->getMax();
@@ -368,8 +367,8 @@ RigidDOF::buildDynamicLimitConstraints(std::map<Body*,int> &islandIndices, int n
 
 	//the first joint in the list is considered the master joint
 	Joint *currentJoint = jointList.front();
-	DynamicBody *prevLink = currentJoint->dynJoint->getPrevLink();
-	DynamicBody *nextLink = currentJoint->dynJoint->getNextLink();
+    DynamicBody *prevLink = currentJoint->getDynJoint()->getPrevLink();
+    DynamicBody *nextLink = currentJoint->getDynJoint()->getNextLink();
    
 	assert( islandIndices[prevLink]>=0 );
 	int row = 6*islandIndices[prevLink];
@@ -397,12 +396,12 @@ RigidDOF::buildDynamicCouplingConstraints(std::map<Body*,int> &islandIndices, in
 	//again we consider the first joint as the master joint 
 	Joint *masterJoint = jointList.front();
 	
-	DynamicBody *masterPrevLink = masterJoint->dynJoint->getPrevLink();
-	DynamicBody *masterNextLink = masterJoint->dynJoint->getNextLink();
+    DynamicBody *masterPrevLink = masterJoint->getDynJoint()->getPrevLink();
+    DynamicBody *masterNextLink = masterJoint->getDynJoint()->getNextLink();
 	double masterRatio = getStaticRatio(masterJoint);
 	vec3 masterFreeRotAxis = masterJoint->getWorldAxis();
 
-	std::list<Joint*>::iterator it = jointList.begin();
+    std::vector<Joint*>::iterator it = jointList.begin();
 	while(++it != jointList.end()) {
 		Joint *currentJoint = (*it);
 		//for now this only works on revolute dynamic joints
@@ -412,8 +411,8 @@ RigidDOF::buildDynamicCouplingConstraints(std::map<Body*,int> &islandIndices, in
 
 		if (currentJoint->getType() != REVOLUTE) continue;
 		
-		DynamicBody *prevLink = currentJoint->dynJoint->getPrevLink();
-		DynamicBody *nextLink = currentJoint->dynJoint->getNextLink();
+        DynamicBody *prevLink = currentJoint->getDynJoint()->getPrevLink();
+        DynamicBody *nextLink = currentJoint->getDynJoint()->getNextLink();
 		vec3 freeRotAxis = currentJoint->getWorldAxis();
 
 		//the *rotation* between these joint links...
@@ -457,7 +456,7 @@ RigidDOF::getStaticRatio(Joint *j) const
 void
 RigidDOF::getJointValues(double *jointVals) const
 {
-	std::list<Joint*>::const_iterator j;
+    std::vector<Joint*>::const_iterator j;
 	for(j=jointList.begin();j!=jointList.end();j++) {
 		jointVals[ (*j)->getNum() ] = q * getStaticRatio(*j);
 	}
@@ -469,7 +468,7 @@ bool
 RigidDOF::accumulateMove(double q1, double *jointVals, int *stoppedJoints)
 {
 	if ( fabs(q-q1) < 1.0e-5 ) return false;
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	if (stoppedJoints) {
 		for(j=jointList.begin();j!=jointList.end();j++) {
 			if ( stoppedJoints[ (*j)->getNum()] ) return false;
@@ -507,7 +506,7 @@ BreakAwayDOF::~BreakAwayDOF()
 	if (mBreakAwayValues) delete [] mBreakAwayValues;
 }
 
-void BreakAwayDOF::initDOF(Robot *myRobot, const std::list<Joint*> &jList)
+void BreakAwayDOF::initDOF(Robot *myRobot, const std::vector<Joint*> &jList)
 {
 	DOF::initDOF(myRobot, jList);
 	int size = (int)jList.size();
@@ -528,7 +527,7 @@ void
 BreakAwayDOF::getJointValues(double *jointVals) const
 {
 	int index = -1;
-	std::list<Joint*>::const_iterator j;
+    std::vector<Joint*>::const_iterator j;
 	for (j=jointList.begin(); j!=jointList.end(); j++) {	
 		index++;
 		if (mInBreakAway[index] && q > mBreakAwayValues[index]) {
@@ -549,7 +548,7 @@ BreakAwayDOF::accumulateMove(double q1, double *jointVals, int *stoppedJoints)
 		DBGP("DOF new value same as current value");
 		return false;
 	}
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	//check if we are moving in the negative direction of the DOF and some joint is stopped
 	for (j=jointList.begin(); j!=jointList.end(); j++) {	
 		if (stoppedJoints && stoppedJoints[ (*j)->getNum()] ) {
@@ -591,7 +590,7 @@ BreakAwayDOF::accumulateMove(double q1, double *jointVals, int *stoppedJoints)
 void
 BreakAwayDOF::updateVal(double q1)
 {
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	int index;
 	for(j=jointList.begin(), index=0; j!=jointList.end(); j++,index++) {
 		double jVal = (*j)->getVal() / getStaticRatio(*j);
@@ -617,7 +616,7 @@ BreakAwayDOF::updateVal(double q1)
 void
 BreakAwayDOF::updateFromJointValues(const double *jointVals)
 {
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	int index;
 	double val;
 	for(j=jointList.begin(),index=0; j!=jointList.end(); j++,index++) {
@@ -721,7 +720,7 @@ BreakAwayDOF::readParametersFromXml(const TiXmlElement* root)
 bool
 BreakAwayDOF::computeStaticJointTorques(double *jointTorques, double)
 {
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	int index;
 	for(j=jointList.begin(), index=0; j!=jointList.end(); j++,index++) {
 		if (mInBreakAway[index]) {
@@ -732,10 +731,10 @@ BreakAwayDOF::computeStaticJointTorques(double *jointTorques, double)
 }
 
 void
-CompliantDOF::initDOF(Robot *myRobot, const std::list<Joint*> &jList)
+CompliantDOF::initDOF(Robot *myRobot, const std::vector<Joint*> &jList)
 {
 	DOF::initDOF(myRobot, jList);
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	for(j=jointList.begin(); j!=jointList.end(); j++) {
 		if ( (*j)->getSpringStiffness() == 0.0 ) {
 			DBGA("ERROR: Compliant joint has no stiffness! DEFAULT VALUE will be used!");
@@ -765,7 +764,7 @@ CompliantDOF::getStaticRatio(Joint *j) const {
 void 
 CompliantDOF::getJointValues(double* jointVals) const 
 {
-	std::list<Joint*>::const_iterator j;
+    std::vector<Joint*>::const_iterator j;
 	for (j=jointList.begin(); j!=jointList.end(); j++) {	
 		jointVals[ (*j)->getNum() ] = q * getStaticRatio(*j);
 	}
@@ -780,7 +779,7 @@ void
 CompliantDOF::updateFromJointValues(const double* jointVals)
 {
 	double max = -1.0e5;
-	std::list<Joint*>::const_iterator j;
+    std::vector<Joint*>::const_iterator j;
 	for (j=jointList.begin(); j!=jointList.end(); j++) {
 		double v;
 		if (jointVals) {
@@ -803,7 +802,7 @@ CompliantDOF::accumulateMove(double q1, double *jointVals, int *stoppedJoints)
 	}
 
 	bool movement = false;
-	std::list<Joint*>::const_iterator j; int index;
+    std::vector<Joint*>::const_iterator j; int index;
 	for (j=jointList.begin(), index=0; j!=jointList.end(); j++, index++) {	
 		double newVal = q1 * getStaticRatio(*j);
 		double oldVal = (*j)->getVal();
@@ -840,7 +839,7 @@ CompliantDOF::computeStaticJointTorques(double *jointTorques, double dofForce)
 	bool retVal = true;
 	//add the spring forces for all joints
 	double maxDofTorque = 0.0;
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	Joint *pj = NULL;
 	int count = 0;
 	for(j=jointList.begin(); j!=jointList.end(); j++) {
@@ -850,8 +849,8 @@ CompliantDOF::computeStaticJointTorques(double *jointTorques, double dofForce)
 		//also propagate this to previous joint
 		if (count==1 || count==3 || count==5 || count==7) {
 			assert(pj);
-			vec3 axis1 = (*j)->dynJoint->getPrevLink()->getTran().affine().row(2);
-			vec3 axis2 =   pj->dynJoint->getPrevLink()->getTran().affine().row(2);
+            vec3 axis1 = (*j)->getDynJoint()->getPrevLink()->getTran().affine().row(2);
+            vec3 axis2 =   pj->getDynJoint()->getPrevLink()->getTran().affine().row(2);
 			double t = fabs(axis1 % axis2);
 			//todo what about non-revolute joints, complex kinematic chains, etc...
 			jointTorques[pj->getNum()] += springTorque * t;
@@ -925,7 +924,7 @@ int
 CompliantDOF::getNumLimitConstraints()
 {
 	int numCon = 0;
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	for(j=jointList.begin(); j!=jointList.end(); j++) {
 		if ( (*j)->getVal() >= (*j)->getMax() - 0.01) numCon ++;
 		else if ( (*j)->getVal() <= (*j)->getMin() + 0.01) numCon ++;
@@ -941,12 +940,12 @@ void
 CompliantDOF::buildDynamicLimitConstraints(std::map<Body*,int> &islandIndices, int numBodies, 
 										   double* H, double *g, int &hcn)
 {
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	int count = 0;
 	for(j=jointList.begin(); j!=jointList.end(); j++) {
 		Joint *currentJoint = *j;
-		DynamicBody *prevLink = currentJoint->dynJoint->getPrevLink();
-		DynamicBody *nextLink = currentJoint->dynJoint->getNextLink();
+        DynamicBody *prevLink = currentJoint->getDynJoint()->getPrevLink();
+        DynamicBody *nextLink = currentJoint->getDynJoint()->getNextLink();
 		int row, dir;
 		double error;
 		if (currentJoint->getVal() >= currentJoint->getMax()-0.01) {
@@ -988,10 +987,10 @@ CompliantDOF::setForce(double f)
 
 	//apply it to links. compute moment arms in order to obtain required torque ratios
 	//reference is a moment arm of 40mm
-	std::list<Joint*>::iterator j;
+    std::vector<Joint*>::iterator j;
 	for(j=jointList.begin(); j!=jointList.end(); j++) {
 		double torqueRatio = (*j)->getCouplingRatio();
-		DynamicBody* body = (*j)->dynJoint->getNextLink();
+        DynamicBody* body = (*j)->getDynJoint()->getNextLink();
 		//assume a pure torque is applied to the joint
 		//easier to match in the statics computation
 		//assume a moment arm of 40mm for the conversion

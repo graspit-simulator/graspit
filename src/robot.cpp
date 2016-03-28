@@ -194,7 +194,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	}
 
 	//set up DOFs before setting up EigenGrasps
-	std::list<Joint *>jointList;
+    std::vector<Joint *>jointList;
 	for (int d=0; d<numDOF; d++) {
 		jointList.clear();
 		for (int f=0; f<numChains; f++) {
@@ -469,7 +469,7 @@ Robot::cloneFrom(Robot *original)
 	}
 	assert (numJoints == original->getNumJoints() );
 
-	std::list<Joint *>jointList;
+    std::vector<Joint *>jointList;
 	for (int d=0; d<numDOF; d++) {
 		jointList.clear();
 		for (int f=0; f<numChains; f++) {

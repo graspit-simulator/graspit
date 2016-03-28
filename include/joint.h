@@ -193,9 +193,10 @@ protected:
   //! A pointer to the associated Inventor transform used for joint draggers
   SoTransform *IVTran;
 
-public:
-  //! [Temporary] this points to the DynJoint that contains this joint
+  //! this points to the DynJoint that contains this joint
   DynJoint *dynJoint;
+
+public:
 
   /*! Initializes all values and pointers to zero.  Joint should set up
   with initJoint.  */
@@ -309,6 +310,12 @@ public:
   /*! Returns the current joint value as computed from the IK during dyanmic
     simulation. */
   double getDynamicsVal() const {return dynamicsVal;}
+
+  DynJoint* getDynJoint() const {return dynJoint;}
+
+  void setDynJoint(DynJoint* _dynJoint) {dynJoint = _dynJoint;}
+
+  bool hasDynJoint() const {return dynJoint != NULL;}
 
   /*! Returns the current value of the DHTransform associated with this joint.*/
   transf const& getTran() const {return DH->getTran();}
