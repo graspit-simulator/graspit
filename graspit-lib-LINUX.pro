@@ -2,6 +2,26 @@
 
 LIBS += $$ADDITIONAL_LINK_FLAGS
 
+# ---------------------- Bullet ----------------------------------
+!exists($(BULLET_PHYSICS_SOURCE_DIR)) {
+                error("Bullet not installed or BULLET_PHYSICS_SOURCE_DIR environment variable not set")
+        }
+
+exists($(BULLET_PHYSICS_SOURCE_DIR)) {
+                message("Bullet BULLET_PHYSICS_SOURCE_DIR environment variable is set: $$(BULLET_PHYSICS_SOURCE_DIR).")
+        }
+
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletCollision/CollisionShapes
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletCollision/Gimpact
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/LinearMath
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletDynamics/ConstraintSolver
+
+LIBS += -lBulletDynamics
+LIBS += -lLinearMath
+LIBS += -lBulletCollision
+
+
 # ---------------------- Blas and Lapack ----------------------------------
 
 LIBS += -lblas -llapack 

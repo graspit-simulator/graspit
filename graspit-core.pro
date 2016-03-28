@@ -27,6 +27,7 @@ DEPENDPATH += src src/Collision include include/math include/Planner include/EGP
 HEADERS	+= include/body.h \
 	include/bBox.h \
 	include/bbox_inl.h \
+        include/bulletDynamics.h \
 	include/contact.h \
 	include/contactSetting.h \
 	include/debug.h \
@@ -35,6 +36,7 @@ HEADERS	+= include/body.h \
 	include/eigenGrasp.h \
 	include/gloveInterface.h \
 	include/grasp.h \
+        include/graspitDynamics.h \
 	include/graspRecord.h \
 	include/gws.h \
 	include/gwsprojection.h \
@@ -110,6 +112,7 @@ HEADERS	+= include/body.h \
 SOURCES	+= src/arch.cpp \
 	src/bBox.cpp \
 	src/body.cpp \
+        src/bulletDynamics.cpp \
 	src/contact.cpp \
 	src/contactSetting.cpp \
 	src/dof.cpp \
@@ -121,6 +124,7 @@ SOURCES	+= src/arch.cpp \
 	src/graspitGUI.cpp \
 	src/graspitServer.cpp \
 	src/graspitApp.cpp \
+        src/graspitDynamics.cpp \
 	src/graspRecord.cpp \
 	src/gws.cpp \
 	src/gwsprojection.cpp \
