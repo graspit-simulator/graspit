@@ -101,8 +101,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 		return FAILURE;
 	}
 	QString robotDBName = root->Attribute("DBName");
-	if(robotDBName.isNull()) robotDBName = robotName;
-        setDBName(robotDBName);
+	setDBName(robotDBName);
 
 	const TiXmlElement* element = findXmlElement(root,"palm");
 	QString valueStr;

@@ -177,7 +177,7 @@ bool SqlDatabaseManager::ModelList(vector<Model*>* model_list,
   for (int row = 0; row < num_rows; ++row) {
     Model* model = model_allocator_->Get();
 	if (!load_model_functor(model, row)){
-		return false;
+        continue;
 	}
     model_list->push_back(model);
   }
@@ -277,7 +277,11 @@ bool SqlDatabaseManager::GetGrasps(const Model& model,
         !results.GetField(volume_quality_column, row, &volume_quality) ||
 		!results.GetField(grasp_contacts_column, row, &grasp_contacts) ||
 		!results.GetField(grasp_source_name_column, row, &grasp_source_name))
-      return false;
+    {
+        grasp_list->pop_back();
+        continue;
+    }
+
 	PROF_STOP_TIMER(GET_GRASPS_GETFIELD);
     grasp.SetSourceModel(model);
     grasp.SetHandName(hand_name);
