@@ -109,7 +109,7 @@ void BulletDynamics::addBody(Body *newBody)
     if (newBody->isDynamic())
     {
         mass = ((DynamicBody*)newBody)->getMass(); //mass g
-        mass=mass*1000; //kg
+        mass=mass/1000; //kg
         triMeshShape = new btGImpactMeshShape(triMesh);
         ((btGImpactMeshShape*)triMeshShape)->updateBound();
         triMeshShape->calculateLocalInertia(mass,localInertia);
@@ -504,25 +504,15 @@ int BulletDynamics::stepDynamics()
             //gains for this controller are read from the robot configuration file.
             dof->callController(timeStep);
 
-            double jointvals[dof->getJointList().size()];
-            dof->getJointValues(jointvals);
+            double magnitude=robot->getDOF(d)->getForce();
 
-            //double joint_value = 1/ dof->getJointList().size();
+            printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
 
+            //1. change torque(?) to torque(N.mm)
+            magnitude=magnitude/10e6;
 
-                Joint *joint = dof->getJointList().at(0);
-
-                double magnitude=robot->getDOF(d)->getForce();
-
-                printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
-
-                //1. change torque(?) to torque(N.mm)
-                magnitude=magnitude/10e6;
-
-                printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, 0, magnitude);
-                btApplyInternalWrench(joint,  magnitude,  btBodyMap);
-                break;
-
+            printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, 0, magnitude);
+            btApplyInternalWrench(dof->getJointList().at(0),  magnitude,  btBodyMap);
 
         }
         // --------------------------add friction--------------------------------------------------
@@ -530,7 +520,7 @@ int BulletDynamics::stepDynamics()
             for (int j = 0; j < robot->getChain(c)->getNumJoints(); j++) {
                 Joint *tempjoint=robot->getChain(c)->getJoint(j);
 
-                double frictionForce = tempjoint->getFriction()/10e5;
+                double frictionForce = tempjoint->getFriction()/10e6;
                 btApplyInternalWrench(tempjoint,frictionForce,btBodyMap);
 
                 double springForce = -tempjoint->getSpringForce();
