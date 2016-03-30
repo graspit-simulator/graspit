@@ -31,6 +31,7 @@
 #include <btGImpactShape.h>
 #include <btGImpactCollisionAlgorithm.h>
 #include <btHingeConstraint.h>
+#include <btGearConstraint.h>
 
 #include "body.h"
 #include "dynJoint.h"
@@ -246,6 +247,19 @@ void BulletDynamics::addRobot(Robot *robot)
                                                  axisInB,
                                                  useReferenceFrameA);
 
+
+
+                if (l==robot->getChain(f)->getJoints().size()-1)
+                {
+                    btGearConstraint* newGear = new btGearConstraint(*rbA,
+                                                   *rbB,
+                                                   axisInA,
+                                                   axisInB,
+                                                   -j->getCouplingRatio()*2.0);
+                    mBtDynamicsWorld->addConstraint(newGear);
+                }
+
+
 //                        double max = j->getMax();
 //                        double min = j->getMin();
 //                        newjoint->setLimit(min,max);
@@ -458,22 +472,34 @@ int BulletDynamics::stepDynamics()
             //gains for this controller are read from the robot configuration file.
             dof->callController(timeStep);
 
-            //THIS NEES TO BE EQUIVALENT TO getRobot(i).applyJointPassiveInternalWrenches()
-                  for (unsigned int j_count = 0; j_count < dof->getJointList().size(); j_count ++)
-                  {
-                      Joint *joint = dof->getJointList().at(j_count);
-                      double magnitude=robot->getDOF(d)->getForce();
+            double jointvals[dof->getJointList().size()];
+            dof->getJointValues(jointvals);
 
-                      printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
+            //double joint_value = 1/ dof->getJointList().size();
 
-                      //1. change torque(?) to torque(N.mm)
-                      magnitude=magnitude/1e6;
-                      printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, j_count, magnitude);
+            for (unsigned int j_count = 0; j_count < dof->getJointList().size(); j_count ++)
+            {
+                Joint *joint = dof->getJointList().at(j_count);
+                //this needs to be the same for all joints for dof.
+                //joint->getCouplingRatio()
+                double magnitude=robot->getDOF(d)->getForce();
 
-                      btApplyInternalWrench(joint,  magnitude,  btBodyMap);
-                      break;
+                printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
 
-                  }
+                //1. change torque(?) to torque(N.mm)
+                magnitude=magnitude/1e6;
+
+                //double ratio = 0.01/joint->getCouplingRatio();
+                //magnitude *= ratio;
+
+                printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, j_count, magnitude);
+                //double joint_value = jointvals[j_count];
+               // printf("JointValue: %f" , joint_value );
+                //joint_value = 0.01/dof->getJointList().size();
+                btApplyInternalWrench(joint,  magnitude,  btBodyMap);
+                break;
+
+            }
         }
         // --------------------------add friction--------------------------------------------------
         for (int c = 0; c < robot->getNumChains(); c++) {
@@ -481,14 +507,12 @@ int BulletDynamics::stepDynamics()
                 Joint *tempjoint=robot->getChain(c)->getJoint(j);
 
                 double f = tempjoint->getFriction();
-                std::cout << " tempjoint->getFriction(): " << f << std::endl;
-                if (f != 0.0){
-                    btApplyInternalWrench(tempjoint,f,btBodyMap);
-                }
+
+                f /= 10e6;
+                //btApplyInternalWrench(tempjoint,f,btBodyMap);
 
                 f = tempjoint->getSpringForce();
-                std::cout << "tempjoint->getSpringForce(): " << f << std::endl;
-                btApplyInternalWrench(tempjoint, -f,btBodyMap);
+                //btApplyInternalWrench(tempjoint, -f,btBodyMap);
             }
         }
     }
