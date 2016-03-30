@@ -509,29 +509,21 @@ int BulletDynamics::stepDynamics()
 
             //double joint_value = 1/ dof->getJointList().size();
 
-            for (unsigned int j_count = 0; j_count < dof->getJointList().size(); j_count ++)
-            {
-                Joint *joint = dof->getJointList().at(j_count);
-                //this needs to be the same for all joints for dof.
-                //joint->getCouplingRatio()
+
+                Joint *joint = dof->getJointList().at(0);
+
                 double magnitude=robot->getDOF(d)->getForce();
 
                 printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
 
                 //1. change torque(?) to torque(N.mm)
-                magnitude=magnitude/1e6;
+                magnitude=magnitude/10e6;
 
-                //double ratio = 0.01/joint->getCouplingRatio();
-                //magnitude *= ratio;
-
-                printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, j_count, magnitude);
-                //double joint_value = jointvals[j_count];
-               // printf("JointValue: %f" , joint_value );
-                //joint_value = 0.01/dof->getJointList().size();
+                printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, 0, magnitude);
                 btApplyInternalWrench(joint,  magnitude,  btBodyMap);
                 break;
 
-            }
+
         }
         // --------------------------add friction--------------------------------------------------
         for (int c = 0; c < robot->getNumChains(); c++) {
