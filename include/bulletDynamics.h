@@ -35,6 +35,7 @@ class btDiscreteDynamicsWorld;
 class btRigidBody;
 class btHingeConstraint;
 class World;
+class KinematicChain;
 
 class BulletDynamics : public DynamicsEngine {
  public:
@@ -42,6 +43,7 @@ class BulletDynamics : public DynamicsEngine {
   ~BulletDynamics();
   void addBody(Body *newBody);
   void addRobot(Robot *robot);
+  void addChain(KinematicChain *chain, btRigidBody *btbase);
   void turnOnDynamics();
   void turnOffDynamics();
   int stepDynamics();

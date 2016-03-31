@@ -150,11 +150,62 @@ void BulletDynamics::addRobot(Robot *robot)
     }
 
     for (int f=0; f <robot->getNumChains(); f++) {
+        addChain(robot->getChain(f), btbase);
+    }
 
-        int numberLinks = robot->getChain(f)->getNumLinks();
+    //couple dof joints
+   for (int i = 0; i < mWorld->getNumRobots(); i++) {
+       Robot* robot=mWorld->getRobot(i);
+       int numDOF=robot->getNumDOF();
+       //for each dof, couple joints.
+       for (int d=0;d<numDOF;d++) {
+
+           DOF * dof=robot->getDOF(d);
+
+           Joint* baseJoint = dof->getJointList().at(0);
+           Link* baseLink = dynamic_cast<Link*>(baseJoint->getDynJoint()->getNextLink());
+           DBGP("baseLink->getName(): " << baseLink->getName().toStdString().c_str() << std::endl);
+           btRigidBody* btbaseLink = btBodyMap.find(baseLink)->second;
+
+           vec3 baseLinkaxis = baseLink->getProximalJointAxis();
+           btVector3 btcbaseLinkaxis(baseLinkaxis.x() , baseLinkaxis.y() , baseLinkaxis.z());
+
+
+           for (unsigned int j_count = 0; j_count < dof->getJointList().size(); j_count ++)
+           {
+
+               Joint *joint = dof->getJointList().at(j_count);
+
+               Link* currentLink = dynamic_cast<Link*>(joint->getDynJoint()->getNextLink());
+
+               btRigidBody* btcurrentLink = btBodyMap.find(currentLink)->second;
+               vec3 currentLinkaxis = currentLink->getProximalJointAxis();
+               btVector3 btcurrentLinkaxis(currentLinkaxis.x() , currentLinkaxis.y() , currentLinkaxis.z());
+
+                   if(btcurrentLink != btbaseLink)
+                   {
+                       DBGP("Gear Ratio: " << baseLink->getName().toStdString().c_str() << std::endl);
+                       btGearConstraint* newGear = new btGearConstraint(*btbaseLink,
+                                                                        *btcurrentLink,
+                                                                        btcbaseLinkaxis,
+                                                                        btcurrentLinkaxis,
+                                                                        -joint->getCouplingRatio()*2.0);
+                                                                        //-1.0/joint->getCouplingRatio());
+                       mBtDynamicsWorld->addConstraint(newGear);
+                   }
+
+           }
+       }
+   }
+
+}
+
+void BulletDynamics::addChain(KinematicChain *chain, btRigidBody *btbase)
+{
+        int numberLinks = chain->getNumLinks();
 
         // get the transfrom from the origin of the palm to the base of this chain
-        transf chaintransf = robot->getChain(f)->getTran();
+        transf chaintransf = chain->getTran();
 
         vec3 chaintranslation = chaintransf.translation();
         btVector3 chainpos(chaintranslation.x(), chaintranslation.y(), chaintranslation.z());
@@ -172,28 +223,28 @@ void BulletDynamics::addRobot(Robot *robot)
         int jointind = 0;  // keep track current joint index
         for (int l=0; l <numberLinks; l++) {
 
-            btRigidBody* btcurrentlink = btBodyMap.find(robot->getChain(f)->getLink(l))->second;
+            btRigidBody* btcurrentlink = btBodyMap.find(chain->getLink(l))->second;
             btRigidBody* btprevlink;
             if (l > 0) {
-                btprevlink = btBodyMap.find(robot->getChain(f)->getLink(l-1))->second;
+                btprevlink = btBodyMap.find(chain->getLink(l-1))->second;
             } else if (l == 0) {
                 btprevlink = btbase;
             }
 
             // get the rotation axis in the frame of next joint
-            vec3 proxjointaxis = robot->getChain(f)->getLink(l)->getProximalJointAxis();
+            vec3 proxjointaxis = chain->getLink(l)->getProximalJointAxis();
             btVector3 currentProximalRotationAxis(proxjointaxis.x() , proxjointaxis.y() , proxjointaxis.z());
 
             // get the proximal joint location in the frame of next joint
-            position prolocation = robot->getChain(f)->getLink(l)->getProximalJointLocation();
+            position prolocation = chain->getLink(l)->getProximalJointLocation();
 
             btVector3 currentProximalJointLocation(prolocation.x(), prolocation.y(), prolocation.z());
 
-            DynJoint::DynamicJointT djtype = robot->getChain(f)->getLink(l)->getDynJoint()->getType();
+            DynJoint::DynamicJointT djtype = chain->getLink(l)->getDynJoint()->getType();
 
             if (djtype == DynJoint::REVOLUTE) {
 
-                Joint* j = robot->getChain(f)->getJoint(jointind);
+                Joint* j = chain->getJoint(jointind);
                 jointind++;
 
                 btHingeConstraint* newjoint;
@@ -228,7 +279,7 @@ void BulletDynamics::addRobot(Robot *robot)
                                              btxjoint0new.z(), btyjoint0new.z(), btzjoint0new.z());
                 frameInB.setOrigin(currentProximalJointLocation);
 
-                position dislocation = robot->getChain(f)->getLink(l-1)->getDistalJointLocation();
+                position dislocation = chain->getLink(l-1)->getDistalJointLocation();
 
                 btVector3 previousDistalJointLocation(dislocation.x(), dislocation.y(), dislocation.z());
                 btVector3 previousDistalRotationAxis(0, 0, 1);
@@ -309,8 +360,8 @@ void BulletDynamics::addRobot(Robot *robot)
 
             } else if (djtype == DynJoint::UNIVERSAL) {
 
-                Joint* joint0 = robot->getChain(f)->getJoint(jointind);
-                Joint* joint1 = robot->getChain(f)->getJoint(jointind+1);
+                Joint* joint0 = chain->getJoint(jointind);
+                Joint* joint1 = chain->getJoint(jointind+1);
                 jointind+=2;  //universal: use two joints
 
                 transf T1 = joint0->getTran();
@@ -397,53 +448,7 @@ void BulletDynamics::addRobot(Robot *robot)
                 DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: FIXED \n");
                 jointind++;
             }
-        }  // for link
-    }  // for chain
-
-     //couple dof joints
-    for (int i = 0; i < mWorld->getNumRobots(); i++) {
-        Robot* robot=mWorld->getRobot(i);
-        int numDOF=robot->getNumDOF();
-        //for each dof, couple joints.
-        for (int d=0;d<numDOF;d++) {
-
-            DOF * dof=robot->getDOF(d);
-
-            Joint* baseJoint = dof->getJointList().at(0);
-            Link* baseLink = dynamic_cast<Link*>(baseJoint->getDynJoint()->getNextLink());
-            std::cout << "baseLink->getName(): " << baseLink->getName().toStdString().c_str() << std::endl;
-            btRigidBody* btbaseLink = btBodyMap.find(baseLink)->second;
-
-            vec3 baseLinkaxis = baseLink->getProximalJointAxis();
-            btVector3 btcbaseLinkaxis(baseLinkaxis.x() , baseLinkaxis.y() , baseLinkaxis.z());
-
-
-            for (unsigned int j_count = 0; j_count < dof->getJointList().size(); j_count ++)
-            {
-
-                Joint *joint = dof->getJointList().at(j_count);
-
-                Link* currentLink = dynamic_cast<Link*>(joint->getDynJoint()->getNextLink());
-
-                btRigidBody* btcurrentLink = btBodyMap.find(currentLink)->second;
-                vec3 currentLinkaxis = currentLink->getProximalJointAxis();
-                btVector3 btcurrentLinkaxis(currentLinkaxis.x() , currentLinkaxis.y() , currentLinkaxis.z());
-
-                    if(btcurrentLink != btbaseLink)
-                    {
-                        DBGP("Gear Ratio: " << baseLink->getName().toStdString().c_str() << std::endl);
-                        btGearConstraint* newGear = new btGearConstraint(*btbaseLink,
-                                                                         *btcurrentLink,
-                                                                         btcbaseLinkaxis,
-                                                                         btcurrentLinkaxis,
-                                                                         -joint->getCouplingRatio()*2.0);
-                                                                         //-1.0/joint->getCouplingRatio());
-                        mBtDynamicsWorld->addConstraint(newGear);
-                    }
-
-            }
         }
-    }
 }
 
 void BulletDynamics::turnOnDynamics()
