@@ -161,7 +161,7 @@ Joint::applyPassiveInternalWrenches()
 double
 Joint::getSpringForce() const 
 {
-    std::cout << "mK: " << mK << " getDisplacement(): " << getDisplacement() << std::endl;
+    DBGP( "mK: " << mK << " getDisplacement(): " << getDisplacement() << std::endl);
 	return mK * getDisplacement();
 }
 

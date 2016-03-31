@@ -255,13 +255,13 @@ DOF::PDPositionController(double timeStep)
 	double newForce;
     newForce = Kp * error + Kv * (error-lastError)/timeStep;
 
-    std::cout << "PDPositionController: DOF " << getDOFNum() << std::endl ;
-    std::cout << "PDPositionController: error =" << error << std::endl;
-    std::cout << "PDPositionController: setPoint =" << setPoint << " error ="<<error<<" edot = "<<(error-lastError) << std::endl;
-    std::cout << "PDPositionController: proportional: "<<error<<"*"<<Kp<<"="<<error*Kp << std::endl;
-    std::cout << "PDPositionController: derivative: "<<Kv<<"*"<<(error-lastError)/timeStep << std::endl;
-    std::cout << "PDPositionController: cap: "<<getMaxForce()*0.8 << " Force: "<<newForce << std::endl;
-    std::cout << "PDPositionController: e " << error << " de " << error-lastError << " ts " << timeStep << " f " << newForce << std::endl;
+    DBGP("PDPositionController: DOF " << getDOFNum() << std::endl) ;
+    DBGP("PDPositionController: error =" << error << std::endl);
+    DBGP( "PDPositionController: setPoint =" << setPoint << " error ="<<error<<" edot = "<<(error-lastError) << std::endl);
+    DBGP("PDPositionController: proportional: "<<error<<"*"<<Kp<<"="<<error*Kp << std::endl);
+    DBGP("PDPositionController: derivative: "<<Kv<<"*"<<(error-lastError)/timeStep << std::endl);
+    DBGP("PDPositionController: cap: "<<getMaxForce()*0.8 << " Force: "<<newForce << std::endl);
+    DBGP( "PDPositionController: e " << error << " de " << error-lastError << " ts " << timeStep << " f " << newForce << std::endl);
 	return newForce;
 }
 

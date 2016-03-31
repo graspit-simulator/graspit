@@ -113,7 +113,6 @@ void BulletDynamics::addBody(Body *newBody)
         triMeshShape = new btGImpactMeshShape(triMesh);
         ((btGImpactMeshShape*)triMeshShape)->updateBound();
         triMeshShape->calculateLocalInertia(mass,localInertia);
-        printf("localInertia: %lf %lf %lf  kg.m^2\n", localInertia.x()/1e6,localInertia.y()/1e6,localInertia.z()/1e6);
     }
     else
     {
@@ -145,11 +144,10 @@ void BulletDynamics::addRobot(Robot *robot)
         btScalar mass(0.);
         btVector3 localInertia(0, 0, 0);
         if ((btbase=btBodyMap.find(robot->getBase())->second) == NULL) {
-            printf("error, base is not in the btBodyMap\n");
+            DBGA("error, base is not in the btBodyMap\n");
         }
         btbase->setMassProps(mass , localInertia);
     }
-    printf("### of m_links: %d \n ", mBtLinks.size());
 
     for (int f=0; f <robot->getNumChains(); f++) {
 
@@ -159,8 +157,6 @@ void BulletDynamics::addRobot(Robot *robot)
         transf chaintransf = robot->getChain(f)->getTran();
 
         vec3 chaintranslation = chaintransf.translation();
-        printf("chain %d TRANSLATION %f,%f,%f \n", f,
-               chaintranslation.x(), chaintranslation.y(), chaintranslation.z());
         btVector3 chainpos(chaintranslation.x(), chaintranslation.y(), chaintranslation.z());
         // calculate chain rotation, and to get base z,x,y in the frame of world frame
         //(palm origin frame)
@@ -184,23 +180,19 @@ void BulletDynamics::addRobot(Robot *robot)
                 btprevlink = btbase;
             }
 
-            printf("link#: %d \n ", l);
             // get the rotation axis in the frame of next joint
             vec3 proxjointaxis = robot->getChain(f)->getLink(l)->getProximalJointAxis();
             btVector3 currentProximalRotationAxis(proxjointaxis.x() , proxjointaxis.y() , proxjointaxis.z());
-            printf("The link PROXIMAL JOINT AXIS:%f,%f,%f \n",
-                   proxjointaxis.x() , proxjointaxis.y(), proxjointaxis.z());
+
             // get the proximal joint location in the frame of next joint
             position prolocation = robot->getChain(f)->getLink(l)->getProximalJointLocation();
-            printf("proximalJoint localtion: %f, %f, %f \n",
-                   prolocation.x(), prolocation.y(), prolocation.z());
+
             btVector3 currentProximalJointLocation(prolocation.x(), prolocation.y(), prolocation.z());
 
             DynJoint::DynamicJointT djtype = robot->getChain(f)->getLink(l)->getDynJoint()->getType();
 
             if (djtype == DynJoint::REVOLUTE) {
-                printf("~~~~~~chain: %d link: %d  type: REVOLUTE \n", f, l);
-                printf("jointind: %d \n ", jointind);
+
                 Joint* j = robot->getChain(f)->getJoint(jointind);
                 jointind++;
 
@@ -224,8 +216,6 @@ void BulletDynamics::addRobot(Robot *robot)
                 btVector3 btzjoint0new(zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
                 btVector3 btxjoint0new(xjoint0new.x(), xjoint0new.y(), xjoint0new.z());
                 btVector3 btyjoint0new(yjoint0new.x(), yjoint0new.y(), yjoint0new.z());
-                printf("chain %d link: %d joint0 z in frame 2 %f,%f,%f \n",
-                       f, l, zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
 
                 btTransform frameInA;
                 btTransform frameInB;
@@ -239,8 +229,7 @@ void BulletDynamics::addRobot(Robot *robot)
                 frameInB.setOrigin(currentProximalJointLocation);
 
                 position dislocation = robot->getChain(f)->getLink(l-1)->getDistalJointLocation();
-                printf("DistalJointLocation location: %f, %f, %f  \n",
-                       dislocation.x(), dislocation.y(), dislocation.z());
+
                 btVector3 previousDistalJointLocation(dislocation.x(), dislocation.y(), dislocation.z());
                 btVector3 previousDistalRotationAxis(0, 0, 1);
 
@@ -319,7 +308,7 @@ void BulletDynamics::addRobot(Robot *robot)
                 mBtDynamicsWorld->addConstraint(newjoint , disable_collision_between_rbA_rbB);
 
             } else if (djtype == DynJoint::UNIVERSAL) {
-                printf("~~~~~~chain: %d link: %d  type: UNIVERSAL \n", f, l);
+
                 Joint* joint0 = robot->getChain(f)->getJoint(jointind);
                 Joint* joint1 = robot->getChain(f)->getJoint(jointind+1);
                 jointind+=2;  //universal: use two joints
@@ -338,8 +327,7 @@ void BulletDynamics::addRobot(Robot *robot)
                 btVector3 btzjoint0new(zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
                 btVector3 btxjoint0new(xjoint0new.x(), xjoint0new.y(), xjoint0new.z());
                 btVector3 btyjoint0new(yjoint0new.x(), yjoint0new.y(), yjoint0new.z());
-                printf("chain %d link: %d joint0 z in frame 2 %f,%f,%f \n",
-                       f, l, zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
+
                 //get the joint1 x,y,z in new frame(after 1 transformation T2)
                 vec3 zjoint1new = rot21*vec3(0, 0, 1);
                 vec3 xjoint1new = rot21*vec3(1, 0, 0);
@@ -347,8 +335,7 @@ void BulletDynamics::addRobot(Robot *robot)
                 btVector3 btzjoint1new(zjoint1new.x(), zjoint1new.y(), zjoint1new.z());
                 btVector3 btxjoint1new(xjoint1new.x(), xjoint1new.y(), xjoint1new.z());
                 btVector3 btyjoint1new(yjoint1new.x(), yjoint1new.y(), yjoint1new.z());
-                printf("chain %d link: %d joint1 z in frame2 %f,%f,%f \n",
-                       f, l, zjoint1new.x(), zjoint1new.y(), zjoint1new.z());
+
                 // joint1 z axis in the frame of joint0
                 vec3 zjoint1infram0 = rotqj01*vec3(0, 0, 1);
 
@@ -387,28 +374,27 @@ void BulletDynamics::addRobot(Robot *robot)
                 newjoint->setLimit(0, 0, 0);
                 newjoint->setLimit(1, 0, 0);
                 newjoint->setLimit(2, 0, 0);
-                printf("chain %d joint1 z in joint0  frame %f,%f,%f \n",
-                       f, zjoint1infram0.x(), zjoint1infram0.y(), zjoint1infram0.z());
+
                 //universal constraints: two rotation axises, one is z axis of joint0,
                 //the other one is the joint1 z axis in the frame of joint0 (x or y),
                 //set the left one limit=0,0
                 if (zjoint1infram0.x() != 0) {
-                    printf("zjoint1 in joint0 frame is x, limit the y rotation \n ");
+                    DBGA("zjoint1 in joint0 frame is x, limit the y rotation \n ");
                     newjoint->setLimit(4, 0, 0);  // limit the y rotation;
                 } else if (zjoint1infram0.y() != 0) {
-                    printf("zjoint1 in joint0 frame is y, limit the x rotation \n ");
+                    DBGA("zjoint1 in joint0 frame is y, limit the x rotation \n ");
                     newjoint->setLimit(3, 0, 0);  // limit the x rotation;
                 }
 
                 mBtDynamicsWorld->addConstraint(newjoint, true);
             } else if (djtype == DynJoint::BALL) {
-                printf("~~~~~~chain: %d link: %d  type: BALL \n", f, l);
+                DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: BALL \n");
                 jointind+=3;
             } else if (djtype == DynJoint::PRISMATIC) {
-                printf("~~~~~~chain: %d link: %d  type: PRISMATIC \n", f, l);
+                DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: PRISMATIC \n");
                 jointind++;
             } else if (djtype == DynJoint::FIXED) {
-                printf("~~~~~~chain: %d link: %d  type: FIXED \n", f, l);
+                DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: FIXED \n");
                 jointind++;
             }
         }  // for link
@@ -445,12 +431,13 @@ void BulletDynamics::addRobot(Robot *robot)
 
                     if(btcurrentLink != btbaseLink)
                     {
+                        DBGP("Gear Ratio: " << baseLink->getName().toStdString().c_str() << std::endl);
                         btGearConstraint* newGear = new btGearConstraint(*btbaseLink,
                                                                          *btcurrentLink,
                                                                          btcbaseLinkaxis,
                                                                          btcurrentLinkaxis,
                                                                          -joint->getCouplingRatio()*2.0);
-                                                                         //joint->getCouplingRatio());
+                                                                         //-1.0/joint->getCouplingRatio());
                         mBtDynamicsWorld->addConstraint(newGear);
                     }
 
@@ -568,8 +555,6 @@ int BulletDynamics::stepDynamics()
                  btApplyInternalWrench(dof->getJointList().at(0),  magnitude,  btBodyMap);
             }
 
-            printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
-            printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, 0, magnitude);
         }
 
         // --------------------------add friction--------------------------------------------------
@@ -577,7 +562,7 @@ int BulletDynamics::stepDynamics()
             for (int j = 0; j < robot->getChain(c)->getNumJoints(); j++) {
                 Joint *tempjoint=robot->getChain(c)->getJoint(j);
 
-                std::cout << " current: j->getVal()" << tempjoint->getVal()<< std::endl;
+                DBGP(" current: j->getVal()" << tempjoint->getVal()<< std::endl);
 
                 double frictionForce = tempjoint->getFriction()/10e6;
                 btApplyInternalWrench(tempjoint,frictionForce,btBodyMap);
