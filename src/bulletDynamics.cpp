@@ -63,7 +63,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, 0));
+    mBtDynamicsWorld->setGravity(btVector3(0,0, -10));
 }
 
 BulletDynamics::~BulletDynamics()
@@ -213,14 +213,38 @@ void BulletDynamics::addRobot(Robot *robot)
                 btVector3 axisInB;
                 bool useReferenceFrameA;
 
+                transf T1 = j->getTran();
+                Quaternion rotqj01 = T1.rotation();
+                Quaternion rot01 = rotqj01;
+                Quaternion rot10 = rot01.inverse();
+                //get the joint0 x,y,z in new frame(after two transformation T1,T2)
+                vec3 zjoint0new = rot10*vec3(0, 0, 1);
+                vec3 xjoint0new = rot10*vec3(1, 0, 0);
+                vec3 yjoint0new = rot10*vec3(0, 1, 0);
+                btVector3 btzjoint0new(zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
+                btVector3 btxjoint0new(xjoint0new.x(), xjoint0new.y(), xjoint0new.z());
+                btVector3 btyjoint0new(yjoint0new.x(), yjoint0new.y(), yjoint0new.z());
+                printf("chain %d link: %d joint0 z in frame 2 %f,%f,%f \n",
+                       f, l, zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
+
                 btTransform frameInA;
                 btTransform frameInB;
+                frameInA.setIdentity();
+                frameInB.setIdentity();
+                //set the constraint frameB: which is the joint0 x,y,z coordinates in new frame
+                //(after 2 transformation T1,T2)
+                frameInB.getBasis().setValue(btxjoint0new.x(), btyjoint0new.x(), btzjoint0new.x(),
+                                             btxjoint0new.y(), btyjoint0new.y(), btzjoint0new.y(),
+                                             btxjoint0new.z(), btyjoint0new.z(), btzjoint0new.z());
+                frameInB.setOrigin(currentProximalJointLocation);
 
                 position dislocation = robot->getChain(f)->getLink(l-1)->getDistalJointLocation();
                 printf("DistalJointLocation location: %f, %f, %f  \n",
                        dislocation.x(), dislocation.y(), dislocation.z());
                 btVector3 previousDistalJointLocation(dislocation.x(), dislocation.y(), dislocation.z());
                 btVector3 previousDistalRotationAxis(0, 0, 1);
+
+
 
                 //if this is the first link, then we need to set it with regard to the base
                 if (l == 0) {
@@ -230,13 +254,13 @@ void BulletDynamics::addRobot(Robot *robot)
                     pivotInB = currentProximalJointLocation;
                     axisInA= baseaxis;
                     axisInB = currentProximalRotationAxis;
-                    useReferenceFrameA = false;
+                    useReferenceFrameA = true;
 
-                    frameInA.setIdentity();
-                    frameInB.setIdentity();
+                    frameInA.getBasis().setValue(xbaseaxis.x(), ybaseaxis.x(), baseaxis.x(),
+                                                 xbaseaxis.y(), ybaseaxis.y(), baseaxis.y(),
+                                                 xbaseaxis.z(), ybaseaxis.z(), baseaxis.z());
 
                     frameInA.setOrigin(chainpos);
-                    frameInB.setOrigin(currentProximalJointLocation);
                 }
                 //set with regard to the previous link
                 else {
@@ -248,17 +272,12 @@ void BulletDynamics::addRobot(Robot *robot)
                     pivotInB = currentProximalJointLocation;
                     axisInA = previousDistalRotationAxis;
                     axisInB = currentProximalRotationAxis;
-                    useReferenceFrameA = false;
-
-                    frameInA.setIdentity();
-                    frameInB.setIdentity();
+                    useReferenceFrameA = true;
 
                     frameInA.setOrigin(btVector3(0, 0, 0));
                     frameInA.getBasis().setValue(1, 0, 0,
                                                  0, 1, 0,
                                                  0, 0, 1);
-                    //frameInA.setOrigin(previousDistalJointLocation);
-                    //frameInB.setOrigin(currentProximalJointLocation);
 
                 }
                 newjoint = new btHingeConstraint(*rbA ,
@@ -275,31 +294,26 @@ void BulletDynamics::addRobot(Robot *robot)
                         double max = j->getMax();
                         double min = j->getMin();
 
-//                        if (max < -M_PI)
-//                        {
-//                            max += (2*M_PI);
-//                        }
-//                        if (max > M_PI)
-//                        {
-//                            max -= (2*M_PI);
-//                        }
+                        if (max < -M_PI)
+                        {
+                            max += (2*M_PI);
+                        }
+                        if (max > M_PI)
+                        {
+                            max -= (2*M_PI);
+                        }
 
-//                        if (min < -M_PI)
-//                        {
-//                            min += (2*M_PI);
-//                        }
-//                        if (min > M_PI)
-//                        {
-//                            min -= (2*M_PI);
-//                        }
+                        if (min < -M_PI)
+                        {
+                            min += (2*M_PI);
+                        }
+                        if (min > M_PI)
+                        {
+                            min -= (2*M_PI);
+                        }
 
-
-
-
-                        //newjoint->setFrames(frameInA, frameInB);
-                        //newjoint->setLimit(min,max);
-                        std::cout << "Joint Limits: "<< min << " : " << max << " current: " << j->getVal()<< "current2: " << newjoint->getHingeAngle()<<  std::endl;
-
+                        newjoint->setFrames(frameInA, frameInB);
+                        newjoint->setLimit(min,max);
 
                 bool disable_collision_between_rbA_rbB = true;
                 mBtDynamicsWorld->addConstraint(newjoint , disable_collision_between_rbA_rbB);
@@ -476,11 +490,6 @@ void BulletDynamics::turnOffDynamics()
 
 
 void BulletDynamics::btApplyInternalWrench (Joint * activeJoint, double magnitude, std::map<Body*, btRigidBody*> btBodyMap) {
-        //currently if magnitude is fixed, the hand moves fine no matter how it is oriented.
-        //so I believe this function is fine, it is the magnitude that is incorrect.
-//        magnitude = -0.1;
-//        std::cout << "magnitude: " << magnitude <<std::endl;
-        //assert(false);
 
         vec3 worldAxis=activeJoint->getWorldAxis();
 
