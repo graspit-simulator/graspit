@@ -159,7 +159,7 @@ grasp_planner::planIt(GraspableBody* gb,SoGroup *IVPrimitives)
 #endif
     
     /* Search graspable primitive objects in object tree. */
-    SoPathList pl = searchPrimitives(my_body);
+    SoPathList pl = searchPrimitives();
     
     int length = pl.getLength();
 #ifdef GRASPITDBG
@@ -583,7 +583,7 @@ grasp_planner::get_planningParameters(int& nr_of_360_deg_steps_in,
   that node in a path list.  The final list of paths is returned at the end.
 */
 SoPathList 
-grasp_planner::searchPrimitives(GraspableBody* bg)
+grasp_planner::searchPrimitives()
 {	
   SoPathList pl_ret;
   SoPathList pl;
@@ -591,7 +591,6 @@ grasp_planner::searchPrimitives(GraspableBody* bg)
   SoGroup *primGeomRoot;
   int j;
   
-  bg = NULL;  // bg is not needed but gives an unused parameter warning
   primGeomRoot = IVGeomPrimitives;
   
   /* Search for cylinders */

@@ -79,9 +79,9 @@ private:
 	//! A pointer to the hand involved in the current grasps
 	Hand* mHand;
 	//! Index of the current grasp in mOriginalGrasps
-	int mCurrentOriginalGrasp;
+    unsigned int mCurrentOriginalGrasp;
 	//! Index of the current grasp in mTestedGrasps
-	int mCurrentTestedGrasp;
+    unsigned int mCurrentTestedGrasp;
 	//! Widget for displaying thumbnails
 	QGraphicsScene * mModelScene;
 	//! Helper variable that indicates whether the neighbor combo box is in reconstruction
@@ -99,17 +99,17 @@ private:
 	template <class vectorType, class treatAsType>
 	void deleteVectorElements(std::vector<vectorType>& v);
 
-	void previousGrasp(int& i, std::vector<db_planner::Grasp*> graspList);
-	void nextGrasp(int& i, std::vector<db_planner::Grasp*> graspList);
+    void previousGrasp(unsigned int& i, std::vector<db_planner::Grasp*> graspList);
+    void nextGrasp(unsigned int& i, std::vector<db_planner::Grasp*> graspList);
 	void showGrasp(db_planner::Grasp* grasp);
 	void setGroupBoxEnabled(bool nbrGen, bool alignment, bool ranking, bool grasp, bool execute);
 
 public:
 	DBasePlannerDlg(QWidget *parent = 0, db_planner::DatabaseManager* dbm = NULL, 
 				    db_planner::Model* m = NULL, Hand* h = NULL) :
-					QDialog(parent), mDBMgr(dbm), mPlanningModel(m), mModelShown(m), 
-					mHand(h), mModelScene(NULL), mCurrentOriginalGrasp(0), 
-					mCurrentTestedGrasp(0), neighborComboBoxInReconstruction(false), mAligner(NULL) {
+                    QDialog(parent), mDBMgr(dbm),mAligner(NULL), mPlanningModel(m), mModelShown(m),
+                    mHand(h), mCurrentOriginalGrasp(0), mCurrentTestedGrasp(0),
+                    mModelScene(NULL), neighborComboBoxInReconstruction(false) {
 		setupUi(this);
 		QObject::connect(exitButton, SIGNAL(clicked()), this, SLOT(exitButton_clicked()));
 		QObject::connect(getNeighborButton, SIGNAL(clicked()), this, SLOT(getNeighborButton_clicked()));
@@ -128,7 +128,7 @@ public:
 	}
 	~DBasePlannerDlg(){destroy();}
 
-public slots:
+public Q_SLOTS:
 	//! Button events
 	void exitButton_clicked();
 	void getNeighborButton_clicked();

@@ -37,7 +37,7 @@
 #ifndef __GRASP_COORDINATES_H__
 #define __GRASP_COORDINATES_H__
 
-#include "matvec3D.h"
+#include "include/matvec3D.h"
 class coordinates;
 class cartesian_coordinates;
 class cylindrical_coordinates;
@@ -66,6 +66,7 @@ public:
   coordinates(coordinates* c);
   coordinates(vec3 v);
   coordinates();
+  virtual ~coordinates(){};
   
   virtual coord_system_type    get_coord_system_type();
   virtual void                 set_coord_system_type(coord_system_type);

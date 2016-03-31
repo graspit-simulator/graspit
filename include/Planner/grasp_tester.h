@@ -57,7 +57,7 @@
 
 #include <vector>
 
-#include "matvec3D.h"
+#include "include/matvec3D.h"
 #include "collisionStructures.h"
 #include "grasp_directions.h"
 #include "grasp_preshape.h"
@@ -210,7 +210,7 @@ private:
   static void testItCB(void *,SoSensor *sensor);
   void testIt();
   
-signals:
+Q_SIGNALS:
   /*! This signal is emitted after the last grasp has been tested. */
   void testingComplete();
   

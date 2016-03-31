@@ -180,6 +180,8 @@ class DatabaseManager {
   virtual bool LoadModelGeometry(Model*) const = 0;
   //! Loads the graspit relative path for a hand
   virtual QString getHandGraspitPath(QString handDBName) const = 0;
+
+  virtual ~DatabaseManager(){}
   
 };
 

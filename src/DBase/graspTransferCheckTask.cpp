@@ -131,8 +131,8 @@ void GraspTransferCheckTask::start()
 
   //do the actual work
   bool success = true;
-  for (int g1=0; g1<graspList1.size(); g1++) {
-    for (int g2=g1; g2<graspList2.size(); g2++) {
+  for (unsigned int g1=0; g1<graspList1.size(); g1++) {
+    for (unsigned int g2=g1; g2<graspList2.size(); g2++) {
       if (g1==g2) continue;
       DBGA("Checking combo " << g1 << " -- " << g2);      
       if (checkGraspCombo(graspList1[g1], graspList2[g2])) {

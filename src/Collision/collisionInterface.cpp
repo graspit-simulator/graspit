@@ -164,7 +164,7 @@ CollisionInterface::replaceContactSetWithPerimeter(ContactReport &contactSet)
 
 	coordT *array = new coordT[contactSet.size()*2];
 	coordT *ptr = &array[0];
-	int ptCount = 0;
+	volatile int ptCount = 0;
 	for (cp=contactSet.begin(); cp!=contactSet.end(); cp++) {    
 		*ptr++ = (cp->b1_pos - position::ORIGIN) % axis1;
 		*ptr++ = (cp->b1_pos - position::ORIGIN) % axis2;

@@ -66,7 +66,7 @@ private:
 	//! A list of grasps for a dbase model, retrieved from the DBMgr
 	std::vector<db_planner::Grasp*> mGraspList;
 	//! An index for the current grasp shown on the screen
-	int mCurrentFrame;
+    unsigned int mCurrentFrame;
 	//! Helper variable to disable the modelChanged trigger
 	bool inModelConstruction;
 
@@ -95,9 +95,9 @@ private:
 	void initializeGraspInfo();
 
 public:
-	DBaseDlg(QWidget *parent = 0) : QDialog(parent), mCurrentLoadedModel(NULL), mDBMgr(NULL), 
-									mModelScene(NULL), mCurrentFrame(0), 
-									inModelConstruction(false) {
+    DBaseDlg(QWidget *parent = 0) : QDialog(parent), mCurrentLoadedModel(NULL),mModelScene(NULL),
+        mDBMgr(NULL), mCurrentFrame(0), inModelConstruction(false)
+    {
 		setupUi(this);
 		QObject::connect(exitButton, SIGNAL(clicked()), this, SLOT(exitButton_clicked()));
 		QObject::connect(connectButton, SIGNAL(clicked()), this, SLOT(connectButton_clicked()));
@@ -119,7 +119,7 @@ public:
 	}
 	~DBaseDlg(){destroy();}
 
-public slots:
+public Q_SLOTS:
 	//! Button events
 	void connectButton_clicked();
 	void exitButton_clicked();

@@ -37,6 +37,7 @@
   #include <unistd.h>
 #endif
 
+#include "graspitParser.h"
 #include "graspitGUI.h"
 #include "mainWindow.h"
 #include "ivmgr.h"
@@ -143,102 +144,128 @@ GraspItGUI::~GraspItGUI()
 int
 GraspItGUI::processArgs(int argc, char** argv)
 {
-  QString filename;
-  int errflag=0; 
-  errflag = errflag;
-  QString graspitRoot = QString(getenv("GRASPIT"));
-  if (graspitRoot.isNull() ) {
-    std::cerr << "Please set the GRASPIT environment variable to the root directory of graspIt." << std::endl;
-    return FAILURE;
-  }
 
-  //look for plugins of the form plugin:name in the arguments
-  for (int i=1; i<argc; i++) {
-    QString arg(argv[i]);
-    if (arg.section(',',0,0)=="plugin") {
-      QString libName = arg.section(',',1,1);
-	  std::cout << "Processing arguments \n ";
-      PluginCreator* creator = PluginCreator::loadFromLibrary(libName.toStdString());	  
-      if (creator) {
-        mPluginCreators.push_back(creator);
-      } else {
-        DBGA("Failed to load plugin: " << libName.latin1());
-      }
+    int errorFlag=0;
+
+    GraspitParser *graspitParser = new GraspitParser();
+    graspitParser->parseArgs(argc, argv);
+    cmdline::parser *args = graspitParser->parseArgs(argc, argv);
+
+    //Ensure that $GRASPIT is set.
+    QString graspitRoot = QString(getenv("GRASPIT"));
+    if (graspitRoot.isNull() ) {
+        std::cerr << "Please set the GRASPIT environment variable to the root directory of graspIt." << std::endl;
+        return FAILURE;
     }
-  }
-  
-  //start any plugins with auto start enabled
-  mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void*)this);
-  for (size_t i=0; i<mPluginCreators.size(); i++) {
-	  std::cout << "plugin creator autostart " << mPluginCreators[i]->autoStart() << std::endl;
-    if (mPluginCreators[i]->autoStart()) {
-      startPlugin(mPluginCreators[i], mPluginCreators[i]->defaultArgs());
-    }    
-  }
-  
+
+    if(args->exist("plugin"))
+    {
+        QString plugins_arg_string = QString::fromStdString(args->get<std::string>("plugin"));
+        QStringList plugins_list = plugins_arg_string.split(',');
+        for(int i=0; i < plugins_list.size(); i++)
+        {
+            std::cout << "Loading Plugin: "<< plugins_list.at(i).toStdString().c_str();
+            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString());
+            if (creator){
+              mPluginCreators.push_back(creator);
+            } else {
+              DBGA("Failed to load plugin: " << plugins_list.at(i).toStdString());
+            }
+        }
+    }
+
+    //start any plugins with auto start enabled
+    mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void*)this);
+    for (size_t i=0; i<mPluginCreators.size(); i++)
+    {
+        std::cout << "plugin creator autostart " << mPluginCreators[i]->autoStart() << std::endl;
+        if (mPluginCreators[i]->autoStart())
+        {
+            startPlugin(mPluginCreators[i], argc, argv);
+        }
+    }
+
   if(argc > 1){
 #ifdef CGDB_ENABLED
-	  if(!strcmp(argv[1],"dbase")){
-		  DBaseBatchPlanner *dbp = new DBaseBatchPlanner(graspItGUI->getIVmgr(), this);
-		  dbp->processArguments(argc, argv);
-		  dbp->startPlanner();
-	  }
-	  if (!strcmp(argv[1],"db_dispatch")) {
-		  mDispatch = new TaskDispatcher();
-		  if (mDispatch->connect("wgs36",5432,"willow","willow","household_objects")) {
-			  std::cerr << "DBase dispatch failed to connect to database\n";
-			  return TERMINAL_FAILURE;
-		  }
-		  std::cerr << "DBase dispatch connected to database\n";
-		  mDispatch->mainLoop();
-		  if (mDispatch->getStatus() != TaskDispatcher::RUNNING) {
-			  mExitCode = mDispatch->getStatus();
-			  return TERMINAL_FAILURE;
-		  }
-	  }
+      if(!strcmp(argv[1],"dbase")){
+          DBaseBatchPlanner *dbp = new DBaseBatchPlanner(graspItGUI->getIVmgr(), this);
+          dbp->processArguments(argc, argv);
+          dbp->startPlanner();
+      }
+      if (!strcmp(argv[1],"db_dispatch")) {
+          mDispatch = new TaskDispatcher();
+          if (mDispatch->connect("wgs36",5432,"willow","willow","household_objects")) {
+              std::cerr << "DBase dispatch failed to connect to database\n";
+              return TERMINAL_FAILURE;
+          }
+          std::cerr << "DBase dispatch connected to database\n";
+          mDispatch->mainLoop();
+          if (mDispatch->getStatus() != TaskDispatcher::RUNNING) {
+              mExitCode = mDispatch->getStatus();
+              return TERMINAL_FAILURE;
+          }
+      }
 #endif
   }
  
 #ifdef Q_WS_X11
-  char c;
-  while((c=getopt(argc, argv, "r:w:o:b:")) != EOF) {
-    switch(c) {
-    case 'r':
-      filename = graspitRoot + QString("models/robots/")+
-	QString(optarg) + QString("/") + QString(optarg) + QString(".xml");
-      if (ivmgr->getWorld()->importRobot(filename)==NULL)
-	++errflag;
-      break;
-    case 'w':
-      filename = graspitRoot + QString("worlds/")+ QString(optarg) +
-	QString(".xml");
-      if (ivmgr->getWorld()->load(filename)==FAILURE)
-	++errflag;
-      else
-	mainWindow->mUI->worldBox->setTitle(filename);
-      break;
-    case 'o':
-      filename = graspitRoot + QString("/models/objects/")+ QString(optarg) +
-	QString(".iv");
-      if (!ivmgr->getWorld()->importBody("GraspableBody",filename))
-	++errflag;
-      break;
-    case 'b':
-      filename = graspitRoot + QString("/models/obstacles/")+ QString(optarg) +
-	QString(".iv");
+  if (args->exist("world"))
+  {
+      QString filename = graspitRoot + QString("/worlds/") + QString::fromStdString(args->get<std::string>("world")) + QString(".xml");
+      if (ivmgr->getWorld()->load(filename)==FAILURE){
+          ++errorFlag;
+      }
+      else{
+          mainWindow->mUI->worldBox->setTitle(filename);
+      }
+  }
+
+  if (args->exist("robot"))
+  {
+      QString filename = graspitRoot +
+              QString("/models/robots/") +
+              QString::fromStdString(args->get<std::string>("robot")) +
+              QString("/")+
+              QString::fromStdString(args->get<std::string>("robot")) +
+              QString(".xml");
+      if (ivmgr->getWorld()->importRobot(filename)==NULL){
+          ++errorFlag;
+      }
+  }
+
+  if (args->exist("obstacle"))
+  {
+      QString filename = graspitRoot +
+              QString("/models/obstacles/") +
+              QString::fromStdString(args->get<std::string>("obstacle")) +
+              QString(".iv");
+
       if (!ivmgr->getWorld()->importBody("Body",filename))
-	++errflag;
-      break;
-    default: 
-      ++errflag;
-      break;
-    }
+      {
+        ++errorFlag;
+      }
   }
-  if (errflag) {
-    std::cerr << "Usage: graspit [-w worldname] [-r robotname] [-o objectname] [-b obstaclename]" << std::endl;
-    return FAILURE;
+
+  if (args->exist("object"))
+  {
+      QString filename = graspitRoot +
+              QString("/models/objects/") +
+              QString::fromStdString(args->get<std::string>("object")) +
+              QString(".iv");
+
+      if (!ivmgr->getWorld()->importBody("GraspableBody",filename))
+      {
+        ++errorFlag;
+      }
   }
-#endif
+
+  if (errorFlag)
+  {
+      std::cerr << "Failed to Parse args." << std::endl;
+      return FAILURE;
+  }
+
+ #endif // Q_WS_X11
   return SUCCESS;
 }
 
@@ -276,9 +303,9 @@ GraspItGUI::sensorCB(void*, SoSensor*)
 }
 
 void 
-GraspItGUI::startPlugin(PluginCreator* creator, std::string args)
+GraspItGUI::startPlugin(PluginCreator* creator, int argc, char** argv)
 {
-  Plugin *plugin = creator->createPlugin(args);
+  Plugin *plugin = creator->createPlugin(argc,argv);
   if (plugin) mActivePlugins.push_back( std::pair<Plugin*, std::string>(plugin, creator->type()) );
   if (!mActivePlugins.empty()) {
     mPluginSensor->schedule();

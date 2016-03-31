@@ -652,7 +652,6 @@ IVmgr::transRot(DraggerInfo *dInfo)
 
 	// save the desired position or orientation and set what percent of the 
 	// desired moved will be accomplished in each step
-	SbVec3f temp = dInfo->lastTran;
 	if (translating) {
 		if ((myHandleBox->translation.getValue() - dInfo->lastTran).length()<0.00001) {
 			myHandleBox->translation.setValue(dInfo->lastTran); 
@@ -1553,16 +1552,9 @@ IVmgr::saveImage(QString filename)
   
   myRenderer->render(renderRoot);
   
-  SbBool result;
-  result = myRenderer->writeToFile(SbString(filename.latin1()),
-				   SbName(filename.section('.',-1)));
 
-#ifdef GRASPITDBG
-  if (result)
-    fprintf(stderr,"saved\n");
-  else
-    fprintf(stderr,"not saved\n");
-#endif
+  myRenderer->writeToFile(SbString(filename.latin1()),
+                          SbName(filename.section('.',-1)));
   
   renderRoot->unref();
   delete myRenderer;

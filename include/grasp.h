@@ -148,7 +148,7 @@ protected:
 
   friend class QMDlg;
 
-signals:
+Q_SIGNALS:
   //! Called when contacts have changes and the wrench spaces need to be updated
   void graspUpdated();
 
@@ -271,7 +271,7 @@ public:
   //! Computes the grasp map matrix G from friction and normal force matrices R and D
   static Matrix graspMapMatrix(const Matrix &R, const Matrix &D);
 
-  //! Sets local contact wrenches into the contact wrench slots so they can be rendered
+  //! Sets local contact wrenches into the contact wrench Q_SLOTS so they can be rendered
   void displayContactWrenches(std::list<Contact*> *contacts, const Matrix &contactWrenches);
   //! Accumulates object wrenches in the external wrench accumulator for the objects
   void accumulateAndDisplayObjectWrenches(std::list<Contact*> *contacts, 

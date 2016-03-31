@@ -46,7 +46,7 @@ void mydlascl(double from,double to,int m,int n,double *A)
 
 /* from sdpsol, for debugging */
 /* print an integer matrix to a stream */
-void disp_imat(FILE *fp,int *ip,int  r, int c,int att)
+void disp_imat(FILE *fp,int *ip,int  r, int c)
 {
     register int i,j;
     register int *rip;
@@ -58,12 +58,10 @@ void disp_imat(FILE *fp,int *ip,int  r, int c,int att)
         fprintf(fp,"|\n");
     }
     fprintf(fp,"\n");
-
-    att = 0;  /* get rid of unused parameter warning */
 }
 
 /* print a double matrix to a stream */
-void disp_mat(FILE *fp, double *dp,int r,int c,int att)
+void disp_mat(FILE *fp, double *dp,int r,int c)
 {
     register int    i,j;
     register double *rdp,dtmp,maxmag=0;
@@ -100,8 +98,6 @@ void disp_mat(FILE *fp, double *dp,int r,int c,int att)
         }
         fprintf(fp,"  \n\n");
     }
-
-    att = 0; /* get rid of unused parameter warning */
 }
 
 
@@ -343,7 +339,7 @@ int maxdet(
     int    iters, minlwork, lwkspc, maxNTiters; /* itmp */
     int    dual_equ_feas=YES, dual_PD_feas=NO;
     int    n, F_sz, F_upsz, max_n, l, G_sz, G_upsz, max_l, sz, M_sz, M_upsz;
-    double t, sqrtt, t_old, y, gap, mu, lambda, alpha[2], beta, psi_ub;
+    double t, sqrtt, t_old, y=0, gap, mu, lambda, alpha[2], beta=0, psi_ub;
     double grad1, grad2, hess1, hess2;
     double *rhs, *GaF, *ZWtmp, *Fsc, *Gsc, *XF, *XG, *dXF, *dXG, *dW, *dZ;
     double *LF, *LG, *LFinv, *LGinv;

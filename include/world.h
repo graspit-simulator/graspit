@@ -203,7 +203,7 @@ protected:
   friend class DynamicBody;
   friend class MainWindow;
 
-signals:
+Q_SIGNALS:
   //! Signal that a dynamic step has been completed
   void dynamicStepTaken();
 
@@ -298,8 +298,8 @@ public:
   //!deselect tendon 
   void deselectTendon();
 
-  //! signals that a tendon has changed status, we need to update the tendon status bar 
-  void tendonChange(){emit tendonDetailsChanged();}
+  //! Q_SIGNALS that a tendon has changed status, we need to update the tendon status bar 
+  void tendonChange(){Q_EMIT tendonDetailsChanged();}
 
   //! Returns the static coefficient of friction between two materials
   double getCOF(int mat1,int mat2) {return cofTable[mat1][mat2];}
@@ -377,7 +377,7 @@ public:
   void addLink(Link *newLink);
 
   //! Called when the user selects a new hand from the drop down menu.
-  void setCurrentHand(Hand *hand) {currentHand = hand; emit handSelectionChanged();}
+  void setCurrentHand(Hand *hand) {currentHand = hand; Q_EMIT handSelectionChanged();}
 
   //! Creates a robot, loads it from a file and adds it to the world
   Robot *importRobot(QString filename);
@@ -496,7 +496,7 @@ public:
   void removeElementFromSceneGraph(WorldElement *e);
 
   //! Emits the signal that informs that grasps have been updated
-  void emitGraspsUpdated(){emit graspsUpdated();}
+  void emitGraspsUpdated(){Q_EMIT graspsUpdated();}
 };
 
 #define WORLD_HXX

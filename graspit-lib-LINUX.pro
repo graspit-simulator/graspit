@@ -1,4 +1,4 @@
-# Linux-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
+    # Linux-specific libraries for GraspIt!. Included from graspit.pro - not for standalone use.
 
 LIBS += $$ADDITIONAL_LINK_FLAGS
 
@@ -33,6 +33,14 @@ OBJECTS_DIR = .obj
 QMAKE_LFLAGS += -rdynamic
 
 #------------------------------------ add-ons --------------------------------------------
+
+graspit_test{
+    INCLUDEPATH += test/
+    SOURCES += test/simple_test.cpp
+    LIBS += -L/usr/lib/ -lgtest
+    TARGET = graspit-test
+    QMAKE_CXXFLAGS += -std=c++0x
+}
 
 cgdb {
         graspit_ros {        
@@ -75,7 +83,8 @@ cgal_qp {
 }
 
 boost {
-	error("Boost linking only tested under Windows")
+
+    LIBS += -L/usr/lib/x86_64-linux-gnu/ -lboost_system
 }
 
 hardwarelib {

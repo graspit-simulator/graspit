@@ -1671,7 +1671,7 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 		moved = true;
 		bool stopRequest = false;
 		//inform whoever is listening a step has been performed
-		emit moveDOFStepTaken(numCols, stopRequest);
+		Q_EMIT moveDOFStepTaken(numCols, stopRequest);
 		if (stopRequest) {
 			DBGP("Receiver of movement signal requests early exit");
 			break;

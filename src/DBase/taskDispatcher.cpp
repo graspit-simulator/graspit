@@ -88,6 +88,10 @@ int TaskDispatcher::connect(std::string host, int port, std::string username,
 	return 0;
 #else
 	DBGA("Task dispatcher only tested using the ROS database manager, which is not available");
+    Q_UNUSED(host);
+    Q_UNUSED(username);
+    Q_UNUSED(password);
+    Q_UNUSED(database);
 	return -1;
 #endif
 }

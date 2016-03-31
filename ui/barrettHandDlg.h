@@ -79,7 +79,7 @@ public:
 	//! Sets the world and extracts from it all the members of this dialog
 	bool setWorld( World *w );
 	
-public slots:
+public Q_SLOTS:
 	//! Calls the initialization procedure on the real hand
 	void initializeHand();
 	//! Makes the simulated hand mimic the posture of the real hand

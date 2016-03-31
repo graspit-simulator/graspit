@@ -114,7 +114,8 @@ int
 GWS::projectTo3D(double *projCoords, std::set<int> fixedCoordSet,
 				 std::vector<position> &hullCoords, std::vector<int> &hullIndices)
 {
-  int i,j,k,validPlanes,numCoords,numInLoop;
+  int i,j,k,numCoords,numInLoop;
+  volatile int validPlanes;
   double **planes;
   int freeCoord[3],fixedCoord[3];
 
@@ -448,11 +449,6 @@ GWS::buildHyperplanesFromWrenches(void *wr, int numWrenches,
 {
   DBGP("Qhull init on " << numWrenches << " wrenches"); 
 
-  int dimensions = 0;
-  for (int d=0; d<6; d++) {
-    if (useDimensions[d]) dimensions++;
-  }
-
   // qhull variables
   coordT *wrenches = (coordT*)wr;
   boolT ismalloc;
@@ -472,7 +468,7 @@ GWS::buildHyperplanesFromWrenches(void *wr, int numWrenches,
 
 
   if ((exitcode = setjmp(qh errexit))) {
-    DBGP("QUALITY: 0 volume in " << dimensions <<"D, quick exit");
+    DBGP("QUALITY: 0 volume, quick exit");
 	qh NOerrexit= True;
 	qh_freeqhull(!qh_ALL);
 	qh_memfreeshort (&curlong, &totlong);
@@ -481,6 +477,11 @@ GWS::buildHyperplanesFromWrenches(void *wr, int numWrenches,
 		  totlong, curlong);
 	if (qhfp) fclose(qhfp);
     return FAILURE;
+  }
+
+  int dimensions = 0;
+  for (int d=0; d<6; d++) {
+    if (useDimensions[d]) dimensions++;
   }
   
   sprintf(options, "qhull Pp n Qx C-0.0001");

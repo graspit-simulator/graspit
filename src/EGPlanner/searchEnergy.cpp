@@ -355,21 +355,20 @@ SearchEnergy::potentialQualityEnergy(bool verbose) const
 		} else contact->mark(false);
 	}
 
-	double gq = -1 ,gv = -1;
+	double gq = -1;
 	//to make computations more efficient, we only use a 3D approximation
 	//of the 6D wrench space
 	std::vector<int> forceDimensions(6,0);
 	forceDimensions[0] = forceDimensions[1] = forceDimensions[2] = 1;
 	if (count >= 3) {
 		mHand->getGrasp()->updateWrenchSpaces(forceDimensions);
-		gq = mEpsQual->evaluate();
-		gv = mVolQual->evaluate();
+		gq = mEpsQual->evaluate();		
 	}
 	if (verbose) {
 		fprintf(stderr,"Quality: %f\n\n",gq);
 	}
 	if (count) {
-		DBGP("Count: " << count << "; Gq: " << gq << "; Gv: " << gv);
+	        DBGP("Count: " << count << "; Gq: " << gq << ";");
 	}
 	return -gq;
 }
@@ -584,7 +583,7 @@ SearchEnergy::dynamicAutograspEnergy() const
 	PRINT_STAT(mOut, "Autograsp done");
 
 	//disable contacts on pedestal
-	Body *obstacle;
+	Body *obstacle=NULL;
 	for (int b=0; b<mHand->getWorld()->getNumBodies(); b++) {
 		Body *bod = mHand->getWorld()->getBody(b);
 		if (bod->isDynamic()) continue;

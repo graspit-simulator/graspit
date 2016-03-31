@@ -129,12 +129,12 @@ class SqlDatabaseManager : public DatabaseManager {
   virtual bool DeleteGrasp(Grasp* /*grasp*/) const  {return false;}
   virtual bool AcquireNextTask(TaskRecord* /*rec*/, std::vector<std::string> /*accepted_types*/){return false;}
   virtual bool SetTaskStatus(int /*task_id*/, const string& /*status*/){return false;}
-  virtual bool GetPlanningTaskRecord(int task_id, PlanningTaskRecord* /*rec*/){return false;}
+  virtual bool GetPlanningTaskRecord(int /*task_id*/, PlanningTaskRecord* /*rec*/){return false;}
   virtual bool SetGraspClusterRep(Grasp* /*grasp*/, bool /*rep*/) const {return false;}
   virtual bool InsertGraspPair(const Grasp* /*grasp1*/, const Grasp* /*grasp2*/) const {return false;}
   virtual bool SetGraspTableClearance(Grasp* /*grasp*/, double /*clearance*/) const { return false;}
   virtual bool LoadModelGeometry(Model*) const {return false;}
-  virtual bool ScaledModel(Model* &model, int scaled_model_id) const {return false;}
+  virtual bool ScaledModel(Model*& /*model*/, int /*scaled_model_id*/ ) const { return false;}
 
   // Translate hand database name into a graspit xml path
   virtual QString getHandGraspitPath(QString handDBName) const;

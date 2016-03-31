@@ -187,7 +187,7 @@ void DistanceCallback::leafTest(const Leaf *l1, const Leaf *l2)
 		const std::list<Triangle>*	list2 = l2->getTriangles();
 		for (it2 = list2->begin(); it2!=list2->end() && mMinDistSq >= 0.0; it2++) {
 			mNumTriangleTests++;
-			position p1,p2;
+			position p1(0,0,0),p2(0,0,0);
 			//both points get computed in the coordinate system of leaf 2
 			double distSq = triangleTriangleDistanceSq(t1, *it2, p1, p2);
 			if (distSq < mMinDistSq) {

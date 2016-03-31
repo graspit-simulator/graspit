@@ -118,7 +118,7 @@ private:
   // void readTorques();
   // void moveBody(Body* bod); 
 
-private slots:
+private Q_SLOTS:
   void readClient();
 
 /*! Deletes this instance of ClientSocket */ 

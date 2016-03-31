@@ -49,9 +49,6 @@
 #include "quality.h"
 #include "graspitGUI.h"
 #include "humanHand.h"
-//#include "about.h"
-//#include "GeometryLibInterface/geometryLibDlgWrapper.h"
-//#include "rosWrapper.h"
 #include "arch.h"
 
 #include "debug.h"
@@ -1326,7 +1323,7 @@ void MainWindow::tendonNamesBoxActivated( int i)
   } else {
     world->deselectTendon();
   }
-  //both of these automatically emit tendonSelectionChanged
+  //both of these automatically Q_EMIT tendonSelectionChanged
 }
 
 
