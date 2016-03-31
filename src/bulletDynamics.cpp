@@ -63,7 +63,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, -10));
+    mBtDynamicsWorld->setGravity(btVector3(0,0, 0));
 }
 
 BulletDynamics::~BulletDynamics()
@@ -213,6 +213,15 @@ void BulletDynamics::addRobot(Robot *robot)
                 btVector3 axisInB;
                 bool useReferenceFrameA;
 
+                btTransform frameInA;
+                btTransform frameInB;
+
+                position dislocation = robot->getChain(f)->getLink(l-1)->getDistalJointLocation();
+                printf("DistalJointLocation location: %f, %f, %f  \n",
+                       dislocation.x(), dislocation.y(), dislocation.z());
+                btVector3 previousDistalJointLocation(dislocation.x(), dislocation.y(), dislocation.z());
+                btVector3 previousDistalRotationAxis(0, 0, 1);
+
                 //if this is the first link, then we need to set it with regard to the base
                 if (l == 0) {
                     rbA = btbase ;
@@ -222,14 +231,16 @@ void BulletDynamics::addRobot(Robot *robot)
                     axisInA= baseaxis;
                     axisInB = currentProximalRotationAxis;
                     useReferenceFrameA = false;
+
+                    frameInA.setIdentity();
+                    frameInB.setIdentity();
+
+                    frameInA.setOrigin(chainpos);
+                    frameInB.setOrigin(currentProximalJointLocation);
                 }
                 //set with regard to the previous link
                 else {
-                    position dislocation = robot->getChain(f)->getLink(l-1)->getDistalJointLocation();
-                    printf("DistalJointLocation location: %f, %f, %f  \n",
-                           dislocation.x(), dislocation.y(), dislocation.z());
-                    btVector3 previousDistalJointLocation(dislocation.x(), dislocation.y(), dislocation.z());
-                    btVector3 previousDistalRotationAxis(0, 0, 1);
+
 
                     rbA = btprevlink;
                     rbB = btcurrentlink;
@@ -238,6 +249,16 @@ void BulletDynamics::addRobot(Robot *robot)
                     axisInA = previousDistalRotationAxis;
                     axisInB = currentProximalRotationAxis;
                     useReferenceFrameA = false;
+
+                    frameInA.setIdentity();
+                    frameInB.setIdentity();
+
+                    frameInA.setOrigin(btVector3(0, 0, 0));
+                    frameInA.getBasis().setValue(1, 0, 0,
+                                                 0, 1, 0,
+                                                 0, 0, 1);
+                    //frameInA.setOrigin(previousDistalJointLocation);
+                    //frameInB.setOrigin(currentProximalJointLocation);
 
                 }
                 newjoint = new btHingeConstraint(*rbA ,
@@ -248,10 +269,37 @@ void BulletDynamics::addRobot(Robot *robot)
                                                  axisInB,
                                                  useReferenceFrameA);
 
-                        //double max = j->getMax();
-                        //double min = j->getMin();
-                        //newjoint->setLimit(min-M_PI_2,max-M_PI_2);
-                        //std::cout << "Joint Limits: "<< min << " : " << max << " current: " << j->getVal()<< std::endl;
+
+                //btJointMap.insert(btJointPair(j,newjoint));
+
+                        double max = j->getMax();
+                        double min = j->getMin();
+
+//                        if (max < -M_PI)
+//                        {
+//                            max += (2*M_PI);
+//                        }
+//                        if (max > M_PI)
+//                        {
+//                            max -= (2*M_PI);
+//                        }
+
+//                        if (min < -M_PI)
+//                        {
+//                            min += (2*M_PI);
+//                        }
+//                        if (min > M_PI)
+//                        {
+//                            min -= (2*M_PI);
+//                        }
+
+
+
+
+                        //newjoint->setFrames(frameInA, frameInB);
+                        //newjoint->setLimit(min,max);
+                        std::cout << "Joint Limits: "<< min << " : " << max << " current: " << j->getVal()<< "current2: " << newjoint->getHingeAngle()<<  std::endl;
+
 
                 bool disable_collision_between_rbA_rbB = true;
                 mBtDynamicsWorld->addConstraint(newjoint , disable_collision_between_rbA_rbB);
@@ -428,6 +476,11 @@ void BulletDynamics::turnOffDynamics()
 
 
 void BulletDynamics::btApplyInternalWrench (Joint * activeJoint, double magnitude, std::map<Body*, btRigidBody*> btBodyMap) {
+        //currently if magnitude is fixed, the hand moves fine no matter how it is oriented.
+        //so I believe this function is fine, it is the magnitude that is incorrect.
+//        magnitude = -0.1;
+//        std::cout << "magnitude: " << magnitude <<std::endl;
+        //assert(false);
 
         vec3 worldAxis=activeJoint->getWorldAxis();
 
@@ -442,31 +495,33 @@ void BulletDynamics::btApplyInternalWrench (Joint * activeJoint, double magnitud
 
         btVector3 torqueNext(magnitude*worldAxis.x(),magnitude*worldAxis.y(), magnitude*worldAxis.z());
         btNextLink->applyTorqueImpulse(torqueNext);
-
 }
 
 int BulletDynamics::stepDynamics()
 {
+    double timeStep=1.0f/60.f;
 
-    mBtDynamicsWorld->stepSimulation(1.f/60.f,10);
+    mBtDynamicsWorld->stepSimulation(timeStep,10);
     for (int j=mBtDynamicsWorld->getNumCollisionObjects()-1; j>=0 ;j--)
     {
-        // FEEDBACK TO GRASPIT
         btCollisionObject* obj = mBtDynamicsWorld->getCollisionObjectArray()[j];
         btRigidBody* body = btRigidBody::upcast(obj);
+
         btTransform feedbacktransform = body->getCenterOfMassTransform();
         btQuaternion btrotation = feedbacktransform.getRotation();
         btVector3 bttranslation = feedbacktransform.getOrigin();
-        Body* tempbody = mWorld->getBody(j);
+
         Quaternion* rot = new Quaternion(btrotation.getAngle() ,
-                                         vec3(btrotation.getAxis()[0] , btrotation.getAxis()[1] ,
+                                         vec3(btrotation.getAxis()[0] ,
+                                         btrotation.getAxis()[1] ,
                 btrotation.getAxis()[2]) );
         vec3* transl = new vec3(bttranslation.getX() , bttranslation.getY() , bttranslation.getZ());
         Quaternion rotfix = *rot;
         vec3 translfix = *transl;
         transf* temptrans2 = new transf(rotfix , translfix) ;
-        transf temptrans2fix = *temptrans2;
-        tempbody->setTran(temptrans2fix);
+
+        Body* tempbody = mWorld->getBody(j);
+        tempbody->setTran(*temptrans2);
 
         //update the bullet velocity to graspit velocity in order to calculate friction
         btVector3 btAngularVelocity=body->getAngularVelocity ();
@@ -480,45 +535,40 @@ int BulletDynamics::stepDynamics()
         }
     }
     // --------------------------add torque--------------------------------------------------
-    double timeStep=1.0f/60.f;
+
     mWorld->resetDynamicWrenches();
 
     for (int i = 0; i < mWorld->getNumRobots(); i++) {
+
         Robot* robot=mWorld->getRobot(i);
+
+        //need to update the joint world axis, values, and velocities...
+        //this currently recomputes the joint values even though bullet has already done this for us..
         robot->updateJointValuesFromDynamics();
-        int numDOF=robot->getNumDOF();
 
-        DBGP("Updating setpoints");
-        for (int d = 0; d < numDOF; d++) {
-            DOF * dof = robot->getDOF(d);
-            dof->updateSetPoint();
-            printf("DOF: %d, dof val: %lf, set point: %lf, desired pos: %lf \n",d, dof->getVal(),dof->getSetPoint(),dof->getDesiredPos());
-        }
+        //apply torque to dofs
+        for (int d=0; d<robot->getNumDOF(); d++) {
 
-
-        for (int d=0;d<numDOF;d++) {
-            //FROM GRASPIT DYNAMICS THIS IS EQUIVALENT TO robot.DOFCONTROLLER()
             DOF * dof=robot->getDOF(d);
-            //this updates the dof setForce to
-            //compute a force that should be applied to the DOF to correct the error.  The
-            //gains for this controller are read from the robot configuration file.
+            dof->updateSetPoint();
             dof->callController(timeStep);
 
-            double magnitude=robot->getDOF(d)->getForce();
+            double magnitude=dof->getForce()/10e6;
+            if (magnitude !=0)
+            {
+                 btApplyInternalWrench(dof->getJointList().at(0),  magnitude,  btBodyMap);
+            }
 
             printf("DOF: %d getForce:%lf ,desired:%lf  \n",d, dof->getForce(), dof->getDesiredForce());
-
-            //1. change torque(?) to torque(N.mm)
-            magnitude=magnitude/10e6;
-
             printf("DOF: %d, Joint %d, apply torque: %lf N.mm  \n",d, 0, magnitude);
-            btApplyInternalWrench(dof->getJointList().at(0),  magnitude,  btBodyMap);
-
         }
+
         // --------------------------add friction--------------------------------------------------
         for (int c = 0; c < robot->getNumChains(); c++) {
             for (int j = 0; j < robot->getChain(c)->getNumJoints(); j++) {
                 Joint *tempjoint=robot->getChain(c)->getJoint(j);
+
+                std::cout << " current: j->getVal()" << tempjoint->getVal()<< std::endl;
 
                 double frictionForce = tempjoint->getFriction()/10e6;
                 btApplyInternalWrench(tempjoint,frictionForce,btBodyMap);

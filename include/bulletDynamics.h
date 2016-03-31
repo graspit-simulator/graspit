@@ -33,7 +33,7 @@
 
 class btDiscreteDynamicsWorld;
 class btRigidBody;
-
+class btHingeConstraint;
 class World;
 
 class BulletDynamics : public DynamicsEngine {
@@ -55,9 +55,11 @@ class BulletDynamics : public DynamicsEngine {
   btDiscreteDynamicsWorld* mBtDynamicsWorld;
   btAlignedObjectArray<btRigidBody*> mBtLinks;
   
-
   typedef std::pair<Body*, btRigidBody*> btBodyPair;
   std::map<Body*, btRigidBody*> btBodyMap;
+
+  typedef std::pair<Body*, btHingeConstraint*> btJointPair;
+  std::map<Joint*, btHingeConstraint*> btJointMap;
 };
 
 #endif

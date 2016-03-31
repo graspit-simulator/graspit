@@ -201,7 +201,7 @@ DOF::callController(double timeStep)
 	//call the appropriate controller
 	double newForce = PDPositionController(timeStep);
 	//actually sets the force
-	setForce(newForce);
+    setForce(newForce);
 
 	mForceHistory.push_front(newForce);
 	while ((int)mForceHistory.size() > mHistoryMaxSize) {
@@ -218,22 +218,50 @@ DOF::callController(double timeStep)
 double
 DOF::PDPositionController(double timeStep)
 {
-	double error = mErrorHistory.front(), lastError;
+    double error = mErrorHistory.front();
+    double lastError;
 	if (mErrorHistory.size() >= 2) {
 		lastError = *(++mErrorHistory.begin());
-	} else {
+    }
+    else if(mErrorHistory.size() == 0) {
+        error = 0;
+        lastError = 0;
+    }
+    else {
 		lastError = error;
 	}
 
-	double newForce;
-	newForce = Kp * error + Kv * (error-lastError)/timeStep;
+    if (error < -M_PI)
+    {
+        error += (2*M_PI);
+    }
 
-    std::cout << "DOF " << getDOFNum() ;
-    std::cout << "setPoint ="<<setPoint<<" error ="<<error<<" edot = "<<(error-lastError);
-    std::cout << "proportional: "<<error<<"*"<<Kp<<"="<<error*Kp;
-    std::cout << "derivative: "<<Kv<<"*"<<(error-lastError)/timeStep;
-    std::cout << "cap: "<<getMaxForce()*0.8 << " Force: "<<newForce;
-    std::cout << "e " << error << " de " << error-lastError << " ts " << timeStep << " f " << newForce << std::endl;
+    if (lastError < -M_PI)
+    {
+        lastError += (2*M_PI);
+    }
+
+
+    if (error > M_PI)
+    {
+        error -= (2*M_PI);
+    }
+
+    if (lastError > M_PI)
+    {
+        lastError -= (2*M_PI);
+    }
+
+	double newForce;
+    newForce = Kp * error + Kv * (error-lastError)/timeStep;
+
+    std::cout << "PDPositionController: DOF " << getDOFNum() << std::endl ;
+    std::cout << "PDPositionController: error =" << error << std::endl;
+    std::cout << "PDPositionController: setPoint =" << setPoint << " error ="<<error<<" edot = "<<(error-lastError) << std::endl;
+    std::cout << "PDPositionController: proportional: "<<error<<"*"<<Kp<<"="<<error*Kp << std::endl;
+    std::cout << "PDPositionController: derivative: "<<Kv<<"*"<<(error-lastError)/timeStep << std::endl;
+    std::cout << "PDPositionController: cap: "<<getMaxForce()*0.8 << " Force: "<<newForce << std::endl;
+    std::cout << "PDPositionController: e " << error << " de " << error-lastError << " ts " << timeStep << " f " << newForce << std::endl;
 	return newForce;
 }
 
