@@ -20,23 +20,20 @@ UI_DIR = ui
 
 # ---------------------- Graspit source code ----------------------------------------------
 
-INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots ui ui/Planner ui/EGPlanner
+INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots include/dynamics ui ui/Planner ui/EGPlanner
 
-DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots ui ui/Planner ui/EGPlanner
+DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots include/dynamics ui ui/Planner ui/EGPlanner
 
 HEADERS	+= include/body.h \
 	include/bBox.h \
 	include/bbox_inl.h \
-        include/bulletDynamics.h \
 	include/contact.h \
 	include/contactSetting.h \
 	include/debug.h \
 	include/dof.h \
-	include/dynamics.h \
 	include/eigenGrasp.h \
 	include/gloveInterface.h \
 	include/grasp.h \
-        include/graspitDynamics.h \
 	include/graspRecord.h \
 	include/gws.h \
 	include/gwsprojection.h \
@@ -68,11 +65,15 @@ HEADERS	+= include/body.h \
 	include/graspitGUI.h \
 	include/graspitServer.h \
 	include/graspitApp.h \
-	include/dynJoint.h \
 	include/arch.h \
 	include/math/matrix.h \
 	src/Collision/collisionInterface.h \
 	src/Collision/collisionStructures.h \
+        include/dynamics/dynamics.h \
+        include/dynamics/dynamicsEngine.h \
+        include/dynamics/dynJoint.h \
+        include/dynamics/graspitDynamics.h \
+        include/dynamics/bulletDynamics.h \
 	include/Planner/grasp_visualization.h \
 	include/Planner/grasp_tester.h \
 	include/Planner/grasp_preshape.h \
@@ -112,19 +113,15 @@ HEADERS	+= include/body.h \
 SOURCES	+= src/arch.cpp \
 	src/bBox.cpp \
 	src/body.cpp \
-        src/bulletDynamics.cpp \
 	src/contact.cpp \
 	src/contactSetting.cpp \
 	src/dof.cpp \
-	src/dynamics.cpp \
-	src/dynJoint.cpp \
 	src/eigenGrasp.cpp \
 	src/gloveInterface.cpp \
 	src/grasp.cpp \
 	src/graspitGUI.cpp \
 	src/graspitServer.cpp \
 	src/graspitApp.cpp \
-        src/graspitDynamics.cpp \
 	src/graspRecord.cpp \
 	src/gws.cpp \
 	src/gwsprojection.cpp \
@@ -152,6 +149,10 @@ SOURCES	+= src/arch.cpp \
 	src/worldElementFactory.cpp \
 	src/math/matrix.cpp \
 	src/Collision/collisionInterface.cpp \
+        src/dynamics/dynamics.cpp \
+        src/dynamics/bulletDynamics.cpp \
+        src/dynamics/graspitDynamics.cpp \
+        src/dynamics/dynJoint.cpp \
 	src/Planner/grasp_visualization.cpp \
 	src/Planner/grasp_tester.cpp \
 	src/Planner/grasp_preshape.cpp \
@@ -461,6 +462,14 @@ eigengrids {
                eigengrids/intersection_triangle.h
 
 }
+
+
+# ---------------------- Graspit Dynamics ----------------------------------
+
+graspit_dynamics{
+    DEFINES += GRASPIT_DYNAMICS
+}
+
 
 #-------------------------------------- Optimizer ---------------------
 

@@ -2,9 +2,13 @@
 
 LIBS += $$ADDITIONAL_LINK_FLAGS
 
-# ---------------------- Bullet ----------------------------------
+# ---------------------- Bullet Dynamics ----------------------------------
+
+bullet_dynamics{
+
 !exists($(BULLET_PHYSICS_SOURCE_DIR)) {
-                error("Bullet not installed or BULLET_PHYSICS_SOURCE_DIR environment variable not set")
+                error("Bullet not installed or BULLET_PHYSICS_SOURCE_DIR environment variable not set. Please insure bullet is installed \
+                        and run: export BULLET_PHYSICS_SOURCE_DIR=~/bullet3-2.83.7/ or equivalent.")
         }
 
 exists($(BULLET_PHYSICS_SOURCE_DIR)) {
@@ -21,6 +25,9 @@ LIBS += -lBulletDynamics
 LIBS += -lLinearMath
 LIBS += -lBulletCollision
 
+DEFINES += BULLET_DYNAMICS
+
+}
 
 # ---------------------- Blas and Lapack ----------------------------------
 

@@ -17,11 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Matei T. Ciocarlie
+// Author(s): Matei T. Ciocarlie, Jake Varley
 //
 // $Id:$
 //
 //######################################################################
+
+#ifdef BULLET_DYNAMICS
 
 #include "bulletDynamics.h"
 
@@ -618,3 +620,5 @@ int BulletDynamics::computeNewVelocities(double timeStep) {
     Q_UNUSED(timeStep)
     return 0;
 }
+
+#endif

@@ -17,7 +17,11 @@ CONFIG += graspitdbg
 
 #select collision detection engine
 #possible values: graspit_collision pqp_collision
-COLLISION = graspit_collision
+CONFIG += graspit_collision
+
+#select collision detection engine
+#possible values: graspit_dynamics bullet_dynamics
+CONFIG += graspit_dynamics
 
 #select blas and lapack libraries, Windows-only
 #possible values: mkl clapack
@@ -47,13 +51,12 @@ CONFIG +=  $$COLLISION $$LAPACK
 DEFINES += GRASPIT_EXPORTS
 DEFINES += QT_NO_KEYWORDS
 
-#graspitdbg {
-#    CONFIG += debug
-#} else {
-#    CONFIG += release
-#    DEFINES += GRASPIT_RELEASE
-#}
-CONFIG += debug
+graspitdbg {
+    CONFIG += debug
+} else {
+    CONFIG += release
+    DEFINES += GRASPIT_RELEASE
+}
 
 win32 {
 	include(graspit-lib-WINDOWS.pro)

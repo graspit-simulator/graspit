@@ -50,9 +50,7 @@
 #include "contact.h"
 #include "contactSetting.h"
 #include "ivmgr.h"
-#include "dynamics.h"
 #include "grasp.h"
-#include "dynJoint.h"
 #include "ivmgr.h"
 #include "barrett.h"
 #include "matvec3D.h"
@@ -61,8 +59,9 @@
 #include "tinyxml.h"
 #include "worldElementFactory.h"
 
-//#undef PQP_COLLISION
-//#undef GRASPIT_COLLISION
+#include "dynamics/dynamics.h"
+#include "dynamics/dynJoint.h"
+#include "dynamics/dynamicsEngine.h"
 
 #ifdef PQP_COLLISION
 #include "PQPCollision.h"
@@ -71,13 +70,11 @@
 #include "Graspit/graspitCollision.h"
 #endif
 
-#define BULLET_DYNAMICS
-
 #ifdef GRASPIT_DYNAMICS
-#include "graspitDynamics.h"
+#include "dynamics/graspitDynamics.h"
 #endif
 #ifdef BULLET_DYNAMICS
-#include "bulletDynamics.h"
+#include "dynamics/bulletDynamics.h"
 #endif
 
 //simulations of arches with John Ochsendorf
@@ -89,7 +86,6 @@
 
 FILE *errFP=NULL;
 
-//#define GRASPITDBG
 #include "debug.h"
 
 //#define PROF_ENABLED
