@@ -127,6 +127,10 @@ void BulletDynamics::addBody(Body *newBody)
             new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0 , 0)));
     btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,triMeshShape,localInertia);
     btRigidBody* body = new btRigidBody(rbInfo);
+
+    body->setFriction(1.0);
+    body->setRollingFriction(1.0);
+
     // avoid deactive
     body->setSleepingThresholds(0,0);
 
@@ -505,39 +509,32 @@ int BulletDynamics::stepDynamics()
     double timeStep=1.0f/60.f;
 
     mBtDynamicsWorld->stepSimulation(timeStep,10);
-    for (int j=mBtDynamicsWorld->getNumCollisionObjects()-1; j>=0 ;j--)
-    {
-        btCollisionObject* obj = mBtDynamicsWorld->getCollisionObjectArray()[j];
-        btRigidBody* body = btRigidBody::upcast(obj);
 
-        btTransform feedbacktransform = body->getCenterOfMassTransform();
-        btQuaternion btrotation = feedbacktransform.getRotation();
-        btVector3 bttranslation = feedbacktransform.getOrigin();
+    computeNewVelocities(timeStep);
+    moveDynamicBodies(mWorld->getTimeStep());
 
-        Quaternion* rot = new Quaternion(btrotation.getAngle() ,
-                                         vec3(btrotation.getAxis()[0] ,
-                                         btrotation.getAxis()[1] ,
-                btrotation.getAxis()[2]) );
-        vec3* transl = new vec3(bttranslation.getX() , bttranslation.getY() , bttranslation.getZ());
-        Quaternion rotfix = *rot;
-        vec3 translfix = *transl;
-        transf* temptrans2 = new transf(rotfix , translfix) ;
+    return 0;
+}
 
-        Body* tempbody = mWorld->getBody(j);
-        tempbody->setTran(*temptrans2);
 
-        //update the bullet velocity to graspit velocity in order to calculate friction
-        btVector3 btAngularVelocity=body->getAngularVelocity ();
-        btVector3 btLinearVelocity=body->getLinearVelocity () ;
 
-        /*! Sets the current 6x1 velocity vector [vx vy vz vrx vry vrz] */
-        double newvelocity[6]={btLinearVelocity.x(), btLinearVelocity.y(),btLinearVelocity.z(),btAngularVelocity.x(), btAngularVelocity.y(),btAngularVelocity.z()};
-        if(tempbody->isDynamic()){
-            DynamicBody * tempdynbody=(DynamicBody *)tempbody;
-            tempdynbody->setVelocity(newvelocity);
-        }
-    }
-    // --------------------------add torque--------------------------------------------------
+/*! One of the two main functions of the dynamics time step. This function is 
+called to move the bodies according to the velocities and accelerations found
+in the previous step. The move is attempted for the duration of the time step 
+given in \a timeStep.
+
+After all the bodies are moved, then collisions are checked. If any collisions
+are found, the move is traced back and the value of the times step is 
+interpolated until the exact moment of contact is found. The actual value
+of the time step until contact is made is returned. If interpolation fails,
+a negative actual time step is returned. All the resulting contacts are added
+to the bodies that are in contact to be used for subsequent computations.
+
+The same procedure is carried out if, by executing a full time step, a joint
+ends up outside of its legal range.
+*/
+double BulletDynamics::moveDynamicBodies(double timeStep) {
+    mWorld->findAllContacts();
 
     mWorld->resetDynamicWrenches();
 
@@ -579,29 +576,6 @@ int BulletDynamics::stepDynamics()
             }
         }
     }
-
-    return 0;
-}
-
-
-
-/*! One of the two main functions of the dynamics time step. This function is 
-called to move the bodies according to the velocities and accelerations found
-in the previous step. The move is attempted for the duration of the time step 
-given in \a timeStep.
-
-After all the bodies are moved, then collisions are checked. If any collisions
-are found, the move is traced back and the value of the times step is 
-interpolated until the exact moment of contact is found. The actual value
-of the time step until contact is made is returned. If interpolation fails,
-a negative actual time step is returned. All the resulting contacts are added
-to the bodies that are in contact to be used for subsequent computations.
-
-The same procedure is carried out if, by executing a full time step, a joint
-ends up outside of its legal range.
-*/
-double BulletDynamics::moveDynamicBodies(double timeStep) {
-    Q_UNUSED(timeStep);
     return 0;
 }
 
@@ -617,7 +591,40 @@ to build and solve the LCP to find the velocities of all the bodies
 in the next iteration.
 */  
 int BulletDynamics::computeNewVelocities(double timeStep) {
-    Q_UNUSED(timeStep)
+    Q_UNUSED(timeStep);
+
+    for (int j=mBtDynamicsWorld->getNumCollisionObjects()-1; j>=0 ;j--)
+    {
+        btCollisionObject* obj = mBtDynamicsWorld->getCollisionObjectArray()[j];
+        btRigidBody* body = btRigidBody::upcast(obj);
+
+        btTransform feedbacktransform = body->getCenterOfMassTransform();
+        btQuaternion btrotation = feedbacktransform.getRotation();
+        btVector3 bttranslation = feedbacktransform.getOrigin();
+
+        Quaternion* rot = new Quaternion(btrotation.getAngle() ,
+                                         vec3(btrotation.getAxis()[0] ,
+                                         btrotation.getAxis()[1] ,
+                btrotation.getAxis()[2]) );
+        vec3* transl = new vec3(bttranslation.getX() , bttranslation.getY() , bttranslation.getZ());
+        Quaternion rotfix = *rot;
+        vec3 translfix = *transl;
+        transf* temptrans2 = new transf(rotfix , translfix) ;
+
+        Body* tempbody = mWorld->getBody(j);
+        tempbody->setTran(*temptrans2);
+
+        //update the bullet velocity to graspit velocity in order to calculate friction
+        btVector3 btAngularVelocity=body->getAngularVelocity ();
+        btVector3 btLinearVelocity=body->getLinearVelocity () ;
+
+        /*! Sets the current 6x1 velocity vector [vx vy vz vrx vry vrz] */
+        double newvelocity[6]={btLinearVelocity.x(), btLinearVelocity.y(),btLinearVelocity.z(),btAngularVelocity.x(), btAngularVelocity.y(),btAngularVelocity.z()};
+        if(tempbody->isDynamic()){
+            DynamicBody * tempdynbody=(DynamicBody *)tempbody;
+            tempdynbody->setVelocity(newvelocity);
+        }
+    }
     return 0;
 }
 
