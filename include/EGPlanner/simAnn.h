@@ -91,17 +91,17 @@ private:
 	double prob(double e_old, double e_new, double t);
 	double cooling(double t0, double c, int k, int d);
 	//! Computes a neighbor of a given HandObjectState
-	GraspPlanningState* stateNeighbor(GraspPlanningState *s, double T, GraspPlanningState *t = NULL);
+    virtual GraspPlanningState* stateNeighbor(GraspPlanningState *s, double T, GraspPlanningState *t = NULL);
 	//! Computes the neighbor of one individual variable
-	void variableNeighbor(VariableSet *set, double T, VariableSet *target = NULL);
-	double neighborDistribution(double T);
-	double neighborInverse(double T, double y);
+    virtual void variableNeighbor(VariableSet *set, double T, VariableSet *target = NULL);
+    virtual double neighborDistribution(double T);
+    virtual double neighborInverse(double T, double y);
 	//! Generates neighbors according to a desired value, or "input", along each dimension
-	double biasedNeighborDistribution(double T, double in, double conf);
+    virtual double biasedNeighborDistribution(double T, double in, double conf);
 
 public:
 	SimAnn();
-	~SimAnn();
+    virtual ~SimAnn();
 
 	//! The main interface to this class. Performs one annealing step
 	Result iterate(GraspPlanningState *currentState, SearchEnergy *energyCalculator, GraspPlanningState *targetState = NULL);
