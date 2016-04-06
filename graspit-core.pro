@@ -35,7 +35,6 @@ HEADERS	+= include/body.h \
 	include/eigenGrasp.h \
 	include/gloveInterface.h \
 	include/grasp.h \
-	include/graspRecord.h \
 	include/gws.h \
 	include/gwsprojection.h \
 	include/ivmgr.h \
@@ -130,7 +129,6 @@ SOURCES	+= src/arch.cpp \
 	src/graspitGUI.cpp \
 	src/graspitServer.cpp \
 	src/graspitApp.cpp \
-	src/graspRecord.cpp \
 	src/gws.cpp \
 	src/gwsprojection.cpp \
 	src/ivmgr.cpp \
