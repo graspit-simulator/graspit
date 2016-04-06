@@ -65,13 +65,15 @@ protected:
     virtual double energy() const = 0;
 
     //! Checks if the current state is legal or not (usually legal means no interpenetrations)
-    bool legal() const;
+    virtual bool legal() const;
 
     void setHandAndObject(Hand *h, Body *o);
 
     void createQualityMeasures();
 
     void setType(SearchEnergyType _mType){mType = _mType;}
+
+    SearchEnergy();
 
 public:
 
@@ -100,7 +102,6 @@ public:
 
     virtual ~SearchEnergy();
 
-    SearchEnergy();
 };
 
 #endif
