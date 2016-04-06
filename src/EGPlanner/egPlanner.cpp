@@ -259,6 +259,7 @@ EGPlanner::setEnergyType(SearchEnergyType s)
 	assert (mEnergyCalculator);
     if (!mEnergyCalculator->isType(s))
     {
+        delete mEnergyCalculator;
         mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
     }
 }

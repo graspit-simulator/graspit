@@ -186,30 +186,46 @@ double SearchEnergy::getVolQual(){
 
 SearchEnergy * SearchEnergy::getSearchEnergy(SearchEnergyType type)
 {
+    SearchEnergy *se;
+
     switch (type)
     {
     case ENERGY_CONTACT:
-        return new ContactEnergy();
+        se = new ContactEnergy();
+        break;
     case ENERGY_POTENTIAL_QUALITY:
-         return new PotentialQualityEnergy();
+        se =  new PotentialQualityEnergy();
+        break;
     case ENERGY_AUTOGRASP_QUALITY:
-        return new AutoGraspQualityEnergy();
+        se =  new AutoGraspQualityEnergy();
+        break;
     case ENERGY_CONTACT_QUALITY:
-        return new GuidedPotentialQualityEnergy();
+        se =  new GuidedPotentialQualityEnergy();
+        break;
     case ENERGY_GUIDED_AUTOGRASP:
-        return new GuidedAutoGraspQualityEnergy();
+        se =  new GuidedAutoGraspQualityEnergy();
+        break;
     case ENERGY_STRICT_AUTOGRASP:
-        return new StrictAutoGraspEnergy();
+        se =  new StrictAutoGraspEnergy();
+        break;
     case ENERGY_COMPLIANT:
-        return new CompliantEnergy();
+        se =  new CompliantEnergy();
+        break;
     case ENERGY_DYNAMIC:
-        return new DynamicAutoGraspEnergy();
+        se =  new DynamicAutoGraspEnergy();
+        break;
     case ENERGY_CLOSURE:
-        return new ClosureSearchEnergy();
+        se =  new ClosureSearchEnergy();
+        break;
     default:
-        std::cout << "INVALID SEARCH ENERGY TYPE" << std::endl;
+        std::cout << "INVALID SEARCH ENERGY TYPE: " <<  type << std::endl;
         return NULL;
     }
+
+    se->setType(type);
+    return se;
 }
+
+
 
 

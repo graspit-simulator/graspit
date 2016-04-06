@@ -71,6 +71,8 @@ protected:
 
     void createQualityMeasures();
 
+    void setType(SearchEnergyType _mType){mType = _mType;}
+
 public:
 
     static SearchEnergy * getSearchEnergy(SearchEnergyType t);
