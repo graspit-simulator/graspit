@@ -82,7 +82,7 @@ protected:
 	//! The current state of the planner (see the HandObjectState class for details)
 	GraspPlanningState *mCurrentState;
 	//! The instance of the SearchEnergy class that this planner can use to compute the "quality" of a state
-	SearchEnergy *mEnergyCalculator;
+    SearchEnergy *mEnergyCalculator;
 
 	//! How many iterations this planner has done since the last reset
 	int mCurrentStep;

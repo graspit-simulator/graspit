@@ -4,7 +4,7 @@
 
 #----------------------general settings--------------------
 
-QT +=  qt3support 
+QT +=  qt3support
 
 CONFIG += qt warn_on exceptions assistant
 
@@ -20,9 +20,9 @@ UI_DIR = ui
 
 # ---------------------- Graspit source code ----------------------------------------------
 
-INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots ui ui/Planner ui/EGPlanner
+INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner include/EGPlanner/energy include/robots
 
-DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner include/robots ui ui/Planner ui/EGPlanner
+DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner include/EGPlanner/energy include/robots
 
 HEADERS	+= include/body.h \
 	include/bBox.h \
@@ -84,7 +84,16 @@ HEADERS	+= include/body.h \
 	include/EGPlanner/simAnn.h \
 	include/EGPlanner/searchState.h \
 	include/EGPlanner/searchStateImpl.h \
-	include/EGPlanner/searchEnergy.h \
+        include/EGPlanner/energy/searchEnergy.h \
+        include/EGPlanner/energy/autograspQualityEnergy.h \
+        include/EGPlanner/energy/compliantEnergy.h \
+        include/EGPlanner/energy/contactEnergy.h \
+        include/EGPlanner/energy/dynamicAutograspEnergy.h \
+        include/EGPlanner/energy/guidedAutoGraspEnergy.h \
+        include/EGPlanner/energy/strictAutoGraspEnergy.h \
+        include/EGPlanner/energy/guidedPotentialQualityEnergy.h \
+        include/EGPlanner/energy/potentialQualityEnergy.h \
+        include/EGPlanner/energy/closureSearchEnergy.h \
 	include/EGPlanner/onLinePlanner.h \
 	include/EGPlanner/egPlanner.h \
 	include/EGPlanner/simAnnPlanner.h \
@@ -160,7 +169,16 @@ SOURCES	+= src/arch.cpp \
 	src/EGPlanner/simAnn.cpp \
 	src/EGPlanner/searchState.cpp \
 	src/EGPlanner/searchStateImpl.cpp \
-	src/EGPlanner/searchEnergy.cpp \
+        src/EGPlanner/energy/searchEnergy.cpp \
+        src/EGPlanner/energy/autograspQualityEnergy.cpp \
+        src/EGPlanner/energy/compliantEnergy.cpp \
+        src/EGPlanner/energy/contactEnergy.cpp \
+        src/EGPlanner/energy/dynamicAutograspEnergy.cpp \
+        src/EGPlanner/energy/guidedAutoGraspEnergy.cpp \
+        src/EGPlanner/energy/strictAutoGraspEnergy.cpp \
+        src/EGPlanner/energy/guidedPotentialQualityEnergy.cpp \
+        src/EGPlanner/energy/potentialQualityEnergy.cpp \
+        src/EGPlanner/energy/closureSearchEnergy.cpp \
 	src/EGPlanner/onLinePlanner.cpp \
 	src/EGPlanner/egPlanner.cpp \
 	src/EGPlanner/simAnnPlanner.cpp \
