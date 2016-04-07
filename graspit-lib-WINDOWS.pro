@@ -33,8 +33,7 @@ mkl {
 }
 
 # ---------------------- General libraries and utilities ----------------------------------
-!exists(($QHULLDIR))
-{
+!exists(($QHULLDIR)){
      warning("QHULLDIR not set. Assuming QHULLDIR=$PWD/qhull")
      QHULL=qhull
 }else{
