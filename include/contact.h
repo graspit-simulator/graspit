@@ -28,6 +28,8 @@
  */
 #ifndef CONTACT_HXX
 
+#include <QtGlobal>
+
 #include <Inventor/nodes/SoSeparator.h>
 #include <list>
 #include <vector>
@@ -197,7 +199,7 @@ public:
 
   //! Initializes an empty contact (not really used)
   Contact() : body1(NULL),body2(NULL),mate(NULL),cof(0.0),
-	contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL), isRendered(false) {}
+    contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL),isRendered(false) , wrench(NULL){}
 
   //! Constructs a contact between two bodies 
   Contact(Body *b1,Body *b2, position pos, vec3 norm);
@@ -351,7 +353,7 @@ public:
   //! Only used in SoftFinger contact
   virtual mat3 getCommonFrameRot(){ return mat3::IDENTITY; }
   //! Render the ellipse
-  virtual void renderEllipse(SoSeparator* root, std::vector<position> points){}
+  virtual void renderEllipse(SoSeparator* root, std::vector<position> points){Q_UNUSED(root); Q_UNUSED(points);}
 
   bool getRendered() {return isRendered;}
   void setRendered() {isRendered = true;}
@@ -459,7 +461,7 @@ public:
 
 	//! Visual indicator is a small patch of the fit analytical surface on the body
 	SoSeparator* getVisualIndicator();
-	virtual mat3 getRot(){return fitRot;};
+    virtual mat3 getRot(){return fitRot;}
 	//! Also attempt to apply some torques in the contact plane; currently disabled.
 	virtual void computeWrenches();
 
@@ -468,9 +470,9 @@ public:
 
 	virtual mat3 getCommonFrameRot(){ return commonRot; }
 
-	virtual void renderEllipse(SoSeparator* root, std::vector<position> points);
-
 	double getNForceSimulated(){ return nForceSimulated; }
+
+    virtual void renderEllipse(SoSeparator* root, std::vector<position> points);
 };
 
 //! A contact that exists even when a hand is not perfectly touching another object

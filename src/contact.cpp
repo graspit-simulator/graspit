@@ -873,7 +873,7 @@ int SoftContact::CalcRelPhi( )
 
 	//A very very lame solution to the offset between self's coordinates and the common axes
 	//The direction is from self's x-axis towards body2's x-axis
-	double err_absolute = 100, offset;
+    double err_absolute = 100, offset=-1;
 	for(double tmp = 0; tmp <= relPhi; tmp += 0.5*M_PI/180.0)
 	{
 		//the tmp is the angle between the contact frame on THIS body and the frame on that body
@@ -934,8 +934,6 @@ int SoftContact::CalcRelPhi( )
 	vec3 commonFrameAxis;
 	commonFrameAxis = m * temp;
 
-	transf contactInWorld = frame * body1->getTran();
-	transf localPoa = curvatureFrameInContact * contactInWorld;
 #ifdef TACTILE_DEBUG
 
 	std::cout << "-----------\n";
@@ -945,8 +943,10 @@ int SoftContact::CalcRelPhi( )
 	std::cout << "relative phi: relPhi_1= " << relPhi << ", relPhi_2= " << ((SoftContact *)getMate())->relPhi << std::endl;
 	//std::cout << "contactNormal w.r.t b1 = [" << normal[0] << ", " << normal[1] << ", " << normal[2] << "]" << std::endl;
 	//std::cout << "contact loc in world: crot = <" << contactPose.rotation().w << "," << contactPose.rotation().x << "," << contactPose.rotation().y << ", " << contactPose.rotation().z << ">  loc = [" << contactPose.translation().x() << ", " <<  contactPose.translation().y() << ", " << contactPose.translation().z() << "]" << std::endl;
-	//contactInWorld.rotation().ToRotationMatrix(m);
+    //transf contactInWorld = frame * body1->getTran();
+    //contactInWorld.rotation().ToRotationMatrix(m);
 	//printMat(m,"contact");
+    //transf localPoa = curvatureFrameInContact * contactInWorld;
 	//localPoa.rotation().ToRotationMatrix(m);
 	//printMat(m,"poa");
 
@@ -1391,7 +1391,7 @@ VirtualContact::getWorldNormal()
 int
 VirtualContact::setUpFrictionEdges(bool dynamicsOn)
 {
-	(void*)&dynamicsOn;
+    Q_UNUSED(dynamicsOn);
 	return 1;
 }
 
@@ -1661,40 +1661,42 @@ void
 VirtualContact::readFromFile(FILE *fp)
 {
 	float v,x,y,z;
+    int fscanf_result;
 
 	//finger and link number
-	fscanf(fp,"%d %d",&mFingerNum, &mLinkNum);
+    fscanf_result = fscanf(fp,"%d %d",&mFingerNum, &mLinkNum);
 
 	//numFrictionEdges
-	fscanf(fp,"%d",&numFrictionEdges);
+    fscanf_result = fscanf(fp,"%d",&numFrictionEdges);
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++) {
-			fscanf(fp,"%f",&v);
+            fscanf_result = fscanf(fp,"%f",&v);
 			frictionEdges[6*i+j] = v;
 		}
 	}
 
 	//loc
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
 	loc = position(x,y,z);
 
 	//frame
 	Quaternion q;
 	vec3 t;
-	fscanf(fp,"%f %f %f %f",&v,&x,&y,&z);
+    fscanf_result = fscanf(fp,"%f %f %f %f",&v,&x,&y,&z);
 	q.set(v,x,y,z);
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
 	t.set(x,y,z);
 	frame.set(q,t);
 
 	//normal
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
 	normal.set(x,y,z);
 
 	//cof
-	fscanf(fp,"%f",&v);
+    fscanf_result = fscanf(fp,"%f",&v);
+    Q_UNUSED(fscanf_result);
 	cof = v;
 }
 
@@ -1726,14 +1728,15 @@ void
 VirtualContactOnObject::readFromFile(FILE *fp)
 {
 	float w,x,y,z;
+    int fscanf_result;
 
 	//numFCVectors
-	fscanf(fp,"%d",&numFrictionEdges);
+    fscanf_result = fscanf(fp,"%d",&numFrictionEdges);
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++) {
-			fscanf(fp,"%f",&w);
+            fscanf_result = fscanf(fp,"%f",&w);
 			frictionEdges[6*i+j] = w;
 		}
 	}
@@ -1743,19 +1746,20 @@ VirtualContactOnObject::readFromFile(FILE *fp)
 	//you can use q(v,vec(x,y,z))
 	Quaternion q;
 	vec3 t;
-	fscanf(fp,"%f %f %f %f",&w,&x,&y,&z);
+    fscanf_result = fscanf(fp,"%f %f %f %f",&w,&x,&y,&z);
 	q.set(w,x,y,z);
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
 	t.set(x,y,z);
 	loc = position(x,y,z);
 	frame.set(q,t);
 
 	//normal
-	fscanf(fp,"%f %f %f",&x, &y, &z);
+    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
 	normal.set(x,y,z);
 
 	//cof
-	fscanf(fp,"%f",&w);
+    fscanf_result = fscanf(fp,"%f",&w);
+    Q_UNUSED(fscanf_result);
 	cof = w;
 }
 /*! set dynamic contact wrench of body when updating contact wrench

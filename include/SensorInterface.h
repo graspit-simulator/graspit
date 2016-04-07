@@ -48,19 +48,19 @@ protected:
 	double getTimeStep();
 	int groupNumber;
 public:
-	virtual SensorOutput * Poll(){return &myOutput;};
+    virtual SensorOutput * Poll(){return &myOutput;}
 	virtual bool updateSensorModel();
 	bool setGroupNumber(int gn);
-	virtual int getGroupNumber(){return groupNumber;};
+    virtual int getGroupNumber(){return groupNumber;}
 	virtual void sensorModel();
 	virtual void resetSensor();
 	virtual SoSeparator * getVisualIndicator();
 	virtual void outputSensorReadings(QTextStream & qts);
 	BodySensor(Link* body);
 	BodySensor(const BodySensor & fs, Link * sl);
-	virtual BodySensor * clone(Body* b){ return new BodySensor(*this);}
+    virtual BodySensor * clone(Body* b){Q_UNUSED(b); return new BodySensor(*this);}
 	virtual transf getSensorTran();
-	virtual void setColor(double maxVal){};
+    virtual void setColor(double maxVal){Q_UNUSED(maxVal)};
 	virtual double getNormalForce(){return myOutput.sensorReading[2];}
 };
 
