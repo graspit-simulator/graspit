@@ -37,8 +37,7 @@ GraspTester::GraspTester(Hand *h)
 {
 	mHand = h;
 	init();
-	mEnergyCalculator = new SearchEnergy();
-	mEnergyCalculator->setType(ENERGY_STRICT_AUTOGRASP);
+    mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_STRICT_AUTOGRASP);
 	mCurrentStep = 0; mMaxSteps = 1; //run forever
 	mMaxCandidates = 20; mNumCandidates = 0;
 }

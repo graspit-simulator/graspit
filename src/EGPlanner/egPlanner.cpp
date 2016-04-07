@@ -53,7 +53,7 @@ EGPlanner::EGPlanner(Hand *h)
 {
 	mHand = h;
 	init();
-	mEnergyCalculator = new SearchEnergy();
+    mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
 }
 
 /*! Also sets the state of the planner to INIT, which is default
@@ -257,7 +257,11 @@ void
 EGPlanner::setEnergyType(SearchEnergyType s)
 {
 	assert (mEnergyCalculator);
-	mEnergyCalculator->setType(s);
+    if (!mEnergyCalculator->isType(s))
+    {
+        delete mEnergyCalculator;
+        mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
+    }
 }
 
 void
