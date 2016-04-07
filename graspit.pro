@@ -24,7 +24,7 @@ COLLISION = graspit_collision
 LAPACK = clapack
 
 #build and use interface with Columbia Grasp Database
-CONFIG += cgdb
+#CONFIG += cgdb
 #and use the ros database manager
 #CONFIG += graspit_ros
 

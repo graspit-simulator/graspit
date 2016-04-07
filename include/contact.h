@@ -42,9 +42,6 @@ class SoSeparator;
 class SoMaterial;
 class Matrix;
 
-//Should not be here, just for visualization
-#include "UncertaintyPlanner/uncertaintyPlannerUtil.h"
-
 #ifdef ARIZONA_PROJECT_ENABLED
 #include <arizona/Arizona_Raw_Exp.h>
 #endif
@@ -352,8 +349,6 @@ public:
   virtual void getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec){pVec.push_back(loc);floatVec.push_back(1);};
   //! Only used in SoftFinger contact
   virtual mat3 getCommonFrameRot(){ return mat3::IDENTITY; }
-  //! Render the ellipse
-  virtual void renderEllipse(SoSeparator* root, std::vector<position> points){Q_UNUSED(root); Q_UNUSED(points);}
 
   bool getRendered() {return isRendered;}
   void setRendered() {isRendered = true;}
@@ -445,7 +440,6 @@ protected:
 	//! Calculates friction characteristics using a Mattress model
 	double CalcContact_Mattress( double nForce );
 
-	UncertaintySpaceVisualizer mVisualizer;
 	double nForceSimulated;
 
 
@@ -471,8 +465,6 @@ public:
 	virtual mat3 getCommonFrameRot(){ return commonRot; }
 
 	double getNForceSimulated(){ return nForceSimulated; }
-
-    virtual void renderEllipse(SoSeparator* root, std::vector<position> points);
 };
 
 //! A contact that exists even when a hand is not perfectly touching another object

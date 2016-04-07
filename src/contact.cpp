@@ -1252,38 +1252,6 @@ void SoftContact::getStaticContactInfo(std::vector<position> &pVec,std::vector<d
 	cpd.sampleForces(params, majorAxis, minorAxis, 100, 100, pVec, floatVec);
 }
 
-void SoftContact::renderEllipse(SoSeparator* root, std::vector<position> points)
-{
-	if(mVisualizer.obj)
-		root->removeChild(mVisualizer.obj);
-	mVisualizer.obj = new SoSeparator;
-	mVisualizer.ps = new SoIndexedPointSet;
-	mVisualizer.coordinate = new SoCoordinate3;
-	mVisualizer.material = new SoMaterial;
-	mVisualizer.binding = new SoMaterialBinding;
-	mVisualizer.style = new SoDrawStyle;
-
-	mVisualizer.style->pointSize = 5.0;
-	mVisualizer.binding->value = SoMaterialBinding::PER_VERTEX_INDEXED;
-
-	for(size_t i = 0; i < points.size(); ++i)
-	{
-		mVisualizer.coordinate->point.set1Value(i, points[i].x(), points[i].y(), points[i].z());
-		mVisualizer.ps->coordIndex.set1Value(i, i);
-		mVisualizer.ps->materialIndex.set1Value(i, i);
-		//mVisualizer.material->diffuseColor.set1Value(i, SbColor(mSpace[i].value / maximum, 0,0));
-	}
-
-	mVisualizer.obj->addChild(mVisualizer.coordinate);
-	mVisualizer.obj->addChild(mVisualizer.material);
-	mVisualizer.obj->addChild(mVisualizer.binding);
-	mVisualizer.obj->addChild(mVisualizer.style);
-	mVisualizer.obj->addChild(mVisualizer.ps);
-	root->addChild(mVisualizer.obj);
-	std::cout << "rendered " << points.size() << " points" << std::endl;
-	isRendered = true;
-
-}
 
 ///////////////////////////////////////////
 // Virtual Contact
