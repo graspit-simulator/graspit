@@ -33,8 +33,7 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <list>
 #include <vector>
-//#include "collisionStructures.h"
-#include "Collision/collisionStructures.h"
+#include "src/Collision/collisionStructures.h"
 #include "ContactPDModels.h"
 class transf;
 class Body;
