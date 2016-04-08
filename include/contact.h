@@ -28,20 +28,18 @@
  */
 #ifndef CONTACT_HXX
 
+#include <QtGlobal>
+
 #include <Inventor/nodes/SoSeparator.h>
 #include <list>
 #include <vector>
-//#include "collisionStructures.h"
-#include "Collision/collisionStructures.h"
+#include "src/Collision/collisionStructures.h"
 #include "ContactPDModels.h"
 class transf;
 class Body;
 class SoSeparator;
 class SoMaterial;
 class Matrix;
-
-//Should not be here, just for visualization
-#include "UncertaintyPlanner/uncertaintyPlannerUtil.h"
 
 #ifdef ARIZONA_PROJECT_ENABLED
 #include <arizona/Arizona_Raw_Exp.h>
@@ -197,7 +195,7 @@ public:
 
   //! Initializes an empty contact (not really used)
   Contact() : body1(NULL),body2(NULL),mate(NULL),cof(0.0),
-	contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL), isRendered(false) {}
+    contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL),isRendered(false) , wrench(NULL){}
 
   //! Constructs a contact between two bodies 
   Contact(Body *b1,Body *b2, position pos, vec3 norm);
@@ -350,8 +348,6 @@ public:
   virtual void getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec){pVec.push_back(loc);floatVec.push_back(1);};
   //! Only used in SoftFinger contact
   virtual mat3 getCommonFrameRot(){ return mat3::IDENTITY; }
-  //! Render the ellipse
-  virtual void renderEllipse(SoSeparator* root, std::vector<position> points){}
 
   bool getRendered() {return isRendered;}
   void setRendered() {isRendered = true;}
@@ -443,7 +439,6 @@ protected:
 	//! Calculates friction characteristics using a Mattress model
 	double CalcContact_Mattress( double nForce );
 
-	UncertaintySpaceVisualizer mVisualizer;
 	double nForceSimulated;
 
 
@@ -459,7 +454,7 @@ public:
 
 	//! Visual indicator is a small patch of the fit analytical surface on the body
 	SoSeparator* getVisualIndicator();
-	virtual mat3 getRot(){return fitRot;};
+    virtual mat3 getRot(){return fitRot;}
 	//! Also attempt to apply some torques in the contact plane; currently disabled.
 	virtual void computeWrenches();
 
@@ -467,8 +462,6 @@ public:
 	virtual void getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec);
 
 	virtual mat3 getCommonFrameRot(){ return commonRot; }
-
-	virtual void renderEllipse(SoSeparator* root, std::vector<position> points);
 
 	double getNForceSimulated(){ return nForceSimulated; }
 };
