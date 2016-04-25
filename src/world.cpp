@@ -2098,40 +2098,6 @@ World::computeNewVelocities(double timeStep)
 		if (bodyVec[i]->isDynamic())
 			((DynamicBody *)bodyVec[i])->resetDynamicsFlag();
 
-	/*  double conMaxErr = 0.0;
-
-	if (!errFP) errFP=fopen("constraintError.txt","w");
-	fprintf(errFP,"%le ",worldTime);
-	for (i=0;i<numBodies;i++) {
-	contactList = bodyVec[i]->getContacts();
-	for (cp=contactList.begin();cp!=contactList.end();cp++) {
-	conMaxErr = MAX(conMaxErr,fabs((*cp)->getConstraintError()));
-	}
-
-	}
-	fprintf(errFP,"%le ",conMaxErr);
-	fprintf(errFP," ");
-	int k,l;
-	double jointErrMax=0.0;
-	for (i=0;i<numRobots;i++) {
-	if (robotVec[i]->getBase()->getDynJoint())
-	for (j=0;j<3;j++)
-	jointErrMax = MAX(jointErrMax,fabs(robotVec[i]->getBase()->getDynJoint()->getConstraintError()[j]));
-	//fprintf(errFP,"%le ",robotVec[i]->getBase()->getDynJoint()->getConstraintError()[j]);
-	for (j=0;j<robotVec[i]->getNumChains();j++) {
-	KinematicChain *chain=robotVec[i]->getChain(j);
-	for (k=0;k<chain->getNumLinks();k++)
-	if (chain->getLink(k)->getDynJoint())
-	for (l=0;l<3;l++)
-	jointErrMax = MAX(jointErrMax,fabs(robotVec[i]->getBase()->getDynJoint()->getConstraintError()[j]));
-	// fprintf(errFP,"%le ",chain->getLink(k)->getDynJoint()->getConstraintError()[l]);
-	}
-	}
-	fprintf(errFP,"%le",jointErrMax);
-	fprintf(errFP,"\n");
-
-	*/
-
 	Q_EMIT dynamicStepTaken();
 	return 0;
 }
@@ -2158,23 +2124,6 @@ joint constraints, for the next time step.
 void
 World::stepDynamics()
 {
-//	resetDynamicWrenches();
-//	double actualTimeStep = moveDynamicBodies(dynamicsTimeStep);
-//	if (actualTimeStep<0) {
-//		turnOffDynamics();
-//		Q_EMIT dynamicsError("Timestep failsafe reached.");
-//		return;
-//	}
-
-//	for (int i=0; i<numRobots; i++) {
-//		robotVec[i]->DOFController(actualTimeStep);
-//		robotVec[i]->applyJointPassiveInternalWrenches();
-//	}
-
-//	if (computeNewVelocities(actualTimeStep)) {
-//		Q_EMIT dynamicsError("LCP could not be solved.");
-//		return;
-//	}
     int ret;
     ret=mDynamicsEngine->stepDynamics();
     if(ret==-1){
