@@ -12,7 +12,8 @@ bullet_dynamics{
         }
 
 exists($(BULLET_PHYSICS_SOURCE_DIR)) {
-                message("Bullet BULLET_PHYSICS_SOURCE_DIR environment variable is set: $$(BULLET_PHYSICS_SOURCE_DIR).")
+                message("Bullet BULLET_PHYSICS_SOURCE_DIR environment variable is set: $$(BULLET_PHYSICS_SOURCE_DIR)")
+                message("For GraspIt! to work with Bullet at runtime, may need to run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/ or equivalent.")
         }
 
 INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src
