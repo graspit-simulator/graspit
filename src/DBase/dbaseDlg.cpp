@@ -466,7 +466,7 @@ void DBaseDlg::displayModelList(){
 	for(int i = 0; i < (int)mModelList.size(); ++i){
 		modelsComboBox->insertItem(QString(mModelList[i]->ModelName().c_str()));
 		tags.insert(mModelList[i]->Tags().begin(), mModelList[i]->Tags().end());
-		mModelMap.insert(std::make_pair<std::string, int>(mModelList[i]->ModelName(), i));
+        mModelMap.insert(std::make_pair(mModelList[i]->ModelName(), i));
 	}
 	classesComboBox->clear();
 	classesComboBox->insertItem("ALL");

@@ -108,8 +108,8 @@ public:
 	virtual double& elem(int m, int n);
 	//! Not inlined as it is overloaded in SparseMatrix
 	virtual const double& elem(int m, int n) const;
-	//! Returns an auto_ptr to a copy of the data 
-	virtual std::auto_ptr<double> getDataCopy() const;
+    //! Returns an auto_ptr to a copy of the data
+    virtual std::auto_ptr<double> getDataCopy() const;
 	//! Returns a copy of the data as a column major vector of doubles
 	virtual void getData(std::vector<double> *data) const;
         //! Returns the actual data pointer for this matrix
@@ -296,7 +296,7 @@ public:
 
 	virtual double& elem(int m, int n);
 	virtual const double& elem(int m, int n) const;
-	virtual std::auto_ptr<double> getDataCopy() const;
+    virtual std::auto_ptr<double> getDataCopy() const;
 	virtual void getData(std::vector<double> *data) const;
         //! There is no data pointer for a sparse matrix, just dies
         virtual double* getDataPointer();
