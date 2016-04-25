@@ -25,8 +25,6 @@ LIBS += -lBulletDynamics
 LIBS += -lLinearMath
 LIBS += -lBulletCollision
 
-DEFINES += BULLET_DYNAMICS
-
 }
 
 # ---------------------- Blas and Lapack ----------------------------------

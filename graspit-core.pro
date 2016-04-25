@@ -73,8 +73,6 @@ HEADERS	+= include/body.h \
         include/dynamics/dynamics.h \
         include/dynamics/dynamicsEngine.h \
         include/dynamics/dynJoint.h \
-        include/dynamics/graspitDynamics.h \
-        include/dynamics/bulletDynamics.h \
 	include/Planner/grasp_visualization.h \
 	include/Planner/grasp_tester.h \
 	include/Planner/grasp_preshape.h \
@@ -160,8 +158,6 @@ SOURCES	+= src/arch.cpp \
 	src/math/matrix.cpp \
 	src/Collision/collisionInterface.cpp \
         src/dynamics/dynamics.cpp \
-        src/dynamics/bulletDynamics.cpp \
-        src/dynamics/graspitDynamics.cpp \
         src/dynamics/dynJoint.cpp \
 	src/Planner/grasp_visualization.cpp \
 	src/Planner/grasp_tester.cpp \
@@ -483,12 +479,19 @@ eigengrids {
 }
 
 
-# ---------------------- Graspit Dynamics ----------------------------------
+# ---------------------- Dynamics ----------------------------------
 
 graspit_dynamics{
     DEFINES += GRASPIT_DYNAMICS
+    HEADERS += include/dynamics/graspitDynamics.h
+    SOURCES += src/dynamics/graspitDynamics.cpp
 }
 
+bullet_dynamics{
+    DEFINES += BULLET_DYNAMICS
+    HEADERS += include/dynamics/bulletDynamics.h
+    SOURCES += src/dynamics/bulletDynamics.cpp
+}
 
 #-------------------------------------- Optimizer ---------------------
 
