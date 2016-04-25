@@ -102,24 +102,24 @@ KinematicChain::createDynamicJoints(const std::vector<int> &dynJointTypes)
                                                jointVec[lastJoint[l]-1],jointVec[lastJoint[l]],
                                                prevLink,linkVec[l], 
                                                dynJointTran, jointVec[lastJoint[l]]->getTran().inverse()));
-      jointVec[lastJoint[l]-2]->dynJoint = linkVec[l]->getDynJoint();
-      jointVec[lastJoint[l]-1]->dynJoint = linkVec[l]->getDynJoint();
-      jointVec[lastJoint[l]-0]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]-2]->setDynJoint(linkVec[l]->getDynJoint());
+      jointVec[lastJoint[l]-1]->setDynJoint(linkVec[l]->getDynJoint());
+      jointVec[lastJoint[l]-0]->setDynJoint(linkVec[l]->getDynJoint());
     } else if (dynJointTypes[l] == DynJoint::UNIVERSAL) {
       linkVec[l]->setDynJoint(new UniversalDynJoint(
                                                     jointVec[lastJoint[l]-1], jointVec[lastJoint[l]],
                                                     prevLink, linkVec[l], 
                                                     dynJointTran, jointVec[lastJoint[l]]->getTran().inverse()));
-      jointVec[lastJoint[l]-1]->dynJoint = linkVec[l]->getDynJoint();
-      jointVec[lastJoint[l]-0]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]-1]->setDynJoint( linkVec[l]->getDynJoint());
+      jointVec[lastJoint[l]-0]->setDynJoint( linkVec[l]->getDynJoint());
     } else if (dynJointTypes[l] == DynJoint::REVOLUTE) {
       linkVec[l]->setDynJoint(new RevoluteDynJoint(jointVec[lastJoint[l]],
                                                    prevLink,linkVec[l],dynJointTran));
-      jointVec[lastJoint[l]]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]]->setDynJoint(linkVec[l]->getDynJoint());
     } else if (dynJointTypes[l] == DynJoint::PRISMATIC) {
       linkVec[l]->setDynJoint(new RevoluteDynJoint(jointVec[lastJoint[l]],
                                                    prevLink,linkVec[l],dynJointTran));
-      jointVec[lastJoint[l]]->dynJoint = linkVec[l]->getDynJoint();
+      jointVec[lastJoint[l]]->setDynJoint(linkVec[l]->getDynJoint());
     } else if (dynJointTypes[l] == DynJoint::FIXED) {
       DBGA("FIXED dynamic joints not yet fully supported");
       return FAILURE;
@@ -612,8 +612,8 @@ KinematicChain::getDynamicJoints(std::vector<DynJoint*> *dj) const
 {
 	DynJoint *lastDynJoint = NULL;
 	for(int j=0; j<numJoints; j++) {
-		if (jointVec[j]->dynJoint == lastDynJoint) continue;
-		lastDynJoint = jointVec[j]->dynJoint;
+        if (jointVec[j]->getDynJoint() == lastDynJoint) continue;
+        lastDynJoint = jointVec[j]->getDynJoint();
 		dj->push_back(lastDynJoint);
 	}
 }

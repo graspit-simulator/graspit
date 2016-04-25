@@ -20,9 +20,10 @@ UI_DIR = ui
 
 # ---------------------- Graspit source code ----------------------------------------------
 
-INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner include/EGPlanner/energy include/robots
+INCLUDEPATH += src src/Collision include include/math include/Planner include/EGPlanner include/dynamics ui ui/Planner ui/EGPlanner include/EGPlanner/energy include/robots
 
-DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner ui ui/Planner ui/EGPlanner include/EGPlanner/energy include/robots
+DEPENDPATH += src src/Collision include include/math include/Planner include/EGPlanner include/dynamics ui ui/Planner ui/EGPlanner include/EGPlanner/energy include/robots
+
 
 HEADERS	+= include/body.h \
 	include/bBox.h \
@@ -31,7 +32,6 @@ HEADERS	+= include/body.h \
 	include/contactSetting.h \
 	include/debug.h \
 	include/dof.h \
-	include/dynamics.h \
 	include/eigenGrasp.h \
 	include/gloveInterface.h \
 	include/grasp.h \
@@ -66,11 +66,13 @@ HEADERS	+= include/body.h \
 	include/graspitGUI.h \
 	include/graspitServer.h \
 	include/graspitApp.h \
-	include/dynJoint.h \
 	include/arch.h \
 	include/math/matrix.h \
 	src/Collision/collisionInterface.h \
 	src/Collision/collisionStructures.h \
+        include/dynamics/dynamics.h \
+        include/dynamics/dynamicsEngine.h \
+        include/dynamics/dynJoint.h \
 	include/Planner/grasp_visualization.h \
 	include/Planner/grasp_tester.h \
 	include/Planner/grasp_preshape.h \
@@ -122,8 +124,6 @@ SOURCES	+= src/arch.cpp \
 	src/contact.cpp \
 	src/contactSetting.cpp \
 	src/dof.cpp \
-	src/dynamics.cpp \
-	src/dynJoint.cpp \
 	src/eigenGrasp.cpp \
 	src/gloveInterface.cpp \
 	src/grasp.cpp \
@@ -157,6 +157,8 @@ SOURCES	+= src/arch.cpp \
 	src/worldElementFactory.cpp \
 	src/math/matrix.cpp \
 	src/Collision/collisionInterface.cpp \
+        src/dynamics/dynamics.cpp \
+        src/dynamics/dynJoint.cpp \
 	src/Planner/grasp_visualization.cpp \
 	src/Planner/grasp_tester.cpp \
 	src/Planner/grasp_preshape.cpp \
@@ -474,6 +476,21 @@ eigengrids {
                eigengrids/intersection_sphere.h \
                eigengrids/intersection_triangle.h
 
+}
+
+
+# ---------------------- Dynamics ----------------------------------
+
+graspit_dynamics{
+    DEFINES += GRASPIT_DYNAMICS
+    HEADERS += include/dynamics/graspitDynamics.h
+    SOURCES += src/dynamics/graspitDynamics.cpp
+}
+
+bullet_dynamics{
+    DEFINES += BULLET_DYNAMICS
+    HEADERS += include/dynamics/bulletDynamics.h
+    SOURCES += src/dynamics/bulletDynamics.cpp
 }
 
 #-------------------------------------- Optimizer ---------------------
