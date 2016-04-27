@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(graspit)
 
+####################################
+## Define build type ###############
+####################################
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+        "Choose the type of build, options are: Debug Release"
+     FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
 
 ####################################
 ## Define graspit variables ####### 
@@ -9,21 +17,11 @@ project(graspit)
 # main source directory
 set (GSRC ${PROJECT_SOURCE_DIR})
 
-# if defined to false, the in-build collision in graspit is used instead.
-set (PQP_COLLISION false)
-
-# compile CGDB sources
-set (CGDB true)
-
-# compile PLY sources
-set (PLY true)
-
-# dynamics engine
+set(PQP_COLLISION false CACHE PATH "if false, the in-build collision in graspit is used instead.")
+set(CGDB true CACHE PATH "compile CGDB sources as well")
+set(PLY true CACHE PATH "compile PLY sources as well")
 set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
-
-if (NOT BUILD_TESTS)
-    set (BUILD_TESTS false)
-endif (NOT BUILD_TESTS)
+set(BUILD_TESTS false CACHE PATH "build tests as well")
 
 if (NOT BUILD_STATIC_LIB)
     set (BUILD_STATIC_LIB false)
@@ -33,10 +31,18 @@ if (NOT SKIP_SHARED_LIB)
     set (SKIP_SHARED_LIB false)
 endif (NOT SKIP_SHARED_LIB)
 
-set (GRASPIT_DEFINES 
-    -DGRASPIT_RELEASE  
-    #-DGRASPIT_DEBUG 
-    -DGRASPIT_EXPORTS)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	set (GRASPIT_DEFINES 
+	    -DGRASPIT_RELEASE  
+	    -DGRASPIT_EXPORTS)
+endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set (GRASPIT_DEFINES  
+	    -DGRASPIT_DEBUG 
+	    -DGRASPIT_EXPORTS)
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
 
 set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
 
