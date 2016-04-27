@@ -917,11 +917,13 @@ endif (PLY)
 if (NOT SKIP_SHARED_LIB)
     install(TARGETS
         graspit 
+        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
         EXPORT graspit-lib-targets
         DESTINATION ${LIB_DESTINATION})
 
     install(EXPORT graspit-lib-targets
         DESTINATION ${LIB_DESTINATION})
+
 endif (NOT SKIP_SHARED_LIB)
 
 if(BUILD_STATIC_LIB)
