@@ -39,35 +39,21 @@ set (GRASPIT_DEFINES
     #-DGRASPIT_DEBUG 
     -DGRASPIT_EXPORTS)
 
-####################################
-## Find packages             ####### 
-####################################
-
-
-# catkin is optional, and only to be used when added 
-# as ROS package and compiling with catkin_make. 
-# CATKIN_DEVEL_PREFIX is only defined if building with catkin
-if (CATKIN_DEVEL_PREFIX)
-    message("Building graspit with catkin.")
-    find_package(catkin) 
-else (CATKIN_DEVEL_PREFIX)
-    message("Building graspit without catkin.")
-endif (CATKIN_DEVEL_PREFIX) 
-
 set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
 
 find_package(Qhull REQUIRED)
 find_package(SoQt4 REQUIRED)
 find_package(LAPACK REQUIRED)
 
-set(BULLET_ROOT /home/jvarley/bullet/)
+
 #if (DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+
+	set(BULLET_ROOT $ENV{BULLET_ROOT})
+	message(USING BULLET_ROOT=${BULLET_ROOT} from env variable BULLET_ROOT.)
 	find_package(BULLET)
+
 #endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
 
-message("BULLET include path: ${BULLET_INCLUDE_DIRS}")
-message("BULLET_ROOT: ${BULLET_ROOT}")
- 
 
 SET( QT_USE_QT3SUPPORT TRUE )
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
@@ -701,11 +687,9 @@ set (GRASPIT_UI_INCLUDE_DIRNAME ui)
 # we will need to create a special folder named GRASPIT_UI_INCLUDE_DIRNAME
 # into which to generate the UI files, so that they can be included from
 # the graspit header files with the right prefix.
-if (catkin_FOUND) 
-    set (GRASPIT_UI_INCLUDE_PATH ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
-else (catkin_FOUND) 
-    set (GRASPIT_UI_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
-endif (catkin_FOUND) 
+
+set (GRASPIT_UI_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
+
     
 file(MAKE_DIRECTORY ${GRASPIT_UI_INCLUDE_PATH})
 
@@ -730,35 +714,12 @@ set (GRASPIT_INCLUDES
      ${QHULL_INCLUDE_DIRS}
 )
 
-if (catkin_FOUND) 
-    set (GRASPIT_INCLUDES ${GRASPIT_INCLUDES} ${catkin_INCLUDES})
-    set (${PROJECT_NAME}_EXPORTED_TARGETS ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-endif (catkin_FOUND) 
 
 ## Specify additional locations of header files
 include_directories(
     ${GRASPIT_INCLUDES}
     ${TINYXML_INCLUDES}
 )
-
-
-if (catkin_FOUND) 
-    ###################################
-    ## catkin specific configuration ##
-    ###################################
-    ## The catkin_package macro generates cmake config files for your package
-    ## Declare things to be passed to dependent projects
-    ## INCLUDE_DIRS: uncomment this if you package contains header files
-    ## LIBRARIES: libraries you create in this project that dependent projects also need
-    ## CATKIN_DEPENDS: catkin_packages dependent projects also need
-    ## DEPENDS: system dependencies of this project that dependent projects also need
-    catkin_package(
-      INCLUDE_DIRS ${GSRC}/include ${GRASPIT_INCLUDES}  
-      LIBRARIES graspit
-      #  CATKIN_DEPENDS 
-      DEPENDS ${QT_LIBRARIES} ${QT_QT3SUPPORT_LIBRARY} ${QHULL_LIBRARIES} ${SOQT_LIBRARY}
-    )
-endif (catkin_FOUND) 
 
 
 ############
@@ -786,10 +747,6 @@ if (NOT SKIP_SHARED_LIB)
     )
 endif (NOT SKIP_SHARED_LIB)
 
-#add_library(graspit_qt_image_collection
-#    SHARED
-#    ${GRASPIT_IMAGE_SOURCES}
-#)
 
 if(BUILD_STATIC_LIB)
     add_library(graspit_static STATIC 
@@ -800,12 +757,7 @@ if(BUILD_STATIC_LIB)
         target_compile_options(graspit_static PRIVATE -fPIC)  # does not work for bloom-release on saucy. Could 
     else ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
         message("Using set_target_properties with cmake version ${CMAKE_VERSION}")
-        # not recommended, but works with catkin:
         set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC)
-        # This would be better, but when compiling with catkin (and on bloom prerelease), has error 
-        # "<command-line>:0:1: error: macro names must be identifiers":
-        # target_compile_definitions(graspit_static PUBLIC -fPIC)
-        # can look into this at some point, but for now this will work.
     endif ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
 endif(BUILD_STATIC_LIB)
 
@@ -843,11 +795,7 @@ set(GRASPIT_LINK_LIBRARIES
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
    ${BULLET_LIBRARIES}
-   
 )
-
-message("GRASPIT LINK LIBRARIES ${GRASPIT_LINK_LIBRARIES}")
-
 
 if (NOT SKIP_SHARED_LIB)
     target_link_libraries(graspit
@@ -867,33 +815,11 @@ else(BUILD_STATIC_LIB)
 endif(BUILD_STATIC_LIB)
 
 
-#############
-## Install ##
-#############
+set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/)
+set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
+set ( BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
+set ( SHARE_DESTINATION ${CMAKE_INSTALL_PREFIX}/share/)
 
-if (catkin_FOUND) 
-    # all install targets should use catkin DESTINATION variables
-    # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-    set ( INCLUDE_DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-    set ( LIB_DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-    set ( BIN_DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-    set ( SHARE_DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-else (catkin_FOUND) 
-    set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/)
-    set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
-    set ( BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
-    set ( SHARE_DESTINATION ${CMAKE_INSTALL_PREFIX}/share/)
-endif (catkin_FOUND) 
-
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-    
 set(INSTALL_BINS graspit_simulator)
 
 if (NOT SKIP_SHARED_LIB)
