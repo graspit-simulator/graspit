@@ -55,6 +55,7 @@ class Link;
 class GraspableBody;
 class WorldElement;
 class Tendon;
+class DynamicsEngine;
 
 typedef std::vector<position> Neighborhood;
 
@@ -156,6 +157,9 @@ protected:
 
   //! A pointer to the collision detection instance
   CollisionInterface *mCollisionInterface;
+
+  //! A pointer to the dynamics engine
+  DynamicsEngine *mDynamicsEngine;
 
   //! A pointer to the root of the world's Inventor scene graph
   SoSeparator *IVRoot;
@@ -297,6 +301,9 @@ public:
 
   //! Returns the current simulation time for this world 
   double getWorldTime() const {return worldTime;}
+
+  //! Returns the current simulation time reference for this world
+  double& getWorldTimeRef() {return worldTime;}
 
   //! Returns the default timestep for this world 
   double getTimeStep() const {return dynamicsTimeStep;}
@@ -480,6 +487,12 @@ public:
 
   //! Emits the signal that informs that grasps have been updated
   void emitGraspsUpdated(){Q_EMIT graspsUpdated();}
+
+  //! Emits the signal that dynamics error has occured with an error string
+  void emitdynamicsError(const char *errMsg){Q_EMIT dynamicsError(errMsg);}
+
+  //! Emits the Signal that a dynamic step has been completed
+  void emitDynamicStepTaken(){Q_EMIT dynamicStepTaken();}
 };
 
 #define WORLD_HXX

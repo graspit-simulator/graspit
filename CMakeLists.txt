@@ -18,6 +18,10 @@ set (CGDB true)
 # compile PLY sources
 set (PLY true)
 
+# dynamics engine
+#set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
+set(DYNAMICS_ENGINE BULLET_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
+
 if (NOT BUILD_TESTS)
     set (BUILD_TESTS false)
 endif (NOT BUILD_TESTS)
@@ -56,6 +60,14 @@ find_package(Qhull REQUIRED)
 find_package(SoQt4 REQUIRED)
 find_package(LAPACK REQUIRED)
 
+set(BULLET_ROOT /home/jvarley/bullet/)
+#if (DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+	find_package(BULLET)
+#endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+
+message("BULLET include path: ${BULLET_INCLUDE_DIRS}")
+message("BULLET_ROOT: ${BULLET_ROOT}")
+ 
 
 SET( QT_USE_QT3SUPPORT TRUE )
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
@@ -69,6 +81,7 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/
     ${GSRC}/include/robots
     ${GSRC}/include/math
+    ${GSRC}/include/dynamics
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
@@ -107,7 +120,9 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/contactSetting.h 
     ${GSRC}/include/debug.h 
     ${GSRC}/include/dof.h 
-    ${GSRC}/include/dynamics.h 
+    ${GSRC}/include/dynamics/dynamics.h 
+    ${GSRC}/include/dynamics/dynJoint.h 
+    ${GSRC}/include/dynamics/dynamicsEngine.h 
     ${GSRC}/include/eigenGrasp.h 
     ${GSRC}/include/gloveInterface.h 
     ${GSRC}/include/grasp.h 
@@ -141,7 +156,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspitGUI.h 
     ${GSRC}/include/graspitServer.h 
     ${GSRC}/include/graspitApp.h 
-    ${GSRC}/include/dynJoint.h 
     ${GSRC}/include/arch.h
     ${GSRC}/include/FitParabola.h 
 )
@@ -199,7 +213,7 @@ set (GRASPIT_SRC_COLLISION_HEADERS
     ${GSRC}/src/Collision/collisionInterface.h 
     ${GSRC}/src/Collision/collisionStructures.h
 )
-	
+
 
 # all headers which are in the include/math 
 # directory and should be included
@@ -338,8 +352,8 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/contact.cpp 
     ${GSRC}/src/contactSetting.cpp 
     ${GSRC}/src/dof.cpp 
-    ${GSRC}/src/dynamics.cpp 
-    ${GSRC}/src/dynJoint.cpp 
+    ${GSRC}/src/dynamics/dynamics.cpp 
+    ${GSRC}/src/dynamics/dynJoint.cpp 
     ${GSRC}/src/eigenGrasp.cpp 
     ${GSRC}/src/gloveInterface.cpp 
     ${GSRC}/src/grasp.cpp 
@@ -453,6 +467,32 @@ else (PQP_COLLISION)
 endif (PQP_COLLISION)
 
 
+#--------------------------------------- Dynamics Engine ---------------------------------
+if(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
+	set (GRASPIT_DEFINES
+        ${GRASPIT_DEFINES}
+        -DGRASPIT_DYNAMICS)
+    set (GRASPIT_DYNAMICS_INCLUDES
+        ${GSRC}/include/dynamics/graspitDynamics.h 
+        )
+    set (GRASPIT_DYNAMICS_SOURCES
+        ${GSRC}/src/dynamics/graspitDynamics.cpp
+        )
+endif(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
+
+if(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+	set (GRASPIT_DEFINES
+        ${GRASPIT_DEFINES}
+        -DBULLET_DYNAMICS)
+    set (GRASPIT_DYNAMICS_INCLUDES
+        ${GSRC}/include/dynamics/bulletDynamics.h  
+        )
+    set (GRASPIT_DYNAMICS_SOURCES
+        ${GSRC}/src/dynamics/bulletDynamics.cpp
+        )
+
+endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+
 
 #--------------------------------------- User interface: main window and dialogs ---------------------------------
 
@@ -467,6 +507,7 @@ set (GRASPIT_INCLUDES
     ${GRASPIT_UI_INCLUDES}
     ${GRASPIT_CGDB_INCLUDES}
     ${GRASPIT_PLY_INCLUDES}
+    ${BULLET_INCLUDE_DIR}
 )
 
 set (GRASPIT_FORMS
@@ -731,6 +772,7 @@ set (GRASPIT_LIBRARY_SOURCES
     ${CGDB_SOURCES}
     ${PLY_SOURCES}
     ${GRASPIT_COLLISION_SOURCES}
+    ${GRASPIT_DYNAMICS_SOURCES}
     ${GRASPIT_OPTIMIZER_SOURCES}
     ${GRASPIT_FORM_SOURCES}
     ${GRASPIT_IMAGE_SOURCES}
@@ -800,7 +842,11 @@ set(GRASPIT_LINK_LIBRARIES
    ${QHULL_LIBRARIES}
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
+   ${BULLET_LIBRARIES}
+   
 )
+
+message("GRASPIT LINK LIBRARIES ${GRASPIT_LINK_LIBRARIES}")
 
 
 if (NOT SKIP_SHARED_LIB)
@@ -870,6 +916,11 @@ install(FILES
 install(FILES
     ${GRASPIT_CMDLINE_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/cmdline
+)
+
+install(FILES
+     ${GRASPIT_DYNAMICS_INCLUDES}
+    DESTINATION ${INCLUDE_DESTINATION}/dynamics
 )
 
 install(FILES

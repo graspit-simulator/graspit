@@ -227,11 +227,11 @@ RevoluteDynJoint::updateValues()
   vec3 axis = b1JointTran.affine().row(2);
   joint->setWorldAxis(axis);
   double vel1 = vec3(prevLink->getVelocity()[3],
-					 prevLink->getVelocity()[4],
-					 prevLink->getVelocity()[5]) % axis;
+                     prevLink->getVelocity()[4],
+                     prevLink->getVelocity()[5]) % axis;
   double vel2 = vec3(nextLink->getVelocity()[3],
-					 nextLink->getVelocity()[4],
-					 nextLink->getVelocity()[5]) % axis;
+                     nextLink->getVelocity()[4],
+                     nextLink->getVelocity()[5]) % axis;
   joint->setVelocity(vel2-vel1);
 
   transf diffTran = joint->getTran(0.0).inverse() * nextLink->getTran() * b1JointTran.inverse();
