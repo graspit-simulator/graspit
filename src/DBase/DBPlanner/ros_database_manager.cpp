@@ -96,6 +96,8 @@ void RosDatabaseManager::modelFromDBModel(Model *model,
 
 bool RosDatabaseManager::ModelList(vector<Model*>* model_list, FilterList::FilterType filter) const
 {
+    Q_UNUSED(filter);
+
   std::string model_root;
   if (!database_->getModelRoot(model_root)) return false;
   std::vector< boost::shared_ptr<household_objects_database::DatabaseScaledModel>  >db_model_list;
@@ -357,6 +359,8 @@ bool RosDatabaseManager::SetGraspTableClearance(Grasp *grasp, double clearance) 
 
 bool RosDatabaseManager::InsertGraspPair(const Grasp *grasp1, const Grasp *grasp2) const
 {
+    Q_UNUSED(grasp1);
+    Q_UNUSED(grasp2);
   //grasp pair not used anymore
   return false;
   /*

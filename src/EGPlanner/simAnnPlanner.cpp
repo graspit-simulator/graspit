@@ -41,7 +41,7 @@ SimAnnPlanner::SimAnnPlanner(Hand *h)
 {
 	mHand = h;
 	init();
-	mEnergyCalculator = new SearchEnergy();
+    mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
 	mSimAnn = new SimAnn();
 	//mSimAnn->writeResults(true);
 }

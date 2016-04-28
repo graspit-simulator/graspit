@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(graspit)
 
+####################################
+## Define build type ###############
+####################################
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+        "Choose the type of build, options are: Debug Release"
+     FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
 
 ####################################
 ## Define graspit variables ####### 
@@ -9,18 +17,11 @@ project(graspit)
 # main source directory
 set (GSRC ${PROJECT_SOURCE_DIR})
 
-# if defined to false, the in-build collision in graspit is used instead.
-set (PQP_COLLISION false)
-
-# compile CGDB sources
-set (CGDB true)
-
-# compile PLY sources
-set (PLY true)
-
-if (NOT BUILD_TESTS)
-    set (BUILD_TESTS false)
-endif (NOT BUILD_TESTS)
+set(PQP_COLLISION false CACHE PATH "if false, the in-build collision in graspit is used instead.")
+set(CGDB true CACHE PATH "compile CGDB sources as well")
+set(PLY true CACHE PATH "compile PLY sources as well")
+set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
+set(BUILD_TESTS false CACHE PATH "build tests as well")
 
 if (NOT BUILD_STATIC_LIB)
     set (BUILD_STATIC_LIB false)
@@ -30,31 +31,33 @@ if (NOT SKIP_SHARED_LIB)
     set (SKIP_SHARED_LIB false)
 endif (NOT SKIP_SHARED_LIB)
 
-set (GRASPIT_DEFINES 
-    -DGRASPIT_RELEASE  
-    #-DGRASPIT_DEBUG 
-    -DGRASPIT_EXPORTS)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	set (GRASPIT_DEFINES 
+	    -DGRASPIT_RELEASE  
+	    -DGRASPIT_EXPORTS)
+endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 
-####################################
-## Find packages             ####### 
-####################################
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set (GRASPIT_DEFINES  
+	    -DGRASPIT_DEBUG 
+	    -DGRASPIT_EXPORTS)
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-
-# catkin is optional, and only to be used when added 
-# as ROS package and compiling with catkin_make. 
-# CATKIN_DEVEL_PREFIX is only defined if building with catkin
-if (CATKIN_DEVEL_PREFIX)
-    message("Building graspit with catkin.")
-    find_package(catkin) 
-else (CATKIN_DEVEL_PREFIX)
-    message("Building graspit without catkin.")
-endif (CATKIN_DEVEL_PREFIX) 
 
 set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
 
 find_package(Qhull REQUIRED)
 find_package(SoQt4 REQUIRED)
 find_package(LAPACK REQUIRED)
+
+
+if (DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+
+	set(BULLET_ROOT $ENV{BULLET_ROOT})
+	message(USING BULLET_ROOT=${BULLET_ROOT} from env variable BULLET_ROOT.)
+	find_package(BULLET)
+
+endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
 
 
 SET( QT_USE_QT3SUPPORT TRUE )
@@ -69,7 +72,9 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/
     ${GSRC}/include/robots
     ${GSRC}/include/math
+    ${GSRC}/include/dynamics
     ${GSRC}/include/EGPlanner
+    ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
     ${GSRC}/src/Collision
     ${GSRC}/cmdline
@@ -106,7 +111,9 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/contactSetting.h 
     ${GSRC}/include/debug.h 
     ${GSRC}/include/dof.h 
-    ${GSRC}/include/dynamics.h 
+    ${GSRC}/include/dynamics/dynamics.h 
+    ${GSRC}/include/dynamics/dynJoint.h 
+    ${GSRC}/include/dynamics/dynamicsEngine.h 
     ${GSRC}/include/eigenGrasp.h 
     ${GSRC}/include/gloveInterface.h 
     ${GSRC}/include/grasp.h 
@@ -140,7 +147,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspitGUI.h 
     ${GSRC}/include/graspitServer.h 
     ${GSRC}/include/graspitApp.h 
-    ${GSRC}/include/dynJoint.h 
     ${GSRC}/include/arch.h
     ${GSRC}/include/FitParabola.h 
 )
@@ -160,7 +166,7 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/simAnn.h 
     ${GSRC}/include/EGPlanner/searchState.h 
     ${GSRC}/include/EGPlanner/searchStateImpl.h 
-    ${GSRC}/include/EGPlanner/searchEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/onLinePlanner.h 
     ${GSRC}/include/EGPlanner/egPlanner.h 
     ${GSRC}/include/EGPlanner/simAnnPlanner.h 
@@ -170,6 +176,15 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/graspTesterThread.h 
     ${GSRC}/include/EGPlanner/onLineGraspInterface.h 
     ${GSRC}/include/EGPlanner/listPlanner.h 
+    ${GSRC}/include/EGPlanner/energy/autograspQualityEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/closureSearchEnergy.h
+    ${GSRC}/include/EGPlanner/energy/compliantEnergy.h
+    ${GSRC}/include/EGPlanner/energy/contactEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/dynamicAutograspEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/guidedAutoGraspEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/guidedPotentialQualityEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/potentialQualityEnergy.h
+    ${GSRC}/include/EGPlanner/energy/strictAutoGraspEnergy.h 
 )
 
 
@@ -189,7 +204,7 @@ set (GRASPIT_SRC_COLLISION_HEADERS
     ${GSRC}/src/Collision/collisionInterface.h 
     ${GSRC}/src/Collision/collisionStructures.h
 )
-	
+
 
 # all headers which are in the include/math 
 # directory and should be included
@@ -295,7 +310,7 @@ set (MOC_HEADERS
     ${GSRC}/include/EGPlanner/egPlanner.h
     ${GSRC}/include/EGPlanner/simAnn.h
     ${GSRC}/include/EGPlanner/loopPlanner.h
-    ${GSRC}/include/EGPlanner/searchEnergy.h
+    ${GSRC}/include/EGPlanner/energy/searchEnergy.h
     ${GSRC}/include/EGPlanner/guidedPlanner.h
     ${GSRC}/include/Planner/grasp_tester.h
     ${GSRC}/include/robots/humanHand.h
@@ -328,8 +343,8 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/contact.cpp 
     ${GSRC}/src/contactSetting.cpp 
     ${GSRC}/src/dof.cpp 
-    ${GSRC}/src/dynamics.cpp 
-    ${GSRC}/src/dynJoint.cpp 
+    ${GSRC}/src/dynamics/dynamics.cpp 
+    ${GSRC}/src/dynamics/dynJoint.cpp 
     ${GSRC}/src/eigenGrasp.cpp 
     ${GSRC}/src/gloveInterface.cpp 
     ${GSRC}/src/grasp.cpp 
@@ -375,7 +390,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/simAnn.cpp 
     ${GSRC}/src/EGPlanner/searchState.cpp 
     ${GSRC}/src/EGPlanner/searchStateImpl.cpp 
-    ${GSRC}/src/EGPlanner/searchEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/searchEnergy.cpp 
     ${GSRC}/src/EGPlanner/onLinePlanner.cpp 
     ${GSRC}/src/EGPlanner/egPlanner.cpp 
     ${GSRC}/src/EGPlanner/simAnnPlanner.cpp 
@@ -385,6 +400,15 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/graspTesterThread.cpp 
     ${GSRC}/src/EGPlanner/onLineGraspInterface.cpp 
     ${GSRC}/src/EGPlanner/listPlanner.cpp 
+    ${GSRC}/src/EGPlanner/energy/autograspQualityEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/closureSearchEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/compliantEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/contactEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/dynamicAutograspEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/guidedAutoGraspEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/guidedPotentialQualityEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/potentialQualityEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/strictAutoGraspEnergy.cpp 
 )
 
 #--------------------------------------- Collision library ---------------------------------
@@ -434,6 +458,32 @@ else (PQP_COLLISION)
 endif (PQP_COLLISION)
 
 
+#--------------------------------------- Dynamics Engine ---------------------------------
+if(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
+	set (GRASPIT_DEFINES
+        ${GRASPIT_DEFINES}
+        -DGRASPIT_DYNAMICS)
+    set (GRASPIT_DYNAMICS_INCLUDES
+        ${GSRC}/include/dynamics/graspitDynamics.h 
+        )
+    set (GRASPIT_DYNAMICS_SOURCES
+        ${GSRC}/src/dynamics/graspitDynamics.cpp
+        )
+endif(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
+
+if(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+	set (GRASPIT_DEFINES
+        ${GRASPIT_DEFINES}
+        -DBULLET_DYNAMICS)
+    set (GRASPIT_DYNAMICS_INCLUDES
+        ${GSRC}/include/dynamics/bulletDynamics.h  
+        )
+    set (GRASPIT_DYNAMICS_SOURCES
+        ${GSRC}/src/dynamics/bulletDynamics.cpp
+        )
+
+endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+
 
 #--------------------------------------- User interface: main window and dialogs ---------------------------------
 
@@ -448,6 +498,7 @@ set (GRASPIT_INCLUDES
     ${GRASPIT_UI_INCLUDES}
     ${GRASPIT_CGDB_INCLUDES}
     ${GRASPIT_PLY_INCLUDES}
+    ${BULLET_INCLUDE_DIR}
 )
 
 set (GRASPIT_FORMS
@@ -641,11 +692,9 @@ set (GRASPIT_UI_INCLUDE_DIRNAME ui)
 # we will need to create a special folder named GRASPIT_UI_INCLUDE_DIRNAME
 # into which to generate the UI files, so that they can be included from
 # the graspit header files with the right prefix.
-if (catkin_FOUND) 
-    set (GRASPIT_UI_INCLUDE_PATH ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
-else (catkin_FOUND) 
-    set (GRASPIT_UI_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
-endif (catkin_FOUND) 
+
+set (GRASPIT_UI_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}/${GRASPIT_UI_INCLUDE_DIRNAME})
+
     
 file(MAKE_DIRECTORY ${GRASPIT_UI_INCLUDE_PATH})
 
@@ -670,35 +719,12 @@ set (GRASPIT_INCLUDES
      ${QHULL_INCLUDE_DIRS}
 )
 
-if (catkin_FOUND) 
-    set (GRASPIT_INCLUDES ${GRASPIT_INCLUDES} ${catkin_INCLUDES})
-    set (${PROJECT_NAME}_EXPORTED_TARGETS ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-endif (catkin_FOUND) 
 
 ## Specify additional locations of header files
 include_directories(
     ${GRASPIT_INCLUDES}
     ${TINYXML_INCLUDES}
 )
-
-
-if (catkin_FOUND) 
-    ###################################
-    ## catkin specific configuration ##
-    ###################################
-    ## The catkin_package macro generates cmake config files for your package
-    ## Declare things to be passed to dependent projects
-    ## INCLUDE_DIRS: uncomment this if you package contains header files
-    ## LIBRARIES: libraries you create in this project that dependent projects also need
-    ## CATKIN_DEPENDS: catkin_packages dependent projects also need
-    ## DEPENDS: system dependencies of this project that dependent projects also need
-    catkin_package(
-      INCLUDE_DIRS ${GSRC}/include ${GRASPIT_INCLUDES}  
-      LIBRARIES graspit
-      #  CATKIN_DEPENDS 
-      DEPENDS ${QT_LIBRARIES} ${QT_QT3SUPPORT_LIBRARY} ${QHULL_LIBRARIES} ${SOQT_LIBRARY}
-    )
-endif (catkin_FOUND) 
 
 
 ############
@@ -712,6 +738,7 @@ set (GRASPIT_LIBRARY_SOURCES
     ${CGDB_SOURCES}
     ${PLY_SOURCES}
     ${GRASPIT_COLLISION_SOURCES}
+    ${GRASPIT_DYNAMICS_SOURCES}
     ${GRASPIT_OPTIMIZER_SOURCES}
     ${GRASPIT_FORM_SOURCES}
     ${GRASPIT_IMAGE_SOURCES}
@@ -725,10 +752,6 @@ if (NOT SKIP_SHARED_LIB)
     )
 endif (NOT SKIP_SHARED_LIB)
 
-#add_library(graspit_qt_image_collection
-#    SHARED
-#    ${GRASPIT_IMAGE_SOURCES}
-#)
 
 if(BUILD_STATIC_LIB)
     add_library(graspit_static STATIC 
@@ -739,12 +762,7 @@ if(BUILD_STATIC_LIB)
         target_compile_options(graspit_static PRIVATE -fPIC)  # does not work for bloom-release on saucy. Could 
     else ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
         message("Using set_target_properties with cmake version ${CMAKE_VERSION}")
-        # not recommended, but works with catkin:
         set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC)
-        # This would be better, but when compiling with catkin (and on bloom prerelease), has error 
-        # "<command-line>:0:1: error: macro names must be identifiers":
-        # target_compile_definitions(graspit_static PUBLIC -fPIC)
-        # can look into this at some point, but for now this will work.
     endif ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
 endif(BUILD_STATIC_LIB)
 
@@ -781,8 +799,8 @@ set(GRASPIT_LINK_LIBRARIES
    ${QHULL_LIBRARIES}
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
+   ${BULLET_LIBRARIES}
 )
-
 
 if (NOT SKIP_SHARED_LIB)
     target_link_libraries(graspit
@@ -802,33 +820,11 @@ else(BUILD_STATIC_LIB)
 endif(BUILD_STATIC_LIB)
 
 
-#############
-## Install ##
-#############
+set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/)
+set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
+set ( BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
+set ( SHARE_DESTINATION ${CMAKE_INSTALL_PREFIX}/share/)
 
-if (catkin_FOUND) 
-    # all install targets should use catkin DESTINATION variables
-    # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-    set ( INCLUDE_DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-    set ( LIB_DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-    set ( BIN_DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-    set ( SHARE_DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-else (catkin_FOUND) 
-    set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/)
-    set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
-    set ( BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
-    set ( SHARE_DESTINATION ${CMAKE_INSTALL_PREFIX}/share/)
-endif (catkin_FOUND) 
-
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-    
 set(INSTALL_BINS graspit_simulator)
 
 if (NOT SKIP_SHARED_LIB)
@@ -851,6 +847,11 @@ install(FILES
 install(FILES
     ${GRASPIT_CMDLINE_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/cmdline
+)
+
+install(FILES
+     ${GRASPIT_DYNAMICS_INCLUDES}
+    DESTINATION ${INCLUDE_DESTINATION}/dynamics
 )
 
 install(FILES
@@ -916,11 +917,13 @@ endif (PLY)
 if (NOT SKIP_SHARED_LIB)
     install(TARGETS
         graspit 
+        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
         EXPORT graspit-lib-targets
         DESTINATION ${LIB_DESTINATION})
 
     install(EXPORT graspit-lib-targets
         DESTINATION ${LIB_DESTINATION})
+
 endif (NOT SKIP_SHARED_LIB)
 
 if(BUILD_STATIC_LIB)
