@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: graspitGUI.cpp,v 1.19 2010/08/11 02:45:37 cmatei Exp $
 //
@@ -85,7 +85,7 @@ GraspItGUI *graspItGUI = 0;
 GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
 {
   if (!initialized) {
-    mainWindow = new MainWindow; 
+    mainWindow = new MainWindow;
     SoQt::init(mainWindow->mWindow);
 
     // initialize my Inventor additions
@@ -94,10 +94,10 @@ GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
     SoTorquePointer::initClass();
 
     ivmgr = new IVmgr((QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
-	
+
 //	mainWindow->viewerHolder->setFocusProxy(ivmgr->getViewer()->getWidget());
 //	mainWindow->viewerHolder->setFocusPolicy(QWidget::StrongFocus);
-    
+
     ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
 
     initialized = true;
@@ -175,7 +175,7 @@ GraspItGUI::processArgs(int argc, char** argv)
 
     //start any plugins with auto start enabled
     mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void*)this);
-    for (size_t i=0; i<mPluginCreators.size(); i++)
+    for (size_t i = 0; i < mPluginCreators.size(); i++)
     {
         std::cout << "plugin creator autostart " << mPluginCreators[i]->autoStart() << std::endl;
         if (mPluginCreators[i]->autoStart())
@@ -206,7 +206,7 @@ GraspItGUI::processArgs(int argc, char** argv)
       }
 #endif
   }
- 
+
 #ifdef Q_WS_X11
 
   if (args->exist("world"))
@@ -274,12 +274,12 @@ GraspItGUI::processArgs(int argc, char** argv)
 */
 void
 GraspItGUI::startMainLoop()
-{	
+{
   SoQt::show(mainWindow->mWindow);
   mainWindow->setMainWorld(ivmgr->getWorld());
-  mainWindow->mWindow->resize(QSize(1070,937));  
+  mainWindow->mWindow->resize(QSize(1070,937));
   SoQt::mainLoop();
-}  
+}
 
 /*!
   Exits the Qt event loop.
@@ -302,14 +302,14 @@ GraspItGUI::sensorCB(void*, SoSensor*)
   graspItGUI->processPlugins();
 }
 
-void 
+void
 GraspItGUI::startPlugin(PluginCreator* creator, int argc, char** argv)
 {
   Plugin *plugin = creator->createPlugin(argc,argv);
   if (plugin) mActivePlugins.push_back( std::pair<Plugin*, std::string>(plugin, creator->type()) );
   if (!mActivePlugins.empty()) {
     mPluginSensor->schedule();
-  }  
+  }
 }
 
 void GraspItGUI::processPlugins()
