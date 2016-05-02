@@ -24,7 +24,7 @@
 //######################################################################
 
 /*! \file
-  \brief Implements the graspit user interface.  Responsible for creating both MainWindow and IVmgr.
+    \brief Implements the graspit user interface.  Responsible for creating both MainWindow and IVmgr.
 */
 
 #include <Q3GroupBox>
@@ -34,7 +34,7 @@
 #include <QLayout>
 
 #ifdef Q_WS_X11
-  #include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "graspitParser.h"
@@ -58,7 +58,7 @@ bool GraspItGUI::initialized = false;
 int GraspItGUI::initResult = SUCCESS;
 
 // Used by getopt in ProcessArgs
-extern int optind,optopt,opterr;
+extern int optind, optopt, opterr;
 extern char *optarg;
 
 ////////////////////////// SYSTEM WIDE GLOBALS ///////////////////////////////
@@ -73,78 +73,75 @@ GraspItGUI *graspItGUI = 0;
 //////////////////////////////////////////////////////////////////////////////
 
 /*!
-  If this class hasn't been initialized in another instance, it performs
-  the following operations:
-  - creates a new MainWindow,
-  - starts Coin by initializing SoQt,
-  - initializes our Coin add on classes,
-  - creates a new IVmgr,
-  - sets the focus policy of the SoQt viewer so keyboard events are accepted
-  - calls a method to process the command line arguments.
- */
-GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
-{
-  if (!initialized) {
-    mainWindow = new MainWindow;
-    SoQt::init(mainWindow->mWindow);
-
-    // initialize my Inventor additions
-    SoComplexShape::initClass();
-    SoArrow::initClass();
-    SoTorquePointer::initClass();
-
-    ivmgr = new IVmgr((QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
-
-//	mainWindow->viewerHolder->setFocusProxy(ivmgr->getViewer()->getWidget());
-//	mainWindow->viewerHolder->setFocusPolicy(QWidget::StrongFocus);
-
-    ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
-
-    initialized = true;
-    graspItGUI = this;
-    mExitCode = 0;
-    initResult = processArgs(argc,argv);
-  }
-}
-
-/*!
-  Deletes both the IVmgr and the MainWindow.
+    If this class hasn't been initialized in another instance, it performs
+    the following operations:
+    - creates a new MainWindow,
+    - starts Coin by initializing SoQt,
+    - initializes our Coin add on classes,
+    - creates a new IVmgr,
+    - sets the focus policy of the SoQt viewer so keyboard events are accepted
+    - calls a method to process the command line arguments.
 */
-GraspItGUI::~GraspItGUI()
-{
-  //originally, ivmgr is first
-//	fprintf(stderr,"Delete children\n");
-//  mainWindow->destroyChildren();
-//  fprintf(stderr,"Delete ivmgr\n");
-  //if a dispatcher was being used, set exit code based on its result
+GraspItGUI::GraspItGUI(int argc, char **argv) : mDispatch(NULL) {
+    if (!initialized) {
+        mainWindow = new MainWindow;
+        SoQt::init(mainWindow->mWindow);
 
-  //clean up plugins and creators
-  stopAllPlugins();
-  for (size_t i=0; i<mPluginCreators.size(); i++) {
-    delete mPluginCreators[i];
-  }
+        // initialize my Inventor additions
+        SoComplexShape::initClass();
+        SoArrow::initClass();
+        SoTorquePointer::initClass();
 
-#ifdef CGDB_ENABLED
-  if (mDispatch) {
-    delete mDispatch;
-  }
-#endif
-  delete ivmgr;
-  delete mainWindow;
+        ivmgr = new IVmgr((QWidget *)mainWindow->mUI->viewerHolder, "myivmgr");
+
+        //  mainWindow->viewerHolder->setFocusProxy(ivmgr->getViewer()->getWidget());
+        //  mainWindow->viewerHolder->setFocusPolicy(QWidget::StrongFocus);
+
+        ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
+
+        initialized = true;
+        graspItGUI = this;
+        mExitCode = 0;
+        initResult = processArgs(argc, argv);
+    }
 }
 
 /*!
-  Processes the command line arguments.  It first checks to make sure the
-  GRASPIT environment variable is set, then if this is run under X11 it
-  examines the command line.  The usage is the following:
-\p graspit \p [-w worldname] \p [-r robotname] \p [-o objectname]
-\p [-b obstaclename]
+    Deletes both the IVmgr and the MainWindow.
+*/
+GraspItGUI::~GraspItGUI() {
+    //originally, ivmgr is first
+    //  fprintf(stderr,"Delete children\n");
+    //  mainWindow->destroyChildren();
+    //  fprintf(stderr,"Delete ivmgr\n");
+    //if a dispatcher was being used, set exit code based on its result
+
+    //clean up plugins and creators
+    stopAllPlugins();
+    for (size_t i = 0; i < mPluginCreators.size(); i++) {
+        delete mPluginCreators[i];
+    }
+
+    #ifdef CGDB_ENABLED
+    if (mDispatch) {
+        delete mDispatch;
+    }
+    #endif
+    delete ivmgr;
+    delete mainWindow;
+}
+
+/*!
+    Processes the command line arguments.  It first checks to make sure the
+    GRASPIT environment variable is set, then if this is run under X11 it
+    examines the command line.  The usage is the following:
+    \p graspit \p [-w worldname] \p [-r robotname] \p [-o objectname]
+    \p [-b obstaclename]
 */
 int
-GraspItGUI::processArgs(int argc, char** argv)
-{
+GraspItGUI::processArgs(int argc, char **argv) {
 
-    int errorFlag=0;
+    int errorFlag = 0;
 
     GraspitParser *graspitParser = new GraspitParser();
     graspitParser->parseArgs(argc, argv);
@@ -152,205 +149,187 @@ GraspItGUI::processArgs(int argc, char** argv)
 
     //Ensure that $GRASPIT is set.
     QString graspitRoot = QString(getenv("GRASPIT"));
-    if (graspitRoot.isNull() ) {
+    if (graspitRoot.isNull()) {
         std::cerr << "Please set the GRASPIT environment variable to the root directory of graspIt." << std::endl;
         return FAILURE;
     }
 
-    if(args->exist("plugin"))
-    {
+    if (args->exist("plugin")) {
         QString plugins_arg_string = QString::fromStdString(args->get<std::string>("plugin"));
         QStringList plugins_list = plugins_arg_string.split(',');
-        for(int i=0; i < plugins_list.size(); i++)
-        {
-            std::cout << "Loading Plugin: "<< plugins_list.at(i).toStdString().c_str();
-            PluginCreator* creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString());
-            if (creator){
-              mPluginCreators.push_back(creator);
-            } else {
-              DBGA("Failed to load plugin: " << plugins_list.at(i).toStdString());
+        for (int i = 0; i < plugins_list.size(); i++) {
+            std::cout << "Loading Plugin: " << plugins_list.at(i).toStdString().c_str();
+            PluginCreator *creator = PluginCreator::loadFromLibrary(plugins_list.at(i).toStdString());
+            if (creator) {
+                mPluginCreators.push_back(creator);
+            }
+            else {
+                DBGA("Failed to load plugin: " << plugins_list.at(i).toStdString());
             }
         }
     }
 
     //start any plugins with auto start enabled
-    mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void*)this);
-    for (size_t i = 0; i < mPluginCreators.size(); i++)
-    {
+    mPluginSensor = new SoIdleSensor(GraspItGUI::sensorCB, (void *)this);
+    for (size_t i = 0; i < mPluginCreators.size(); i++) {
         std::cout << "plugin creator autostart " << mPluginCreators[i]->autoStart() << std::endl;
-        if (mPluginCreators[i]->autoStart())
-        {
+        if (mPluginCreators[i]->autoStart()) {
             startPlugin(mPluginCreators[i], argc, argv);
         }
     }
 
-  if(argc > 1){
-#ifdef CGDB_ENABLED
-      if(!strcmp(argv[1],"dbase")){
-          DBaseBatchPlanner *dbp = new DBaseBatchPlanner(graspItGUI->getIVmgr(), this);
-          dbp->processArguments(argc, argv);
-          dbp->startPlanner();
-      }
-      if (!strcmp(argv[1],"db_dispatch")) {
-          mDispatch = new TaskDispatcher();
-          if (mDispatch->connect("wgs36",5432,"willow","willow","household_objects")) {
-              std::cerr << "DBase dispatch failed to connect to database\n";
-              return TERMINAL_FAILURE;
-          }
-          std::cerr << "DBase dispatch connected to database\n";
-          mDispatch->mainLoop();
-          if (mDispatch->getStatus() != TaskDispatcher::RUNNING) {
-              mExitCode = mDispatch->getStatus();
-              return TERMINAL_FAILURE;
-          }
-      }
-#endif
-  }
+    if (argc > 1) {
+        #ifdef CGDB_ENABLED
+        if (!strcmp(argv[1], "dbase")) {
+            DBaseBatchPlanner *dbp = new DBaseBatchPlanner(graspItGUI->getIVmgr(), this);
+            dbp->processArguments(argc, argv);
+            dbp->startPlanner();
+        }
+        if (!strcmp(argv[1], "db_dispatch")) {
+            mDispatch = new TaskDispatcher();
+            if (mDispatch->connect("wgs36", 5432, "willow", "willow", "household_objects")) {
+                std::cerr << "DBase dispatch failed to connect to database\n";
+                return TERMINAL_FAILURE;
+            }
+            std::cerr << "DBase dispatch connected to database\n";
+            mDispatch->mainLoop();
+            if (mDispatch->getStatus() != TaskDispatcher::RUNNING) {
+                mExitCode = mDispatch->getStatus();
+                return TERMINAL_FAILURE;
+            }
+        }
+        #endif
+    }
 
-#ifdef Q_WS_X11
+    #ifdef Q_WS_X11
 
-  if (args->exist("world"))
-  {
-      QString filename = graspitRoot + QString("/worlds/") + QString::fromStdString(args->get<std::string>("world")) + QString(".xml");
-      if (ivmgr->getWorld()->load(filename)==FAILURE){
-          ++errorFlag;
-      }
-      else{
-          mainWindow->mUI->worldBox->setTitle(filename);
-      }
-  }
+    if (args->exist("world")) {
+        QString filename = graspitRoot + QString("/worlds/") + QString::fromStdString(args->get<std::string>("world")) + QString(".xml");
+        if (ivmgr->getWorld()->load(filename) == FAILURE) {
+            ++errorFlag;
+        }
+        else {
+            mainWindow->mUI->worldBox->setTitle(filename);
+        }
+    }
 
-  if (args->exist("robot"))
-  {
-      QString filename = graspitRoot +
-              QString("/models/robots/") +
-              QString::fromStdString(args->get<std::string>("robot")) +
-              QString("/")+
-              QString::fromStdString(args->get<std::string>("robot")) +
-              QString(".xml");
-      if (ivmgr->getWorld()->importRobot(filename)==NULL){
-          ++errorFlag;
-      }
-  }
+    if (args->exist("robot")) {
+        QString filename = graspitRoot +
+                           QString("/models/robots/") +
+                           QString::fromStdString(args->get<std::string>("robot")) +
+                           QString("/") +
+                           QString::fromStdString(args->get<std::string>("robot")) +
+                           QString(".xml");
+        if (ivmgr->getWorld()->importRobot(filename) == NULL) {
+            ++errorFlag;
+        }
+    }
 
-  if (args->exist("obstacle"))
-  {
-      QString filename = graspitRoot +
-              QString("/models/obstacles/") +
-              QString::fromStdString(args->get<std::string>("obstacle")) +
-              QString(".iv");
+    if (args->exist("obstacle")) {
+        QString filename = graspitRoot +
+                           QString("/models/obstacles/") +
+                           QString::fromStdString(args->get<std::string>("obstacle")) +
+                           QString(".iv");
 
-      if (!ivmgr->getWorld()->importBody("Body",filename))
-      {
-        ++errorFlag;
-      }
-  }
+        if (!ivmgr->getWorld()->importBody("Body", filename)) {
+            ++errorFlag;
+        }
+    }
 
-  if (args->exist("object"))
-  {
-      QString filename = graspitRoot +
-              QString("/models/objects/") +
-              QString::fromStdString(args->get<std::string>("object")) +
-              QString(".iv");
+    if (args->exist("object")) {
+        QString filename = graspitRoot +
+                           QString("/models/objects/") +
+                           QString::fromStdString(args->get<std::string>("object")) +
+                           QString(".iv");
 
-      if (!ivmgr->getWorld()->importBody("GraspableBody",filename))
-      {
-        ++errorFlag;
-      }
-  }
+        if (!ivmgr->getWorld()->importBody("GraspableBody", filename)) {
+            ++errorFlag;
+        }
+    }
 
-  if (errorFlag)
-  {
-      std::cerr << "Failed to Parse args." << std::endl;
-      return FAILURE;
-  }
+    if (errorFlag) {
+        std::cerr << "Failed to Parse args." << std::endl;
+        return FAILURE;
+    }
 
- #endif // Q_WS_X11
-  return SUCCESS;
+    #endif // Q_WS_X11
+    return SUCCESS;
 }
 
 /*!
-  Shows the mainWindow, sets its size, and starts the Qt event loop.
+    Shows the mainWindow, sets its size, and starts the Qt event loop.
 */
 void
-GraspItGUI::startMainLoop()
-{
-  SoQt::show(mainWindow->mWindow);
-  mainWindow->setMainWorld(ivmgr->getWorld());
-  mainWindow->mWindow->resize(QSize(1070,937));
-  SoQt::mainLoop();
+GraspItGUI::startMainLoop() {
+    SoQt::show(mainWindow->mWindow);
+    mainWindow->setMainWorld(ivmgr->getWorld());
+    mainWindow->mWindow->resize(QSize(1070, 937));
+    SoQt::mainLoop();
 }
 
 /*!
-  Exits the Qt event loop.
+    Exits the Qt event loop.
 */
 void
-GraspItGUI::exitMainLoop()
-{
-  SoQt::exitMainLoop();
+GraspItGUI::exitMainLoop() {
+    SoQt::exitMainLoop();
 }
 
 bool
-GraspItGUI::terminalFailure() const
-{
-  return initResult == TERMINAL_FAILURE;
+GraspItGUI::terminalFailure() const {
+    return initResult == TERMINAL_FAILURE;
 }
 
 void
-GraspItGUI::sensorCB(void*, SoSensor*)
-{
-  graspItGUI->processPlugins();
+GraspItGUI::sensorCB(void *, SoSensor *) {
+    graspItGUI->processPlugins();
 }
 
 void
-GraspItGUI::startPlugin(PluginCreator* creator, int argc, char** argv)
-{
-  Plugin *plugin = creator->createPlugin(argc,argv);
-  if (plugin) mActivePlugins.push_back( std::pair<Plugin*, std::string>(plugin, creator->type()) );
-  if (!mActivePlugins.empty()) {
-    mPluginSensor->schedule();
-  }
-}
-
-void GraspItGUI::processPlugins()
-{
-  std::list< std::pair<Plugin*, std::string> >::iterator it = mActivePlugins.begin();
-  while (it != mActivePlugins.end()) {
-    if (it->first->mainLoop() == SUCCESS) {
-      it++;
-    } else{
-      delete it->first;
-      it = mActivePlugins.erase(it);
+GraspItGUI::startPlugin(PluginCreator *creator, int argc, char **argv) {
+    Plugin *plugin = creator->createPlugin(argc, argv);
+    if (plugin) mActivePlugins.push_back(std::pair<Plugin *, std::string>(plugin, creator->type()));
+    if (!mActivePlugins.empty()) {
+        mPluginSensor->schedule();
     }
-  }
-  if (!mActivePlugins.empty()) {
-    mPluginSensor->schedule();
-  }
 }
 
-void GraspItGUI::stopPlugin(Plugin *plugin)
-{
-  std::list< std::pair<Plugin*, std::string> >::iterator it;
-  for (it = mActivePlugins.begin(); it!=mActivePlugins.end(); it++) {
-    if (it->first == plugin) {
-      delete it->first;
-      mActivePlugins.erase(it);
-      return;
+void GraspItGUI::processPlugins() {
+    std::list< std::pair<Plugin *, std::string> >::iterator it = mActivePlugins.begin();
+    while (it != mActivePlugins.end()) {
+        if (it->first->mainLoop() == SUCCESS) {
+            it++;
+        }
+        else {
+            delete it->first;
+            it = mActivePlugins.erase(it);
+        }
     }
-  }
-  DBGA("Stop plugin: plugin not found");
+    if (!mActivePlugins.empty()) {
+        mPluginSensor->schedule();
+    }
 }
 
-void GraspItGUI::stopAllPlugins()
-{
-  std::list< std::pair<Plugin*, std::string> >::iterator it = mActivePlugins.begin();
-  while (it != mActivePlugins.end()) {
-    delete it->first;
-    it = mActivePlugins.erase(it);
-  }
+void GraspItGUI::stopPlugin(Plugin *plugin) {
+    std::list< std::pair<Plugin *, std::string> >::iterator it;
+    for (it = mActivePlugins.begin(); it != mActivePlugins.end(); it++) {
+        if (it->first == plugin) {
+            delete it->first;
+            mActivePlugins.erase(it);
+            return;
+        }
+    }
+    DBGA("Stop plugin: plugin not found");
 }
 
-World* GraspItGUI::getMainWorld() const
-{
-  return getMainWindow()->getMainWorld();
+void GraspItGUI::stopAllPlugins() {
+    std::list< std::pair<Plugin *, std::string> >::iterator it = mActivePlugins.begin();
+    while (it != mActivePlugins.end()) {
+        delete it->first;
+        it = mActivePlugins.erase(it);
+    }
+}
+
+World *GraspItGUI::getMainWorld() const {
+    return getMainWindow()->getMainWorld();
 }

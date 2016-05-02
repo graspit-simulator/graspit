@@ -17,14 +17,14 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: graspitGUI.h,v 1.5 2010/08/11 02:45:37 cmatei Exp $
 //
 //######################################################################
 
-/*! \file 
-  \brief Defines a graspit user interface class that contains subpieces of the UI.
+/*! \file
+    \brief Defines a graspit user interface class that contains subpieces of the UI.
 */
 
 #ifndef GRASPITGUI_HXX
@@ -45,82 +45,87 @@ class World;
 
 //! This is the main user interface class that is responsible for creating and destroying the MainWindow and IVmgr.
 /*!
-  This class also processes command line arguments and holds pointers to both
-  the MainWindow and IVmgr.  There is one global instance of this class, which
-  allows access to these two main pieces of the UI.  This class also has
-  methods for both the entry and exit to the interactive program loop.
+    This class also processes command line arguments and holds pointers to both
+    the MainWindow and IVmgr.  There is one global instance of this class, which
+    allows access to these two main pieces of the UI.  This class also has
+    methods for both the entry and exit to the interactive program loop.
 
-  This class can also initialize a task dispatcher which is then in charge of 
-  batch execution of tasks based on information form a grasp database.
+    This class can also initialize a task dispatcher which is then in charge of
+    batch execution of tasks based on information form a grasp database.
 */
-class GraspItGUI
-{
-  //! A pointer to the MainWindow.
-  MainWindow *mainWindow;
+class GraspItGUI {
+        //! A pointer to the MainWindow.
+        MainWindow *mainWindow;
 
-  //! A pointer to the IVmgr.
-  IVmgr *ivmgr;
+        //! A pointer to the IVmgr.
+        IVmgr *ivmgr;
 
-  //! A pointer to the Task Dispatcher, if any
-  TaskDispatcher *mDispatch;
+        //! A pointer to the Task Dispatcher, if any
+        TaskDispatcher *mDispatch;
 
-  //! TRUE if this class has been initialized.
-  static bool initialized;
+        //! TRUE if this class has been initialized.
+        static bool initialized;
 
-  //! Holds result of UI initialization.
-  static int initResult;
+        //! Holds result of UI initialization.
+        static int initResult;
 
-  //! Holds the exit code of the UI execution
-  int mExitCode;
-  
-  //! Plugins currently running
-  std::list< std::pair<Plugin*,std::string> > mActivePlugins;
+        //! Holds the exit code of the UI execution
+        int mExitCode;
 
-  //! Available plugin creators
-  std::vector<PluginCreator*> mPluginCreators;
+        //! Plugins currently running
+        std::list< std::pair<Plugin *, std::string> > mActivePlugins;
 
-  //! Idle sensor for calling the plugins from GraspIt's event loop
-  SoIdleSensor *mPluginSensor;
+        //! Available plugin creators
+        std::vector<PluginCreator *> mPluginCreators;
 
- protected:
-  int processArgs(int argc, char **argv);
+        //! Idle sensor for calling the plugins from GraspIt's event loop
+        SoIdleSensor *mPluginSensor;
 
- public:
-  GraspItGUI(int argc,char **argv);
-  ~GraspItGUI();
-  
-  /*! Returns whether the UI pieces were successfully initialized. */
-  bool terminalFailure() const;
+    protected:
+        int processArgs(int argc, char **argv);
 
-  //! Returns the exit code (set internally based on the application)
-  int getExitCode() const {return mExitCode;}
+    public:
+        GraspItGUI(int argc, char **argv);
+        ~GraspItGUI();
 
-  /*! Returns a pointer to the MainWindow. */
-  MainWindow *getMainWindow() const {return mainWindow;}
+        /*! Returns whether the UI pieces were successfully initialized. */
+        bool terminalFailure() const;
 
-  /*! Returns a pointer to the World (obtained through the main window) */
-  World *getMainWorld() const;
+        //! Returns the exit code (set internally based on the application)
+        int getExitCode() const {
+            return mExitCode;
+        }
 
-  /*! Returns a pointer to the IVmgr. */
-  IVmgr *getIVmgr() const {return ivmgr;}
+        /*! Returns a pointer to the MainWindow. */
+        MainWindow *getMainWindow() const {
+            return mainWindow;
+        }
 
-  //! Static sensor callback, just calls processPlugins()
-  static void sensorCB(void *data, SoSensor*);
-  
-  //! Calls the main processing routine of all active plugins
-  void processPlugins();
+        /*! Returns a pointer to the World (obtained through the main window) */
+        World *getMainWorld() const;
 
-  //! Starts a plugin from the given creator
-  void startPlugin(PluginCreator* creator, int argc, char** argv);
+        /*! Returns a pointer to the IVmgr. */
+        IVmgr *getIVmgr() const {
+            return ivmgr;
+        }
 
-  //! Stops and deletes the specified plugin
-  void stopPlugin(Plugin *plugin);
+        //! Static sensor callback, just calls processPlugins()
+        static void sensorCB(void *data, SoSensor *);
 
-  //! Stops and deletes all currently active plugins
-  void stopAllPlugins();
+        //! Calls the main processing routine of all active plugins
+        void processPlugins();
 
-  void startMainLoop();
-  void exitMainLoop();
+        //! Starts a plugin from the given creator
+        void startPlugin(PluginCreator *creator, int argc, char **argv);
+
+        //! Stops and deletes the specified plugin
+        void stopPlugin(Plugin *plugin);
+
+        //! Stops and deletes all currently active plugins
+        void stopAllPlugins();
+
+        void startMainLoop();
+        void exitMainLoop();
 };
 
 #ifdef WIN32

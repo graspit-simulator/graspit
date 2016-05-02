@@ -34,56 +34,51 @@ class World;
 class WorldElement;
 
 //! Functor interface for creating world elements
-class WorldElementCreator
-{
-public:
-  virtual WorldElement* operator() (World* parent, const char* name) = 0;
-  virtual ~WorldElementCreator(){};
+class WorldElementCreator {
+    public:
+        virtual WorldElement *operator()(World *parent, const char *name) = 0;
+        virtual ~WorldElementCreator() {};
 };
 
 //! Templated implementation
 template <class E>
-class SimpleWorldElementCreator : public WorldElementCreator
-{
-public:
-  virtual WorldElement* operator() (World* parent, const char* name)
-  {
-    return new E(parent, name);
-  }
+class SimpleWorldElementCreator : public WorldElementCreator {
+    public:
+        virtual WorldElement *operator()(World *parent, const char *name) {
+            return new E(parent, name);
+        }
 };
 
 //! Factory class for creating WorldElements
 /*! Used to instantiate the right WorldElement based on a name, presumably read
-  from an .xml configuration file, such as a saved world or a robot definition.
+    from an .xml configuration file, such as a saved world or a robot definition.
 */
-class WorldElementFactory 
-{
-private:
-  //! Maps world element types to their creators
-  std::map<std::string, WorldElementCreator*> mCreators;
+class WorldElementFactory {
+    private:
+        //! Maps world element types to their creators
+        std::map<std::string, WorldElementCreator *> mCreators;
 
-public:  
-  //! Stub constructor
-  WorldElementFactory(){}
+    public:
+        //! Stub constructor
+        WorldElementFactory() {}
 
-  //! Cleans up, deletes all creators
-  ~WorldElementFactory();
+        //! Cleans up, deletes all creators
+        ~WorldElementFactory();
 
-  //! Instantiates an element based on the given type
-  WorldElement* createElement(std::string elementType, World *parent,const char *name);
+        //! Instantiates an element based on the given type
+        WorldElement *createElement(std::string elementType, World *parent, const char *name);
 
-  //! Registers a new world element creator for the given type
-  void registerCreator(std::string elementType, WorldElementCreator *creator);
+        //! Registers a new world element creator for the given type
+        void registerCreator(std::string elementType, WorldElementCreator *creator);
 
-  //! Registers creators for the built in element types. Called from the world constructor
-  static void registerBuiltinCreators();
+        //! Registers creators for the built in element types. Called from the world constructor
+        static void registerBuiltinCreators();
 };
 
 //! Returns the world element factory singleton
-inline WorldElementFactory& getWorldElementFactory()
-{
-  static WorldElementFactory wef;
-  return wef;
+inline WorldElementFactory &getWorldElementFactory() {
+    static WorldElementFactory wef;
+    return wef;
 }
 
 //! Convenience macro for registering a new class

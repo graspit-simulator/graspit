@@ -17,14 +17,14 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: SoComplexShape.h,v 1.2 2009/03/25 22:10:23 cmatei Exp $
 //
 //######################################################################
 
 /*! \file
-  \brief Defines a new abstract shape class for Inventor/Coin.
+    \brief Defines a new abstract shape class for Inventor/Coin.
 */
 
 #ifndef _SO_COMPLEX_SHAPE_H
@@ -43,43 +43,43 @@ class SoChildList;
 */
 class SoComplexShape : public SoNode {
 
-   SO_NODE_ABSTRACT_HEADER(SoComplexShape);
+        SO_NODE_ABSTRACT_HEADER(SoComplexShape);
 
- public:
-  
-   static void    initClass();
+    public:
 
-   virtual SoChildList *getChildren() const;
+        static void    initClass();
 
-   virtual void copyContents(const SoFieldContainer *FC, 
-			     SbBool copyConnection);
+        virtual SoChildList *getChildren() const;
 
- protected:
+        virtual void copyContents(const SoFieldContainer *FC,
+                                  SbBool copyConnection);
 
-   // These are the methods that are used to apply the action
-   // to various node classes. The third method is registered
-   // for all relevant non-shape nodes. The calling sequence for
-   // these methods is that used for all methods in the global
-   // action table.
+    protected:
 
-   SoComplexShape();
+        // These are the methods that are used to apply the action
+        // to various node classes. The third method is registered
+        // for all relevant non-shape nodes. The calling sequence for
+        // these methods is that used for all methods in the global
+        // action table.
 
-   virtual ~SoComplexShape();
+        SoComplexShape();
 
-   /*! Empty stub. */
-   virtual void generateChildren() { }
+        virtual ~SoComplexShape();
+
+        /*! Empty stub. */
+        virtual void generateChildren() { }
 
 
-   virtual void  doAction(SoAction *action);
-   virtual void  getBoundingBox(SoGetBoundingBoxAction *action);
-   virtual void  GLRender(SoGLRenderAction *action);
-   virtual void  handleEvent(SoHandleEventAction *action);
-   virtual void  pick(SoPickAction *action);
-   virtual void  callback(SoCallbackAction *action);
-   virtual void  getMatrix(SoGetMatrixAction *action);
+        virtual void  doAction(SoAction *action);
+        virtual void  getBoundingBox(SoGetBoundingBoxAction *action);
+        virtual void  GLRender(SoGLRenderAction *action);
+        virtual void  handleEvent(SoHandleEventAction *action);
+        virtual void  pick(SoPickAction *action);
+        virtual void  callback(SoCallbackAction *action);
+        virtual void  getMatrix(SoGetMatrixAction *action);
 
-   //! A pointer to a list of the nodes that make up this complex shape.
-   SoChildList *children;
+        //! A pointer to a list of the nodes that make up this complex shape.
+        SoChildList *children;
 
 
 };

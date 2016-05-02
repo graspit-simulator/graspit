@@ -24,4 +24,4 @@
 //######################################################################
 
 
-void HandController(Hand *hand,Grasp *grasp,double timeInterval);
+void HandController(Hand *hand, Grasp *grasp, double timeInterval);

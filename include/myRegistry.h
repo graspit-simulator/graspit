@@ -24,7 +24,7 @@
 //######################################################################
 
 /*! \file
-  \brief Defines the company and application keys for accessing the registry.
+    \brief Defines the company and application keys for accessing the registry.
 */
 #ifndef MYREGISTRY_HXX
 #define MYREGISTRY_HXX

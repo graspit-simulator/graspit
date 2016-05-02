@@ -35,36 +35,35 @@
 class CalibrationPose;
 
 //! Obsolete class used for saving a hand pose and posture for a grasp of an object
-/*!	This class records a grasp. It just knows a hand pose and a transform.
-	It uses the CalibrationPose to record the pose, but makes use of very 
-	little from that class. It keeps the pose in DOF space, not in 
-	EigenGrasp space.
+/*! This class records a grasp. It just knows a hand pose and a transform.
+    It uses the CalibrationPose to record the pose, but makes use of very
+    little from that class. It keeps the pose in DOF space, not in
+    EigenGrasp space.
 
-	This class is obsolete, only used by the GraspCaptureDlg. It is in a very
-	poor state, not recommended for use.
+    This class is obsolete, only used by the GraspCaptureDlg. It is in a very
+    poor state, not recommended for use.
 */
-class GraspRecord
-{
-private:
-	int mSize;
-public:
-	GraspRecord(int size);
-	~GraspRecord();
+class GraspRecord {
+    private:
+        int mSize;
+    public:
+        GraspRecord(int size);
+        ~GraspRecord();
 
-	CalibrationPose *mPose;
-	QString mObjectName;
-	QString mRobotName;
-	transf mTran;
+        CalibrationPose *mPose;
+        QString mObjectName;
+        QString mRobotName;
+        transf mTran;
 
-	//modified to DBase project
-	double quality;
-	int originalIndex;
+        //modified to DBase project
+        double quality;
+        int originalIndex;
 
-	void writeToFile(FILE *fp);
-	void readFromFile(FILE *fp);
+        void writeToFile(FILE *fp);
+        void readFromFile(FILE *fp);
 };
 
-void loadGraspListFromFile(std::vector<GraspRecord*> *list, const char *filename);
-void writeGraspListToFile (std::vector<GraspRecord*> *list, const char *filename);
+void loadGraspListFromFile(std::vector<GraspRecord *> *list, const char *filename);
+void writeGraspListToFile(std::vector<GraspRecord *> *list, const char *filename);
 
 #endif
