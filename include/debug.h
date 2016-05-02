@@ -24,17 +24,17 @@
 //######################################################################
 
 /*! \file
-	Defines some convenience macros for output and debug, which behave 
-	differently depending on whether GRASPITDBG is defined:
+    Defines some convenience macros for output and debug, which behave
+    differently depending on whether GRASPITDBG is defined:
 
-	DBGA(msg) always prints the message to std::err
+    DBGA(msg) always prints the message to std::err
 
-	DBGP(msg) only prints the message if GRASPITDBG is defined, and 
-	swallows it otherwise. 
+    DBGP(msg) only prints the message if GRASPITDBG is defined, and
+    swallows it otherwise.
 
-	To use this, include "debug.h" in your source file, and then 
-	define GRASPITDBG just before the #include if you want the debug
-	output.
+    To use this, include "debug.h" in your source file, and then
+    define GRASPITDBG just before the #include if you want the debug
+    output.
 */
 
 #ifndef _DEBUG_H_
@@ -46,7 +46,7 @@
 #define DBGP(STMT) std::cerr<<STMT<<std::endl;
 #define DBGST(STMT) STMT;
 #else
-#define DBGP(STMT) 
+#define DBGP(STMT)
 #define DBGST(STMT)
 #endif
 

@@ -24,7 +24,7 @@
 //######################################################################
 
 /*! \file
-\brief Contains the graspit version number and other constants as needed
+    \brief Contains the graspit version number and other constants as needed
 */
 
 #define GRASPIT_VERSION "2.1"

@@ -24,62 +24,64 @@
 //######################################################################
 
 /*! \file
-  \brief Defines the interface for a plugin that can be loaded dynamically and used with GraspIt
+    \brief Defines the interface for a plugin that can be loaded dynamically and used with GraspIt
 */
 #ifndef __PLUGIN_H__
 #include <string>
 
 //! Defines a plugin that can can be loaded dynamically and used with GraspIt
-class Plugin
-{
-public:
-  //! Stub destructor
-  virtual ~Plugin(){}
-  //! Called once when user starts the plugin (or on startup if the plugin is automatically started)
-  virtual int init(int argc, char **argv) = 0;
-  //! Called whenever GraspIt's main loop is idle
-  virtual int mainLoop() = 0;
+class Plugin {
+    public:
+        //! Stub destructor
+        virtual ~Plugin() {}
+        //! Called once when user starts the plugin (or on startup if the plugin is automatically started)
+        virtual int init(int argc, char **argv) = 0;
+        //! Called whenever GraspIt's main loop is idle
+        virtual int mainLoop() = 0;
 };
 
-class PluginCreator
-{
-public:
-  typedef Plugin* (*CreatePluginFctn)();
-  typedef std::string (*GetTypeFctn)();
-private:
-  void* mLibraryHandle;
-  CreatePluginFctn mCreatePluginFctn;
+class PluginCreator {
+    public:
+        typedef Plugin *(*CreatePluginFctn)();
+        typedef std::string(*GetTypeFctn)();
+    private:
+        void *mLibraryHandle;
+        CreatePluginFctn mCreatePluginFctn;
 
-  bool mAutoStart;
-  std::string mType;
+        bool mAutoStart;
+        std::string mType;
 
-public:
-  PluginCreator(void* libraryHandle, CreatePluginFctn createPluginFctn,
-                bool autoStart, std::string type) :
-    mLibraryHandle(libraryHandle),
-    mCreatePluginFctn(createPluginFctn),
-    mAutoStart(autoStart),
-    mType(type)
-  {}
-  
-  ~PluginCreator();
+    public:
+        PluginCreator(void *libraryHandle, CreatePluginFctn createPluginFctn,
+                      bool autoStart, std::string type) :
+            mLibraryHandle(libraryHandle),
+            mCreatePluginFctn(createPluginFctn),
+            mAutoStart(autoStart),
+            mType(type) {
+        }
 
-  Plugin* createPlugin(int argc, char** argv);
-  
-  bool autoStart() const {return mAutoStart;}
-  std::string type() const {return mType;}
+        ~PluginCreator();
 
-  static PluginCreator* loadFromLibrary(std::string libName);
+        Plugin *createPlugin(int argc, char **argv);
+
+        bool autoStart() const {
+            return mAutoStart;
+        }
+        std::string type() const {
+            return mType;
+        }
+
+        static PluginCreator *loadFromLibrary(std::string libName);
 };
 
 
 
 
-/*Under windows, DLL files only export symbols prefaced with this compiler macro.
+/*  Under windows, DLL files only export symbols prefaced with this compiler macro.
 
 
-For both linux and windows, extern "C" are necessary.
-I.E. 
+    For both linux and windows, extern "C" are necessary.
+    I.E.
      namespace fooplugin{
      class fooPlugin: Plugin{
      --stuff--
@@ -92,10 +94,10 @@ I.E.
      but this does not appear to cause any problems.
 
 
-}
+    }
 
 
-Both the createPlugin and getType functions must be declared using these macros.
+    Both the createPlugin and getType functions must be declared using these macros.
 */
 #ifdef WIN32
 #define PLUGIN_API __declspec(dllexport)

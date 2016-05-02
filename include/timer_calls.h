@@ -24,17 +24,17 @@
 //######################################################################
 
 /*! This file implements the macros for reading and converting system time.
-  A total of six macros must be implemented:
+    A total of six macros must be implemented:
 
-  PROF_TIME_UNIT  - the data type for storing a time value
-  PROF_DURATION_UNIT - the data type for storing an interval or a duration
-  PROF_RESET_DURATION(DURATION) - resets a duration to zero
-  PROF_GET_TIME(TIME) - gets the current system time
-  PROF_ADD_DURATION(DURATION, START_TIME, END_TIME) - adds the interval between two time values to a duration
-  PROF_CONVERT_TO_MICROS(DURATION,DOUBLE) - converts a duration to microseconds
+    PROF_TIME_UNIT  - the data type for storing a time value
+    PROF_DURATION_UNIT - the data type for storing an interval or a duration
+    PROF_RESET_DURATION(DURATION) - resets a duration to zero
+    PROF_GET_TIME(TIME) - gets the current system time
+    PROF_ADD_DURATION(DURATION, START_TIME, END_TIME) - adds the interval between two time values to a duration
+    PROF_CONVERT_TO_MICROS(DURATION,DOUBLE) - converts a duration to microseconds
 
-  Conversion is separate from read time, since we don't want to do it every time we read time, but only
-  when we need to return it.
+    Conversion is separate from read time, since we don't want to do it every time we read time, but only
+    when we need to return it.
 */
 
 // ------------------------------------------- WINDOWS -----------------------------------------------
@@ -48,20 +48,20 @@
 #define PROF_TIME_UNIT unsigned __int64
 #define PROF_DURATION_UNIT unsigned __int64
 #define PROF_RESET_DURATION(DURATION) DURATION=0;
-#define PROF_ADD_DURATION(DURATION, START_TIME, END_TIME) DURATION += END_TIME - START_TIME; 
+#define PROF_ADD_DURATION(DURATION, START_TIME, END_TIME) DURATION += END_TIME - START_TIME;
 
 // Gets time in the highest resolution available to the CPU, about a nanosecond
-#define PROF_GET_TIME(TIME) LARGE_INTEGER tmp;			  \
-  QueryPerformanceCounter(&tmp);				  \
-  TIME = tmp.QuadPart;
+#define PROF_GET_TIME(TIME) LARGE_INTEGER tmp;            \
+    QueryPerformanceCounter(&tmp);                  \
+    TIME = tmp.QuadPart;
 #define PROF_CONVERT_TO_MICROS(DURATION,DOUBLE) DOUBLE = 1.0e6 * ((double)DURATION) / getProfiler().getCountsPerSec();
 
 /*
-// Gets time in units of 100 nanoseconds as 2 4-byte words
-#define PROF_GET_TIME(TIME)  FILETIME tmp;					\
-  GetSystemTimeAsFileTime(&tmp);					\
-  TIME = (static_cast<unsigned __int64>(tmp.dwHighDateTime) << 32) | tmp.dwLowDateTime;
-#define PROF_CONVERT_TO_MICROS(DURATION, DOUBLE) DOUBLE = 0.1 * DURATION;
+    // Gets time in units of 100 nanoseconds as 2 4-byte words
+    #define PROF_GET_TIME(TIME)  FILETIME tmp;                  \
+    GetSystemTimeAsFileTime(&tmp);                    \
+    TIME = (static_cast<unsigned __int64>(tmp.dwHighDateTime) << 32) | tmp.dwLowDateTime;
+    #define PROF_CONVERT_TO_MICROS(DURATION, DOUBLE) DOUBLE = 0.1 * DURATION;
 */
 
 // --------------------------------------------------------------------------------------------------
@@ -77,31 +77,31 @@
 #define PROF_DURATION_UNIT struct timeval
 #define PROF_RESET_DURATION(DURATION) DURATION.tv_sec = DURATION.tv_usec = 0;
 #define PROF_GET_TIME(TIME) gettimeofday(&TIME, NULL);
-#define PROF_ADD_DURATION(DURATION,START,END)	\
-  if (END.tv_usec < START.tv_usec) { \
-    int nsec = (START.tv_usec - END.tv_usec) / 1000000 + 1; \
-    START.tv_usec -= 1000000 * nsec; \
-    START.tv_sec += nsec; \
-  } \
-  if (END.tv_usec - START.tv_usec > 1000000) { \
-    int nsec = (END.tv_usec - START.tv_usec) / 1000000; \
-    START.tv_usec += 1000000 * nsec; \
-    START.tv_sec -= nsec; \
-  } \
-  DURATION.tv_sec += END.tv_sec - START.tv_sec; \
-  DURATION.tv_usec += END.tv_usec - START.tv_usec;
+#define PROF_ADD_DURATION(DURATION,START,END)   \
+    if (END.tv_usec < START.tv_usec) { \
+        int nsec = (START.tv_usec - END.tv_usec) / 1000000 + 1; \
+        START.tv_usec -= 1000000 * nsec; \
+        START.tv_sec += nsec; \
+    } \
+    if (END.tv_usec - START.tv_usec > 1000000) { \
+        int nsec = (END.tv_usec - START.tv_usec) / 1000000; \
+        START.tv_usec += 1000000 * nsec; \
+        START.tv_sec -= nsec; \
+    } \
+    DURATION.tv_sec += END.tv_sec - START.tv_sec; \
+    DURATION.tv_usec += END.tv_usec - START.tv_usec;
 #define PROF_CONVERT_TO_MICROS(DURATION,DOUBLE) DOUBLE = 1.0e6 * DURATION.tv_sec + DURATION.tv_usec;
 
 /*
-//version WITH ONLY ONE SECOND RESOLUTION
-#include <ctime>
-#include <sys/types.h>
+    //version WITH ONLY ONE SECOND RESOLUTION
+    #include <ctime>
+    #include <sys/types.h>
 
-#define PROF_TIME_UNIT u_int64_t
-#define PROF_DURATION_UNIT u_int64_t
-#define PROF_RESET_DURATION(STR) STR = 0;
-#define PROF_GET_TIME(STR) STR = time(NULL);
-#define PROF_ADD_DURATION(DURATION,START,END) DURATION += END - START; 
-#define PROF_CONVERT_TO_DOUBLE(DURATION,DOUBLE) DOUBLE = 1.0e6 * DURATION;
+    #define PROF_TIME_UNIT u_int64_t
+    #define PROF_DURATION_UNIT u_int64_t
+    #define PROF_RESET_DURATION(STR) STR = 0;
+    #define PROF_GET_TIME(STR) STR = time(NULL);
+    #define PROF_ADD_DURATION(DURATION,START,END) DURATION += END - START; 
+    #define PROF_CONVERT_TO_DOUBLE(DURATION,DOUBLE) DOUBLE = 1.0e6 * DURATION;
 */
 #endif

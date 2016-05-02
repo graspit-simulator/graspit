@@ -27,13 +27,13 @@
 #define _jacobian_h_
 
 /*! \file
-	A hard-coded jacobian and derivative for the thumb of the human 
-	hand, computed in Mathematica and then translated here. Used 
-	only for CyberGlove thumb calibration. 
+    A hard-coded jacobian and derivative for the thumb of the human
+    hand, computed in Mathematica and then translated here. Used
+    only for CyberGlove thumb calibration.
 
-	This file needs a less generic name - this is only a very 
-	specific thing for the human hand and glove calibration. More
-	general Jacobian computations can be found in the Grasp class.
+    This file needs a less generic name - this is only a very
+    specific thing for the human hand and glove calibration. More
+    general Jacobian computations can be found in the Grasp class.
 */
 
 void jacobian(double t1, double t2, double t3, double t4, double px, double py, double pz, double *J);
