@@ -38,6 +38,9 @@ extern "C"{
 #include "plugin.h"
 #include "mytools.h"
 #include "debug.h"
+#include "string.h"
+
+
 
 PluginCreator::~PluginCreator()
 {
@@ -47,7 +50,7 @@ PluginCreator::~PluginCreator()
 
 Plugin* PluginCreator::createPlugin(int argc, char** argv)
 {
-  Plugin* plugin = (*mCreatePluginFctn)(); 
+  Plugin* plugin = (*mCreatePluginFctn)();
   if (!plugin)
   {
       return NULL;
@@ -57,9 +60,7 @@ Plugin* PluginCreator::createPlugin(int argc, char** argv)
   char ** argv_copy = new char*[argc+1];
   for(int i=0; i < argc; i++)
   {
-      int len = strlen(argv[i] + 1);
-      argv_copy[i] = new char[len];
-      strcpy(argv_copy[i], argv[i]);
+      argv_copy[i] = strdup(argv[i]);
   }
   argv_copy[argc] = NULL;
 
@@ -107,10 +108,10 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
       }
     }
     if (!found) {
-      DBGA("Could not find relative plugin file " << filename.latin1() << 
+      DBGA("Could not find relative plugin file " << filename.latin1() <<
            " in any directory specified in GRASPIT_PLUGIN_DIR");
       return NULL;
-    }    
+    }
   }
 
   //look for the library file and load it
