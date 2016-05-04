@@ -2,6 +2,32 @@
 
 LIBS += $$ADDITIONAL_LINK_FLAGS
 
+# ---------------------- Bullet Dynamics ----------------------------------
+
+bullet_dynamics{
+
+!exists($(BULLET_PHYSICS_SOURCE_DIR)) {
+                error("Bullet not installed or BULLET_PHYSICS_SOURCE_DIR environment variable not set. Please insure bullet is installed \
+                        and run: export BULLET_PHYSICS_SOURCE_DIR=~/bullet3-2.83.7/ or equivalent.")
+        }
+
+exists($(BULLET_PHYSICS_SOURCE_DIR)) {
+                message("Bullet BULLET_PHYSICS_SOURCE_DIR environment variable is set: $$(BULLET_PHYSICS_SOURCE_DIR)")
+                message("For GraspIt! to work with Bullet at runtime, may need to run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/ or equivalent.")
+        }
+
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletCollision/CollisionShapes
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletCollision/Gimpact
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/LinearMath
+INCLUDEPATH += $(BULLET_PHYSICS_SOURCE_DIR)/src/BulletDynamics/ConstraintSolver
+
+LIBS += -lBulletDynamics
+LIBS += -lLinearMath
+LIBS += -lBulletCollision
+
+}
+
 # ---------------------- Blas and Lapack ----------------------------------
 
 LIBS += -lblas -llapack 

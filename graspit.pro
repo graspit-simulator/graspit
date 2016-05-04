@@ -17,7 +17,11 @@ LANGUAGE	= C++
 
 #select collision detection engine
 #possible values: graspit_collision pqp_collision
-COLLISION = graspit_collision
+CONFIG += graspit_collision
+
+#select collision detection engine
+#possible values: graspit_dynamics bullet_dynamics
+CONFIG += graspit_dynamics
 
 #select blas and lapack libraries, Windows-only
 #possible values: mkl clapack

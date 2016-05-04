@@ -161,6 +161,7 @@ Joint::applyPassiveInternalWrenches()
 double
 Joint::getSpringForce() const 
 {
+    DBGP( "mK: " << mK << " getDisplacement(): " << getDisplacement() << std::endl);
 	return mK * getDisplacement();
 }
 
@@ -221,9 +222,9 @@ PrismaticJoint::initJointFromXml(const TiXmlElement* root, int jnum)
 	if(!getDouble(root,"alpha", alpha)) return FAILURE;
 	if(!getDouble(root,"minValue", minVal)) return FAILURE;
 	if(!getDouble(root,"maxValue", maxVal))	return FAILURE;
-	if (!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
+    if (!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
 	if (!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
-	if (!getDouble(root,"springStiffness", mK)) mK = 0.0;
+    if (!getDouble(root,"springStiffness", mK)) mK = 0.0;
 	if (!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
 
 	DBGP("thStr: " << theta << " d: " << dStr << " a: " << a << " alpha: " 
@@ -329,6 +330,7 @@ RevoluteJoint::initJointFromXml(const TiXmlElement* root, int jnum)
   //convert to graspit units which for now seem to be the
   //rather strange Nmm * 1.0e6
   mK *= 1.0e6; 
+
   
   alpha *= M_PI/180.0;
   minVal *= M_PI/180.0;

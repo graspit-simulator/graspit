@@ -50,9 +50,7 @@
 #include "contact.h"
 #include "contactSetting.h"
 #include "ivmgr.h"
-#include "dynamics.h"
 #include "grasp.h"
-#include "dynJoint.h"
 #include "ivmgr.h"
 #include "barrett.h"
 #include "matvec3D.h"
@@ -61,17 +59,22 @@
 #include "tinyxml.h"
 #include "worldElementFactory.h"
 
-//#undef PQP_COLLISION
-//#undef GRASPIT_COLLISION
+#include "dynamics/dynamics.h"
+#include "dynamics/dynJoint.h"
+#include "dynamics/dynamicsEngine.h"
 
 #ifdef PQP_COLLISION
 #include "PQPCollision.h"
 #endif
-#ifdef BULLET_COLLISION
-#include "Bullet/bulletCollision.h"
-#endif
-#ifdef GRASPIT_COLLISION 
+#ifdef GRASPIT_COLLISION
 #include "Graspit/graspitCollision.h"
+#endif
+
+#ifdef GRASPIT_DYNAMICS
+#include "dynamics/graspitDynamics.h"
+#endif
+#ifdef BULLET_DYNAMICS
+#include "dynamics/bulletDynamics.h"
 #endif
 
 //simulations of arches with John Ochsendorf
@@ -83,7 +86,6 @@
 
 FILE *errFP=NULL;
 
-//#define GRASPITDBG
 #include "debug.h"
 
 //#define PROF_ENABLED
@@ -131,13 +133,10 @@ World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,nam
 	readSettings();  
 
 #ifdef PQP_COLLISION
-	mCollisionInterface = new PQPCollision();
-#endif
-#ifdef BULLET_COLLISION
-	mCollisionInterface = new BulletCollision();
+  mCollisionInterface = new PQPCollision();
 #endif
 #ifdef GRASPIT_COLLISION
-	mCollisionInterface = new GraspitCollision();
+  mCollisionInterface = new GraspitCollision();
 #endif
 
 	IVRoot = new SoSeparator;
@@ -149,6 +148,13 @@ World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,nam
         // This has to happen at runtime, so it's placed here
         // maybe we can find a better solution at some point.
         WorldElementFactory::registerBuiltinCreators();
+
+#ifdef GRASPIT_DYNAMICS
+  mDynamicsEngine = new GraspitDynamics(this);
+#endif
+#ifdef BULLET_DYNAMICS
+  mDynamicsEngine = new BulletDynamics(this);
+#endif
 }
 
 /*! Saves the global settings and parameters and deletes the world
@@ -178,6 +184,7 @@ World::~World()
 
 	if (idleSensor) delete idleSensor;
 	delete mCollisionInterface;
+    delete mDynamicsEngine;
 	IVRoot->unref();
 }
 
@@ -900,6 +907,7 @@ World::addBody(Body *newBody)
 	IVRoot->addChild(newBody->getIVRoot());
 	modified = true;
 	Q_EMIT numElementsChanged();
+    mDynamicsEngine->addBody(newBody);
 }
 
 /*! Adds a robot link. No need to add it to scene graph, since the robot 
@@ -911,6 +919,7 @@ World::addLink(Link *newLink)
 {
 	bodyVec.push_back(newLink);
 	numBodies++;
+    mDynamicsEngine->addBody(newLink);
 }
 
 /*! Loads a robot from a file and adds it to the world. \a filename must
@@ -1013,6 +1022,7 @@ World::addRobot(Robot *robot, bool addToScene)
 
 	modified = true;
 	Q_EMIT numElementsChanged();
+    mDynamicsEngine->addRobot(robot);
 }
 
 /*! Adds to this world a sensor that is already created and initialized.
@@ -1696,6 +1706,7 @@ World::turnOnDynamics()
 	//PROF_RESET_ALL;
 	//PROF_START_TIMER(DYNAMICS);
 	dynamicsOn = true;
+    mDynamicsEngine->turnOnDynamics();
 	if (idleSensor) delete idleSensor;
 	idleSensor = new SoIdleSensor(dynamicsCB,this);
 	idleSensor->schedule();
@@ -1710,6 +1721,7 @@ World::turnOffDynamics()
 	if (idleSensor) delete idleSensor;
 	idleSensor = NULL;
 	dynamicsOn = false;
+    mDynamicsEngine->turnOffDynamics();
 	for (int i=0; i<numRobots; i++) {
 		//actually set joint values
 		robotVec[i]->updateJointValuesFromDynamics();
@@ -2095,40 +2107,6 @@ World::computeNewVelocities(double timeStep)
 		if (bodyVec[i]->isDynamic())
 			((DynamicBody *)bodyVec[i])->resetDynamicsFlag();
 
-	/*  double conMaxErr = 0.0;
-
-	if (!errFP) errFP=fopen("constraintError.txt","w");
-	fprintf(errFP,"%le ",worldTime);
-	for (i=0;i<numBodies;i++) {
-	contactList = bodyVec[i]->getContacts();
-	for (cp=contactList.begin();cp!=contactList.end();cp++) {
-	conMaxErr = MAX(conMaxErr,fabs((*cp)->getConstraintError()));
-	}
-
-	}
-	fprintf(errFP,"%le ",conMaxErr);
-	fprintf(errFP," ");
-	int k,l;
-	double jointErrMax=0.0;
-	for (i=0;i<numRobots;i++) {
-	if (robotVec[i]->getBase()->getDynJoint())
-	for (j=0;j<3;j++)
-	jointErrMax = MAX(jointErrMax,fabs(robotVec[i]->getBase()->getDynJoint()->getConstraintError()[j]));
-	//fprintf(errFP,"%le ",robotVec[i]->getBase()->getDynJoint()->getConstraintError()[j]);
-	for (j=0;j<robotVec[i]->getNumChains();j++) {
-	KinematicChain *chain=robotVec[i]->getChain(j);
-	for (k=0;k<chain->getNumLinks();k++)
-	if (chain->getLink(k)->getDynJoint())
-	for (l=0;l<3;l++)
-	jointErrMax = MAX(jointErrMax,fabs(robotVec[i]->getBase()->getDynJoint()->getConstraintError()[j]));
-	// fprintf(errFP,"%le ",chain->getLink(k)->getDynJoint()->getConstraintError()[l]);
-	}
-	}
-	fprintf(errFP,"%le",jointErrMax);
-	fprintf(errFP,"\n");
-
-	*/
-
 	Q_EMIT dynamicStepTaken();
 	return 0;
 }
@@ -2155,23 +2133,11 @@ joint constraints, for the next time step.
 void
 World::stepDynamics()
 {
-	resetDynamicWrenches();
-	double actualTimeStep = moveDynamicBodies(dynamicsTimeStep);
-	if (actualTimeStep<0) {
-		turnOffDynamics();
-		Q_EMIT dynamicsError("Timestep failsafe reached.");
-		return;
-	}
-
-	for (int i=0; i<numRobots; i++) {
-		robotVec[i]->DOFController(actualTimeStep);
-		robotVec[i]->applyJointPassiveInternalWrenches();
-	}
-
-	if (computeNewVelocities(actualTimeStep)) {
-		Q_EMIT dynamicsError("LCP could not be solved.");
-		return;
-	} 
+    int ret;
+    ret=mDynamicsEngine->stepDynamics();
+    if(ret==-1){
+      return;
+    }
 	if (idleSensor) idleSensor->schedule();
 }
 
