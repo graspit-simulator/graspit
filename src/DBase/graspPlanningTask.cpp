@@ -70,7 +70,7 @@ void GraspPlanningTask::start()
   //get the details of the planning task itself
   if (!mDBMgr->GetPlanningTaskRecord(mRecord.taskId, &mPlanningTask)) {
     DBGA("Failed to get planning record for task");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
 
@@ -88,14 +88,14 @@ void GraspPlanningTask::start()
     mHand = static_cast<Hand*>(world->importRobot(handPath));
     if ( !mHand ) {
       DBGA("Failed to load hand");
-      mStatus = ERROR;
+      mStatus = FAILED;
       return;
     }
   }
   //check for virtual contacts
   if (mHand->getNumVirtualContacts()==0) {
     DBGA("Specified hand does not have virtual contacts defined");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
   
@@ -103,7 +103,7 @@ void GraspPlanningTask::start()
   GraspitDBModel *model = static_cast<GraspitDBModel*>(mPlanningTask.model);
   if (model->load(world) != SUCCESS) {
     DBGA("Grasp Planning Task: failed to load model");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
   mObject = model->getGraspableBody();
@@ -136,7 +136,7 @@ void GraspPlanningTask::start()
   
   if (!mPlanner->resetPlanner()) {
     DBGA("Grasp Planning Task: failed to reset planner");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return ;
   }
   
@@ -191,11 +191,11 @@ void GraspPlanningTask::plannerLoopUpdate()
     //we are ready to save it
     if (!saveGrasp(sol)) {
       DBGA("Grasp Planning Task: failed to save solution to dbase");
-      mStatus = ERROR;
+      mStatus = FAILED;
       break;
     }				
   }
-  if (mStatus == ERROR) {
+  if (mStatus == FAILED) {
     // this is a bit of a hack, but ensures that the planner will stop 
     // as soon as it attempts to take another step. If we specifically start
     // the planner from in here, it causes problem, as this is called from inside

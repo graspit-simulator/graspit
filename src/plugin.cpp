@@ -143,7 +143,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   }
 
   //look for the library file and load it
-   void* handle = PLUGIN_DYNLIB_OPEN(filename.toAscii().constData());
+  PLUGIN_DYNLIB_HANDLE handle = PLUGIN_DYNLIB_OPEN(filename.toAscii().constData());
   char *errstr = PLUGIN_DYNLIB_ERROR();
   if (!handle) {
     DBGA("Failed to open dynamic library " << filename.toAscii().constData() );
@@ -157,7 +157,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   //see also discussion here:
   // http://www.trilithium.com/johan/2004/12/problem-with-dlsym/
   //maybe in the future a better solution can be found...
-  void * _createPluginFctn = PLUGIN_DYNLIB_IMPORT(handle,"createPlugin");
+  PluginCreator::CreatePluginFctn _createPluginFctn = (CreatePluginFctn) PLUGIN_DYNLIB_IMPORT(handle,"createPlugin");
   if (PLUGIN_DYNLIB_ERROR()) {
     DBGA("Could not load symbol createPlugin from library " << filename.toAscii().constData());
     return NULL;
@@ -165,7 +165,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   PluginCreator::CreatePluginFctn createPluginFctn = reinterpret_cast<PluginCreator::CreatePluginFctn>(_createPluginFctn);
 
   //read the type of plugin
-  void * _getTypeFctn = PLUGIN_DYNLIB_IMPORT(handle,"getType");
+  PluginCreator::GetTypeFctn _getTypeFctn = (GetTypeFctn) PLUGIN_DYNLIB_IMPORT(handle,"getType");
   if (PLUGIN_DYNLIB_ERROR()) {
     DBGA("Could not load symbol getType from library " << filename.toAscii().constData());
     return NULL;

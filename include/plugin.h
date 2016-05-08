@@ -73,14 +73,14 @@ public:
   typedef Plugin* (*CreatePluginFctn)();
   typedef PLUGIN_API_ENTRY std::string (PLUGIN_API_CALL *GetTypeFctn)();
 private:
-  void* mLibraryHandle;
+  PLUGIN_DYNLIB_HANDLE mLibraryHandle;
   CreatePluginFctn mCreatePluginFctn;
 
   bool mAutoStart;
   std::string mType;
 
 public:
-  PluginCreator(void* libraryHandle, CreatePluginFctn createPluginFctn,
+  PluginCreator(PLUGIN_DYNLIB_HANDLE libraryHandle, CreatePluginFctn createPluginFctn,
                 bool autoStart, std::string type) :
     mLibraryHandle(libraryHandle),
     mCreatePluginFctn(createPluginFctn),
