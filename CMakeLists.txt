@@ -23,14 +23,6 @@ set(PLY true CACHE PATH "compile PLY sources as well")
 set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
 set(BUILD_TESTS false CACHE PATH "build tests as well")
 
-if (NOT BUILD_STATIC_LIB)
-    set (BUILD_STATIC_LIB false)
-endif (NOT BUILD_STATIC_LIB)
-
-if (NOT SKIP_SHARED_LIB)
-    set (SKIP_SHARED_LIB false)
-endif (NOT SKIP_SHARED_LIB)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	set (GRASPIT_DEFINES 
 	    -DGRASPIT_RELEASE  
@@ -748,51 +740,24 @@ set (GRASPIT_LIBRARY_SOURCES
     ${MOC_OUTFILES}
 )
 
-if (NOT SKIP_SHARED_LIB)
-    add_library(graspit SHARED
-        ${GRASPIT_LIBRARY_SOURCES} 
-    )
-endif (NOT SKIP_SHARED_LIB)
+add_library(graspit SHARED ${GRASPIT_LIBRARY_SOURCES})
 
-
-if(BUILD_STATIC_LIB)
-    add_library(graspit_static STATIC 
-        ${GRASPIT_LIBRARY_SOURCES} 
-    )
-    if ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
-        message("Using target_compile_options with cmake version ${CMAKE_VERSION}")
-        target_compile_options(graspit_static PRIVATE -fPIC)  # does not work for bloom-release on saucy. Could 
-    else ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
-        message("Using set_target_properties with cmake version ${CMAKE_VERSION}")
-        set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC)
-    endif ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
-endif(BUILD_STATIC_LIB)
-
+## ---
+## comment for future reference: This is required to build a static library
+# add_library(graspit_static STATIC ${GRASPIT_LIBRARY_SOURCES})
+# if ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
+#     target_compile_options(graspit_static PRIVATE -fPIC)  # does not work for bloom-release on saucy. Could 
+# else ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
+#     set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC)
+# endif ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
+## ---
 
 ## Make simulator executable
 
 # sources for executable graspit_simulator
 set(SIMULATOR_SRC ${GSRC}/src/main.cpp)
 
-if (BUILD_STATIC_LIB)
-    # the graspit_simulator executable can still not be linked
-    # with a static library, the problem being the QPixmap resources
-    # (see also: https://wiki.qt.io/QtResources)
-    # With a static library they can't be found, and Q_INIT_RESOURCE can only be done
-    # with a .qrt file (which I tried to use but QT4_ADD_RESOURCES doesn't work).
-    # So for now, compile all sources into the graspit_simulator directly.
-    set(SIMULATOR_SRC 
-        ${GRASPIT_LIBRARY_SOURCES}
-        ${SIMULATOR_SRC}
-    )
-endif (BUILD_STATIC_LIB)
-
-
-if (NOT SKIP_SHARED_LIB OR BUILD_STATIC_LIB)
-    add_executable(graspit_simulator 
-        ${SIMULATOR_SRC}
-    )
-endif (NOT SKIP_SHARED_LIB OR BUILD_STATIC_LIB)
+add_executable(graspit_simulator ${SIMULATOR_SRC})
 
 ## System libraries which are needed for graspit
 set(GRASPIT_LINK_LIBRARIES
@@ -804,35 +769,30 @@ set(GRASPIT_LINK_LIBRARIES
    ${BULLET_LIBRARIES}
 )
 
-if (NOT SKIP_SHARED_LIB)
-    target_link_libraries(graspit
-       ${GRASPIT_LINK_LIBRARIES}
-    )
-endif (NOT SKIP_SHARED_LIB)
+## ---
+## comment for future reference: This is required to build a static library
+# The graspit_simulator executable can still not be linked
+# with a static library, the problem being the QPixmap resources
+# (see also: https://wiki.qt.io/QtResources)
+# With a static library they can't be found, and Q_INIT_RESOURCE can only be done
+# with a .qrt file (which I tried to use but QT4_ADD_RESOURCES doesn't work).
+# So for now, compile all sources into the graspit_simulator directly.
+# set(SIMULATOR_SRC ${GRASPIT_LIBRARY_SOURCES} ${SIMULATOR_SRC})
+# target_link_libraries(graspit_static ${GRASPIT_LINK_LIBRARIES})
+# target_link_libraries(graspit_simulator ${GRASPIT_LINK_LIBRARIES})
+## ---
 
-# link the libraries: If a static lib is built, use this one.
-# otherwise, use the shared lib.
-if(BUILD_STATIC_LIB)
-    target_link_libraries(graspit_static ${GRASPIT_LINK_LIBRARIES})
-    target_link_libraries(graspit_simulator ${GRASPIT_LINK_LIBRARIES})
-else(BUILD_STATIC_LIB)
-    if (NOT SKIP_SHARED_LIB)
-        target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES})
-    endif(NOT SKIP_SHARED_LIB)
-endif(BUILD_STATIC_LIB)
+## Link the shared library and the executable
+target_link_libraries(graspit ${GRASPIT_LINK_LIBRARIES})
+target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES})
 
-
+## Set install destination paths
 set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/)
 set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 set ( BIN_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
 set ( SHARE_DESTINATION ${CMAKE_INSTALL_PREFIX}/share/)
 
-set(INSTALL_BINS graspit_simulator)
-
-if (NOT SKIP_SHARED_LIB)
-    set(INSTALL_BINS ${INSTALL_BINS} graspit)
-endif (NOT SKIP_SHARED_LIB)
-
+set(INSTALL_BINS graspit_simulator graspit)
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${INSTALL_BINS} 
@@ -913,30 +873,29 @@ if (PLY)
     )
 endif (PLY)
 
+#############
+## Install ##
+#############
 
-# Generate and install configuration files for libraries:
+install(TARGETS
+    graspit 
+    PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
+    EXPORT graspit-lib-targets
+    DESTINATION ${LIB_DESTINATION})
 
-if (NOT SKIP_SHARED_LIB)
-    install(TARGETS
-        graspit 
-        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
-        EXPORT graspit-lib-targets
-        DESTINATION ${LIB_DESTINATION})
+install(EXPORT graspit-lib-targets
+    DESTINATION ${LIB_DESTINATION})
 
-    install(EXPORT graspit-lib-targets
-        DESTINATION ${LIB_DESTINATION})
 
-endif (NOT SKIP_SHARED_LIB)
-
-if(BUILD_STATIC_LIB)
-    install(TARGETS
-        graspit_static 
-        EXPORT graspit-static-lib-targets
-        DESTINATION ${LIB_DESTINATION})
-
-    install(EXPORT graspit-static-lib-targets
-        DESTINATION ${LIB_DESTINATION})
-endif(BUILD_STATIC_LIB)
+## ---
+## comment for future reference: This is required to build a static library
+# install(TARGETS
+#     graspit_static 
+#     EXPORT graspit-static-lib-targets
+#     DESTINATION ${LIB_DESTINATION})
+# install(EXPORT graspit-static-lib-targets
+#     DESTINATION ${LIB_DESTINATION})
+## ---
 
 
 #############
