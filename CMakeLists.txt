@@ -48,6 +48,7 @@ set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
 
 find_package(Qhull REQUIRED)
 find_package(SoQt4 REQUIRED)
+find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 
 
@@ -61,7 +62,7 @@ endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
 
 
 SET( QT_USE_QT3SUPPORT TRUE )
-find_package(Qt4 COMPONENTS QtCore REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtSql REQUIRED)
 
 include (${QT_USE_FILE})
 
@@ -731,7 +732,8 @@ include_directories(
 ## Build  ## 
 ############
 
-add_definitions(${GRASPIT_DEFINES} -g)
+add_definitions(${GRASPIT_DEFINES} ${SOQT_CXXFLAGS} ${LAPACK_LINKER_FLAGS} -g)
+link_directories(${SOQT_LINK_DIRS} ${QT_LIBRARY_DIR})
 
 set (GRASPIT_LIBRARY_SOURCES
     ${GRASPIT_CORE_SOURCES}

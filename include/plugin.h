@@ -29,6 +29,32 @@
 #ifndef __PLUGIN_H__
 #include <string>
 
+
+// set GRASPIT_USE_WIN_DYNLIB in order to use windows libraries (LoadLibraray etc.)
+// instead of the DL library (dlopen etc). This flag is needed in plugin.cpp also.
+#ifdef _WIN32
+#define GRASPIT_USE_WIN_DYNLIB
+#endif
+
+#ifdef  GRASPIT_USE_WIN_DYNLIB
+    #include <windows.h>
+    // typedef HMODULE           PLUGIN_DYNLIB_HANDLE;
+    typedef HINSTANCE           PLUGIN_DYNLIB_HANDLE;
+    #define PLUGIN_DYNLIB_ERROR plugin_dynlib_error
+
+    #define PLUGIN_API_ENTRY
+    #define PLUGIN_API_CALL     __cdecl  // __stdcall
+    #define PLUGIN_CALLBACK     __cdecl  // __stdcall
+
+#else
+    typedef void*                PLUGIN_DYNLIB_HANDLE;
+    #define PLUGIN_API_ENTRY
+    #define PLUGIN_API_CALL
+    #define PLUGIN_CALLBACK
+#endif
+    
+
+
 //! Defines a plugin that can can be loaded dynamically and used with GraspIt
 class Plugin
 {
@@ -45,7 +71,7 @@ class PluginCreator
 {
 public:
   typedef Plugin* (*CreatePluginFctn)();
-  typedef std::string (*GetTypeFctn)();
+  typedef PLUGIN_API_ENTRY std::string (PLUGIN_API_CALL *GetTypeFctn)();
 private:
   void* mLibraryHandle;
   CreatePluginFctn mCreatePluginFctn;
@@ -97,7 +123,7 @@ I.E.
 
 Both the createPlugin and getType functions must be declared using these macros.
 */
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #define PLUGIN_API __declspec(dllexport)
 #else
 #define PLUGIN_API

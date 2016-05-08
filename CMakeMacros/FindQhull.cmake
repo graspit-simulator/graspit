@@ -28,7 +28,7 @@ set(QHULL_HEADER "${QHULL_HEADER}" CACHE INTERNAL "QHull header" FORCE )
 
 
 find_file(QHULL_A_HEADER
-          NAMES qhull_a.h
+          NAMES libqhull/qhull_a.h qhull_a.h
           HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}" "${QHULL_INCLUDE_DIR}"
           PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
           PATH_SUFFIXES qhull include)
