@@ -33,8 +33,8 @@
 #include <list>
 #include <vector>
 
-#include "include/worldElement.h"
-#include "include/contact.h"
+#include "worldElement.h"
+#include "contact.h"
 
 #ifdef CGDB_ENABLED
 #include "DBase/graspit_db_model.h"

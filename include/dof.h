@@ -30,7 +30,7 @@
 #include <list>
 #include <map>
 
-#include "include/mytools.h"
+#include "mytools.h"
 
 class Robot;
 class Joint;
