@@ -17,7 +17,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 # main source directory
 set (GSRC ${PROJECT_SOURCE_DIR})
 
-set(PQP_COLLISION false CACHE PATH "if false, the in-build collision in graspit is used instead.")
+set(COLLISION_ENGINE GRASPIT_COLLISION CACHE PATH "back end for GraspIt! Collision detection, current options are GRASPIT_COLLISION, PQP_COLLISION.")
 set(CGDB true CACHE PATH "compile CGDB sources as well")
 set(PLY true CACHE PATH "compile PLY sources as well")
 set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
@@ -407,7 +407,7 @@ set (GRASPIT_CORE_SOURCES
 #--------------------------------------- Collision library ---------------------------------
 
 
-if (PQP_COLLISION) 
+if (COLLISION_ENGINE STREQUAL PQP_COLLISION)
     set (GRASPIT_DEFINES
         ${GRASPIT_DEFINES}
          -DPQP_COLLISION)
@@ -430,7 +430,7 @@ if (PQP_COLLISION)
         ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/TriDist.cpp
         ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src/Tri.cpp)
 
-else (PQP_COLLISION)
+else (COLLISION_ENGINE STREQUAL PQP_COLLISION)
  
     set (GRASPIT_DEFINES
         ${GRASPIT_DEFINES}
@@ -448,7 +448,7 @@ else (PQP_COLLISION)
         ${GSRC}/src/Collision/Graspit/collisionAlgorithms.cpp 
         ${GSRC}/src/Collision/Graspit/graspitCollision.cpp)
 
-endif (PQP_COLLISION)
+endif (COLLISION_ENGINE STREQUAL PQP_COLLISION)
 
 
 #--------------------------------------- Dynamics Engine ---------------------------------
