@@ -42,13 +42,6 @@
 #include "body.h"
 #include "joint.h"
 
-//#include "src/Collision/collisionStructures.h"
-//#include "include/mytools.h"
-//#include "include/kinematicChain.h"
-//#include "include/dof.h"
-//#include "include/worldElement.h"
-//#include "include/body.h"
-//#include "include/joint.h"
 
 class Grasp;
 class GloveInterface;
