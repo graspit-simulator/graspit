@@ -48,28 +48,28 @@ void CompliantGraspCopyTask::start()
   //get the details of the planning task itself
   if (!mDBMgr->GetPlanningTaskRecord(mPlanningTask.taskId, &mPlanningTask)) {
     DBGA("Failed to get planning record for task");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
 
   loadHand();
-  if (mStatus == ERROR) return;
+  if (mStatus == FAILED) return;
 
   if (!mHand->isA("Pr2Gripper2010")) {
     DBGA("Compliant copy task only works on the PR2 gripper");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
   Pr2Gripper2010* gripper = static_cast<Pr2Gripper2010*>(mHand);
 
   loadObject();
-  if (mStatus == ERROR) return;
+  if (mStatus == FAILED) return;
 
   //load all the grasps
   std::vector<db_planner::Grasp*> graspList;
   if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
     DBGA("Load grasps failed");
-    mStatus = ERROR;
+    mStatus = FAILED;
     emptyGraspList(graspList);
     return;
   }
@@ -97,7 +97,7 @@ void CompliantGraspCopyTask::start()
 
   emptyGraspList(graspList);
   if (success) mStatus = DONE;
-  else mStatus = ERROR;
+  else mStatus = FAILED;
 }
 
 bool CompliantGraspCopyTask::compliantCopy(const db_planner::Grasp *grasp, Pr2Gripper2010::ComplianceType compliance)

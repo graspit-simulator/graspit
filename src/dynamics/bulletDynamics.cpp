@@ -28,12 +28,12 @@
 #include "bulletDynamics.h"
 
 #include <btBulletDynamicsCommon.h>
-#include <btBvhTriangleMeshShape.h>
-#include <btTriangleMesh.h>
-#include <btGImpactShape.h>
-#include <btGImpactCollisionAlgorithm.h>
-#include <btHingeConstraint.h>
-#include <btGearConstraint.h>
+#include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
+#include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletCollision/Gimpact/btGImpactShape.h>
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include <BulletDynamics/ConstraintSolver/btHingeConstraint.h>
+#include <BulletDynamics/ConstraintSolver/btGearConstraint.h>
 
 #include "body.h"
 #include "dynJoint.h"

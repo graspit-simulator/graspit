@@ -99,7 +99,7 @@ int TaskDispatcher::connect(std::string host, int port, std::string username,
 /*! Gets a new task from the database and starts it. Possible outcomes:
   - no more tasks in database; sets status to NO_TASK
   - max number of tasks exceeded; sets status to DONE
-  - error in reading the task; sets status to ERROR
+  - error in reading the task; sets status to FAILED
   - error in starting the task; sets status to READY
   - task has started and needs us to surrender control; sets status to RUNNING
   - task is finished in one shot; sets status to READY
@@ -119,7 +119,7 @@ void TaskDispatcher::startNewTask()
     std::vector<std::string> empty;
     if (!mDBMgr->AcquireNextTask(&rec, empty)) {
         DBGA("Dispatcher: error reading next task");
-	mStatus = ERROR;
+	mStatus = FAILED;
 	return;
     }
     DBGA("Task id: " << rec.taskId);
@@ -132,7 +132,7 @@ void TaskDispatcher::startNewTask()
     mCurrentTask = mFactory.getTask(this, mDBMgr,rec);
     if (!mCurrentTask) {
         DBGA("Dispatcher: can not understand task type: " << rec.taskType);
-	mStatus = ERROR;
+	mStatus = FAILED;
 	return;
     }
 
@@ -159,7 +159,7 @@ void TaskDispatcher::startNewTask()
   result in the database.
 
   If task is finished, sets status to READY, unless there is an error marking the 
-  finished task in the database, in which case status is set to ERROR.
+  finished task in the database, in which case status is set to FAILED.
 
   Nore that even if the task finishes with an error, the dispatcher will be READY
   for the next task (not abort altogether). The task that had an error is marked
@@ -173,12 +173,12 @@ void TaskDispatcher::checkCurrentTask()
     switch (mCurrentTask->getStatus()) {
         case Task::RUNNING:
 	    break;
-        case Task::ERROR:
+        case Task::FAILED:
 	    mStatus = READY;
 	    //mark the task as error in the database
-	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord().taskId, "ERROR")) {
+	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord().taskId, "FAILED")) {
 	        DBGA("Dispatcher: error marking completed task");
-		mStatus = ERROR;
+		mStatus = FAILED;
 	    }
 	    delete mCurrentTask; mCurrentTask = NULL;
 	    break;
@@ -188,7 +188,7 @@ void TaskDispatcher::checkCurrentTask()
 	    //mark the task as completed in the database
 	    if (!mDBMgr->SetTaskStatus(mCurrentTask->getRecord().taskId, "COMPLETED")) {
 	        DBGA("Dispatcher: error marking completed task");
-		mStatus = ERROR;
+		mStatus = FAILED;
 	    }
 	    delete mCurrentTask; mCurrentTask = NULL;
 	    break;
@@ -216,7 +216,7 @@ void TaskDispatcher::mainLoop()
 	    case DONE:
 		graspItGUI->exitMainLoop();		
 	        return;
-	    case ERROR:
+	    case FAILED:
 		graspItGUI->exitMainLoop();		
 	        return;
 	    case NO_TASK:
