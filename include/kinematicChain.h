@@ -29,7 +29,7 @@
 #include <QTextStream>
 #include <vector>
 
-#include "Collision/collisionStructures.h"
+#include "src/Collision/collisionStructures.h"
 #include "matvec3D.h"
 
 class SoSeparator;

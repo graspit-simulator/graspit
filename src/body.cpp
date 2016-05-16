@@ -2315,7 +2315,7 @@ operator<<(QTextStream &os, const GraspableBody &gb)
 Something to do with the contacts changed flag might be better.
 */
 bool SensorLink::setPos(const double *new_q){
-    //updateSensors();
+    updateSensors();
     return Link::setPos(new_q);
 }
 
@@ -2365,8 +2365,8 @@ void SensorLink::updateSensors(){
 }
 
 void  SensorLink::setContactsChanged(){
-    updateSensors();
     Link::setContactsChanged();
+    updateSensors();
 }
 
 void SensorLink::updateAndOuputSensors(QTextStream & qts){

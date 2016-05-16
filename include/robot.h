@@ -34,7 +34,7 @@
 #include <QTextStream>
 #include <QString>
 
-#include "Collision/collisionStructures.h"
+#include "src/Collision/collisionStructures.h"
 #include "mytools.h"
 #include "kinematicChain.h"
 #include "dof.h"

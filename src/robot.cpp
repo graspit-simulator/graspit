@@ -29,6 +29,7 @@
 #include <iomanip>
 #include <QFile>
 #include <QTextStream>
+#include <typeinfo>
 
 //needed just for the image of the Flock of Birds sensor and the approach direction
 #include "SoArrow.h"
@@ -1572,6 +1573,16 @@ Robot::jumpDOFToContact(double *desiredVals, int *stoppedJoints, int *numCols)
 		if (numCols) *numCols = (int)lateContacts.size();
 	}
 
+    std::vector<DynamicBody *> robotLinks;
+    getAllLinks(robotLinks);
+    for (int i=0; i<robotLinks.size(); i++) {
+        if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
+            ((SensorLink*)robotLinks.at(i))->setContactsChanged();
+        }
+    }
+
+
+
 	delete [] initialDofVals; delete [] newDofVals;
 	delete [] initialJointVals; delete [] newJointVals;
 
@@ -1689,6 +1700,16 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 			graspItGUI->getIVmgr()->getViewer()->render();
 		}
 	} while (1);
+
+    std::vector<DynamicBody *> robotLinks;
+    getAllLinks(robotLinks);
+    for (unsigned int i=0; i<robotLinks.size(); i++) {
+        if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
+            ((SensorLink*)robotLinks.at(i))->setContactsChanged();
+        }
+    }
+    graspItGUI->getIVmgr()->getViewer()->render();
+
 
 	//	PROF_STOP_TIMER(MOVE_DOF);
 	//	PROF_PRINT_ALL;
@@ -2407,11 +2428,29 @@ will move back until collision is resolved.
 bool 
 Hand::findInitialContact(double moveDist)
 {
-	CollisionReport colReport;
-	while (myWorld->getCollisionReport(&colReport)) {
+    std::vector<Body*> interestList;
+    for (int c=0; c<numChains; c++) {
+        for (int l=0; l<chainVec[c]->getNumLinks(); l++) {
+            interestList.push_back( chainVec[c]->getLink(l) );
+        }
+    }
+
+    CollisionReport colReport;
+    int iter_count = 0;
+    while (myWorld->getCollisionReport(&colReport, &interestList))
+    {
+        iter_count += 1;
+
 		transf newTran = translate_transf(vec3(0,0,-moveDist / 2.0) * 
 			getApproachTran()) * getTran();
 		setTran(newTran);
+
+        if (iter_count > 100)
+        {
+            DBGP( "Unable to find initial contact" );
+            break;
+        }
+
 	}
 	return approachToContact(moveDist, false);
 }
