@@ -694,9 +694,9 @@ public:
     void setEmColor(double x1, double x2, double x3);
     virtual void addIVMat(bool clone);
     virtual void updateSensors();
-    virtual void setContactsChanged();
+     virtual void setContactsChanged();
     void updateAndOuputSensors(QTextStream & qts);
-    static LinkT getType(){return SENSORLINK;}
+    static LinkT getType(){return SENSORLINK;};
 };
 
 
