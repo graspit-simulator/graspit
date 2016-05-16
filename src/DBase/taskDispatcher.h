@@ -58,7 +58,7 @@ class TaskDispatcher;
     Task must start its own event management from there. 
     
     - if the Task is one-shot, it can do all the work in start() and set its 
-    status to either DONE or ERROR at the end. The Dispatcher will see this, 
+    status to either DONE or FAILED at the end. The Dispatcher will see this, 
     clean up and go to the next Task.
 
     - if the Task is event based, start() must set up the Task event loop, then 
@@ -72,7 +72,7 @@ class TaskDispatcher;
 */
 class Task {
  public:
-	enum Status{RUNNING, ERROR, DONE};
+	enum Status{RUNNING, FAILED, DONE};
  protected:
 	//! The current status of this task
 	Status mStatus;
@@ -128,7 +128,7 @@ class TaskFactory {
 class TaskDispatcher 
 {
  public:
-        enum Status {READY, NO_TASK, ERROR, RUNNING, DONE};
+        enum Status {READY, NO_TASK, FAILED, RUNNING, DONE};
  private:
 	//! A factory for instantiating the right type of task
 	TaskFactory mFactory;

@@ -30,7 +30,7 @@
 #include <list>
 #include <map>
 
-#include "include/mytools.h"
+#include "mytools.h"
 
 class Robot;
 class Joint;
@@ -142,7 +142,7 @@ protected:
   int currTrajPt;
 
   //! List of robot joints that are connected to this DOF
-  std::list<Joint *> jointList;
+  std::vector<Joint *> jointList;
 
   //! How large we want the UI dragger for this DOF to be
   double draggerScale;
@@ -156,7 +156,7 @@ public:
   //! Stub destructor
   virtual ~DOF() {}
   //! Initializes a DOF based on a list of joints it controls
-  virtual void initDOF(Robot *myRobot,const std::list<Joint *>& jList);
+  virtual void initDOF(Robot *myRobot,const std::vector<Joint *>& jList);
   //! Sets the max and min vals of the DOF from the smallest range of the joint limits.
   void updateMinMax();
 
@@ -262,6 +262,9 @@ public:
   void setDefaultVelocity(double v) {defaultVelocity = v;}
   void setTrajectory(double *traj,int numPts);
   void addToTrajectory(double *traj,int numPts);
+
+  /*! Get the jointlist of that DOF */
+  std::vector<Joint *> getJointList() const {return jointList;}
 };
 
 /*! The RigidDOF is the simplest form of DOF. All of its joints are rigidly 
@@ -347,7 +350,7 @@ public:
 	~BreakAwayDOF();
 
 	//! Initializes breakaway flags
-	void initDOF(Robot *myRobot,const std::list<Joint *>& jList);
+    void initDOF(Robot *myRobot,const std::vector<Joint *>& jList);
 	//! Takes breakaway into account
 	virtual bool accumulateMove(double q1, double *jointVals, int *stoppedJoints);
 	//! Looks at a joint that's not in breakaway
@@ -389,7 +392,7 @@ public:
 
     //------------------- STATICS ---------------------
 	//! Makes sure all the joints have spring stiffness defined 
-	virtual void initDOF(Robot *myRobot,const std::list<Joint *>& jList);
+    virtual void initDOF(Robot *myRobot,const std::vector<Joint *>& jList);
 	//! Static ratio depends on both coupling ratio and joint spring ratio.
 	virtual double getStaticRatio(Joint *j) const;
 	//! Returns the values as if no contact were present and links were free

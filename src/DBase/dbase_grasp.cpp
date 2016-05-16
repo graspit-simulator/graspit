@@ -316,15 +316,14 @@ void DBaseBatchPlanner::processSolution(const GraspPlanningState *s)
 	//we need a SearchEnergy calculator in order to do the autoGrasp in the exact same way that the planner does it
 	static SearchEnergy *se = NULL; //don't create it each time
 	if (!se) {
-		se = new SearchEnergy();
 		//this is the same type used by the loop planner
 		switch(mType) {
 		case DEXTEROUS:
-			se->setType(ENERGY_STRICT_AUTOGRASP);
+            se = SearchEnergy::getSearchEnergy(ENERGY_STRICT_AUTOGRASP);
 			break;
 		case GRIPPER: 
-			se->setType(ENERGY_CONTACT);
-			se->setContactType(CONTACT_PRESET);
+             se = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
+             se->setContactType(CONTACT_PRESET);
 			break;
 		}
 	}

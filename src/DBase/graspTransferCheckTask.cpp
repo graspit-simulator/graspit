@@ -71,7 +71,7 @@ void GraspTransferCheckTask::start()
   //get the details of the planning task itself
   if (!mDBMgr->GetPlanningTaskRecord(mPlanningTask.taskId, &mPlanningTask)) {
     DBGA("Failed to get planning record for task");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
 
@@ -85,7 +85,7 @@ void GraspTransferCheckTask::start()
     mHand2 = static_cast<Hand*>(world->importRobot(handPath));
     if ( !mHand1 || !mHand2 ) {
       DBGA("Failed to load hand(s)");
-      mStatus = ERROR;
+      mStatus = FAILED;
       return;
     }
   } else if ( world->getNumHands()==2 &&
@@ -95,7 +95,7 @@ void GraspTransferCheckTask::start()
     mHand2 = world->getHand(1);
   } else {
     DBGA("Grasp transfer task: wring hand(s) found");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
    
@@ -103,7 +103,7 @@ void GraspTransferCheckTask::start()
   GraspitDBModel *model = static_cast<GraspitDBModel*>(mPlanningTask.model);
   if (model->load(world) != SUCCESS) {
     DBGA("Grasp Planning Task: failed to load model");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
   mObject = model->getGraspableBody();
@@ -115,7 +115,7 @@ void GraspTransferCheckTask::start()
   std::vector<db_planner::Grasp*> graspList1;
   if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList1)){
     DBGA("Load grasps failed for hand 1");
-    mStatus = ERROR;
+    mStatus = FAILED;
     emptyGraspListHack(graspList1);
     return;
   }
@@ -124,7 +124,7 @@ void GraspTransferCheckTask::start()
   std::vector<db_planner::Grasp*> graspList2;
   if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList2)){
     DBGA("Load grasps failed for hand 2");
-    mStatus = ERROR;
+    mStatus = FAILED;
     emptyGraspListHack(graspList2);
     return;
   }
@@ -151,7 +151,7 @@ void GraspTransferCheckTask::start()
   emptyGraspListHack(graspList1);
   emptyGraspListHack(graspList2);
   if (success) mStatus = DONE;
-  else mStatus = ERROR;
+  else mStatus = FAILED;
 }
 
 /*! Checks if grasp2 can be executed while grasp1 is active. 
