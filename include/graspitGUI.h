@@ -123,7 +123,7 @@ class GraspItGUI
   void exitMainLoop();
 };
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #ifdef GRASPIT_EXPORTS
 #define GRASPIT_API __declspec(dllexport)
 #else

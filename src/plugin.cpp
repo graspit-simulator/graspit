@@ -23,16 +23,6 @@
 //
 //######################################################################
 
-#ifdef WIN32
-#include "dlfcn-win32.h"
-#define LIBRARY_SUFFIX ".dll"
-#else
-extern "C"{
-#include <dlfcn.h>
-}
-#define LIBRARY_SUFFIX ".so"
-#endif
-
 #include <QFile>
 
 #include "plugin.h"
@@ -42,9 +32,48 @@ extern "C"{
 
 
 
+#ifdef GRASPIT_USE_WIN_DYNLIB 
+    #include <windows.h>
+
+    #define PLUGIN_DYNLIB_OPEN    LoadLibrary
+    #define PLUGIN_DYNLIB_CLOSE   FreeLibrary
+    #define PLUGIN_DYNLIB_IMPORT  GetProcAddress
+    #define LIBRARY_SUFFIX ".dll"
+
+    static char* plugin_dynlib_error(void)
+    {
+        static char buf[32];
+	DWORD dw = GetLastError();
+	if (dw == 0) return NULL;
+	sprintf(buf,"error 0x%x", (unsigned int)dw);
+	return buf;
+    }
+
+    #define PLUGIN_DYNLIB_ERROR plugin_dynlib_error
+
+#else // GRASPIT_USE_WIN_DYNLIB
+    // extern "C"{  // it seems extern C is not needed (any more?)
+    #include <dlfcn.h>
+    // }
+    #define PLUGIN_DYNLIB_OPEN(path)  dlopen(path, RTLD_NOW | RTLD_GLOBAL)
+    #define PLUGIN_DYNLIB_CLOSE       dlclose
+    #define PLUGIN_DYNLIB_IMPORT      dlsym
+    
+    #define PLUGIN_DYNLIB_ERROR dlerror
+
+    #define LIBRARY_SUFFIX ".so"
+#endif // GRASPIT_USE_WIN_DYNLIB
+
+
+
+
+
+
+
+
 PluginCreator::~PluginCreator()
 {
-  dlclose(mLibraryHandle);
+  PLUGIN_DYNLIB_CLOSE(mLibraryHandle);
 }
 
 
@@ -115,8 +144,8 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   }
 
   //look for the library file and load it
-   void* handle = dlopen(filename.toAscii().constData(), RTLD_NOW | RTLD_GLOBAL);
-  char *errstr = dlerror();
+  PLUGIN_DYNLIB_HANDLE handle = PLUGIN_DYNLIB_OPEN(filename.toAscii().constData());
+  char *errstr = PLUGIN_DYNLIB_ERROR();
   if (!handle) {
     DBGA("Failed to open dynamic library " << filename.toAscii().constData() );
     if (errstr) DBGA("Error: " << errstr);
@@ -129,20 +158,21 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   //see also discussion here:
   // http://www.trilithium.com/johan/2004/12/problem-with-dlsym/
   //maybe in the future a better solution can be found...
-  PluginCreator::CreatePluginFctn createPluginFctn;
-  *(void **)(&createPluginFctn) = dlsym(handle,"createPlugin");
-  if (dlerror()) {
+  PluginCreator::CreatePluginFctn _createPluginFctn = (CreatePluginFctn) PLUGIN_DYNLIB_IMPORT(handle,"createPlugin");
+  if (PLUGIN_DYNLIB_ERROR()) {
     DBGA("Could not load symbol createPlugin from library " << filename.toAscii().constData());
     return NULL;
   }
+  PluginCreator::CreatePluginFctn createPluginFctn = reinterpret_cast<PluginCreator::CreatePluginFctn>(_createPluginFctn);
 
   //read the type of plugin
-  PluginCreator::GetTypeFctn getTypeFctn;
-  *(void **)(&getTypeFctn) = dlsym(handle,"getType");
-  if (dlerror()) {
+  PluginCreator::GetTypeFctn _getTypeFctn = (GetTypeFctn) PLUGIN_DYNLIB_IMPORT(handle,"getType");
+  if (PLUGIN_DYNLIB_ERROR()) {
     DBGA("Could not load symbol getType from library " << filename.toAscii().constData());
     return NULL;
   }
+  PluginCreator::GetTypeFctn getTypeFctn = reinterpret_cast<PluginCreator::GetTypeFctn>(_getTypeFctn);
+  
   std::cout << "Function name " << (*getTypeFctn)() <<std::endl;
   std::string type = (*getTypeFctn)();
   if (type.empty()) {

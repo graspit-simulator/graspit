@@ -26,7 +26,7 @@
 #ifndef BULLETDYNAMICS_HXX
 #define BULLETDYNAMICS_HXX
 
-#include <btAlignedObjectArray.h>
+#include <LinearMath/btAlignedObjectArray.h>
 
 #include "dynamicsEngine.h"
 #include "joint.h"

@@ -464,8 +464,8 @@ operator>>(std::istream &is, vec3 &v)
 std::ostream &
 operator<<(std::ostream &os, const vec3 &v)
 {
-#ifdef WIN32
-  int oldFlags = os.setf(std::ios_base::showpos);
+#if defined(WIN32) && !defined(__MINGW32__)
+    int oldFlags = os.setf(std::ios_base::showpos);
 #else
 #ifdef GCC22
  int oldFlags = os.setf(ios::showpos);
@@ -501,7 +501,7 @@ operator>>(std::istream &is, position &p)
 std::ostream &
 operator<<(std::ostream &os, const position &p)
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
   int oldFlags = os.setf(std::ios_base::showpos);
 #else
 #ifdef GCC22
@@ -536,7 +536,7 @@ operator>>(std::istream &is, mat3 &m)
 std::ostream &
 operator<<(std::ostream &os, const mat3 &m)
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
   int oldFlags = os.setf(std::ios_base::showpos);
 #else
 #ifdef GCC22
@@ -578,7 +578,7 @@ operator>>(std::istream &is, Quaternion &q)
 std::ostream&
 operator<<(std::ostream &os, const Quaternion &q)
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
   int oldFlags = os.setf(std::ios_base::showpos);
 #else
 #ifdef GCC22

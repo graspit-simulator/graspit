@@ -55,7 +55,7 @@ void GraspClusteringTask::start()
   //get the details of the planning task itself
   if (!mDBMgr->GetPlanningTaskRecord(mRecord.taskId, &mPlanningTask)) {
     DBGA("Failed to get planning record for task");
-    mStatus = ERROR;
+    mStatus = FAILED;
     return;
   }
 
@@ -74,7 +74,7 @@ void GraspClusteringTask::start()
     hand = static_cast<Hand*>(world->importRobot(handPath));
     if ( !hand ) {
       DBGA("Failed to load hand");
-      mStatus = ERROR;
+      mStatus = FAILED;
       return;
     }
   }
@@ -84,7 +84,7 @@ void GraspClusteringTask::start()
   std::vector<db_planner::Grasp*> graspList;
   if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
     DBGA("Load grasps failed");
-    mStatus = ERROR;
+    mStatus = FAILED;
     while (!graspList.empty()) {
       delete graspList.back();
       graspList.pop_back();
@@ -114,7 +114,7 @@ void GraspClusteringTask::start()
     //mark it as cluster center in the database
     if (!mDBMgr->SetGraspClusterRep(repGrasp, true)) {
       DBGA("Failed to mark cluster rep in database");
-      mStatus = ERROR;
+      mStatus = FAILED;
       delete repGrasp;
       break;
     }
@@ -132,7 +132,7 @@ void GraspClusteringTask::start()
 	//mark it as non-center in the database
 	if (!mDBMgr->SetGraspClusterRep(*it, false)) {
 	  DBGA("Failed to mark non-cluster rep in database");
-	  mStatus = ERROR;
+	  mStatus = FAILED;
 	  break;
 	}
 	cloud++;
@@ -145,7 +145,7 @@ void GraspClusteringTask::start()
     }
     DBGA("  Marked cluster of size " << cloud);
     delete repGrasp;
-    if (mStatus == ERROR) break;
+    if (mStatus == FAILED) break;
   }  
   while (!graspList.empty()) {
     delete graspList.back();
