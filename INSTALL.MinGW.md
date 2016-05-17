@@ -31,8 +31,6 @@ to generate the makefiles, and then use the MSYS shell to compile.
 cd build
 cmake -G "MinGW Makefiles" ..
 ```
-
-*Hint:* Pass -DCMAKE_PREFIX_PATH with a custom install directory for any dependencies installed in custom paths.
       
 *Note about the error with sh.exe*    
 This error will go away after re-running cmake.
@@ -74,8 +72,8 @@ A few notes about the installation:
 *Coin*    
 -  Use the extra configure flag  ``--build=x86_64-w64-mingw32``, or if you are not on x86_64, get the output of ``gcc -dumpmachine``.
    Careful though not to use the MSYS build (it has to be the MinGW build).
-- As of May 2016, the source code had to be edited as suggested in the instructions linked above, except the change in *freetype.cpp* which was not necessary
-- You also may need to install diffutils: ``pacman -S diffutils``
+- As of May 2016, the source code had to be edited as suggested in the instructions linked above, except the change in *freetype.cpp* which was not necessary.
+- You also may need to install diffutils: ``pacman -S diffutils``.
 - Add the *bin* directory of the resulting Coin install to your PATH environment variable.
 
 *SoQt*    
