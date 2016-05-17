@@ -26,7 +26,7 @@ So in general, the best is to use the cmake graphical interface for Windows
 to generate the makefiles, and then use the MSYS shell to compile.
 
 
-If you do want to run cmake from within a MSYS shell, you should set it to generate MinGW makefiles:    
+**If** you explicitly want to try and run cmake from within a MSYS shell, you should set it to generate MinGW makefiles:    
 ```
 cd build
 cmake -G "MinGW Makefiles" ..
@@ -38,11 +38,11 @@ cmake -G "MinGW Makefiles" ..
 This error will go away after re-running cmake.
 Be careful though, because this may lead to the wrong compilers being chosen, ie. using the MSYS
 gcc/g++ instead of the MinGW ones. You could try to explicitly set them with CMAKE_CXX_COMPILER and CMAKE_C_COMPILER.
-In this guide however, only instructions for using the Windows Cmake GUI are given.
+In this guide however, only instructions for using the Windows CMake GUI are given.
 
 *Compiling*        
 
-For convenience, you may want to soft-link *ming32-make.exe* to *make.exe*, or just run the mingw *make* explicitly:
+For convenience, you may want to create a softlink to *ming32-make.exe* and call it *make.exe*. Alternatively, just run the mingw *make* explicitly:
 
 ``mingw32-make``
     
@@ -88,24 +88,24 @@ This is very straight forward with cmake. Clone [the bullet repository](https://
 ###Step 5. Compile graspit
 
 For compiling with CMake, the path to the **MSYS bash.exe** needs to be passed to cmake.
-This is required for cmake to be able to call soqt-config (which is not provided as Windows .exe file and needs to be run via bash).     
+This is required for cmake to be able to call *soqt-config* (which is not provided as Windows .exe file and needs to be run via bash).     
 So you will need to pass the path to bash.exe (probably this is ``<your-msys-install>/usr/bin``) with the CMAKE_PREFIX_PATH.
 
-Use the **CMake GUI** to generate the make files, as the command line in an MSYS shell will be problematic (see also building with cmake explained in Step 1).
+Use the **CMake GUI** to generate the make files, as running cmake from the MSYS shell may be problematic (see also building with cmake explained in Step 1).
 
 1. Start CMake GUI.
 2. Select source and build directory, then click "Configure".
-3. Select "MinGW Makefiles", and you may first try to stick to the default compilers.
-    If it does not compile or it causes other issues, try to re-run cmake and this time select "Specify native compilers",
+3. Select "MinGW Makefiles", and you may first try to stick to the default compilers.   
+    *If* it does not compile, or the default compilers causes other issues, try to re-run cmake and this time select "Specify native compilers",
     choosing the fortran.exe/gcc.exe/g++.exe *from your MinGW install* (not MSYS).
 4. The first configuration process may be unsuccessful because not all directories are included.
-    Either way, you still need to add
+    Either way, you still need to add the following to your CMAKE_PREFIX_PATH:
     - the path to bash.exe
     - the path to the Qt files (QTDIR), and
     - any other dependency directories.      
-    You can do this by clicking on "New Entry" and add a variable named CMAKE_PREFIX_PATH, in which you add all paths, separated by semicolons.
-5. Click "Configure" again. It should be printing something like **"Result of soqt_config: ..."** followed by a list of libraries.
-    *If it does not, it did not find bash.exe, and the makefiles have not been generated properly!!*
+    You can add the paths by clicking on "New Entry" and add a variable named CMAKE_PREFIX_PATH, in which you add all paths, separated by semicolons.
+5. Click "Configure" again. It should be printing something like **"Result of soqt_config: ..." followed by a list of libraries**.
+    *If it does not print the libraries, it did not find bash.exe, and the makefiles have not been generated properly!!*
 6. After configuration was successful, click on "Generate".
 
 After the cmake files were generated in the GUI,
