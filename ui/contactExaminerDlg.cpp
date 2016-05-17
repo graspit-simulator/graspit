@@ -26,6 +26,7 @@
 #include "contactExaminerDlg.h"
 
 #include <QFileDialog>
+#include <fstream>
 
 #include "world.h"
 #include "robot.h"
@@ -150,24 +151,29 @@ void ContactExaminerDlg::saveButton_clicked()
 		return;
 	}
 
-	FILE *fp = fopen(fn.latin1(), "w");
-	if (!fp) {
+    std::ofstream outFile;
+    outFile.open (fn.latin1(), std::ios::out | std::ios::trunc); 
+    if (!outFile.is_open())
+    {
 		fprintf(stderr,"Failed to open file for writing\n");
-	}
+        return;
+    }
+        
+    fprintf(stderr,"Writing number of marked contacts: %u", (int)mMarkedContacts.size());
 
 	if(handRadioButton->isChecked()){
-		fprintf(fp,"%s\n",mHand->getName().latin1());
-		fprintf(fp,"%d\n",(int)mMarkedContacts.size());
+		outFile << mHand->getName().latin1() << std::endl;
+		outFile << (int)mMarkedContacts.size() << std::endl;
 		for (int i=0; i<(int)mMarkedContacts.size(); i++) {
-			((VirtualContact*)mMarkedContacts[i])->writeToFile(fp);
+			((VirtualContact*)mMarkedContacts[i])->writeToFile(outFile);
 		}
 	} else if (objectRadioButton->isChecked()){
-		fprintf(fp,"%d\n",(int)mMarkedContacts.size());
+        outFile << (int)mMarkedContacts.size() << std::endl;
 		for (int i=0; i<(int)mMarkedContacts.size(); i++) {
-			((VirtualContactOnObject*)mMarkedContacts[i])->writeToFile(fp);
+			((VirtualContactOnObject*)mMarkedContacts[i])->writeToFile(outFile);
 		}
 	}
-	fclose(fp);
+    outFile.close();
 }
 
 void ContactExaminerDlg::exitButton_clicked()
