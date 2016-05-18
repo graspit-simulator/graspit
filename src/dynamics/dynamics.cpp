@@ -564,12 +564,12 @@ iterateDynamics(std::vector<Robot *> robotVec,
     vec3 invBodyTransl = invBody.translation();
     buildForceTransform(invBody,invBodyTransl,ForcesToBodyFrame);
 	DBGP("fext initial: ");
-    DBGST( disp_mat(stdout,&fext[6*bn],1,6) );
+	DBGST( disp_mat(stdout,&fext[6*bn],1,6) );
 
     // add any other wrenches that have accumulated on the body
     daxpy(6,1.0,bodyVec[bn]->getExtWrenchAcc(),1,&fext[6*bn],1);
 	DBGP("fext with accumulated wrench: ");
-    DBGST( disp_mat(stdout,&fext[6*bn],1,6) );
+	DBGST( disp_mat(stdout,&fext[6*bn],1,6) );
 
 	if (numContacts||numDOFLimits) {
       // k = Mv_l + hfext
@@ -901,7 +901,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
 				printf("Cnu:\n");
 				dgemv("N",Nucols,Hcols,-1.0,INVNutM_iNuNutM_iH,Nucols,lambda,1,0.0,cnu,1);
 				daxpy(Nucols,-1.0,INVNutM_iNuNutM_ikminuseps,1,cnu,1);
-                disp_mat(stdout,cnu,1,Nucols);
+				disp_mat(stdout,cnu,1,Nucols);
 				delete [] cnu;
 			}
 #endif
@@ -1162,9 +1162,9 @@ myLemke(double *M,int n,double *q,double *z, bool usePrediction, bool ldbg, int 
 	}
 /*
 	fprintf(stderr,"M is:\n");
-    disp_mat(stderr,M,n,n);
+	disp_mat(stderr,M,n,n);
 	fprintf(stderr,"B is:\n");
-    disp_mat(stderr,B,n,n);
+	disp_mat(stderr,B,n,n);
 */
 	// Check if initial basis provides solution
 	for (i=0;i<n && x[i] >= 0.0;i++)
@@ -1236,7 +1236,7 @@ myLemke(double *M,int n,double *q,double *z, bool usePrediction, bool ldbg, int 
 		if (ldbg) {
 			printf("entering: %d\n",entering);
 			//    printf("Be:\n");
-            //    disp_mat(stdout,Be,1,n);
+			//    disp_mat(stdout,Be,1,n);
 		}
 #endif
 
@@ -1249,10 +1249,10 @@ myLemke(double *M,int n,double *q,double *z, bool usePrediction, bool ldbg, int 
 
 #ifdef LEMKE_DBG
 		if (ldbg) {
-			//    printf("x:\n");
-            //    disp_mat(stdout,x,1,n);
+		  //    printf("x:\n");
+		  //    disp_mat(stdout,x,1,n);
 			printf("d:\n");
-            disp_mat(stdout,d,1,n);
+			disp_mat(stdout,d,1,n);
 		}
 #endif
 
@@ -1369,10 +1369,10 @@ myLemke(double *M,int n,double *q,double *z, bool usePrediction, bool ldbg, int 
 #ifdef LEMKE_DBG
 		if (ldbg) {
 			printf("ratio: %lf\n",ratio);
-      //    printf("x:\n");
-      //    disp_mat(stdout,x,1,n);
-      //    printf("B:\n");
-      //    disp_mat(stdout,B,n,n);
+			//    printf("x:\n");
+			//    disp_mat(stdout,x,1,n);
+			//    printf("B:\n");
+			//    disp_mat(stdout,B,n,n);
 			printf("bas:\n");
 			for (i=0;i<n;i++) printf("%d ",bas[i]);
 			printf("\n");
@@ -1400,12 +1400,12 @@ myLemke(double *M,int n,double *q,double *z, bool usePrediction, bool ldbg, int 
 	dcopy(n,q,1,tmpZ,1);
 #ifdef LEMKEDBG
 	printf("q:\n");
-    disp_mat(stdout,q,1,n);
+	disp_mat(stdout,q,1,n);
 #endif
 	dgemv("N",n,n,1.0,M,n,z,1,1.0,tmpZ,1);
 #ifdef LEMKEDBG
 	printf("Mz+q:\n");
-    disp_mat(stdout,tmpZ,1,n);
+	disp_mat(stdout,tmpZ,1,n);
 #endif
 
 	for (i=0;i<n;i++)
