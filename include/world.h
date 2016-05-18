@@ -36,7 +36,6 @@
 #include <QObject>
 
 #include "material.h"
-#include "ivmgrBase.h"
 
 #include <Inventor/SoType.h>
 
