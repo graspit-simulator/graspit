@@ -19,13 +19,13 @@ more details.
 Distribution Contents
 ---------------------
 
-graspit.pro
-graspit-core.pro
-graspit-lib-LINUX.pro
-graspit-lib-WINDOWS.pro
-	      -  These are the main project files for GraspIt! that you can 
-		 use to create your project that you can compile. Please see
-		 the User Manual for installation instructions.
+**CMakeLists.txt**: Used to compile GraspIt!, multiple flags that can be set with ccmake. 
+
+**CMakeMacros**: contains .cmake files used to find GraspIt! dependencies. 
+
+**cmdline**: command line parser used by GraspIt!. 
+
+**ci**: contains scripts used by travis ci. 
 
 **doc**: Documentation.  Contains both the User Manual and code Reference Manual. The User Manual contains installation instructions, pointers for getting started, examples, and trouble shooting and contact information.
 
