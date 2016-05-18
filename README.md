@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CURG/graspit.svg?branch=travis)](https://travis-ci.org/CURG/graspit)
+
                                  GraspIt!
                               Version 2.2.0 
 
