@@ -254,7 +254,7 @@ SimAnn::variableNeighbor(VariableSet *set, double T, VariableSet *target)
 			} else {
 				//we have a target value and a confidence level
 				tv = target->getVariable(i)->getValue();
-				DBGP(target->getVariable(i)->getName() << " input: " << tv);
+                DBGP(target->getVariable(i)->getName().toStdString().c_str() << " input: " << tv);
 				conf = target->getVariable(i)->getConfidence();
 				assert( conf >= 0 && conf <= 1);
 				//normalize desired change to -1..1 interval relative to the max jump
@@ -263,11 +263,11 @@ SimAnn::variableNeighbor(VariableSet *set, double T, VariableSet *target)
 				else if (change < -1 * var->mMaxJump) change = -1 * var->mMaxJump;
 				change = change / var->mMaxJump;
 				//call the appropriate neighbor generator
-				DBGP(var->getName() << " value: " << var->getValue() << " Target: " << tv << " Change: " << change);
+                DBGP(var->getName().toStdString().c_str() << " value: " << var->getValue() << " Target: " << tv << " Change: " << change);
 				v = var->getValue() + biasedNeighborDistribution(T,change,conf) * var->mMaxJump;
 			}
 			if (var->isCircular()) {
-				DBGP("Circular variable! " << var->getName());
+                DBGP("Circular variable! " << var->getName().toStdString().c_str());
 				if ( v > var->mMaxVal) v -= var->getRange();
 				else if ( v < var->mMinVal) v += var->getRange();
 			}
