@@ -36,6 +36,7 @@
 #include <QObject>
 
 #include "material.h"
+#include "ivmgrBase.h"
 
 #include <Inventor/SoType.h>
 
@@ -45,7 +46,7 @@ class mat3;
 class Quaternion;
 class transf;
 
-class IVmgr;
+class IVmgrBase;
 class Hand;
 class Robot;
 class HumanHand;
@@ -90,7 +91,7 @@ class World : public QObject {
 
 protected:
   //! Pointer to the IVmgr who controls the simulation
-  IVmgr *myIVmgr;
+  IVmgrBase *myIVmgr;
 
   //! Keeps track of the current simulation time.
   double worldTime;
@@ -228,7 +229,7 @@ Q_SIGNALS:
 
 public:	
   //! public constructor
-  World(QObject *parent=0,const char *name=0, IVmgr *mgr=NULL);
+  World(QObject *parent=0,const char *name=0, IVmgrBase *mgr=NULL);
 
   //! Saves the current user settings in the registry and clears the world
   ~World();

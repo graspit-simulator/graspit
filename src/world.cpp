@@ -51,7 +51,7 @@
 #include "contactSetting.h"
 #include "ivmgr.h"
 #include "grasp.h"
-#include "ivmgr.h"
+#include "ivmgrBase.h"
 #include "barrett.h"
 #include "matvec3D.h"
 #include "bBox.h"
@@ -108,7 +108,7 @@ char graspitVersionStr[] = "GraspIt! version 2.1";
 that will handle all user interaction. Also initialized collision detection
 system and reads in global settings such as friction coefficients 
 */
-World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,name)
+World::World(QObject *parent, const char *name, IVmgrBase *mgr) : QObject(parent,name)
 {
 	myIVmgr = mgr;
 
@@ -739,7 +739,7 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 	}
 
 	if (!cameraFound) {
-		myIVmgr->getViewer()->viewAll();
+		myIVmgr->viewAll();
 	}
 	findAllContacts();
 	modified = false;
