@@ -3,7 +3,8 @@
                                  GraspIt!
                               Version 2.2.0 
 
-Introduction 
+
+Introduction
 ------------
 Please see the User Manual in doc/ for an introduction to GraspIt!, a list of
 features, installation instructions, getting started examples, etc.
@@ -26,46 +27,40 @@ graspit-lib-WINDOWS.pro
 		 use to create your project that you can compile. Please see
 		 the User Manual for installation instructions.
 
-doc/          -  Documentation.  Contains both the User Manual and code 
-		 Reference Manual. The User Manual contains installation 
-		 instructions, pointers for getting started, examples, and 
-		 trouble shooting and contact information.
+**doc**: Documentation.  Contains both the User Manual and code Reference Manual. The User Manual contains installation instructions, pointers for getting started, examples, and trouble shooting and contact information.
 
-images/       -  A place to put images saved from GraspIt!
+**images**: A place to put images saved from GraspIt!
 
-include/      -  Header files for the main GraspIt! source code
+**include**: Header files for the main GraspIt! source code
 
-LICENSE.txt   -  A copy of the license you accepted when you downloaded this.
+**LICENSE.txt**: A copy of the license you accepted when you downloaded this.
 
-models/       -  The geometry and configuration files for all the robots and
+**models**: The geometry and configuration files for all the robots and
 		objects.
 
-plugins/      -  Examples for creating plugins that can be loaded into GraspIt! 
+**plugins**:  Examples for creating plugins that can be loaded into GraspIt! 
                  at run time, and can use GraspIt! without being statically linked
 		 into GraspIt's main executable.
 
-ply/          - Code for loading .ply files; see header files for authorship 
+**ply**:  Code for loading .ply files; see header files for authorship 
                 information and detail.
 
-qhull/	  - A popular package for computing n-dimensional convex hulls.
+**qhull**: A popular package for computing n-dimensional convex hulls.
 		This is used both for the contact system and to create grasp
 	      wrench spaces.
 
-README.txt    -  This file.
+**README.md**:  This file.
 
-src/          -  The source code for GraspIt!.
+**src**:  The source code for GraspIt!.
 
-src/DBase     - source code for the interface between GraspIt and the Columbia 
+**src/DBase**: source code for the interface between GraspIt and the Columbia 
 		Grasp Database
 
-tinyxml/	  - a library for processing XML documents. See the header files 
+**tinyxml**: a library for processing XML documents. See the header files 
 		therein for license and author information for this package.
 
-ui/	        -  The dialog windows and interfaces for GraspIt!.
+**ui**:	The dialog windows and interfaces for GraspIt!.
 
-worlds/       -  A place to save GraspIt! worlds.  Also includes a few
+**worlds**: A place to save GraspIt! worlds.  Also includes a few
 		examples.
 
-Troubleshooting
----------------
-Please check the user manual for troubleshooting and contact information!
