@@ -507,9 +507,11 @@ public:
 	void setObject(Body *b){body2 = b;}
 
 	//! Writes this contact, including friction edges, to a file
-	void writeToFile(FILE *fp);
+    // Returns false if file cannot be opened for writing
+	void writeToFile(std::ofstream& outfile);
 	//! Loads this contact, including friction edges, from a file
-	void readFromFile(FILE *fp);
+    // Returns false if file cannot be opened for reading 
+	bool readFromFile(std::ifstream& infile);
 
 	//! Wrench computation is done in world coordinates considers the fact that we have no object
 	void computeWrenches(bool useObjectData = false, bool simply = false);
@@ -564,11 +566,11 @@ class VirtualContactOnObject : public VirtualContact
 public:
 	VirtualContactOnObject ();
 	~VirtualContactOnObject ();
-	void readFromFile(FILE * fp);
+	bool readFromFile(std::ifstream& infile);
 #ifdef ARIZONA_PROJECT_ENABLED
 	void readFromRawData(ArizonaRawExp* are, QString file, int index, bool flipNormal = false);
 #endif
-	void writeToFile(FILE * fp);
+	void writeToFile(std::ofstream& outfile);
 };
 #define CONTACT_HXX
 #endif
