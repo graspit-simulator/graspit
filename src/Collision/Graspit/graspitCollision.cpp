@@ -134,6 +134,24 @@ GraspitCollision::activatePair(const Body* body1, const Body* body2, bool active
 		mDisabledMap.insert( std::pair<const CollisionModel*, const CollisionModel*>(model1, model2) );
 	} else {
 		//remove from list
+	  std::pair<const CollisionModel*, const CollisionModel*> pair(model1, model2);
+
+	  typedef std::multimap<const CollisionModel*, const CollisionModel*>::iterator iterator;
+	  bool found_one = true;
+	  while(found_one)
+	    {
+	      found_one=false;
+	      std::pair<iterator, iterator> iterpair = mDisabledMap.equal_range(model1);
+	      iterator it = iterpair.first;
+	      for (; it != iterpair.second; ++it) {
+                if (it->second == model2) {
+		  mDisabledMap.erase(it);
+		  found_one = true;
+		  break;
+                }
+	      }
+	    }
+
 	}
 }
 
