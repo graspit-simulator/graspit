@@ -1,0 +1,24 @@
+language: cpp
+
+sudo: required
+
+dist: trusty
+
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Debug COMPILER=GCC
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Release COMPILER=GCC
+
+install:
+  - 'ci/install.sh'
+
+script:
+  - 'ci/script.sh'
+
+after_failure: 
+  - cat Testing/Temporary/LastTest.log
+  - cat Testing/Temporary/LastTestsFailed.log
