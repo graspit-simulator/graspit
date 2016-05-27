@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/CURG/graspit.svg?branch=travis)](https://travis-ci.org/CURG/graspit)
+[![Build Status](https://travis-ci.org/graspit-simulator/graspit.svg?branch=master)](https://travis-ci.org/graspit-simulator/graspit)
 
 <h1>GraspIt!</h1>
 
