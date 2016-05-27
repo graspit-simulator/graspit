@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot type="Barrett">
+<robot type="Barrett" DBName="Barrett">
     <palm>palm.xml</palm>
     <dof type="r">
         <defaultVelocity>0.0</defaultVelocity>
