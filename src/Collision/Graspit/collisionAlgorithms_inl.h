@@ -254,7 +254,7 @@ void
 RegionCallback::leafTest(const Leaf *l1, const Leaf *l2)
 {
 	mNumLeafTests++;
-	assert(l1); assert(!l2);
+    assert(l1); //assert(!l2);
 	const std::list<Triangle>*	list1 = l1->getTriangles();
 	std::list<Triangle>::const_iterator it1;
 	for (it1=list1->begin(); it1!=list1->end(); it1++) {

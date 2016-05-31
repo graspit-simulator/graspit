@@ -1708,7 +1708,11 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
             ((SensorLink*)robotLinks.at(i))->setContactsChanged();
         }
     }
-    graspItGUI->getIVmgr()->getViewer()->render();
+
+    if(renderIt)
+    {
+        graspItGUI->getIVmgr()->getViewer()->render();
+    }
 
 
 	//	PROF_STOP_TIMER(MOVE_DOF);

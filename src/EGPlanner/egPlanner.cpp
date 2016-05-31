@@ -324,8 +324,7 @@ EGPlanner::run()
 {
 	mMultiThread = true;
 	mRenderType = RENDER_NEVER;
-	//threaded planners always use cloned hands
-	createAndUseClone();
+	
 	//signal that initialization is ready
 	setState(INIT);
 	threadLoop();
@@ -345,6 +344,8 @@ EGPlanner::startThread()
 	if (getState()!=INIT) {
 		DBGA("Can not start thread; state is not INIT");
 	}
+	//threaded planners always use cloned hands
+	createAndUseClone();
 	setState(STARTING_THREAD);
 	start();
 	mMultiThread = true;
