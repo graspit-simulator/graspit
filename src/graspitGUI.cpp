@@ -157,6 +157,15 @@ GraspItGUI::processArgs(int argc, char** argv)
         return FAILURE;
     }
 
+#ifdef CGDB_ENABLED
+    //Ensure $CGDB_MODEL_ROOT is set.
+    QString modelRoot = QString(getenv("CGDB_MODEL_ROOT"));
+    if (modelRoot.isNull() ) {
+      std::cerr << "You've built Graspit with the CGDB enabled. Please set CGDB_MODEL_ROOT or disable CGDB." << std::endl;
+      return FAILURE;
+    }
+#endif
+
     if(args->exist("plugin"))
     {
         QString plugins_arg_string = QString::fromStdString(args->get<std::string>("plugin"));

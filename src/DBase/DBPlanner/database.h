@@ -74,9 +74,7 @@ class Table {
   bool GetField(const size_t column_num, 
                 const size_t row_num, 
                 FieldType* result) const {    
-    return (column_num < data_.size())
-        ? QVariantConvert(data_[column_num][row_num], result)
-        : false;
+      return QVariantConvert(data_[column_num][row_num], result);
   }
 };
 

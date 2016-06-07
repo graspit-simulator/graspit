@@ -202,7 +202,15 @@ void DBaseDlg::loadGraspButton_clicked(){
 	mCurrentFrame = 0;
 	//get new grasps from database manager
 	PROF_START_TIMER(GET_GRASPS_CALL);
-	if(!mDBMgr->GetGrasps(*mCurrentLoadedModel,hand->getDBName().toStdString(), &mGraspList)){
+
+	if (hand->getDBName() == NULL) {
+		std::string handname(hand->getName().toStdString() + "_" + graspItGUI->getIVmgr()->getWorld()->getMaterialName(hand->getPalm()->getMaterial()).toStdString());
+		for (std::string::size_type i=0; i<handname.length(); ++i)
+			handname[i] = toupper(handname[i]);
+		hand->setDBName(QString(handname.c_str()));
+	}
+
+	if(!mDBMgr->GetGrasps(*mCurrentLoadedModel,hand->getDBName().toStdString().c_str(), &mGraspList)){
 		DBGA("Load grasps failed");
 		mGraspList.clear();
 		return;
