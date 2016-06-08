@@ -285,6 +285,8 @@ public:
 	//! This HandObjectState becomes a snapshot of the CURRENT world state when the function is called.
 	void saveCurrentHandState();
 
+	bool dynamicExecute(Hand *h) const;
+
 	void changeHand(Hand *h, bool sticky = false);
 	Hand *getHand() const {return mHand;}
 	void setObject(GraspableBody *b){mTargetObject = b;}

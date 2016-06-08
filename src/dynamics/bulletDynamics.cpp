@@ -65,7 +65,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, -10));
+    mBtDynamicsWorld->setGravity(btVector3(0,0,0));
 }
 
 BulletDynamics::~BulletDynamics()
