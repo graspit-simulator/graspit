@@ -890,7 +890,7 @@ system, it is the caller's responsability to do that. Also does not initialize
 dynamics.
 */
 void
-World::addBody(Body *newBody)
+World::addBody(Body *newBody, bool addToDynamics)
 {
 	newBody->setDefaultViewingParameters();
 	bodyVec.push_back(newBody);
@@ -907,7 +907,11 @@ World::addBody(Body *newBody)
 	IVRoot->addChild(newBody->getIVRoot());
 	modified = true;
 	Q_EMIT numElementsChanged();
-    mDynamicsEngine->addBody(newBody);
+    if (addToDynamics)
+    {
+        mDynamicsEngine->addBody(newBody);
+    }
+
 }
 
 /*! Adds a robot link. No need to add it to scene graph, since the robot 

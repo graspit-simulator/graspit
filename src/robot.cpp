@@ -1705,7 +1705,8 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
     getAllLinks(robotLinks);
     for (unsigned int i=0; i<robotLinks.size(); i++) {
         if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
-            ((SensorLink*)robotLinks.at(i))->setContactsChanged();
+            SensorLink *sl = (SensorLink*)robotLinks.at(i);
+            sl->setContactsChanged();
         }
     }
 
@@ -1983,6 +1984,7 @@ Robot::setDesiredDOFVals(double *dofVals)
 			timeNeeded = numSteps*myWorld->getTimeStep();
 
 			DBGP("numSteps: "<< numSteps << " time needed: " << timeNeeded);
+            std::cout << "numSteps: "<< numSteps << " time needed: " << timeNeeded << std::endl;
 			traj = new double[numSteps];
 
 			for (i=0;i<numSteps;i++) {
@@ -1992,13 +1994,13 @@ Robot::setDesiredDOFVals(double *dofVals)
 				coeffs[2] = 10.0*(q1 - q0) - (6.0*qd0 + 4.0*qd1)*timeNeeded;
 				coeffs[1] = 0.0;
 				coeffs[0] = qd0*timeNeeded; 
-				traj[i] = q0;
+                traj[i] = q0;
 
-				tpow = 1.0;
-				for (j=0;j<5;j++) {
-					tpow *= t;
-					traj[i] += tpow*coeffs[j];
-				}
+                tpow = 1.0;
+                for (j=0;j<5;j++) {
+                    tpow *= t;
+                    traj[i] += tpow*coeffs[j];
+                }
 				DBGP(i << " " << t << " " << traj[i]);
 			}
 			dofVec[d]->setTrajectory(traj,numSteps);
@@ -2197,6 +2199,14 @@ Robot::DOFController(double timeStep)
 	for (int d=0;d<numDOF;d++) {
 		dofVec[d]->callController(timeStep);
 	}
+
+    std::vector<DynamicBody *> robotLinks;
+    getAllLinks(robotLinks);
+    for (unsigned int i=0; i<robotLinks.size(); i++) {
+        if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
+            ((SensorLink*)robotLinks.at(i))->setContactsChanged();
+        }
+    }
 }
 
 
@@ -2233,8 +2243,8 @@ Robot::dynamicAutograspComplete()
 		//if this joint has hit its limit, it is possible that the autograsp is done
 		if (fabs(j->getDynamicsVal() - limit) < 3.0e-2) continue;
 		//if none or the above are true, the autograsp definitely is still going
-		DBGP("Autograsp going on chain " << c << " joint " << jNum << ": val " 
-			<< j->getDynamicsVal() << "; limit " << limit);
+        //std::cout << "Autograsp going on chain " << c << " joint " << jNum << ": val "
+         //   << j->getDynamicsVal() << "; limit " << limit << std::endl;
 		return false;
 	}
 	return true;		
@@ -2320,6 +2330,7 @@ If you want the opposite motion, just pass a negative \a speedFactor.
 bool
 Hand::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 {
+    //std::cout << "Inside AutoGrasp" << std::endl;
 	int i;
 	double *desiredVals = new double[numDOF];
 
@@ -2330,7 +2341,7 @@ Hand::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 			else if (speedFactor * dofVec[i]->getDefaultVelocity() < 0)
 				desiredVals[i] = dofVec[i]->getMin();		
 			else desiredVals[i] = dofVec[i]->getVal();
-			DBGP("Desired val "<<i<<" "<<desiredVals[i]);
+            //std::cout << "Desired val "<<i<<" "<<desiredVals[i] << std::endl;
 			//for now
 			dofVec[i]->setDesiredVelocity(speedFactor * dofVec[i]->getDefaultVelocity());
 		}
@@ -2345,7 +2356,7 @@ Hand::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 		else desiredVals[i] = dofVec[i]->getMin();
 		stepSize[i] = dofVec[i]->getDefaultVelocity()*speedFactor*AUTO_GRASP_TIME_STEP;
 	}
-
+    //std::cout << "about to move dof to contacts" << std::endl;
 	bool moved = moveDOFToContacts(desiredVals, stepSize, stopAtContact, renderIt);
 	delete [] desiredVals;
 	delete [] stepSize;

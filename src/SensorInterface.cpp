@@ -39,8 +39,8 @@ BodySensor::BodySensor(const BodySensor & fs, Link * sl)
 	}
 bool
 BodySensor :: updateSensorModel(){
-sensorModel();
-return true;
+    sensorModel();
+    return true;
 }
 
 //FIXME this should be more flexible.
@@ -69,6 +69,7 @@ addVector6(double * force, double * contactForce){
 
 void
 BodySensor::sensorModel(){
+    std::cout << "In sensorModel" << std::endl;
 	double forces[6] = {0,0,0,0,0,0};
 	std::list<Contact *>::const_iterator cp;
 	std::list<Contact *> cList = sbody->getContacts();
@@ -76,12 +77,12 @@ BodySensor::sensorModel(){
 
 	for(cp = cList.begin(); cp != cList.end(); cp++){
 		double * contactForce; 
-		if(sbody->getWorld()->dynamicsAreOn())
-			contactForce = (*cp)->getDynamicContactWrench();
-		else{
+//		if(sbody->getWorld()->dynamicsAreOn())
+//			contactForce = (*cp)->getDynamicContactWrench();
+//		else{
 			double tempForce[6] = {0, 0, 1, 0, 0, 0};
 			contactForce = tempForce;
-		}
+//		}
 		addVector6(forces, contactForce);
 	}
 	//std::cout << "Body Sensor Reading: ";
@@ -90,7 +91,7 @@ BodySensor::sensorModel(){
 	if (ts > 0.0)
 		for(int ind = 0; ind < 6; ind++){
 			myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
-		//	std::cout << myOutput.sensorReading[ind] << " ";
+            std::cout << myOutput.sensorReading[ind] << " " << std::endl;
 		}
 		//std::cout<<std::endl;
 	sbody->setEmColor(myOutput.sensorReading[2]/3.0,0,1);
@@ -249,26 +250,36 @@ void printMat3(mat3 m, std::string comment)
 //////////////////////////////////////////////
 void
 RegionFilteredSensor::sensorModel(){
+
 	double forces[6] = {0,0,0,0,0,0};
 	std::list<Contact *>::const_iterator cp;
 	std::list<Contact *> cList = sbody->getContacts();
 	//Adding contacts
-	if(sbody->getWorld()->dynamicsAreOn()){
-	for(cp = cList.begin(); cp != cList.end(); cp++){
-		double * contactForce = (*cp)->getDynamicContactWrench();
-		//std::cout << "Contact pos:" << (*cp)->getPosition()[0] <<" " <<(*cp)->getPosition()[1] <<" "<< (*cp)->getPosition()[2] << std::endl;
+    if(sbody->getWorld()->dynamicsAreOn())
+    {
+        for(cp = cList.begin(); cp != cList.end(); cp++){
+            double * contactForce = (*cp)->getDynamicContactWrench();
+            if(filterContact(*cp))
+            {
+                forces[2] = 1;
+                //std::cout << "Contact pos:" << (*cp)->getPosition()[0] <<" " <<(*cp)->getPosition()[1] <<" "<< (*cp)->getPosition()[2] << std::endl;
+                //std::cout << "Contact Force" << contactForce[0] << " " << contactForce[1] << " "  << contactForce[2] << " "  << contactForce[3] << " "  << contactForce[4] << " "  << contactForce[5] << std::endl;
 
-		if (filterContact(*cp))
-			addVector6(forces, contactForce);
-	}
-	//Adding Forces for the current sensor pad
-	double ts = getTimeStep();
-	if (ts > 0.0)
-		for(int ind = 0; ind < 6; ind++){
-			myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
-		}
-	}
-	else{
+            }
+
+            //if (filterContact(*cp))
+            //    addVector6(forces, contactForce);
+        }
+        //Adding Forces for the current sensor pad
+        double ts = getTimeStep();
+        if (ts > 0.0)
+        {
+            for(int ind = 0; ind < 6; ind++){
+                myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
+            }
+        }
+    }
+    else{
 		myOutput.sensorReading[2] = 0;
 		// loop through all the contacts
 		for(cp = cList.begin(); cp != cList.end(); cp++){
@@ -330,7 +341,7 @@ RegionFilteredSensor::sensorModel(){
 				myOutput.sensorReading[2] += 1;
 			}
 		}
-	}
+    }
 }
 
 

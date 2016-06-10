@@ -925,7 +925,7 @@ Body::breakContacts()
 	if (!contactList.empty()) {
 		setContactsChanged();
 		for (cp=contactList.begin();cp!=contactList.end();cp++) {
-			delete *cp; *cp = NULL;
+            delete *cp;
 		}
 		contactList.clear();
 	}
@@ -936,7 +936,7 @@ Body::breakContacts()
 			(*cp)->getMate()->setMate(NULL);
 		}
 		(*cp)->setMate(NULL);
-		delete *cp; *cp = NULL;
+        delete *cp;
 	}
 	prevContactList.clear();
 
@@ -2347,8 +2347,9 @@ void SensorLink::updateSensors(){
     std::vector<BodySensor *>::iterator bi;
     double maxVal = 0;
     for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
-        (*bi)->updateSensorModel();
-        double v = (*bi)->getNormalForce() ;
+        BodySensor * bs = (*bi);
+        bs->updateSensorModel();
+        double v = bs->getNormalForce() ;
         if(v > maxVal)
             maxVal = v;
     }
@@ -2358,10 +2359,12 @@ void SensorLink::updateSensors(){
         maxVal = 1e10;
     }
     //set the color of each sensor
-    //std::cout << this << std::endl;
+//    std::cout << this << std::endl;
     for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++){
-        (*bi)->setColor(maxVal);
+        BodySensor * bs = (*bi);
+        bs->setColor(maxVal);
     }
+    //std::cout << "maxVal:" << maxVal <<std::endl;
 }
 
 void  SensorLink::setContactsChanged(){

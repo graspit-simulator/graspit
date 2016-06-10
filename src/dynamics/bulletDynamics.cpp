@@ -23,6 +23,7 @@
 //
 //######################################################################
 
+#define BULLET_DYNAMICS
 #ifdef BULLET_DYNAMICS
 
 #include "bulletDynamics.h"
@@ -65,7 +66,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, -10));
+    mBtDynamicsWorld->setGravity(btVector3(0,0, 0));
 }
 
 BulletDynamics::~BulletDynamics()
@@ -533,14 +534,14 @@ to the bodies that are in contact to be used for subsequent computations.
 The same procedure is carried out if, by executing a full time step, a joint
 ends up outside of its legal range.
 */
-double BulletDynamics::moveDynamicBodies(double timeStep) {
+double BulletDynamics::moveDynamicBodies(double timeStep)
+{
     mWorld->findAllContacts();
-
     mWorld->resetDynamicWrenches();
 
     for (int i = 0; i < mWorld->getNumRobots(); i++) {
 
-        Robot* robot=mWorld->getRobot(i);
+        Robot* robot = mWorld->getRobot(i);
 
         //need to update the joint world axis, values, and velocities...
         //this currently recomputes the joint values even though bullet has already done this for us..
@@ -613,6 +614,10 @@ int BulletDynamics::computeNewVelocities(double timeStep) {
 
         Body* tempbody = mWorld->getBody(j);
         tempbody->setTran(*temptrans2);
+
+        delete temptrans2;
+        delete transl;
+        delete rot;
 
         //update the bullet velocity to graspit velocity in order to calculate friction
         btVector3 btAngularVelocity=body->getAngularVelocity ();

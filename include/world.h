@@ -378,7 +378,7 @@ public:
   Body *importBodyFromXml(QString bodyType, const TiXmlElement* child, QString rootPath);
 
   //! Adds an already populated body to the world, but not to collision detection system
-  void addBody(Body *body);
+  void addBody(Body *body, bool addToDynamics=true);
 
   //! Links are loaded in during the robot load method, but are added to the world with this routine
   void addLink(Link *newLink);

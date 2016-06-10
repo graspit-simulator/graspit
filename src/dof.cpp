@@ -255,6 +255,15 @@ DOF::PDPositionController(double timeStep)
 	double newForce;
     newForce = Kp * error + Kv * (error-lastError)/timeStep;
 
+    if(newForce > getMaxForce())
+    {
+        newForce = getMaxForce();
+    }
+    if(newForce < -getMaxForce())
+    {
+        newForce = -getMaxForce();
+    }
+
     DBGP("PDPositionController: DOF " << getDOFNum() << std::endl) ;
     DBGP("PDPositionController: error =" << error << std::endl);
     DBGP( "PDPositionController: setPoint =" << setPoint << " error ="<<error<<" edot = "<<(error-lastError) << std::endl);
@@ -525,7 +534,7 @@ RigidDOF::updateFromJointValues(const double *jointVals)
 		val = jointList.front()->getVal();
 	}
 	q = val / getStaticRatio(jointList.front());
-	DBGP("DOF " << getDOFNum() << ": set value " << q);
+    DBGP("DOF " << getDOFNum() << ": set value " << q);
 }
 
 BreakAwayDOF::~BreakAwayDOF()
