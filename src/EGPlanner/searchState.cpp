@@ -85,11 +85,9 @@ VariableSet::VariableSet(const VariableSet &vs)
 void
 VariableSet::clearVariables()
 {
-    while(!mVariables.empty())
-    {
-        delete mVariables.back();
-        mVariables.pop_back();
-    }
+    for (int i=0; i < (int)mVariables.size(); i++)
+        delete mVariables[i];
+    mVariables.clear();
 }
 
 void
