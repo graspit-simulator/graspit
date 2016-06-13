@@ -630,8 +630,6 @@ public:
   static double defaultMass;
 };
 
-
-
 //! Used for bodies that are part of a robot.
 /*! A link is a dynamic body that notifies its owner robot when contacts have
     changed.
