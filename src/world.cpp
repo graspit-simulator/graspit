@@ -890,7 +890,7 @@ system, it is the caller's responsability to do that. Also does not initialize
 dynamics.
 */
 void
-World::addBody(Body *newBody, bool addToDynamics)
+World::addBody(Body *newBody)
 {
 	newBody->setDefaultViewingParameters();
 	bodyVec.push_back(newBody);
@@ -907,10 +907,7 @@ World::addBody(Body *newBody, bool addToDynamics)
 	IVRoot->addChild(newBody->getIVRoot());
 	modified = true;
 	Q_EMIT numElementsChanged();
-    if (addToDynamics)
-    {
-        mDynamicsEngine->addBody(newBody);
-    }
+    mDynamicsEngine->addBody(newBody);
 
 }
 
