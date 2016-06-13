@@ -61,10 +61,6 @@ const double Contact::INHERITANCE_THRESHOLD = 1;
 const double Contact::INHERITANCE_ANGULAR_THRESHOLD = 0.984; //cosine of 10 degrees
 
 
-//should never be here, but now, i cannot care
-#include "graspitGUI.h"
-#include "ivmgr.h"
-
 /*!
   Initializes a new contact on body \a b1.  The other contacting body is \a b2.
   The contact position \a pos and the contact normal \a norm are expressed
