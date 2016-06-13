@@ -35,7 +35,7 @@
 #include <QObject>
 #include <QTextStream>
 
-#include "src/Collision/collisionStructures.h"
+#include "Collision/collisionStructures.h"
 
 class transf;
 class World;
