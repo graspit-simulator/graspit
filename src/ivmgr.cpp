@@ -38,6 +38,7 @@
 #include <q3listbox.h>
 #include <QApplication>
 #include <QThread>
+#include <QGLWidget>
 
 #include <Inventor/SoDB.h>
 #include <Inventor/SoInput.h>
@@ -1531,13 +1532,6 @@ IVmgr::saveImage(QString filename)
   myRenderer = new SoOffscreenRenderer(glRend);
   myRenderer->setBackgroundColor(white);
 
-#ifdef GRASPITDBG
-  if (myRenderer->isWriteSupported("jpg"))
-	std::cout << " supports jpg" << std::endl;
-  else
-	std::cout << "no jpg support" << std::endl;
-#endif  
-
   SoSeparator *renderRoot = new SoSeparator;
   renderRoot->ref();
   renderRoot->addChild(myViewer->getCamera());
@@ -1551,10 +1545,10 @@ IVmgr::saveImage(QString filename)
   renderRoot->addChild(sg);
   
   myRenderer->render(renderRoot);
-  
 
-  myRenderer->writeToFile(SbString(filename.latin1()),
-                          SbName(filename.section('.',-1)));
+  QGLWidget * glWidget = dynamic_cast<QGLWidget *>(renderArea->getGLWidget());
+  QImage image = glWidget->grabFrameBuffer();
+  image.save(filename);
   
   renderRoot->unref();
   delete myRenderer;
