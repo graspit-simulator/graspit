@@ -299,7 +299,6 @@ public:
 
 	//! Places the given hand in the given state; if no hand is given it places its own hand
 	bool execute(Hand *h = NULL) const;
-    bool dynamicExecute(Hand *h) const;
 
 	//! Gives the inner transform (stored in mPosition) multiplied by the reference transform
 	transf getTotalTran() const {return mPosition->getCoreTran() * mRefTran;}

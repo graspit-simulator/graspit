@@ -71,31 +71,31 @@ const double Contact::INHERITANCE_ANGULAR_THRESHOLD = 0.984; //cosine of 10 degr
  */
 Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
 {
-	body1 = b1;
-	body2 = b2;
-	mate = NULL;
-	wrench = NULL;
-	body1Tran = b1->getTran();
-	body2Tran = b2->getTran();
+  body1 = b1;
+  body2 = b2;
+  mate = NULL;
+  wrench = NULL;
+  body1Tran = b1->getTran();
+  body2Tran = b2->getTran();
 
-	updateCof();
-	normal = normalise(norm);
-	loc = pos;
-	vec3 tangentX,tangentY;
+  updateCof();
+  normal = normalise(norm);
+  loc = pos;
+  vec3 tangentX,tangentY;
 
-	if (fabs(normal % vec3(1,0,0)) > 1.0 - MACHINE_ZERO) {
-		tangentX = normalise(normal * vec3(0,0,1));
-	} else {
-		tangentX = normalise(normal * vec3(1,0,0));
-	}
-	tangentY = normalise(normal * tangentX);
-	frame = coordinate_transf(loc,tangentX,tangentY);
-	coneMat = NULL;
-	prevBetas = NULL;
-	inheritanceInfo = false;
-	for (int i=0; i<6; i++) {
-		dynamicForce[i] = 0;
-	}
+  if (fabs(normal % vec3(1,0,0)) > 1.0 - MACHINE_ZERO) {
+    tangentX = normalise(normal * vec3(0,0,1));
+  } else {
+    tangentX = normalise(normal * vec3(1,0,0));
+  }
+  tangentY = normalise(normal * tangentX);
+  frame = coordinate_transf(loc,tangentX,tangentY);
+  coneMat = NULL;
+  prevBetas = NULL;
+  inheritanceInfo = false;
+  for (int i=0; i<6; i++) {
+      dynamicForce[i] = 0;
+  }
 }
 
 /*!
@@ -106,15 +106,15 @@ Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
  */
 Contact::~Contact()
 {
-	if (optimalCoeffs) delete [] optimalCoeffs;
-	if (wrench) delete [] wrench;
-	if (prevBetas) delete [] prevBetas;
+  if (optimalCoeffs) delete [] optimalCoeffs;
+  if (wrench) delete [] wrench;
+  if (prevBetas) delete [] prevBetas;
 
-	if (mate) {
-		mate->setMate(NULL);
-		body2->removeContact(mate);
-	}
-	DBGP("Contact deleted");
+  if (mate) {
+    mate->setMate(NULL);
+    body2->removeContact(mate);
+  }
+  DBGP("Contact deleted");
 }
 
 /*! Friction edges contain "normalised" friction information: just the 
@@ -407,10 +407,10 @@ bool Contact::preventsMotion(const transf& motion) const
 void
 Contact::updateCof()
 {
-	cof = body1->getWorld()->getCOF(body1->getMaterial(),body2->getMaterial());
-	kcof = body1->getWorld()->getKCOF(body1->getMaterial(),body2->getMaterial());
-	body1->setContactsChanged();
-	body2->setContactsChanged();
+  cof = body1->getWorld()->getCOF(body1->getMaterial(),body2->getMaterial());
+  kcof = body1->getWorld()->getKCOF(body1->getMaterial(),body2->getMaterial());
+  body1->setContactsChanged();
+  body2->setContactsChanged();
 }
 
 /*!
@@ -422,28 +422,28 @@ Contact::updateCof()
 double
 Contact::getCof() const
 {
-	DynamicBody *db;
-	vec3 radius,vel1(vec3::ZERO),vel2(vec3::ZERO),rotvel;
+  DynamicBody *db;
+  vec3 radius,vel1(vec3::ZERO),vel2(vec3::ZERO),rotvel;
 
-	if (body1->isDynamic()) {
-		db = (DynamicBody *)body1;
-		radius = db->getTran().rotation() * (loc - db->getCoG());
-		vel1.set(db->getVelocity()[0],db->getVelocity()[1],db->getVelocity()[2]);
-		rotvel.set(db->getVelocity()[3],db->getVelocity()[4],db->getVelocity()[5]);
-		vel1 += radius * rotvel;
-	}
-	if (body2->isDynamic()) {
-		db = (DynamicBody *)body2;
-		radius = db->getTran().rotation() * (mate->loc - db->getCoG());
-		vel2.set(db->getVelocity()[0],db->getVelocity()[1],db->getVelocity()[2]);
-		rotvel.set(db->getVelocity()[3],db->getVelocity()[4],db->getVelocity()[5]);
-		vel2 += radius * rotvel;
-	}
-	if ((vel1 - vel2).len() > 1.0) {
-		DBGP("SLIDING!");
-		return kcof;
-	}
-	else return cof;
+  if (body1->isDynamic()) {
+    db = (DynamicBody *)body1;
+    radius = db->getTran().rotation() * (loc - db->getCoG());
+    vel1.set(db->getVelocity()[0],db->getVelocity()[1],db->getVelocity()[2]);
+    rotvel.set(db->getVelocity()[3],db->getVelocity()[4],db->getVelocity()[5]);
+    vel1 += radius * rotvel;
+  }
+  if (body2->isDynamic()) {
+    db = (DynamicBody *)body2;
+    radius = db->getTran().rotation() * (mate->loc - db->getCoG());
+    vel2.set(db->getVelocity()[0],db->getVelocity()[1],db->getVelocity()[2]);
+    rotvel.set(db->getVelocity()[3],db->getVelocity()[4],db->getVelocity()[5]);
+    vel2 += radius * rotvel;
+  }
+  if ((vel1 - vel2).len() > 1.0) {
+    DBGP("SLIDING!");
+    return kcof;
+  }
+  else return cof;
 }
 
 /*!
@@ -455,9 +455,10 @@ Contact::getCof() const
 void
 Contact::setContactForce (double *optmx)
 {
-	for (int i=0;i<contactDim;i++)
-		optimalCoeffs[i] = optmx[i];
+  for (int i=0;i<contactDim;i++)
+    optimalCoeffs[i] = optmx[i];
 }
+
 
 /*!
   Each body has a thin layer around it that is Contact::THRESHOLD mm thick, and

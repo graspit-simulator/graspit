@@ -521,21 +521,6 @@ bool HandObjectState::execute(Hand *h) const
 	return true;
 }
 
-bool HandObjectState::dynamicExecute(Hand *h) const
-{
-    if (!h) h = mHand;
-    else assert( h->getNumDOF() == mHand->getNumDOF());
-
-    if (h->setTran( mPosition->getCoreTran() * mRefTran ) == FAILURE) return false;
-    double *dof = new double[ h->getNumDOF() ];
-    mPosture->getHandDOF(dof);
-    //DBGP("Dof: " << dof[0] << " " << dof[1] << " " << dof[2] << " " << dof[3]);
-    h->setDesiredDOFVals(dof);
-    delete [] dof;
-    return true;
-}
-
-
 SearchVariable* HandObjectState::getVariable(int i)
 {
 	if ( i < 0 ) assert(0);
