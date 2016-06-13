@@ -2339,37 +2339,36 @@ If you want the opposite motion, just pass a negative \a speedFactor.
 bool
 Hand::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 {
-    //std::cout << "Inside AutoGrasp" << std::endl;
-	int i;
-	double *desiredVals = new double[numDOF];
+    int i;
+    double *desiredVals = new double[numDOF];
 
-	if (myWorld->dynamicsAreOn()) {
-		for (i=0;i<numDOF;i++) {
-			if (speedFactor * dofVec[i]->getDefaultVelocity() > 0)
-				desiredVals[i] = dofVec[i]->getMax();
-			else if (speedFactor * dofVec[i]->getDefaultVelocity() < 0)
-				desiredVals[i] = dofVec[i]->getMin();		
-			else desiredVals[i] = dofVec[i]->getVal();
-            //std::cout << "Desired val "<<i<<" "<<desiredVals[i] << std::endl;
-			//for now
-			dofVec[i]->setDesiredVelocity(speedFactor * dofVec[i]->getDefaultVelocity());
-		}
-		setDesiredDOFVals(desiredVals);
-		delete [] desiredVals;
-		return true;
-	}
+    if (myWorld->dynamicsAreOn()) {
+        for (i=0;i<numDOF;i++) {
+            if (speedFactor * dofVec[i]->getDefaultVelocity() > 0)
+                desiredVals[i] = dofVec[i]->getMax();
+            else if (speedFactor * dofVec[i]->getDefaultVelocity() < 0)
+                desiredVals[i] = dofVec[i]->getMin();
+            else desiredVals[i] = dofVec[i]->getVal();
+            DBGP("Desired val "<<i<<" "<<desiredVals[i]);
+            //for now
+            dofVec[i]->setDesiredVelocity(speedFactor * dofVec[i]->getDefaultVelocity());
+        }
+        setDesiredDOFVals(desiredVals);
+        delete [] desiredVals;
+        return true;
+    }
 
-	double *stepSize= new double[numDOF];
-	for (i=0;i<numDOF;i++) {
-		if (speedFactor * dofVec[i]->getDefaultVelocity() >= 0) desiredVals[i] = dofVec[i]->getMax();
-		else desiredVals[i] = dofVec[i]->getMin();
-		stepSize[i] = dofVec[i]->getDefaultVelocity()*speedFactor*AUTO_GRASP_TIME_STEP;
-	}
-    //std::cout << "about to move dof to contacts" << std::endl;
-	bool moved = moveDOFToContacts(desiredVals, stepSize, stopAtContact, renderIt);
-	delete [] desiredVals;
-	delete [] stepSize;
-	return moved;
+    double *stepSize= new double[numDOF];
+    for (i=0;i<numDOF;i++) {
+        if (speedFactor * dofVec[i]->getDefaultVelocity() >= 0) desiredVals[i] = dofVec[i]->getMax();
+        else desiredVals[i] = dofVec[i]->getMin();
+        stepSize[i] = dofVec[i]->getDefaultVelocity()*speedFactor*AUTO_GRASP_TIME_STEP;
+    }
+
+    bool moved = moveDOFToContacts(desiredVals, stepSize, stopAtContact, renderIt);
+    delete [] desiredVals;
+    delete [] stepSize;
+    return moved;
 }
 
 /*
