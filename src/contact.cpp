@@ -1546,19 +1546,14 @@ VirtualContact::getVisualIndicator()
 	zaxisCyl->radius = 0.2f;
 	zaxisCyl->height = Body::CONE_HEIGHT;
 
-	SoSphere *zaxisSphere = new SoSphere;
-	zaxisSphere->radius = 3.0f;
-
 	SoTransform *zaxisTran = new SoTransform;
 	zaxisTran->translation.setValue(0,0,Body::CONE_HEIGHT/2.0);
-	//	zaxisTran->translation.setValue(0,0,2.0);
 	zaxisTran->rotation.setValue(SbVec3f(1,0,0),(float)M_PI/2.0f);
 
 	SoSeparator *zaxisSep = new SoSeparator;
 	zaxisSep->addChild(zaxisTran);
 	zaxisSep->addChild(mZaxisMat);
 	zaxisSep->addChild(zaxisCyl);
-	//	zaxisSep->addChild(zaxisSphere);
 
 	SoSeparator* cne = new SoSeparator;
 	cne->addChild(tran);
