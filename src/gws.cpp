@@ -68,7 +68,7 @@ const std::vector<int> GWS::ALL_DIMENSIONS = std::vector<int>(6, 1);
 */
 GWS::~GWS()
 {
-  //DBGA("deleting GWS");
+  DBGA("deleting GWS");
   clearGWS();
 }
 
