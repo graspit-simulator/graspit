@@ -116,7 +116,6 @@ World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,nam
 	numSelectedBodyElements = numSelectedRobotElements = 0;
 	numSelectedElements = 0;
 	numSelectedBodies = 0;
-	numSensors = 0;
 	currentHand = NULL;
 
 	isTendonSelected = false;
@@ -908,7 +907,6 @@ World::addBody(Body *newBody)
 	modified = true;
 	Q_EMIT numElementsChanged();
     mDynamicsEngine->addBody(newBody);
-
 }
 
 /*! Adds a robot link. No need to add it to scene graph, since the robot 
