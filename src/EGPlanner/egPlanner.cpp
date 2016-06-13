@@ -53,7 +53,7 @@ EGPlanner::EGPlanner(Hand *h)
 {
 	mHand = h;
 	init();
-    mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
+	mEnergyCalculator = new SearchEnergy();
 }
 
 /*! Also sets the state of the planner to INIT, which is default
@@ -257,11 +257,7 @@ void
 EGPlanner::setEnergyType(SearchEnergyType s)
 {
 	assert (mEnergyCalculator);
-    if (!mEnergyCalculator->isType(s))
-    {
-        delete mEnergyCalculator;
-        mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
-    }
+	mEnergyCalculator->setType(s);
 }
 
 void
@@ -324,7 +320,8 @@ EGPlanner::run()
 {
 	mMultiThread = true;
 	mRenderType = RENDER_NEVER;
-	
+	//threaded planners always use cloned hands
+	createAndUseClone();
 	//signal that initialization is ready
 	setState(INIT);
 	threadLoop();
@@ -344,8 +341,6 @@ EGPlanner::startThread()
 	if (getState()!=INIT) {
 		DBGA("Can not start thread; state is not INIT");
 	}
-	//threaded planners always use cloned hands
-	createAndUseClone();
 	setState(STARTING_THREAD);
 	start();
 	mMultiThread = true;
