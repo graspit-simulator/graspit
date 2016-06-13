@@ -34,6 +34,9 @@
 #include "dmalloc.h"
 #endif
 
+#include <iostream>
+#include <fstream>
+
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoCoordinate3.h>
 #include <Inventor/nodes/SoCylinder.h>
@@ -1582,81 +1585,123 @@ VirtualContact::mark(bool m)
 	a file.
  */
 void
-VirtualContact::writeToFile(FILE *fp)
+VirtualContact::writeToFile(std::ofstream& outFile)
 {
+    if (!outFile.is_open())
+    {
+        DBGA("VirtualContact::writeToFile: failed to open file");
+        return;
+    }
+
 	//finger and link number
-	fprintf(fp,"%d %d\n",mFingerNum, mLinkNum);
+    outFile << mFingerNum <<" " << mLinkNum << std::endl;
 
 	//numFrictionEdges
-	fprintf(fp,"%d\n",numFrictionEdges);
+    outFile << numFrictionEdges << std::endl;
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++)
-			fprintf(fp,"%f ",frictionEdges[6*i+j]);
-		fprintf(fp,"\n");
+			outFile << frictionEdges[6*i+j] << " ";
+        outFile << std::endl;
 	}
 
 	//loc
-	fprintf(fp,"%f %f %f\n",loc.x(), loc.y(), loc.z());
+	outFile << loc.x() << " " << loc.y() << " " << loc.z() << std::endl;
 
 	//frame
 	Quaternion q = frame.rotation();
 	vec3 t = frame.translation();
-	fprintf(fp,"%f %f %f %f\n",q.w,q.x,q.y,q.z);
-	fprintf(fp,"%f %f %f\n",t.x(), t.y(), t.z());
+	outFile << q.w << " " << q.x << " " << q.y << " " << q.z << std::endl;
+	outFile << t.x() << " " << t.y() << " " << t.z() << std::endl;
 
 	//normal
-	fprintf(fp,"%f %f %f\n",normal.x(), normal.y(), normal.z());
+	outFile << normal.x() << " " << normal.y() << " " << normal.z() << std::endl;
 
 	//cof
-	fprintf(fp,"%f\n",cof);
+    outFile << cof << std::endl;
 }
 
 /*! Loads all the info for this contact from a file previously written
 	by VirtualContact::writeToFile(...)
  */
-void
-VirtualContact::readFromFile(FILE *fp)
+
+bool
+VirtualContact::readFromFile(std::ifstream& inFile)
 {
-	float v,x,y,z;
-    int fscanf_result;
+    if (!inFile.is_open())
+    {
+      DBGA("VirtualContact::readFromFile - Failed to read from file");
+      return false;
+    }
 
-	//finger and link number
-    fscanf_result = fscanf(fp,"%d %d",&mFingerNum, &mLinkNum);
+    float v,x,y,z;
 
-	//numFrictionEdges
-    fscanf_result = fscanf(fp,"%d",&numFrictionEdges);
+    //finger and link number
+    inFile >> mFingerNum >> mLinkNum;
+    if (inFile.fail()){
+      DBGA("VirtualContact::readFromFile - Failed to read fingernumber or link number");
+      return false;
+    }
+    //numFrictionEdges
+    inFile >> numFrictionEdges;
+    if (inFile.fail()){
+        DBGA("VirtualContact::readFromFile - Failed to read number of virtual contacts");
+        return false;
+      }
 
-	//frictionEdges
-	for (int i=0; i<numFrictionEdges; i++) {
-		for (int j=0; j<6; j++) {
-            fscanf_result = fscanf(fp,"%f",&v);
-			frictionEdges[6*i+j] = v;
-		}
-	}
+    //frictionEdges
+    for (int i=0; i<numFrictionEdges; i++) {
+        for (int j=0; j<6; j++) {
+          inFile >> v;
+          if(inFile.fail()){
+            DBGA("VirtualContact::readFromFile - Failed to read number of friction edges");
+            return false;
+          };
+          frictionEdges[6*i+j] = v;
+        }
+    }
 
-	//loc
-    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
-	loc = position(x,y,z);
+    //loc
+    inFile >> x >> y >> z;
+    if(inFile.fail()){
+     DBGA("VirtualContact::readFromFile - Failed to read virtual contact location");
+     return false;
+    }
+    loc = position(x,y,z);
 
-	//frame
-	Quaternion q;
-	vec3 t;
-    fscanf_result = fscanf(fp,"%f %f %f %f",&v,&x,&y,&z);
-	q.set(v,x,y,z);
-    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
-	t.set(x,y,z);
-	frame.set(q,t);
+    //frame
+    Quaternion q;
+    vec3 t;
+    inFile >> v >> x >> y >> z;
+    if(inFile.fail()) {
+      DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame orientation");
+    }
+    q.set(v,x,y,z);
+    inFile >> x >> y >> z;
+    if(inFile.fail()) {
+     DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame location");
+    }
 
-	//normal
-    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
-	normal.set(x,y,z);
+    t.set(x,y,z);
+    frame.set(q,t);
 
-	//cof
-    fscanf_result = fscanf(fp,"%f",&v);
-    Q_UNUSED(fscanf_result);
-	cof = v;
+    //normal
+    inFile >> x >> y >> z;
+    if( inFile.fail()){
+     DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
+     return false;
+    }
+    normal.set(x,y,z);
+
+    //cof
+    inFile >> v;
+    if( inFile.fail()){
+      DBGA("VirtualContact::readFromFile - Failed to read virtual contact friction");
+      return false;
+    }
+    cof = v;
+    return true;
 }
 
 /*! Sets objDistance to be the vector from the contact to the closest
@@ -1682,45 +1727,78 @@ VirtualContactOnObject::VirtualContactOnObject()
 VirtualContactOnObject::~VirtualContactOnObject()
 {
 }
-
-void
-VirtualContactOnObject::readFromFile(FILE *fp)
+bool
+VirtualContactOnObject::readFromFile(std::ifstream& inFile)
 {
-	float w,x,y,z;
-    int fscanf_result;
+    if (!inFile.is_open())
+    {
+      DBGA("VirtualContact::readFromFile - Failed to read from file");
+      return false;
+    }
 
-	//numFCVectors
-    fscanf_result = fscanf(fp,"%d",&numFrictionEdges);
+    float w,x,y,z;
 
-	//frictionEdges
-	for (int i=0; i<numFrictionEdges; i++) {
-		for (int j=0; j<6; j++) {
-            fscanf_result = fscanf(fp,"%f",&w);
-			frictionEdges[6*i+j] = w;
-		}
-	}
-	fprintf(stderr,"\n<frictionEdges scanned successfully>"); // for test
+    //numFCVectors
+    inFile >> numFrictionEdges;
+    if (inFile.fail()){
+      DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction vectors");
+      return false;
+    }
 
-	// (w,x,y,z) is already a quaternion, if you want to do frame rotate v rad along a vector (x,y,z),
-	//you can use q(v,vec(x,y,z))
-	Quaternion q;
-	vec3 t;
-    fscanf_result = fscanf(fp,"%f %f %f %f",&w,&x,&y,&z);
-	q.set(w,x,y,z);
-    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
-	t.set(x,y,z);
-	loc = position(x,y,z);
-	frame.set(q,t);
+    //frictionEdges
+    for (int i=0; i<numFrictionEdges; i++) {
+        for (int j=0; j<6; j++) {
+          inFile >> w;
+          if(inFile.fail()){
+            DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction edges");
+            return false;
+          }
+          frictionEdges[6*i+j] = w;
+        }
+    }
+    fprintf(stderr,"\n<frictionEdges scanned successfully>"); // for test
 
-	//normal
-    fscanf_result = fscanf(fp,"%f %f %f",&x, &y, &z);
-	normal.set(x,y,z);
+    // (w,x,y,z) is already a quaternion, if you want to do frame rotate v rad along a vector (x,y,z),
+    //you can use q(v,vec(x,y,z))
+    Quaternion q;
+    vec3 t;
+    inFile >> w >> x >> y >> z;
+    if(inFile.fail()) {
+      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact location");
+      return false;
+    }
 
-	//cof
-    fscanf_result = fscanf(fp,"%f",&w);
-    Q_UNUSED(fscanf_result);
-	cof = w;
+    q.set(w,x,y,z);
+
+    inFile >> x >> y >> z;
+    if(inFile.fail()) {
+      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact orientation");
+      return false;
+    }
+
+    t.set(x,y,z);
+    loc = position(x,y,z);
+    frame.set(q,t);
+
+    //normal
+    inFile >> x >> y >> z;
+    if(inFile.fail()) {
+      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
+      return false;
+    }
+
+    normal.set(x,y,z);
+
+    //cof
+    inFile >> w;
+    if(inFile.fail()) {
+      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
+      return false;
+    }
+    cof = w;
+    return true;
 }
+
 /*! set dynamic contact wrench of body when updating contact wrench
  */
 
@@ -1771,26 +1849,31 @@ VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int in
 #endif
 
 void
-VirtualContactOnObject::writeToFile(FILE *fp){
-	//numFrictionEdges
-	fprintf(fp,"%d\n",numFrictionEdges);
+VirtualContactOnObject::writeToFile(std::ofstream& outFile){
+
+    if (!outFile.is_open())
+    {
+        DBGA("VirtualContactOnObject::writeToFile: failed to open file");
+        return;
+    }
+
+    outFile << numFrictionEdges << std::endl;
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++)
-			fprintf(fp,"%f ",frictionEdges[6*i+j]);
-		fprintf(fp,"\n");
+            outFile << frictionEdges[6*i+j] << " ";
+        outFile << std::endl;
 	}
 
 	//frame
 	Quaternion q = frame.rotation();
 	vec3 t = frame.translation();
-	fprintf(fp,"%f %f %f %f\n",q.w,q.x,q.y,q.z);
-	fprintf(fp,"%f %f %f\n",t.x(), t.y(), t.z());
+	outFile << q.w << " " << q.x << " " << q.y << " " << q.z << std::endl;
 
 	//normal
-	fprintf(fp,"%f %f %f\n",normal.x(), normal.y(), normal.z());
+	outFile << normal.x() << " " << normal.y() << " " << normal.z() << std::endl;
 
 	//cof
-	fprintf(fp,"%f\n",cof);
+    outFile << cof << std::endl;
 }

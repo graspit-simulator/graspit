@@ -20,7 +20,7 @@ set (GSRC ${PROJECT_SOURCE_DIR})
 set(COLLISION_ENGINE GRASPIT_COLLISION CACHE PATH "back end for GraspIt! Collision detection, current options are GRASPIT_COLLISION, PQP_COLLISION.")
 set(CGDB true CACHE PATH "compile CGDB sources as well")
 set(PLY true CACHE PATH "compile PLY sources as well")
-set(DYNAMICS_ENGINE BULLET_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
+set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
 set(BUILD_TESTS false CACHE PATH "build tests as well")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")

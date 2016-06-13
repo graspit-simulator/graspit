@@ -29,7 +29,9 @@
 #include <iomanip>
 #include <QFile>
 #include <QTextStream>
+
 #include <typeinfo>
+#include <fstream>
 
 //needed just for the image of the Flock of Birds sensor and the approach direction
 #include "SoArrow.h"
@@ -412,29 +414,36 @@ Robot::loadEigenData(QString filename)
 int 
 Robot::loadContactData(QString filename)
 {
-  FILE *fp = fopen(filename.latin1(), "r");
-  if (!fp) {
-    DBGA("Could not open contact file " << filename.latin1());
+  std::ifstream inFile(filename.latin1(), std::ios::in);
+  if (!inFile.is_open())
+  {
+    fprintf(stderr,"Could not open filename %s\n",filename.latin1());
     return FAILURE;
   }
   
   char robotName[500];
   ; //yes, I know, can seg fault...
-  if(fscanf(fp,"%s",robotName) <= 0)
+  inFile >> robotName;
+  if(inFile.fail())
     {
       DBGA("Robot::loadContactData - failed to read robot name");
       return 0;
     }
   
   int numContacts;
-  if( fscanf(fp,"%d",&numContacts) <= 0){
+  inFile >> numContacts;
+  if(inFile.fail()){
     DBGA("Robot::loadContactData - failed to read number of contacts");
     return -1;
   }
 
   for (int i=0; i<numContacts; i++) {
     VirtualContact* newContact = new VirtualContact();
-    newContact->readFromFile(fp);    
+    if (!newContact->readFromFile(inFile))
+    {
+        DBGA("Robot::loadContactData - failed to read contacts");
+        return -1;
+    }
     int f = newContact->getFingerNum();
     int l = newContact->getLinkNum();
     if ( f >= 0) {
@@ -452,7 +461,7 @@ Robot::loadContactData(QString filename)
     }
     newContact->computeWrenches(false,false);
   }
-  fclose(fp);
+  inFile.close();
   return SUCCESS;
 }
 
