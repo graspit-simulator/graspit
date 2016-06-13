@@ -108,6 +108,7 @@
 //hmmm not sure this is right
 #include "graspitGUI.h"
 
+
 //#define GRASPITDBG
 #include "debug.h"
 
@@ -1547,8 +1548,13 @@ IVmgr::saveImage(QString filename)
   myRenderer->render(renderRoot);
 
   QGLWidget * glWidget = dynamic_cast<QGLWidget *>(renderArea->getGLWidget());
-  QImage image = glWidget->grabFrameBuffer();
-  image.save(filename);
+  if(glWidget){
+      QImage image = glWidget->grabFrameBuffer();
+      image.save(filename);
+  }else{
+        DBGA("Could not save image renderArea was not a GLWidget.");
+  }
+
   
   renderRoot->unref();
   delete myRenderer;
