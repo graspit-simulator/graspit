@@ -116,7 +116,7 @@ World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,nam
 	numSelectedBodyElements = numSelectedRobotElements = 0;
 	numSelectedElements = 0;
 	numSelectedBodies = 0;
-    numSensors = 0;
+	numSensors = 0;
 	currentHand = NULL;
 
 	isTendonSelected = false;
