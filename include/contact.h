@@ -34,8 +34,9 @@
 #include <list>
 #include <vector>
 
+#include "Collision/collisionStructures.h"
 #include "ContactPDModels.h"
-#include "src/Collision/collisionStructures.h"
+
 
 
 class transf;
@@ -457,7 +458,7 @@ public:
 
 	//! Visual indicator is a small patch of the fit analytical surface on the body
 	SoSeparator* getVisualIndicator();
-    virtual mat3 getRot(){return fitRot;}
+	virtual mat3 getRot(){return fitRot;}
 	//! Also attempt to apply some torques in the contact plane; currently disabled.
 	virtual void computeWrenches();
 
