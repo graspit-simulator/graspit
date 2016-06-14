@@ -116,7 +116,7 @@ void ContactCallback::leafTest(const Leaf *l1, const Leaf *l2)
 			int numContacts = triangleTriangleContact(t1, *it2, mThreshold*mThreshold,
 													  &contactPoints);
 			if (numContacts < 0) {
-                DBGP("Collision found when looking for contacts");
+				DBGA("Collision found when looking for contacts");
 			}
 			std::vector< std::pair<position,position> >::iterator it;
 			for(it=contactPoints.begin(); it!=contactPoints.end(); it++) {
@@ -254,7 +254,7 @@ void
 RegionCallback::leafTest(const Leaf *l1, const Leaf *l2)
 {
 	mNumLeafTests++;
-    assert(l1); //assert(!l2);
+	assert(l1); assert(!l2);
 	const std::list<Triangle>*	list1 = l1->getTriangles();
 	std::list<Triangle>::const_iterator it1;
 	for (it1=list1->begin(); it1!=list1->end(); it1++) {
