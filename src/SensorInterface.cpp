@@ -93,11 +93,6 @@ bool BodySensor::setGroupNumber(int gn){
 	return true;
 }
 
-SensorOutput * BodySensor::outputSensorReadings(){
-	SensorOutput * so = Poll();
-    return so;
-}
-
 transf BodySensor::getSensorTran(){
 	return sbody->getTran();
 }
@@ -337,15 +332,9 @@ RegionFilteredSensor::RegionFilteredSensor(const RegionFilteredSensor & fs, Link
     setFilterParams(myOutput.pos);
 }
 
-
 SoSeparator * 
 RegionFilteredSensor::getVisualIndicator(){	
 	return visualIndicator;
-}
-
-SensorOutput * RegionFilteredSensor::outputSensorReadings(){
-	SensorOutput * so = Poll();
-    return so;
 }
 
 BodySensor * RegionFilteredSensor::clone(SensorLink * sl)

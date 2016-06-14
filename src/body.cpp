@@ -2378,7 +2378,7 @@ void SensorLink::updateAndOuputSensors(std::vector<SensorOutput*> &sensorReading
     std::vector<BodySensor *>::iterator bi;
     for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
         (*bi)->updateSensorModel();
-        SensorOutput *so = (*bi)->outputSensorReadings();
+        SensorOutput *so = (*bi)->getSensorOutput();
         sensorReadings.push_back(so);
     }
     return;

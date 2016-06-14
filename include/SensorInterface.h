@@ -25,12 +25,11 @@ public:
 	//or asking the sensor to update its model.
 	//It should also support asking for visualization of the sensor output 
 	//and sensor groupname, which may be relevant to control strategies.
-	virtual SensorOutput * Poll() = 0;
+    virtual SensorOutput * getSensorOutput() = 0;
 	virtual bool updateSensorModel() = 0;
 	virtual void resetSensor() = 0;
 	virtual SoSeparator * getVisualIndicator() = 0;
 	virtual int getGroupNumber() = 0;
-    virtual SensorOutput* outputSensorReadings() = 0;
 	virtual transf getSensorTran() = 0;
 	virtual void setColor(double maxVal) = 0;
 	virtual double getNormalForce(){return -1;}
@@ -49,14 +48,13 @@ protected:
 	double getTimeStep();
 	int groupNumber;
 public:
-    virtual SensorOutput * Poll(){return &myOutput;}
+    virtual SensorOutput * getSensorOutput(){return &myOutput;}
 	virtual bool updateSensorModel();
 	bool setGroupNumber(int gn);
     virtual int getGroupNumber(){return groupNumber;}
 	virtual void sensorModel();
 	virtual void resetSensor();
 	virtual SoSeparator * getVisualIndicator();
-    virtual SensorOutput* outputSensorReadings();
 	BodySensor(Link* body);
 	BodySensor(const BodySensor & fs, Link * sl);
     virtual BodySensor * clone(Body* b){Q_UNUSED(b); return new BodySensor(*this);}
@@ -84,7 +82,6 @@ public:
 	RegionFilteredSensor(Link * body);
 	RegionFilteredSensor(const RegionFilteredSensor & fs, Link * sl);
 	SoSeparator * getVisualIndicator();
-    virtual SensorOutput* outputSensorReadings();
 //	SoTransform* tran;
 	SbVec3f sbv[8];
 	virtual BodySensor * clone(SensorLink * sl);
