@@ -125,9 +125,6 @@ protected:
   //! The number of hands currently in this world
   int numHands;
 
-  //! The number of sensors currently in this world
-  int numSensors;
-
   //! The number of currently selected elements
   int numSelectedElements;
 
@@ -276,7 +273,7 @@ public:
   int getNumSelectedBodies() const {return numSelectedBodies;}
 
   //! Returns the number of sensors defined in the world
-  int getNumSensors() const {return numSensors;}
+  int getNumSensors() const {return sensorVec.size();}
 
   //! Returns a pointer to the i-th selected body in the world 
   Body *getSelectedBody(int i) const {return selectedBodyVec[i];}
