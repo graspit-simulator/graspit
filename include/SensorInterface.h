@@ -43,8 +43,6 @@ protected:
 	SensorLink * sbody;
 	SensorOutput myOutput;
 	static double retention_level;
-	//FIXME this is horribly incorrect there must be a better way
-	double last_world_time;
 	double getTimeStep();
 	int groupNumber;
 public:

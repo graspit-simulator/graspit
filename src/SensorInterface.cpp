@@ -33,7 +33,6 @@ BodySensor :: BodySensor(Link * body){
 
 BodySensor::BodySensor(const BodySensor & fs, Link * sl){
     BodySensor::init(sl);
-    last_world_time = 0;
     groupNumber = fs.groupNumber;
 }
 
@@ -325,7 +324,6 @@ RegionFilteredSensor::RegionFilteredSensor(Link * body) : BodySensor(body){
 RegionFilteredSensor::RegionFilteredSensor(const RegionFilteredSensor & fs, Link * sl):BodySensor(sl)
 {
 	RegionFilteredSensor::init();
-	last_world_time = 0;
 	groupNumber = fs.groupNumber;
     myOutput.pos[0] = fs.myOutput.pos[0];
     myOutput.pos[1] = fs.myOutput.pos[1];
