@@ -29,16 +29,12 @@
 #include <iomanip>
 #include <QFile>
 #include <QTextStream>
-
-#include <typeinfo>
 #include <fstream>
+#include <typeinfo>
 
 //needed just for the image of the Flock of Birds sensor and the approach direction
 #include "SoArrow.h"
 #include <Inventor/nodes/SoCube.h>
-#include <Inventor/nodes/SoGroup.h>
-#include <Inventor/nodes/SoScale.h>
-
 
 #include "bBox.h"
 #include "mytools.h"
@@ -57,7 +53,6 @@
 #include "tinyxml.h"
 #include "collisionInterface.h"
 #include "SensorInterface.h"
-#include "triangle.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -120,8 +115,8 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	DBGA("Creating base...\n");  
     QString sensorType = element->Attribute("sensorType");
 	if(element){
-        valueStr = element->GetText();
-        valueStr = valueStr.stripWhiteSpace();
+		valueStr = element->GetText();	
+		valueStr = valueStr.stripWhiteSpace();
         if(!sensorType.isNull())
         {
             if(sensorType == "BodySensor")
@@ -1590,8 +1585,6 @@ Robot::jumpDOFToContact(double *desiredVals, int *stoppedJoints, int *numCols)
         }
     }
 
-
-
 	delete [] initialDofVals; delete [] newDofVals;
 	delete [] initialJointVals; delete [] newJointVals;
 
@@ -1643,7 +1636,6 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 	double *newVals = new double[numDOF];
 
 	for (i=0;i<numDOF;i++) {
-        desiredVals[i] = std::max(dofVec[i]->getMin(), std::min(desiredVals[i], dofVec[i]->getMax()));
 		if (!desiredSteps || desiredSteps[i] == WorldElement::ONE_STEP ) {
 			stepSize[i] = desiredVals[i] - dofVec[i]->getVal();
 		} else if (desiredSteps[i]!=0.0) {
@@ -1723,7 +1715,6 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
     {
         graspItGUI->getIVmgr()->getViewer()->render();
     }
-
 
 	//	PROF_STOP_TIMER(MOVE_DOF);
 	//	PROF_PRINT_ALL;
@@ -1993,7 +1984,6 @@ Robot::setDesiredDOFVals(double *dofVals)
 			timeNeeded = numSteps*myWorld->getTimeStep();
 
 			DBGP("numSteps: "<< numSteps << " time needed: " << timeNeeded);
-            std::cout << "numSteps: "<< numSteps << " time needed: " << timeNeeded << std::endl;
 			traj = new double[numSteps];
 
 			for (i=0;i<numSteps;i++) {
@@ -2003,13 +1993,13 @@ Robot::setDesiredDOFVals(double *dofVals)
 				coeffs[2] = 10.0*(q1 - q0) - (6.0*qd0 + 4.0*qd1)*timeNeeded;
 				coeffs[1] = 0.0;
 				coeffs[0] = qd0*timeNeeded; 
-                traj[i] = q0;
+				traj[i] = q0;
 
-                tpow = 1.0;
-                for (j=0;j<5;j++) {
-                    tpow *= t;
-                    traj[i] += tpow*coeffs[j];
-                }
+				tpow = 1.0;
+				for (j=0;j<5;j++) {
+					tpow *= t;
+					traj[i] += tpow*coeffs[j];
+				}
 				DBGP(i << " " << t << " " << traj[i]);
 			}
 			dofVec[d]->setTrajectory(traj,numSteps);
@@ -2208,14 +2198,6 @@ Robot::DOFController(double timeStep)
 	for (int d=0;d<numDOF;d++) {
 		dofVec[d]->callController(timeStep);
 	}
-
-    std::vector<DynamicBody *> robotLinks;
-    getAllLinks(robotLinks);
-    for (unsigned int i=0; i<robotLinks.size(); i++) {
-        if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
-            ((SensorLink*)robotLinks.at(i))->setContactsChanged();
-        }
-    }
 }
 
 
@@ -2252,8 +2234,8 @@ Robot::dynamicAutograspComplete()
 		//if this joint has hit its limit, it is possible that the autograsp is done
 		if (fabs(j->getDynamicsVal() - limit) < 3.0e-2) continue;
 		//if none or the above are true, the autograsp definitely is still going
-        //std::cout << "Autograsp going on chain " << c << " joint " << jNum << ": val "
-         //   << j->getDynamicsVal() << "; limit " << limit << std::endl;
+		DBGP("Autograsp going on chain " << c << " joint " << jNum << ": val " 
+			<< j->getDynamicsVal() << "; limit " << limit);
 		return false;
 	}
 	return true;		
@@ -2339,36 +2321,36 @@ If you want the opposite motion, just pass a negative \a speedFactor.
 bool
 Hand::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 {
-    int i;
-    double *desiredVals = new double[numDOF];
+	int i;
+	double *desiredVals = new double[numDOF];
 
-    if (myWorld->dynamicsAreOn()) {
-        for (i=0;i<numDOF;i++) {
-            if (speedFactor * dofVec[i]->getDefaultVelocity() > 0)
-                desiredVals[i] = dofVec[i]->getMax();
-            else if (speedFactor * dofVec[i]->getDefaultVelocity() < 0)
-                desiredVals[i] = dofVec[i]->getMin();
-            else desiredVals[i] = dofVec[i]->getVal();
-            DBGP("Desired val "<<i<<" "<<desiredVals[i]);
-            //for now
-            dofVec[i]->setDesiredVelocity(speedFactor * dofVec[i]->getDefaultVelocity());
-        }
-        setDesiredDOFVals(desiredVals);
-        delete [] desiredVals;
-        return true;
-    }
+	if (myWorld->dynamicsAreOn()) {
+		for (i=0;i<numDOF;i++) {
+			if (speedFactor * dofVec[i]->getDefaultVelocity() > 0)
+				desiredVals[i] = dofVec[i]->getMax();
+			else if (speedFactor * dofVec[i]->getDefaultVelocity() < 0)
+				desiredVals[i] = dofVec[i]->getMin();		
+			else desiredVals[i] = dofVec[i]->getVal();
+			DBGP("Desired val "<<i<<" "<<desiredVals[i]);
+			//for now
+			dofVec[i]->setDesiredVelocity(speedFactor * dofVec[i]->getDefaultVelocity());
+		}
+		setDesiredDOFVals(desiredVals);
+		delete [] desiredVals;
+		return true;
+	}
 
-    double *stepSize= new double[numDOF];
-    for (i=0;i<numDOF;i++) {
-        if (speedFactor * dofVec[i]->getDefaultVelocity() >= 0) desiredVals[i] = dofVec[i]->getMax();
-        else desiredVals[i] = dofVec[i]->getMin();
-        stepSize[i] = dofVec[i]->getDefaultVelocity()*speedFactor*AUTO_GRASP_TIME_STEP;
-    }
+	double *stepSize= new double[numDOF];
+	for (i=0;i<numDOF;i++) {
+		if (speedFactor * dofVec[i]->getDefaultVelocity() >= 0) desiredVals[i] = dofVec[i]->getMax();
+		else desiredVals[i] = dofVec[i]->getMin();
+		stepSize[i] = dofVec[i]->getDefaultVelocity()*speedFactor*AUTO_GRASP_TIME_STEP;
+	}
 
-    bool moved = moveDOFToContacts(desiredVals, stepSize, stopAtContact, renderIt);
-    delete [] desiredVals;
-    delete [] stepSize;
-    return moved;
+	bool moved = moveDOFToContacts(desiredVals, stepSize, stopAtContact, renderIt);
+	delete [] desiredVals;
+	delete [] stepSize;
+	return moved;
 }
 
 /*
@@ -2451,29 +2433,11 @@ will move back until collision is resolved.
 bool 
 Hand::findInitialContact(double moveDist)
 {
-    std::vector<Body*> interestList;
-    for (int c=0; c<numChains; c++) {
-        for (int l=0; l<chainVec[c]->getNumLinks(); l++) {
-            interestList.push_back( chainVec[c]->getLink(l) );
-        }
-    }
-
-    CollisionReport colReport;
-    int iter_count = 0;
-    while (myWorld->getCollisionReport(&colReport, &interestList))
-    {
-        iter_count += 1;
-
+	CollisionReport colReport;
+	while (myWorld->getCollisionReport(&colReport)) {
 		transf newTran = translate_transf(vec3(0,0,-moveDist / 2.0) * 
 			getApproachTran()) * getTran();
 		setTran(newTran);
-
-        if (iter_count > 100)
-        {
-            DBGP( "Unable to find initial contact" );
-            break;
-        }
-
 	}
 	return approachToContact(moveDist, false);
 }
