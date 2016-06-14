@@ -31,36 +31,26 @@ void BodySensor::init(Link * body){
 BodySensor :: BodySensor(Link * body){
 	BodySensor::init(body);
 }
-BodySensor::BodySensor(const BodySensor & fs, Link * sl)
-	{
-		BodySensor::init(sl);	
-		last_world_time = 0;
-		groupNumber = fs.groupNumber;
-	}
+
+BodySensor::BodySensor(const BodySensor & fs, Link * sl){
+    BodySensor::init(sl);
+    last_world_time = 0;
+    groupNumber = fs.groupNumber;
+}
+
 bool
 BodySensor :: updateSensorModel(){
     sensorModel();
     return true;
 }
 
-//FIXME this should be more flexible.
 double
 BodySensor::getTimeStep(){
 	return .0025;
-	/*static double lastTime = 0;
-	double currTime, stepSize;
-	World * sbworld = sbody->getWorld();
-	currTime = sbworld->getWorldTime();
-	stepSize = currTime - lastTime;
-	lastTime =  currTime;
-	return stepSize;*/
 }
+
 double BodySensor::retention_level = .1;
 
-//simple model lowpass filters all forces.
-
-
-//Temporary function for adding these vectors.  A faster way may be necessary
 void inline 
 addVector6(double * force, double * contactForce){
 	for(int ind = 0; ind < 6; ind ++)
@@ -69,34 +59,24 @@ addVector6(double * force, double * contactForce){
 
 void
 BodySensor::sensorModel(){
-    std::cout << "In sensorModel" << std::endl;
 	double forces[6] = {0,0,0,0,0,0};
 	std::list<Contact *>::const_iterator cp;
 	std::list<Contact *> cList = sbody->getContacts();
-	//Adding contacts
 
-	for(cp = cList.begin(); cp != cList.end(); cp++){
-		double * contactForce; 
-//		if(sbody->getWorld()->dynamicsAreOn())
-//			contactForce = (*cp)->getDynamicContactWrench();
-//		else{
-			double tempForce[6] = {0, 0, 1, 0, 0, 0};
-			contactForce = tempForce;
-//		}
-		addVector6(forces, contactForce);
+    for(cp = cList.begin(); cp != cList.end(); cp++){
+        double contactForce[6] = {0, 0, 1, 0, 0, 0};
+        addVector6(forces, contactForce);
 	}
-	//std::cout << "Body Sensor Reading: ";
-	//Adding Forces
+
 	double ts = getTimeStep();
 	if (ts > 0.0)
 		for(int ind = 0; ind < 6; ind++){
 			myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
             std::cout << myOutput.sensorReading[ind] << " " << std::endl;
 		}
-		//std::cout<<std::endl;
+
 	sbody->setEmColor(myOutput.sensorReading[2]/3.0,0,1);
 }
-
 
 void
 BodySensor::resetSensor(){
@@ -107,18 +87,13 @@ BodySensor::resetSensor(){
 SoSeparator * 
 BodySensor::getVisualIndicator(){
 	return NULL;
-};
+}
 
 bool BodySensor::setGroupNumber(int gn){
 	groupNumber = gn;
 	return true;
 }
-/*bool RegionFilteredSensor::projectSensorToBody(){
-	std::vector <position> vertices;
-	sbody->getGeometryVertices(&vertices);
-	
-}
-*/
+
 void BodySensor::outputSensorReadings(QTextStream & qts){
 	SensorOutput * so = Poll();
 	int sNum = SensorOutputTools::getSensorReadingNumber(so);
@@ -262,13 +237,7 @@ RegionFilteredSensor::sensorModel(){
             if(filterContact(*cp))
             {
                 forces[2] = 1;
-                //std::cout << "Contact pos:" << (*cp)->getPosition()[0] <<" " <<(*cp)->getPosition()[1] <<" "<< (*cp)->getPosition()[2] << std::endl;
-                //std::cout << "Contact Force" << contactForce[0] << " " << contactForce[1] << " "  << contactForce[2] << " "  << contactForce[3] << " "  << contactForce[4] << " "  << contactForce[5] << std::endl;
-
             }
-
-            //if (filterContact(*cp))
-            //    addVector6(forces, contactForce);
         }
         //Adding Forces for the current sensor pad
         double ts = getTimeStep();
@@ -351,19 +320,18 @@ void RegionFilteredSensor::setColor(double maxVal)
 	IVMat->emissiveColor.setValue(myOutput.sensorReading[2]/maxVal,
 		0.2,
 		1.0-myOutput.sensorReading[2]/maxVal);
-//	std::cout << myOutput.sensorReading[2] << std::endl;
 }
 
 void RegionFilteredSensor::init(){
-coords = new SoCoordinate3;
-ifs = new SoIndexedFaceSet;
-visualIndicator = new SoSeparator;
-IVMat = new SoMaterial;
+    coords = new SoCoordinate3;
+    ifs = new SoIndexedFaceSet;
+    visualIndicator = new SoSeparator;
+    IVMat = new SoMaterial;
 }
 
 RegionFilteredSensor::RegionFilteredSensor(Link * body) : BodySensor(body){
 	RegionFilteredSensor::init();
-return;
+    return;
 }
 
 RegionFilteredSensor::RegionFilteredSensor(const RegionFilteredSensor & fs, Link * sl):BodySensor(sl)
@@ -374,15 +342,13 @@ RegionFilteredSensor::RegionFilteredSensor(const RegionFilteredSensor & fs, Link
 	pos[0] = fs.pos[0];
 	pos[1] = fs.pos[1];
 	setFilterParams(pos);
-
 }
 
 
 SoSeparator * 
-RegionFilteredSensor::getVisualIndicator(){
-	
+RegionFilteredSensor::getVisualIndicator(){	
 	return visualIndicator;
-};
+}
 
 void RegionFilteredSensor::outputSensorReadings(QTextStream & qts){
 	SensorOutput * so = Poll();
@@ -412,7 +378,6 @@ transf RegionFilteredSensor::getSensorTran()
 	transf linkInWorld = sbody->getTran();
 	transf res = sensorInLink * linkInWorld; // mathematically should be sensorInWorld = linkInWorld * sensorInLink, but inside GraspIt! it is reversed
 	return res;
-
 }
 
 int SensorOutputTools::getSensorReadingNumber(SensorOutput * so){
