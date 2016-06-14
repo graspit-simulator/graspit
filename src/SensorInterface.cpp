@@ -185,20 +185,6 @@ bool RegionFilteredSensor::setFilterParams(position pos[]){
 	return true;
 }
 
-
-////////////////////////////////////HELPERS
-void printMat3(mat3 m, std::string comment)
-{
-	std::cout << "------------------------" << comment.c_str() << std::endl;
-	std::cout << m[0] << ", " << m[3] << ", " << m[6] << "\n"
-			<< m[1] << ", " << m[4] << ", " << m[7] << "\n"
-			<< m[2] << ", " << m[5] << ", " << m[8] << "\n";
-	std::cout << "========================" << std::endl;
-}
-
-
-
-//////////////////////////////////////////////
 bool
 RegionFilteredSensor::updateSensorModel(){
 
