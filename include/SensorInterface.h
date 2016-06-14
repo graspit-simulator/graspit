@@ -50,7 +50,6 @@ public:
     virtual bool updateSensorModel();
     bool setGroupNumber(int gn);
     virtual int getGroupNumber(){return groupNumber;}
-    virtual void sensorModel();
     virtual void resetSensor();
     virtual SoSeparator * getVisualIndicator();
     BodySensor(Link* body);
@@ -75,17 +74,15 @@ protected:
 public:
 	bool setFilterParams(QString * params);
 	bool setFilterParams(position pos[]);
-	virtual void sensorModel();
-	//virtual SoSeparator * getVisualIndicator();
 	RegionFilteredSensor(Link * body);
 	RegionFilteredSensor(const RegionFilteredSensor & fs, Link * sl);
 	SoSeparator * getVisualIndicator();
-//	SoTransform* tran;
 	SbVec3f sbv[8];
 	virtual BodySensor * clone(SensorLink * sl);
 	~RegionFilteredSensor();
 	virtual transf getSensorTran();
 	virtual void setColor(double maxVal);
+    virtual bool updateSensorModel();
 };
 
 

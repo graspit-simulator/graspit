@@ -36,9 +36,31 @@ BodySensor::BodySensor(const BodySensor & fs, Link * sl){
     groupNumber = fs.groupNumber;
 }
 
+void inline
+addVector6(double * force, double * contactForce){
+    for(int ind = 0; ind < 6; ind ++)
+        force[ind]+=contactForce[ind];
+}
+
 bool
 BodySensor :: updateSensorModel(){
-    sensorModel();
+    double forces[6] = {0,0,0,0,0,0};
+    std::list<Contact *>::const_iterator cp;
+    std::list<Contact *> cList = sbody->getContacts();
+
+    for(cp = cList.begin(); cp != cList.end(); cp++){
+        double contactForce[6] = {0, 0, 1, 0, 0, 0};
+        addVector6(forces, contactForce);
+    }
+
+    double ts = getTimeStep();
+    if (ts > 0.0)
+        for(int ind = 0; ind < 6; ind++){
+            myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
+            std::cout << myOutput.sensorReading[ind] << " " << std::endl;
+        }
+
+    sbody->setEmColor(myOutput.sensorReading[2]/3.0,0,1);
     return true;
 }
 
@@ -49,32 +71,6 @@ BodySensor::getTimeStep(){
 
 double BodySensor::retention_level = .1;
 
-void inline 
-addVector6(double * force, double * contactForce){
-	for(int ind = 0; ind < 6; ind ++)
-		force[ind]+=contactForce[ind];
-}
-
-void
-BodySensor::sensorModel(){
-	double forces[6] = {0,0,0,0,0,0};
-	std::list<Contact *>::const_iterator cp;
-	std::list<Contact *> cList = sbody->getContacts();
-
-    for(cp = cList.begin(); cp != cList.end(); cp++){
-        double contactForce[6] = {0, 0, 1, 0, 0, 0};
-        addVector6(forces, contactForce);
-	}
-
-	double ts = getTimeStep();
-	if (ts > 0.0)
-		for(int ind = 0; ind < 6; ind++){
-			myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
-            std::cout << myOutput.sensorReading[ind] << " " << std::endl;
-		}
-
-	sbody->setEmColor(myOutput.sensorReading[2]/3.0,0,1);
-}
 
 void
 BodySensor::resetSensor(){
@@ -210,8 +206,8 @@ void printMat3(mat3 m, std::string comment)
 
 
 //////////////////////////////////////////////
-void
-RegionFilteredSensor::sensorModel(){
+bool
+RegionFilteredSensor::updateSensorModel(){
 
 	double forces[6] = {0,0,0,0,0,0};
 	std::list<Contact *>::const_iterator cp;
