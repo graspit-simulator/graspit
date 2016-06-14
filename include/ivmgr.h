@@ -277,6 +277,7 @@ public:
   transf getCameraTransf();
 
   void saveImage(QString filename);
+  void saveDepthImage(QString filename);
   void beginMainLoop();
 
   void setStereo(bool s);

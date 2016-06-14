@@ -399,6 +399,7 @@
         <addaction name="fileSaveAction" />
         <addaction name="fileSaveAsAction" />
         <addaction name="fileSaveImageAction" />
+        <addaction name="fileSaveDepthImageAction" />
         <addaction name="separator" />
         <addaction name="fileImportRobotAction" />
         <addaction name="fileImportObjectAction" />
@@ -653,6 +654,17 @@
       </property>
       <property name="text" >
         <string>Save Image...</string>
+      </property>
+    </action>
+    <action name="fileSaveDepthImageAction" >
+      <property name="name" >
+        <cstring>fileSaveDepthImageAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Save Depth Image</string>
+      </property>
+      <property name="text" >
+        <string>Save Depth Image...</string>
       </property>
     </action>
     <action name="graspCreateProjectionAction" >

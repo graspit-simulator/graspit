@@ -106,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(mUI->fileImportObjectAction, SIGNAL(triggered()), this, SLOT(fileImportObject()));
   QObject::connect(mUI->fileEditSettingsAction, SIGNAL(triggered()), this, SLOT(fileEditSettings()));
   QObject::connect(mUI->fileSaveImageAction, SIGNAL(triggered()), this, SLOT(fileSaveImage()));
+  QObject::connect(mUI->fileSaveDepthImageAction, SIGNAL(triggered()), this, SLOT(fileSaveDepthImage()));
   QObject::connect(mUI->fileExitAction, SIGNAL(triggered()), this, SLOT(fileExit()));
   // -- help menu
   QObject::connect(mUI->helpManualAction, SIGNAL(triggered()), this, SLOT(helpManual()));
@@ -460,6 +461,23 @@ void MainWindow::fileSaveImage()
   if ( !fn.isEmpty() ) {
     if (fn.section('.',-1)!="jpg") fn.append(".jpg");
     graspItGUI->getIVmgr()->saveImage(fn);
+  }
+}
+
+/*!
+  A file dialog box is opened with the $GRASPIT/images directory
+  opened, and the user is asked to choose a name for the image.
+  Currently this only save jpg images, but functionality should be added to
+  save other formats.  If the user does not add an extension, ".jpg" is added
+  to the filename.  A rendered images of the current scence is then saved.
+*/
+void MainWindow::fileSaveDepthImage()
+{
+  QString fn = QFileDialog::getSaveFileName( mWindow, QString(), QString(getenv("GRASPIT"))+QString("/images"),
+                                             "Image Files (*.jpg)" );
+  if ( !fn.isEmpty() ) {
+    if (fn.section('.',-1)!="jpg") fn.append(".jpg");
+    graspItGUI->getIVmgr()->saveDepthImage(fn);
   }
 }
 

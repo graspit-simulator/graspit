@@ -88,6 +88,7 @@ public Q_SLOTS:
 	void fileEditSettings();
 	void fileExit();
 	void fileSaveImage();
+    void fileSaveDepthImage();
 	int saveAndContinue(const QString & action);
 	//-------------
 	void helpManual();
