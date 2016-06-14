@@ -36,12 +36,6 @@ BodySensor::BodySensor(const BodySensor & fs, Link * sl){
     groupNumber = fs.groupNumber;
 }
 
-void inline
-addVector6(double * force, double * contactForce){
-    for(int ind = 0; ind < 6; ind ++)
-        force[ind]+=contactForce[ind];
-}
-
 bool
 BodySensor :: updateSensorModel(){
     double forces[6] = {0,0,0,0,0,0};
@@ -49,8 +43,7 @@ BodySensor :: updateSensorModel(){
     std::list<Contact *> cList = sbody->getContacts();
 
     for(cp = cList.begin(); cp != cList.end(); cp++){
-        double contactForce[6] = {0, 0, 1, 0, 0, 0};
-        addVector6(forces, contactForce);
+        forces[2] += 1;
     }
 
     double ts = getTimeStep();
