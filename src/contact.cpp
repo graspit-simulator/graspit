@@ -63,12 +63,11 @@ const double Contact::THRESHOLD = 0.1;
 const double Contact::INHERITANCE_THRESHOLD = 1;
 const double Contact::INHERITANCE_ANGULAR_THRESHOLD = 0.984; //cosine of 10 degrees
 
-
 /*!
   Initializes a new contact on body \a b1.  The other contacting body is \a b2.
   The contact position \a pos and the contact normal \a norm are expressed
   in local body \a b1 coordinates.
- */
+*/
 Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
 {
   body1 = b1;
@@ -77,7 +76,7 @@ Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
   wrench = NULL;
   body1Tran = b1->getTran();
   body2Tran = b2->getTran();
-
+  
   updateCof();
   normal = normalise(norm);
   loc = pos;
@@ -88,13 +87,13 @@ Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
   } else {
     tangentX = normalise(normal * vec3(1,0,0));
   }
-  tangentY = normalise(normal * tangentX);
-  frame = coordinate_transf(loc,tangentX,tangentY);
+  tangentY = normalise(normal * tangentX);  
+  frame = coordinate_transf(loc,tangentX,tangentY);			 
   coneMat = NULL;
   prevBetas = NULL;
   inheritanceInfo = false;
   for (int i=0; i<6; i++) {
-      dynamicForce[i] = 0;
+	  dynamicForce[i] = 0;
   }
 }
 
@@ -103,7 +102,7 @@ Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
   friction cone boundary wrenches.  If the contact has an undeleted mate,
   it removes the mate's connection to this contact, and removes the mate
   contact from the other body (thus deleting it).
- */
+*/
 Contact::~Contact()
 {
   if (optimalCoeffs) delete [] optimalCoeffs;
@@ -121,11 +120,11 @@ Contact::~Contact()
 	frictional component, and without reference to normal force or coeff
 	of friction (c.o.f.). They only care about the relationship between 
 	frictional components.
-
+	
 	To get an actual wrench that can be applied at the contact, we must add
 	normal force (normalised here to 1N) and take into account the relationship
 	btw normal force and c.o.f.
- */
+*/
 void Contact::wrenchFromFrictionEdge(double *edge, const vec3 &radius, Wrench *wr)
 {
 	vec3 tangentX = frame.affine().row(0);
@@ -136,12 +135,12 @@ void Contact::wrenchFromFrictionEdge(double *edge, const vec3 &radius, Wrench *w
 	//max friction is normal_force_magnitude (which is 1) * coeff_of_friction 
 	//possible friction for this wrench is (friction_edge * max_friction) in the X and Y direction of the contact
 	vec3 forceVec = normal + (tangentX*cof*edge[0])+ (tangentY*cof*edge[1]);
-
+	
 	//max torque is contact_radius * normal_force_magnitude (which is 1) * coeff_of_friction
 	//possible torque for this wrench is (friction_edge * max_torque) in the direction of the contact normal
 	//the contact_radius coefficient is already taken into account in the friction_edge
 	vec3 torqueVec = ( (radius*forceVec) + normal*cof*edge[5] )/object->getMaxRadius();
-
+	
 	wr->torque = torqueVec;
 	wr->force = forceVec;
 }
@@ -151,19 +150,19 @@ void Contact::wrenchFromFrictionEdge(double *edge, const vec3 &radius, Wrench *w
 	to obtain actual wrenches that can be applied at this contact. Essentially
 	builds the Contact Wrench Space based on the friction information and
 	(normalized) contact forces. See wrenchFromFrictionEdge for details.  
- */
+*/
 void Contact::computeWrenches()
 {
-	DBGP("COMPUTING WRENCHES");
+  DBGP("COMPUTING WRENCHES");
 
-	if (wrench) delete [] wrench;
-	//one wrench for each vector
-	numFCWrenches = numFrictionEdges;
-	wrench = new Wrench[numFCWrenches];
+  if (wrench) delete [] wrench;
+  //one wrench for each vector
+  numFCWrenches = numFrictionEdges;
+  wrench = new Wrench[numFCWrenches];
 
-	vec3 radius = loc - ((GraspableBody*)body1)->getCoG();
-	for (int i=0;i<numFCWrenches;i++) {
-		wrenchFromFrictionEdge( &frictionEdges[6*i], radius, &wrench[i] );
+  vec3 radius = loc - ((GraspableBody*)body1)->getCoG();
+  for (int i=0;i<numFCWrenches;i++) {
+	  wrenchFromFrictionEdge( &frictionEdges[6*i], radius, &wrench[i] );
 	}
 }
 
@@ -173,7 +172,7 @@ void Contact::computeWrenches()
 	be set in many ways. However, we currently use PCWF and SFC models
 	which are both cases of linearized ellipsoids, so this function
 	can be used for both.
-
+	
 	Consider a 3D friction ellipsoid, where the first two dimensions are
 	tangential frictional force (along X and Y) and the third is frictional
 	torque (along Z). This function samples this ellipsoid at \a numLatitudes
@@ -198,7 +197,7 @@ Contact::setUpFrictionEllipsoid(int numLatitudes, int numDirs[], double phi[], d
 		double sinphi = sin(phi[i]);
 		for (int j=0;j<numDirs[i];j++) {
 			double theta = j * 2*M_PI/numDirs[i];
-
+      
 			double num = cos(theta)*cosphi;
 			double denom = num*num/(eccen[0]*eccen[0]);
 			num = sin(theta)*cosphi;
@@ -224,7 +223,7 @@ Contact::setUpFrictionEllipsoid(int numLatitudes, int numDirs[], double phi[], d
 	edge. This is used in a constraint as F * beta <= 0, saying that the sum of
 	friction edge amplitudes (thus friction force) must be less than normal force 
 	times friction coefficient.
- */
+*/
 Matrix 
 Contact::frictionConstraintsMatrix() const
 {
@@ -238,7 +237,7 @@ Contact::frictionConstraintsMatrix() const
 	matrix is of the form [n D] where n is the contact normal and D has as columns
 	the friction edges. The computations are done in local contact coordinate system
 	(contact normal along the z axis).
- */
+*/
 Matrix 
 Contact::frictionForceMatrix() const
 {
@@ -260,7 +259,7 @@ Contact::frictionForceMatrix() const
 
 /*! Creates the individual force matrices for all contacts in the list using
 	frictionConstraintMatrix() then assembles them in block diagonal form.
- */
+*/
 Matrix
 Contact::frictionForceBlockMatrix(const std::list<Contact*> &contacts)
 {
@@ -283,7 +282,7 @@ Contact::frictionForceBlockMatrix(const std::list<Contact*> &contacts)
 /*! Creates the friction constraint matrices of all contacts in the list using
 	Contact::frictionConstraintMatrix(), then assembles all the matrices in 
 	block diagonal form.
- */
+*/
 Matrix 
 Contact::frictionConstraintsBlockMatrix(const std::list<Contact*> &contacts)
 {
@@ -307,7 +306,7 @@ Contact::frictionConstraintsBlockMatrix(const std::list<Contact*> &contacts)
 	amplitudes returns the sum of the normal components. Therefore, it has 1
 	in the positions corresponding to normal force amplitudes and 0 in the
 	positions corresponding to friction wrench amplitudes.
- */
+*/
 Matrix 
 Contact::normalForceSumMatrix(const std::list<Contact*> &contacts)
 {
@@ -337,14 +336,14 @@ Contact::normalForceSumMatrix(const std::list<Contact*> &contacts)
 	|CR R |
 	Where R is the 3x3 rotation matrix between the coordinate systems and C also 
 	contains the cross product matrix that depends on the translation between them.	
- */
+*/
 Matrix 
 Contact::localToWorldWrenchMatrix() const
 {
 	Matrix Ro(Matrix::ZEROES<Matrix>(6,6));
 	transf contactTran = getContactFrame() * getBody1()->getTran();
-	mat3 R; contactTran.rotation().ToRotationMatrix(R);
-	Matrix Rot( Matrix::ROTATION(R) );
+    mat3 R; contactTran.rotation().ToRotationMatrix(R);
+    Matrix Rot( Matrix::ROTATION(R) );
 	//the force transform is simple, just the matrix that changes coord. systems
 	Ro.copySubMatrix(0, 0, Rot);
 	Ro.copySubMatrix(3, 3, Rot);
@@ -367,7 +366,7 @@ Contact::localToWorldWrenchMatrix() const
 
 /*! Assembles together the localToWorldWrenchMatrix for all the contacts in the list
 	in block diagonal form.
- */
+*/
 Matrix 
 Contact::localToWorldWrenchBlockMatrix(const std::list<Contact*> &contacts)
 {
@@ -392,18 +391,18 @@ Contact::localToWorldWrenchBlockMatrix(const std::list<Contact*> &contacts)
   transform (expressed with respect to the body coordinate frame).  If the
   dot product of the contact point motion vector and the contact normal is
   less than zero, then the contact prevents this motion.
- */
+*/
 bool Contact::preventsMotion(const transf& motion) const
 {  
-	if ( (loc*motion - loc) % normal < -MACHINE_ZERO) return true;
-	return false;
+  if ( (loc*motion - loc) % normal < -MACHINE_ZERO) return true;
+  return false;
 }
 
 
 /*!
   Recomputes the COF for this contact.  This is called when the material of
   one of the two bodies is changed.
- */
+*/
 void
 Contact::updateCof()
 {
@@ -418,7 +417,7 @@ Contact::updateCof()
   body is dynamic, and the relative velocity between them is greater than
   1.0 mm/sec (should be made a parameter), then it returns the kinetic COF,
   otherwise it returns the static COF.
- */
+*/
 double
 Contact::getCof() const
 {
@@ -451,14 +450,13 @@ Contact::getCof() const
   this contact's optimal force.  This force is a compromise between minimizing
   internal grasp forces and how close the force is to the boundary of the
   friction cone, or starting to slip.
- */
+*/
 void
 Contact::setContactForce (double *optmx)
 {
   for (int i=0;i<contactDim;i++)
     optimalCoeffs[i] = optmx[i];
 }
-
 
 /*!
   Each body has a thin layer around it that is Contact::THRESHOLD mm thick, and
@@ -470,7 +468,7 @@ Contact::setContactForce (double *optmx)
   we correct this specifying a constraint error in the dynamics, which will
   serve to move the bodies apart.  This routine returns the distance that
   two bodies have violated that halfway constraint.
- */
+*/
 double
 Contact::getConstraintError()
 {
@@ -483,7 +481,7 @@ Contact::getConstraintError()
 	time step. The contact \a c is from the previous time step, but has been 
 	determined to be close enough to this one that it is probably the same
 	contact, having slightly evolved over a time step.
- */
+*/
 void
 Contact::inherit(Contact *c)
 {
@@ -499,7 +497,7 @@ Contact::inherit(Contact *c)
 	coneMat->diffuseColor = SbColor( coneR, coneG, coneB);
 	coneMat->ambientColor = SbColor( coneR, coneG, coneB);
 	coneMat->emissiveColor = SbColor( coneR, coneG, coneB);
-	 */
+	*/
 }
 
 void
@@ -520,7 +518,7 @@ Contact::setLCPInfo(double cn, double l, double *betas)
 ///////////////////////////////////////////
 
 PointContact::PointContact(Body *b1,Body *b2,position pos, vec3 norm) : 
-						Contact( b1, b2, pos, norm )
+				Contact( b1, b2, pos, norm )
 {
 	//we should really have another class for the FL contact
 	if (cof == 0.0) {
@@ -544,7 +542,7 @@ PointContact::~PointContact()
 	forces (no torques) in the tangential plane of the contact. When normal
 	force will be added later, the friction circle becomes the more 
 	familiar contact cone.
- */
+*/
 int PointContact::setUpFrictionEdges(bool dynamicsOn)
 {
 
@@ -578,10 +576,10 @@ PointContact::getVisualIndicator()
 	//this is now a member of the class so no need to declare it here
 	coneMat = new SoMaterial;  
 
-	coneMat->diffuseColor = SbColor(0.8f,0.0f,0.0f);
-	coneMat->ambientColor = SbColor(0.2f,0.0f,0.0f);
-	coneMat->emissiveColor = SbColor(0.4f,0.0f,0.0f);
-	/*
+    coneMat->diffuseColor = SbColor(0.8f,0.0f,0.0f);
+    coneMat->ambientColor = SbColor(0.2f,0.0f,0.0f);
+    coneMat->emissiveColor = SbColor(0.4f,0.0f,0.0f);
+/*
 	coneR = ((float)rand())/RAND_MAX;
 	coneG = ((float)rand())/RAND_MAX;
 	coneB = ((float)rand())/RAND_MAX;
@@ -589,12 +587,12 @@ PointContact::getVisualIndicator()
 	coneMat->diffuseColor = SbColor(coneR, coneG, coneB);
 	coneMat->ambientColor = SbColor(coneR, coneG, coneB);
 	coneMat->emissiveColor = SbColor(coneR, coneG, coneB);
-	 */
-	coneMat->transparency = 0.8f;
+*/
+    coneMat->transparency = 0.8f;
 
-	SoMaterial* zaxisMat = new SoMaterial;
-	zaxisMat->diffuseColor = SbColor(0,0,0);
-	zaxisMat->ambientColor = SbColor(0,0,0);
+    SoMaterial* zaxisMat = new SoMaterial;  
+    zaxisMat->diffuseColor = SbColor(0,0,0);
+    zaxisMat->ambientColor = SbColor(0,0,0);
 
 	cof = getCof();
 
@@ -603,7 +601,7 @@ PointContact::getVisualIndicator()
 	coords = new SoCoordinate3;
 	ifs = new SoIndexedFaceSet;
 	tran = new SoTransform;
-
+  
 	alpha = 0.0;
 	for (i=0;i<numFrictionEdges;i++) {
 		points[i+1].setValue(cos(alpha)*cof,sin(alpha)*cof,1.0);
@@ -616,27 +614,27 @@ PointContact::getVisualIndicator()
 		alpha += 2.0*M_PI/numFrictionEdges;
 	}
 	cIndex[5*numFrictionEdges] = -1;
-
+  
 	coords->point.setValues(0,numFrictionEdges+1,points);
 	ifs->coordIndex.setValues(0,5*numFrictionEdges+1,cIndex);
 	delete [] points;
 	delete [] cIndex;
 
 	getContactFrame().toSoTransform(tran);
-
+  
 	SoCylinder *zaxisCyl = new SoCylinder;
 	zaxisCyl->radius = 0.05f;
 	zaxisCyl->height = height;
-
+  
 	SoTransform *zaxisTran = new SoTransform;
 	zaxisTran->translation.setValue(0,0,height/2.0);
 	zaxisTran->rotation.setValue(SbVec3f(1,0,0),(float)M_PI/2.0f);
-
+  
 	SoSeparator *zaxisSep = new SoSeparator;
 	zaxisSep->addChild(zaxisTran);
 	zaxisSep->addChild(zaxisMat);
 	zaxisSep->addChild(zaxisCyl);
-
+  
 	cne->addChild(tran);
 	cne->addChild(zaxisSep);
 	cne->addChild(coneMat);
@@ -652,9 +650,9 @@ PointContact::getVisualIndicator()
 /*! Does not set up friction edges yet; we need to wait until the mate of
 	this contact is also defined because we will need its own analytical
 	surface before we can come up with friction edges.
- */
+*/
 SoftContact::SoftContact( Body *b1, Body *b2, position pos, vec3 norm,
-		Neighborhood *bn ) : Contact(b1, b2, pos, norm)
+						 Neighborhood *bn ) : Contact(b1, b2, pos, norm)
 { 
 	frictionType = SFCL;
 	contactDim = 4;
@@ -665,7 +663,7 @@ SoftContact::SoftContact( Body *b1, Body *b2, position pos, vec3 norm,
 	Neighborhood::iterator itr;
 	int i = 0;
 	vec3 temp;
-
+	
 	for( itr = bn->begin(); itr != bn->end(); itr++ ) {
 		temp.set(itr->x(), itr->y(), itr->z());
 		//places bodyNghbd in frame of contact with the z-axis pointing out
@@ -674,7 +672,6 @@ SoftContact::SoftContact( Body *b1, Body *b2, position pos, vec3 norm,
 		posit = position( temp.toSbVec3f() ) * frame.inverse();
 		bodyNghbd[i] = vec3( posit.toSbVec3f() );
 		i++;
-		//std::cout << bodyNghbd[i].x() << " " << bodyNghbd[i].y() << " " << bodyNghbd[i].z() << std::endl;
 	}
 	numPts = (int) bn->size();
 	majorAxis = 0.0;
@@ -693,13 +690,12 @@ SoftContact::SoftContact( Body *b1, Body *b2, position pos, vec3 norm,
 SoftContact::~SoftContact()
 {
 	delete[]bodyNghbd;
-	//graspItGUI->getIVmgr()->getWorld()->getIVRoot()->removeChild(mVisualizer.obj);
 }
 
 /*! Sets up friction edges as a 3D friction ellipsoid. All the computations for
 	fitting analytical surfaces to the two bodies should already have been 
 	completed.
- */
+*/
 int SoftContact::setUpFrictionEdges(bool dynamicsOn )
 {
 	if( !getMate() ) {
@@ -721,7 +717,7 @@ int SoftContact::setUpFrictionEdges(bool dynamicsOn )
 
 	if (!dynamicsOn) {
 		// if dynamics are not on, compute it based on some random applied force
-		torquedivN = CalcContact_Mattress( 10 );
+		torquedivN = CalcContact_Mattress( 5 );
 		eccen[2] = torquedivN*1000;
 	} else {
 		// if dynamics are on, compute it based on the applied force reported by the LCP
@@ -741,15 +737,15 @@ int SoftContact::setUpFrictionEdges(bool dynamicsOn )
 	double phi[9] = {M_PI_2, M_PI_2*0.6, M_PI_2*0.3, M_PI_2*0.15, 0.0,
                      -M_PI_2*0.15, -M_PI_2*0.3, -M_PI_2*0.6, -M_PI_2};
 	return Contact::setUpFrictionEdges(9,numDirs,phi,eccen);
-	 */
+	*/
 
 	/*
 	int numDirs[9] = {1,8,8,8,8,8,8,8,1};
 	double phi[9] = {M_PI_2, M_PI_2*0.66, M_PI_2*0.33, M_PI_2*0.165, 0.0,
 				  -M_PI_2*0.165, -M_PI_2*0.33, -M_PI_2*0.66, -M_PI_2};
 	return Contact::setUpFrictionEdges(9,numDirs,phi,eccen);
-	 */
-
+	*/
+	
 	int numDirs[5] = {1,5,8,5,1};
 	double phi[5] = {M_PI_2, M_PI_2*0.50, 0.0, -M_PI_2*0.50, -M_PI_2};
 	return Contact::setUpFrictionEllipsoid( 5, numDirs, phi, eccen );
@@ -786,7 +782,7 @@ void SoftContact::computeWrenches()
 
 	vec3 tangentX = frame.affine().row(0);
 	vec3 tangentY = frame.affine().row(1);
-
+	
 	vec3 radius;
 	vec3 baseRadius = loc - ((GraspableBody*)body1)->getCoG();
 
@@ -815,152 +811,138 @@ void SoftContact::computeWrenches()
 /*! Computes an analytical surface of the form ax^2 + bx + c in a small patch
 	around the contact on body1. The fit is in the local body1 coordinate 
 	system.
- */
+*/
 void SoftContact::FitPoints( )
 {
-	double *coeffs = new double [3];
-	//std::cout << "computing paraboloid params based on: " << numPts << std::endl;
-	FitParaboloid( bodyNghbd, numPts, coeffs );
+    double *coeffs = new double [3];
+    FitParaboloid( bodyNghbd, numPts, coeffs );
 
-	a = coeffs[0];
-	b = coeffs[1];
-	c = coeffs[2];
+    a = coeffs[0];
+    b = coeffs[1];
+    c = coeffs[2];
 
-	RotateParaboloid2( coeffs, &r1, &r2, &fitRot, &fitRotAngle );
+    RotateParaboloid2( coeffs, &r1, &r2, &fitRot, &fitRotAngle );
 
-	if(r1 < 0)
-		r1 = 100000000;
-	if(r2 < 0)
-		r2 = 100000000;
-
-	//DBGA(getBody1()->getName().latin1() << ": " << "a=" << a << " b=" << b << " c=" <<c << " r1=" << r1 << " r2=" << r2);
-	//	DBGA("r1=" << r1 << " r2=" <<r2);
-}
-
-////////////////////////////////////HELPERS
-void printMat(mat3 m, std::string comment)
-{
-	std::cout << "<<------------------------" << comment.c_str() << std::endl;
-	std::cout << m[0] << ", " << m[3] << ", " << m[6] << "\n"
-			<< m[1] << ", " << m[4] << ", " << m[7] << "\n"
-			<< m[2] << ", " << m[5] << ", " << m[8] << "\n";
-	std::cout << ">>========================" << std::endl;
+    if(r1 < 0)
+        r1 = 100000000;
+    if(r2 < 0)
+        r2 = 100000000;
 }
 
 /*! Calculates the angle betwen the main radius curvature on body1 and the 
 	main radius of curvature on body 2.
- */
+*/
 int SoftContact::CalcRelPhi( )
 {
-	vec3 temp, t;
-	vec3 R11, R12;		//directions of relative curvatures in world frame
+    vec3 temp, t;
+    vec3 R11, R12;		//directions of relative curvatures in world frame
 
-	temp.set( 1, 0 , 0);
-	t = fitRot * temp;
-	R11 = t * frame;
-	R11 = R11 * body1->getTran();
-	//printMat(fitRot,"fitRot");
-	//std::cout << "t: " << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
+    temp.set( 1, 0 , 0);
+    t = fitRot * temp;
+    R11 = t * frame;
+    R11 = R11 * body1->getTran();
+    //printMat(fitRot,"fitRot");
+    //std::cout << "t: " << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
 
-	temp.set( 1, 0 , 0);
-	t = ((SoftContact *)getMate())->fitRot * temp;
-	R12 = t * ((SoftContact *)getMate())->frame;
-	R12 = R12 * body2->getTran();
+    temp.set( 1, 0 , 0);
+    t = ((SoftContact *)getMate())->fitRot * temp;
+    R12 = t * ((SoftContact *)getMate())->frame;
+    R12 = R12 * body2->getTran();
 
-	//relPhi is [0,180] degrees
-	relPhi = acos( (R11%R12)/(R11.len()*R12.len()) );
-	//((SoftContact *)getMate())->relPhi = relPhi ;
+    //relPhi is [0,180] degrees
+    relPhi = acos( (R11%R12)/(R11.len()*R12.len()) );
+    //((SoftContact *)getMate())->relPhi = relPhi ;
 
-	//A very very lame solution to the offset between self's coordinates and the common axes
-	//The direction is from self's x-axis towards body2's x-axis
+    //A very very lame solution to the offset between self's coordinates and the common axes
+    //The direction is from self's x-axis towards body2's x-axis
     double err_absolute = 100, offset=-1;
-	for(double tmp = 0; tmp <= relPhi; tmp += 0.5*M_PI/180.0)
-	{
-		//the tmp is the angle between the contact frame on THIS body and the frame on that body
-		double tmp_error = (1/r1 - 1/r2)*sin(2*(tmp)) - (1/((SoftContact *)getMate())->r1 - 1/((SoftContact *)getMate())->r2)*sin(2*(relPhi-tmp));
-		if(fabs(tmp_error) < err_absolute)
-		{
-			err_absolute = fabs(tmp_error);
-			offset = tmp;
-		}
-	}
+    for(double tmp = 0; tmp <= relPhi; tmp += 0.5*M_PI/180.0)
+    {
+        //the tmp is the angle between the contact frame on THIS body and the frame on that body
+        double tmp_error = (1/r1 - 1/r2)*sin(2*(tmp)) - (1/((SoftContact *)getMate())->r1 - 1/((SoftContact *)getMate())->r2)*sin(2*(relPhi-tmp));
+        if(fabs(tmp_error) < err_absolute)
+        {
+            err_absolute = fabs(tmp_error);
+            offset = tmp;
+        }
+    }
 
-	//now compute the direction of the rotation denoted by offset in body1's coordinate system
-	vec3 contactNormalInWorld = normal * body1->getTran();
-	if ( ((1/ (R11.len() * R12.len()) ) * (R11*R12)) % contactNormalInWorld < 0 )
-	{
-		commonRotAngle = -offset;
-	}
-	else
-	{
-		commonRotAngle = offset;
-	}
+    //now compute the direction of the rotation denoted by offset in body1's coordinate system
+    vec3 contactNormalInWorld = normal * body1->getTran();
+    if ( ((1/ (R11.len() * R12.len()) ) * (R11*R12)) % contactNormalInWorld < 0 )
+    {
+        commonRotAngle = -offset;
+    }
+    else
+    {
+        commonRotAngle = offset;
+    }
 
-	//we want to use the columns of commonRot to represent the x,y,z axes while transf uses the rows
-	//so we have to transpose/inverse
-	Quaternion(commonRotAngle, vec3(0,0,1)).inverse().ToRotationMatrix(commonRot);
-	//std::cout << "angle: " << commonRotAngle << std::endl;
-	//printMat(commonRot, "commonRot");
+    //we want to use the columns of commonRot to represent the x,y,z axes while transf uses the rows
+    //so we have to transpose/inverse
+    Quaternion(commonRotAngle, vec3(0,0,1)).inverse().ToRotationMatrix(commonRot);
+    //std::cout << "angle: " << commonRotAngle << std::endl;
+    //printMat(commonRot, "commonRot");
 
-	if(commonRotAngle < 0)
-	{
-		((SoftContact *)getMate())->commonRotAngle = - (relPhi - offset);
-	}
-	else
-	{
-		((SoftContact *)getMate())->commonRotAngle = (relPhi - offset);
-	}
+    if(commonRotAngle < 0)
+    {
+        ((SoftContact *)getMate())->commonRotAngle = - (relPhi - offset);
+    }
+    else
+    {
+        ((SoftContact *)getMate())->commonRotAngle = (relPhi - offset);
+    }
 
-	//Quaternion(((SoftContact *)getMate())->commonRotAngle, vec3(0,0,1)).ToRotationMatrix(((SoftContact *)getMate())->commonRot);
+    //Quaternion(((SoftContact *)getMate())->commonRotAngle, vec3(0,0,1)).ToRotationMatrix(((SoftContact *)getMate())->commonRot);
 
-	///////////////////////////////////////////////////For Debug Info Output
-	//rotation from the contact to the local curvature frame
-	transf curvatureFrameInContact;
-	//if we want to use transf, we need to set the rotation part to its transpose
-	curvatureFrameInContact.set(fitRot.transpose(), vec3::ZERO);
-	//curvatureFrameInContact.set(Quaternion(-fitRotAngle, vec3(0,0,1)), vec3::ZERO);
-	//printMat3(contactRot, "fitRot");
+    ///////////////////////////////////////////////////For Debug Info Output
+    //rotation from the contact to the local curvature frame
+    transf curvatureFrameInContact;
+    //if we want to use transf, we need to set the rotation part to its transpose
+    curvatureFrameInContact.set(fitRot.transpose(), vec3::ZERO);
+    //curvatureFrameInContact.set(Quaternion(-fitRotAngle, vec3(0,0,1)), vec3::ZERO);
+    //printMat3(contactRot, "fitRot");
 
-	//transform from local curvature frame to the common frame
-	transf commonFrameInCurvature;
-	//if we want to use transf, we need to set the rotation part to its transpose
-	commonFrameInCurvature.set(commonRot.transpose(),vec3::ZERO);
-	//printMat3(commonFrameRot, "commonFrameRot");
+    //transform from local curvature frame to the common frame
+    transf commonFrameInCurvature;
+    //if we want to use transf, we need to set the rotation part to its transpose
+    commonFrameInCurvature.set(commonRot.transpose(),vec3::ZERO);
+    //printMat3(commonFrameRot, "commonFrameRot");
 
-	transf commonFrame = commonFrameInCurvature * curvatureFrameInContact * frame * body1->getTran();
-	mat3 m;
-	commonFrame.rotation().ToRotationMatrix(m);
-	temp.set(1,0,0);
-	vec3 commonFrameAxis;
-	commonFrameAxis = m * temp;
+    transf commonFrame = commonFrameInCurvature * curvatureFrameInContact * frame * body1->getTran();
+    mat3 m;
+    commonFrame.rotation().ToRotationMatrix(m);
+    temp.set(1,0,0);
+    vec3 commonFrameAxis;
+    commonFrameAxis = m * temp;
 
 #ifdef TACTILE_DEBUG
 
-	std::cout << "-----------\n";
-	std::cout << "contacts= " << this << ", " << getMate() << std::endl;
-	std::cout << "b1= " << getBody1()->getName().latin1() << " majorAxis (" << r1 << "," << r2 << ") dir = [" << R11[0] << ", " << R11[1] << ", " << R11[2] << "]" << std::endl;
-	std::cout << "b2= " << body2->getName().latin1() << " majorAxis (" << ((SoftContact *)getMate())->r1 << "," << ((SoftContact *)getMate())->r2 << ") dir = [" <<  R12[0] << ", " << R12[1] << ", " << R12[2] << "]" << std::endl;
-	std::cout << "relative phi: relPhi_1= " << relPhi << ", relPhi_2= " << ((SoftContact *)getMate())->relPhi << std::endl;
-	//std::cout << "contactNormal w.r.t b1 = [" << normal[0] << ", " << normal[1] << ", " << normal[2] << "]" << std::endl;
-	//std::cout << "contact loc in world: crot = <" << contactPose.rotation().w << "," << contactPose.rotation().x << "," << contactPose.rotation().y << ", " << contactPose.rotation().z << ">  loc = [" << contactPose.translation().x() << ", " <<  contactPose.translation().y() << ", " << contactPose.translation().z() << "]" << std::endl;
+    std::cout << "-----------\n";
+    std::cout << "contacts= " << this << ", " << getMate() << std::endl;
+    std::cout << "b1= " << getBody1()->getName().latin1() << " majorAxis (" << r1 << "," << r2 << ") dir = [" << R11[0] << ", " << R11[1] << ", " << R11[2] << "]" << std::endl;
+    std::cout << "b2= " << body2->getName().latin1() << " majorAxis (" << ((SoftContact *)getMate())->r1 << "," << ((SoftContact *)getMate())->r2 << ") dir = [" <<  R12[0] << ", " << R12[1] << ", " << R12[2] << "]" << std::endl;
+    std::cout << "relative phi: relPhi_1= " << relPhi << ", relPhi_2= " << ((SoftContact *)getMate())->relPhi << std::endl;
+    //std::cout << "contactNormal w.r.t b1 = [" << normal[0] << ", " << normal[1] << ", " << normal[2] << "]" << std::endl;
+    //std::cout << "contact loc in world: crot = <" << contactPose.rotation().w << "," << contactPose.rotation().x << "," << contactPose.rotation().y << ", " << contactPose.rotation().z << ">  loc = [" << contactPose.translation().x() << ", " <<  contactPose.translation().y() << ", " << contactPose.translation().z() << "]" << std::endl;
     //transf contactInWorld = frame * body1->getTran();
     //contactInWorld.rotation().ToRotationMatrix(m);
-	//printMat(m,"contact");
+    //printMat(m,"contact");
     //transf localPoa = curvatureFrameInContact * contactInWorld;
-	//localPoa.rotation().ToRotationMatrix(m);
-	//printMat(m,"poa");
+    //localPoa.rotation().ToRotationMatrix(m);
+    //printMat(m,"poa");
 
-	std::cout << "angle to common frame around normal b1= " << commonRotAngle*180.0/M_PI << std::endl;
-	std::cout << "commonFrame's majorAxis dir = [" << commonFrameAxis[0] << ", " << commonFrameAxis[1] << ", " << commonFrameAxis[2] << "]" << std::endl;
-	std::cout << "===========\n";
+    std::cout << "angle to common frame around normal b1= " << commonRotAngle*180.0/M_PI << std::endl;
+    std::cout << "commonFrame's majorAxis dir = [" << commonFrameAxis[0] << ", " << commonFrameAxis[1] << ", " << commonFrameAxis[2] << "]" << std::endl;
+    std::cout << "===========\n";
 #endif
-	return 0;	
+    return 0;
 }
 
 /*! Calculates the relative radii of curvature of the contact, using the
 	radii of curvature of both bodies and the angle between them. 
 	See Johnson, Contact Mechanics Chapter 4 page 85 for calculations.
- */
+*/
 int SoftContact::CalcRprimes()
 {
 	if( !(getMate()) ) {
@@ -1004,8 +986,8 @@ int SoftContact::CalcRprimes()
 
 	DBGP("Apb: " << ApB);
 
-	double AmB = -0.5*sqrt( (w - x)*(w - x) + (y - z)*(y - z) +
-			2*cos(2*relPhi)*(w - x)*(y - z) );
+    double AmB = -0.5*sqrt( (w - x)*(w - x) + (y - z)*(y - z) +
+					2*cos(2*relPhi)*(w - x)*(y - z) );
 
 	DBGP("Amb: " << AmB << " relPhi: " << relPhi);
 
@@ -1014,26 +996,19 @@ int SoftContact::CalcRprimes()
 		return 1;
 	}
 
-	//by definition r1prime >= r2prime, A <= B
-	//r1prime = 1/2A, r2prime = 1/2B
+	//by definition r1prime >= r2prime
 	if (ApB + AmB != 0)
 		r1prime = 1/( ApB + AmB );
 	else
-		r1prime = 100000000;//-1.0;
+        r1prime = 100000000;
 
 	if( ApB == AmB)
-		r2prime = 100000000;//-1.0;
+        r2prime = 100000000;
 	else
 		r2prime = 1/(ApB - AmB );
 
 	m->r1prime = r1prime;
 	m->r2prime = r2prime;
-
-	if(r1prime < r2prime)
-	{
-		printf("Invalid: r1 = %lf, r2 = %lf\n", r1prime, r2prime);
-		return 1;
-	}
 
 	//fprintf(stderr,"original: %f %f and %f %f\n",r1,r2,m->r1, m->r2);
 	//fprintf(stderr,"Relative radii: %f %f equiv: %f\n",r1prime, r2prime, sqrt(r1prime*r2prime) );
@@ -1045,37 +1020,39 @@ int SoftContact::CalcRprimes()
 	of the dynamic contact force). Sets major axis and minor axis.
 	Returns the max torque available.
 	See Contact Mechanics, KL Johnson Chapter 4
- */
+*/
 double SoftContact::CalcContact_Mattress( double nForce )
 {
-	nForceSimulated = nForce;
+
+    nForceSimulated = nForce;
 
 	if (r1prime < 0) {
-		DBGA("Degenerate soft contact");
+		DBGP("Degenerate soft contact");
 		r1prime = 20;
 	}
 	if (r2prime < 0) {
-		DBGA("Degenerate soft contact");
+		DBGP("Degenerate soft contact");
 		r2prime = 20;
 	}
-
+		
 	//hardwired height of mattress = 3.0 mm
 	//r primes are in mm
-	double h = 0.001;
+	double h = 0.003;
 	double delta = sqrt( nForce*h/(MAX(body1->getYoungs(), body2->getYoungs())
-			* M_PI * sqrt(r1prime*0.001*r2prime*0.001)) ); //meters
+									* M_PI * sqrt(r1prime*0.001*r2prime*0.001)) ); //meters
 
-	majorAxis = sqrt( 2*delta*r1prime*0.001 ); //in meters
+	majorAxis = sqrt( 2*delta*r1prime*0.001 ); //meters
 	minorAxis = sqrt( 2*delta*r2prime*0.001 ); 
+	DBGP("Axes: " << majorAxis << " " << minorAxis);
 	//axes are given in meters!!!!
 	//rprimes and the radii of curvature are calculated in mm
 
 #ifdef TACTILE_DEBUG
-	std::cout << "-----------\n";
-	std::cout << "simulating force f = " << nForce << std::endl;
-	std::cout << "youngs y1 = " << body1->getYoungs() << ", y2 = " << body2->getYoungs() << std::endl;
-	std::cout << " majorAxis = " << majorAxis << " minorAxis = " << minorAxis << std::endl;
-	std::cout << "===========\n";
+    std::cout << "-----------\n";
+    std::cout << "simulating force f = " << nForce << std::endl;
+    std::cout << "youngs y1 = " << body1->getYoungs() << ", y2 = " << body2->getYoungs() << std::endl;
+    std::cout << " majorAxis = " << majorAxis << " minorAxis = " << minorAxis << std::endl;
+    std::cout << "===========\n";
 #endif
 
 	SoftContact *m = (SoftContact *)getMate();
@@ -1090,14 +1067,15 @@ double SoftContact::CalcContact_Mattress( double nForce )
 	//the pressure distrib is K*delta/h/2*pi*ab
 
 	//std::cerr<<"Ma ma "<< majorAxis << minorAxis << "\n";
-	double params[2] = {majorAxis, minorAxis};
-	return cpd.maxFrictionOverTotalLoad(params);	//in meters
+
+    double params[2] = {majorAxis, minorAxis};
+    return cpd.maxFrictionOverTotalLoad(params);	//in meters
 }
 
 /*! Gets the visual indicator as a small patch of the fit analytical surface
 	around the body. Also places a small arrow indicating the direction of
 	the main radius of curvature computed for the body.
- */
+*/
 SoSeparator* SoftContact::getVisualIndicator()
 {
         double height;
@@ -1107,13 +1085,16 @@ SoSeparator* SoftContact::getVisualIndicator()
 	cne = new SoSeparator;
 
 	int sampling_n = 10, sampling_m = 10;
+	//double sampleSize_n = 2, sampleSize_m = 1;
+	//double sampleSize_n = (4.0 * majorAxis * 1000) / (2.0 * sampling_n);
+	//double sampleSize_m = (4.0 * minorAxis * 1000) / (2.0 * sampling_m);
 
 	double sampleSize_n = 0.7;
 	double sampleSize_m = 0.7;
 
 
 	DBGP("Major " << majorAxis << " minor " << minorAxis);
-
+	
 	//points runs left to right and then up to down in the grid
 	SbVec3f *points = new SbVec3f[(2*sampling_n + 1)*(2*sampling_m + 1) ];
 
@@ -1135,11 +1116,11 @@ SoSeparator* SoftContact::getVisualIndicator()
 	SoCylinder *zaxisCyl = new SoCylinder;
 	zaxisCyl->radius = 0.05f;
 	zaxisCyl->height = 0.2 * height;
-
+  
 	SoTransform *zaxisTran = new SoTransform;
 	zaxisTran->translation.setValue(0,0,0.2 * height/2.0);
 	zaxisTran->rotation.setValue(SbVec3f(1,0,0),(float)M_PI/2.0f);
-
+  
 	SoSeparator *zaxisSep = new SoSeparator;
 	zaxisSep->addChild(zaxisTran);
 	zaxisSep->addChild(zaxisMat);
@@ -1188,7 +1169,7 @@ SoSeparator* SoftContact::getVisualIndicator()
 
 	//neighborhood is in frame of contact, so add contact transform first
 	cne->addChild(tran);
-	/*
+/*
 	SoMaterial* sphereMat = new SoMaterial;  
 	sphereMat->diffuseColor = SbColor(1,1,0);
 	sphereMat->ambientColor = SbColor(1,1,0);
@@ -1204,7 +1185,7 @@ SoSeparator* SoftContact::getVisualIndicator()
 		sep->addChild(sphere);
 		cne->addChild(sep);
 	}
-	 */
+*/
 
 	cne->addChild(zaxisSep);
 
@@ -1229,11 +1210,11 @@ SoSeparator* SoftContact::getVisualIndicator()
 	SoCylinder *xaxisCyl = new SoCylinder;
 	xaxisCyl->radius = 0.05f;
 	xaxisCyl->height = height / 2.0;
-
+  
 	SoTransform *xaxisTran = new SoTransform;
 	xaxisTran->translation.setValue(height/4.0, 0.0, 0.0);
 	xaxisTran->rotation.setValue(SbVec3f(0,0,1),-(float)M_PI/2.0f);
-
+  
 	SoSeparator *xaxisSep = new SoSeparator;
 	xaxisSep->addChild(xaxisTran);
 	xaxisSep->addChild(zaxisMat);
@@ -1244,12 +1225,12 @@ SoSeparator* SoftContact::getVisualIndicator()
 }
 
 void SoftContact::getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec){
-	//We need to give a reasonably large number of discritizing sampling steps.  Here we use 100, 100
-	//If we are not discritizing it with small enough intervals, chances are when the ellipse is big,
-	//some sensor pads will not get any responses
-	cpd.distributionSamples(majorAxis, minorAxis, 100, 100, pVec );
-	double params[3] = {majorAxis, minorAxis, nForceSimulated};
-	cpd.sampleForces(params, majorAxis, minorAxis, 100, 100, pVec, floatVec);
+    //We need to give a reasonably large number of discritizing sampling steps.  Here we use 100, 100
+    //If we are not discritizing it with small enough intervals, chances are when the ellipse is big,
+    //some sensor pads will not get any responses
+    cpd.distributionSamples(majorAxis, minorAxis, 100, 100, pVec );
+    double params[3] = {majorAxis, minorAxis, nForceSimulated};
+    cpd.sampleForces(params, majorAxis, minorAxis, 100, 100, pVec, floatVec);
 }
 
 
@@ -1260,7 +1241,7 @@ void SoftContact::getStaticContactInfo(std::vector<position> &pVec,std::vector<d
 /*! Initializes an empty (and for now unusable) contact. Sets it
 	as its own mate, which is the distinctive sign of a virtual
 	contact.
- */
+*/
 void
 VirtualContact::init()
 {
@@ -1275,7 +1256,7 @@ VirtualContact::init()
 
 /*! Just calls the super and then calls init to give default values 
 	to the virtual contact specific parameters.
- */
+*/
 VirtualContact::VirtualContact() : Contact()
 {
 	init();
@@ -1285,7 +1266,7 @@ VirtualContact::VirtualContact() : Contact()
 	This should really use a super's copy constructor, but we never wrote
 	one. Does not copy the wrenches; the new contact needs to build them
 	itself from the friction edges.
- */
+*/
 VirtualContact::VirtualContact(const VirtualContact *original) : Contact()
 {
 	init();
@@ -1307,7 +1288,7 @@ VirtualContact::VirtualContact(const VirtualContact *original) : Contact()
 /*! When copying from a regular contact, we must be careful because the	
 	normal of a virtual contact points outwards, whereas the normal of a 
 	trasitional contact points inwards.
- */
+*/
 VirtualContact::VirtualContact(int f, int l, Contact *original) : Contact()
 {
 	init();
@@ -1331,10 +1312,19 @@ VirtualContact::VirtualContact(int f, int l, Contact *original) : Contact()
 
 /*! Just sets the mate to NULL and let the super destructor 
 	take care of the rest.
- */
+*/
 VirtualContact::~VirtualContact()
 {
 	mate = NULL;
+}
+
+/*! Sets the frame, location and normal, but does not do anything with the friction edges.
+ */
+void VirtualContact::changeFrame(transf tr)
+{
+  frame = tr;
+  loc = position(tr.translation().toSbVec3f());
+  normal = vec3(0,0,1) * tr;
 }
 
 position
@@ -1353,31 +1343,31 @@ VirtualContact::getWorldNormal()
 	edges, but just inherits them from the regular contact that it 
 	starts from. Alternatively, if it loaded from a file, it reads
 	them in from the file.
-
+	
 	In the future, this hierarchy needs to be better engineered.
- */
+*/
 int
 VirtualContact::setUpFrictionEdges(bool dynamicsOn)
 {
-    Q_UNUSED(dynamicsOn);
+	dynamicsOn = dynamicsOn;
 	return 1;
 }
 
 /*!	This computes the wrenches of the virtual contact as used for grasp 
 	quality computations. The important aspect to take into account is 
 	wether we are using an object or not.
-
+	
 	If we are using an object, we assume that contact centroid and maxradius 
 	have already been set to match those of the	object (hopefully, the grasp 
 	has done this). Also, the force applied be the contact is scaled by a 
 	function of the distance between the contact and the actual object.
-
+	
 	If there is no object, we assume that contact centroid and maxradius 
 	have been preset dependign only on the set of virtual contacts that 
 	make up the grasp (again, we hope the grasp has done this). There is no 
 	scaling involved, all forces are handled normally as if the contact was 
 	actually on the object.
- */
+*/
 void
 VirtualContact::computeWrenches(bool useObjectData, bool simplify)
 {
@@ -1396,7 +1386,7 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
 		tangentX = worldFrame.affine().row(0);
 		tangentY = worldFrame.affine().row(1);
 	} else {
-		//		LOOK AT VIRTUAL CONTACT ON THE HAND
+//		LOOK AT VIRTUAL CONTACT ON THE HAND
 		worldLoc = getWorldLocation();
 		worldNormal = getWorldNormal();
 		tangentX = vec3(0,1,0) * worldNormal;
@@ -1440,7 +1430,7 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
 	is on of off the surface of the object. Ratherm we want it smooth so 
 	we allow a VirtualContact to contribute to GQ even if it's a bit off the
 	surface of the object.
- */
+*/
 void
 VirtualContact::scaleWrenches(double factor)
 {
@@ -1455,9 +1445,9 @@ VirtualContact::scaleWrenches(double factor)
 	in WORLD COORDINATES. Since this contact has to be transformed 
 	to world coordinates for the sake of grasp analysis, this allows 
 	us to be sure that the transformation makes sense.
-
+	
 	It assumes WRENCHES have been computed.
- */
+*/
 void
 VirtualContact::getWorldIndicator(bool useObjectData)
 {
@@ -1476,7 +1466,7 @@ VirtualContact::getWorldIndicator(bool useObjectData)
 	SbMatrix tr;
 	tr.setTranslate( worldLoc.toSbVec3f() );
 	tran->setMatrix( tr );
-
+  
 	SbVec3f *points = (SbVec3f*)calloc(numFCWrenches+1, sizeof(SbVec3f) );
 	int32_t *cIndex = (int32_t*)calloc(4*numFCWrenches, sizeof(int32_t) );
 
@@ -1502,9 +1492,9 @@ VirtualContact::getWorldIndicator(bool useObjectData)
 	free(cIndex);
 
 	SoMaterial *coneMat = new SoMaterial;  
-	coneMat->diffuseColor = SbColor(0.0f,0.0f,0.8f);
-	coneMat->ambientColor = SbColor(0.0f,0.0f,0.2f);
-	coneMat->emissiveColor = SbColor(0.0f,0.0f,0.4f);
+    coneMat->diffuseColor = SbColor(0.0f,0.0f,0.8f);
+    coneMat->ambientColor = SbColor(0.0f,0.0f,0.2f);
+    coneMat->emissiveColor = SbColor(0.0f,0.0f,0.4f);
 
 	if (mWorldInd) {
 		body1->getWorld()->getIVRoot()->removeChild(mWorldInd);
@@ -1527,7 +1517,7 @@ VirtualContact::getWorldIndicator(bool useObjectData)
 	cSphere->radius = 5;
 	cSep->addChild(cSphere);
 	body1->getWorld()->getIVRoot()->addChild(cSep);
-	 */
+	*/
 }
 
 SoSeparator* 
@@ -1545,19 +1535,24 @@ VirtualContact::getVisualIndicator()
 
 	tran = new SoTransform;  
 	getContactFrame().toSoTransform(tran);
-
+  
 	SoCylinder *zaxisCyl = new SoCylinder;
 	zaxisCyl->radius = 0.2f;
 	zaxisCyl->height = Body::CONE_HEIGHT;
 
+	SoSphere *zaxisSphere = new SoSphere;
+	zaxisSphere->radius = 3.0f;
+  
 	SoTransform *zaxisTran = new SoTransform;
 	zaxisTran->translation.setValue(0,0,Body::CONE_HEIGHT/2.0);
+//	zaxisTran->translation.setValue(0,0,2.0);
 	zaxisTran->rotation.setValue(SbVec3f(1,0,0),(float)M_PI/2.0f);
-
+  
 	SoSeparator *zaxisSep = new SoSeparator;
 	zaxisSep->addChild(zaxisTran);
 	zaxisSep->addChild(mZaxisMat);
 	zaxisSep->addChild(zaxisCyl);
+//	zaxisSep->addChild(zaxisSphere);
 
 	SoSeparator* cne = new SoSeparator;
 	cne->addChild(tran);
@@ -1567,7 +1562,7 @@ VirtualContact::getVisualIndicator()
 
 /*! Changes the color of the visual indicator from red to blue
 	if this contact is to be "marked".
- */
+*/
 void
 VirtualContact::mark(bool m)
 {
@@ -1584,7 +1579,7 @@ VirtualContact::mark(bool m)
 /*! Saves all the info needed for this contact (what body and link 
 	it's on, location, normal, friction edges and coefficient) to
 	a file.
- */
+*/
 void
 VirtualContact::writeToFile(std::ofstream& outFile)
 {
@@ -1625,90 +1620,89 @@ VirtualContact::writeToFile(std::ofstream& outFile)
 
 /*! Loads all the info for this contact from a file previously written
 	by VirtualContact::writeToFile(...)
- */
-
+*/
 bool
 VirtualContact::readFromFile(std::ifstream& inFile)
 {
     if (!inFile.is_open())
     {
-      DBGA("VirtualContact::readFromFile - Failed to read from file");
+	  DBGA("VirtualContact::readFromFile - Failed to read from file");
       return false;
     }
-
+	
     float v,x,y,z;
 
-    //finger and link number
+	//finger and link number
     inFile >> mFingerNum >> mLinkNum;
-    if (inFile.fail()){
-      DBGA("VirtualContact::readFromFile - Failed to read fingernumber or link number");
-      return false;
-    }
-    //numFrictionEdges
+	if (inFile.fail()){
+	  DBGA("VirtualContact::readFromFile - Failed to read fingernumber or link number");
+	  return false;
+	}
+	//numFrictionEdges
     inFile >> numFrictionEdges;
-    if (inFile.fail()){
-        DBGA("VirtualContact::readFromFile - Failed to read number of virtual contacts");
-        return false;
-      }
+	if (inFile.fail()){
+	    DBGA("VirtualContact::readFromFile - Failed to read number of virtual contacts");
+	    return false;
+	  }
 
-    //frictionEdges
-    for (int i=0; i<numFrictionEdges; i++) {
-        for (int j=0; j<6; j++) {
+	//frictionEdges
+	for (int i=0; i<numFrictionEdges; i++) {
+		for (int j=0; j<6; j++) {
           inFile >> v;
-          if(inFile.fail()){
-            DBGA("VirtualContact::readFromFile - Failed to read number of friction edges");
-            return false;
-          };
-          frictionEdges[6*i+j] = v;
-        }
-    }
+		  if(inFile.fail()){
+		    DBGA("VirtualContact::readFromFile - Failed to read number of friction edges");
+		    return false;
+		  };
+		  frictionEdges[6*i+j] = v;
+		}
+	}
 
-    //loc
+	//loc
     inFile >> x >> y >> z;
-    if(inFile.fail()){
-     DBGA("VirtualContact::readFromFile - Failed to read virtual contact location");
-     return false;
-    }
-    loc = position(x,y,z);
+	if(inFile.fail()){
+	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact location");
+	 return false;
+	}
+	loc = position(x,y,z);
 
-    //frame
-    Quaternion q;
-    vec3 t;
+	//frame
+	Quaternion q;
+	vec3 t;
     inFile >> v >> x >> y >> z;
-    if(inFile.fail()) {
-      DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame orientation");
-    }
-    q.set(v,x,y,z);
+	if(inFile.fail()) {
+	  DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame orientation");
+	}
+	q.set(v,x,y,z);
     inFile >> x >> y >> z;
-    if(inFile.fail()) {
-     DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame location");
-    }
+	if(inFile.fail()) {
+	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame location");
+	} 
 
-    t.set(x,y,z);
-    frame.set(q,t);
+	t.set(x,y,z);
+	frame.set(q,t);
 
-    //normal
+	//normal
     inFile >> x >> y >> z;
-    if( inFile.fail()){
-     DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
-     return false;
-    }
-    normal.set(x,y,z);
+	if( inFile.fail()){
+	 DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
+	 return false;
+	}
+	normal.set(x,y,z);
 
-    //cof
+	//cof
     inFile >> v;
-    if( inFile.fail()){
-      DBGA("VirtualContact::readFromFile - Failed to read virtual contact friction");
-      return false;
-    }
-    cof = v;
-    return true;
+	if( inFile.fail()){ 
+	  DBGA("VirtualContact::readFromFile - Failed to read virtual contact friction");
+	  return false;
+	}
+	cof = v;
+	return true;
 }
 
 /*! Sets objDistance to be the vector from the contact to the closest
 	point on the given body. Sets objNormal to be the object surface normal
 	at that point.
- */
+*/
 void
 VirtualContact::getObjectDistanceAndNormal(Body *body, vec3 *objDistance, vec3 *objNormal)
 {
@@ -1728,87 +1722,84 @@ VirtualContactOnObject::VirtualContactOnObject()
 VirtualContactOnObject::~VirtualContactOnObject()
 {
 }
+
 bool
 VirtualContactOnObject::readFromFile(std::ifstream& inFile)
 {
     if (!inFile.is_open())
     {
-      DBGA("VirtualContact::readFromFile - Failed to read from file");
+	  DBGA("VirtualContact::readFromFile - Failed to read from file");
       return false;
     }
 
-    float w,x,y,z;
+	float w,x,y,z;
 
-    //numFCVectors
+	//numFCVectors
     inFile >> numFrictionEdges;
-    if (inFile.fail()){
-      DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction vectors");
-      return false;
-    }
+	if (inFile.fail()){
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction vectors");
+	  return false; 
+	}
 
-    //frictionEdges
-    for (int i=0; i<numFrictionEdges; i++) {
-        for (int j=0; j<6; j++) {
+	//frictionEdges
+	for (int i=0; i<numFrictionEdges; i++) {
+		for (int j=0; j<6; j++) {
           inFile >> w;
-          if(inFile.fail()){
-            DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction edges");
-            return false;
-          }
-          frictionEdges[6*i+j] = w;
-        }
-    }
-    fprintf(stderr,"\n<frictionEdges scanned successfully>"); // for test
+		  if(inFile.fail()){
+		    DBGA("VirtualContactOnObject::readFromFile - Failed to read number of friction edges");
+		    return false; 
+		  }
+	      frictionEdges[6*i+j] = w;
+		}
+	}
+	fprintf(stderr,"\n<frictionEdges scanned successfully>"); // for test
 
-    // (w,x,y,z) is already a quaternion, if you want to do frame rotate v rad along a vector (x,y,z),
-    //you can use q(v,vec(x,y,z))
-    Quaternion q;
-    vec3 t;
+	// (w,x,y,z) is already a quaternion, if you want to do frame rotate v rad along a vector (x,y,z),
+	//you can use q(v,vec(x,y,z))
+	Quaternion q;
+	vec3 t;
     inFile >> w >> x >> y >> z;
-    if(inFile.fail()) {
-      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact location");
-      return false;
-    }
+	if(inFile.fail()) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact location");
+	  return false;
+	}
 
-    q.set(w,x,y,z);
+	q.set(w,x,y,z);
 
     inFile >> x >> y >> z;
-    if(inFile.fail()) {
-      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact orientation");
-      return false;
-    }
+	if(inFile.fail()) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact orientation");
+	  return false;
+	}
+	
+	t.set(x,y,z);
+	loc = position(x,y,z);
+	frame.set(q,t);
 
-    t.set(x,y,z);
-    loc = position(x,y,z);
-    frame.set(q,t);
-
-    //normal
+	//normal
     inFile >> x >> y >> z;
-    if(inFile.fail()) {
-      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
-      return false;
-    }
+	if(inFile.fail()) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
+	  return false;
+	}
 
-    normal.set(x,y,z);
+	normal.set(x,y,z);
 
-    //cof
+	//cof
     inFile >> w;
-    if(inFile.fail()) {
-      DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
-      return false;
-    }
-    cof = w;
+	if(inFile.fail()) {
+	  DBGA("VirtualContactOnObject::readFromFile - Failed to read virtual contact normal");
+	  return false;
+	}
+	cof = w;
     return true;
 }
-
-/*! set dynamic contact wrench of body when updating contact wrench
- */
-
 
 #ifdef ARIZONA_PROJECT_ENABLED
 void
 VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int index, bool flipNormal)
 {
-
+	
 	float v;
 	FILE *fp = fopen(file.latin1(), "r");
 	if (!fp) {
@@ -1817,13 +1808,20 @@ VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int in
 	}
 
 	//numFCVectors
-	fscanf(fp,"%d",&numFrictionEdges);
+	if(fscanf(fp,"%d",&numFrictionEdges) <= 0) {
+	  DBGA("VirtualContactOnObject::readFromRawData - Failed to read virtual contact orientation");
+	  return; 
+	}
 
 	//frictionEdges
 	for (int i=0; i<numFrictionEdges; i++) {
 		for (int j=0; j<6; j++) {
-			fscanf(fp,"%f",&v);
-			frictionEdges[6*i+j] = v;
+		  if(fscanf(fp,"%f",&v) <= 0) 
+		    {
+		      DBGA("VirtualContactOnObject::readFromRawData - Failed to read number of friction edges for virtual contacts");
+		      return; 
+		    }
+		  frictionEdges[6*i+j] = v;
 		}
 	}
 
@@ -1845,7 +1843,7 @@ VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int in
 	cof = 0.5;
 
 	fclose(fp);
-
+	
 }
 #endif
 
