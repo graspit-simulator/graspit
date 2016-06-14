@@ -14,25 +14,25 @@ class Contact;
 class QTextStream;
 
 struct SensorOutput{
-	SensorType stype;
+    SensorType stype;
     position pos[2];
-	double * sensorReading;
+    double * sensorReading;
 };
 
 class SensorInterface{
 public:
-	//front end should allow only polling and resetting the sensor, 
-	//or asking the sensor to update its model.
-	//It should also support asking for visualization of the sensor output 
-	//and sensor groupname, which may be relevant to control strategies.
+    //front end should allow only polling and resetting the sensor,
+    //or asking the sensor to update its model.
+    //It should also support asking for visualization of the sensor output
+    //and sensor groupname, which may be relevant to control strategies.
     virtual SensorOutput * getSensorOutput() = 0;
-	virtual bool updateSensorModel() = 0;
-	virtual void resetSensor() = 0;
-	virtual SoSeparator * getVisualIndicator() = 0;
-	virtual int getGroupNumber() = 0;
-	virtual transf getSensorTran() = 0;
-	virtual void setColor(double maxVal) = 0;
-	virtual double getNormalForce(){return -1;}
+    virtual bool updateSensorModel() = 0;
+    virtual void resetSensor() = 0;
+    virtual SoSeparator * getVisualIndicator() = 0;
+    virtual int getGroupNumber() = 0;
+    virtual transf getSensorTran() = 0;
+    virtual void setColor(double maxVal) = 0;
+    virtual double getNormalForce(){return -1;}
 };
 
 
@@ -49,18 +49,18 @@ protected:
 	int groupNumber;
 public:
     virtual SensorOutput * getSensorOutput(){return &myOutput;}
-	virtual bool updateSensorModel();
-	bool setGroupNumber(int gn);
+    virtual bool updateSensorModel();
+    bool setGroupNumber(int gn);
     virtual int getGroupNumber(){return groupNumber;}
-	virtual void sensorModel();
-	virtual void resetSensor();
-	virtual SoSeparator * getVisualIndicator();
-	BodySensor(Link* body);
-	BodySensor(const BodySensor & fs, Link * sl);
+    virtual void sensorModel();
+    virtual void resetSensor();
+    virtual SoSeparator * getVisualIndicator();
+    BodySensor(Link* body);
+    BodySensor(const BodySensor & fs, Link * sl);
     virtual BodySensor * clone(Body* b){Q_UNUSED(b); return new BodySensor(*this);}
-	virtual transf getSensorTran();
+    virtual transf getSensorTran();
     virtual void setColor(double maxVal){Q_UNUSED(maxVal);}
-	virtual double getNormalForce(){return myOutput.sensorReading[2];}
+    virtual double getNormalForce(){return myOutput.sensorReading[2];}
 };
 
 class RegionFilteredSensor : public BodySensor {
