@@ -39,6 +39,7 @@
 
 #include "body.h"
 #include "collisionInterface.h"
+#include "SensorInterface.h"
 #include "bBox.h"
 #include "triangle.h"
 #include "world.h"
@@ -84,7 +85,6 @@ extern "C" {
 
 #include <Inventor/actions/SoWriteAction.h>
 
-#include "SensorInterface.h"
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
 #endif
@@ -925,7 +925,7 @@ Body::breakContacts()
 	if (!contactList.empty()) {
 		setContactsChanged();
 		for (cp=contactList.begin();cp!=contactList.end();cp++) {
-            delete *cp;
+			delete *cp; *cp = NULL;
 		}
 		contactList.clear();
 	}
@@ -936,7 +936,7 @@ Body::breakContacts()
 			(*cp)->getMate()->setMate(NULL);
 		}
 		(*cp)->setMate(NULL);
-        delete *cp;
+		delete *cp; *cp = NULL;
 	}
 	prevContactList.clear();
 
@@ -2318,11 +2318,6 @@ operator<<(QTextStream &os, const GraspableBody &gb)
   return os;
 }
 
-
-/*FIXME - This is possibly the wrong way to do this -
- sensors only update when the link moves, not when things move in to the link
-Something to do with the contacts changed flag might be better.
-*/
 bool SensorLink::setPos(const double *new_q){
     updateSensors();
     return Link::setPos(new_q);
@@ -2330,13 +2325,13 @@ bool SensorLink::setPos(const double *new_q){
 
 SensorLink::SensorLink(Robot *r,int c, int l,World *w,const char *name) : Link(r,c,l,w,name){
  memset(contactForceSum,0,6*sizeof(double));
-};
+}
 
 void SensorLink::resetDynamicsFlag() {
-     updateSensors();
-      dynamicsComputedFlag = false;
-      memset(contactForceSum,0,6*sizeof(double));
-  }
+    updateSensors();
+    dynamicsComputedFlag = false;
+    memset(contactForceSum,0,6*sizeof(double));
+}
 
 void SensorLink::addIVMat(bool clone){
     Body::addIVMat(clone);
@@ -2345,11 +2340,11 @@ void SensorLink::addIVMat(bool clone){
 }
 
 void SensorLink::setEmColor(double x1, double x2, double x3){
-IVMat->emissiveColor.setValue(x1,x2,x3);
+    IVMat->emissiveColor.setValue(x1,x2,x3);
 }
 
 void SensorLink::setBodySensor(BodySensor *si){
-bdSensor.push_back(si);
+    bdSensor.push_back(si);
 }
 
 void SensorLink::updateSensors(){
@@ -2368,12 +2363,10 @@ void SensorLink::updateSensors(){
         maxVal = 1e10;
     }
     //set the color of each sensor
-//    std::cout << this << std::endl;
     for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++){
         BodySensor * bs = (*bi);
         bs->setColor(maxVal);
     }
-    //std::cout << "maxVal:" << maxVal <<std::endl;
 }
 
 void  SensorLink::setContactsChanged(){
@@ -2392,7 +2385,6 @@ void SensorLink::updateAndOuputSensors(QTextStream & qts){
 
 void SensorLink::cloneFrom(const SensorLink * originalLink){
     Link::cloneFrom(originalLink);
-    //copy all body sensors
 
     for(std::vector<BodySensor *>::const_iterator bdIt = originalLink->bdSensor.begin();
         bdIt != bdSensor.end(); ++bdIt){
@@ -2400,4 +2392,3 @@ void SensorLink::cloneFrom(const SensorLink * originalLink){
 
     }
 }
-
