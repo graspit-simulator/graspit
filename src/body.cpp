@@ -2374,11 +2374,12 @@ void  SensorLink::setContactsChanged(){
     updateSensors();
 }
 
-void SensorLink::updateAndOuputSensors(QTextStream & qts){
+void SensorLink::updateAndOuputSensors(std::vector<SensorOutput*> &sensorReadings){
     std::vector<BodySensor *>::iterator bi;
     for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
         (*bi)->updateSensorModel();
-        (*bi)->outputSensorReadings(qts);
+        SensorOutput *so = (*bi)->outputSensorReadings();
+        sensorReadings.push_back(so);
     }
     return;
 }

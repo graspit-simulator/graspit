@@ -679,6 +679,7 @@ class Link : public DynamicBody {
 
 
 class BodySensor;
+class SensorOutput;
 
 class SensorLink : public Link{
 private:
@@ -693,7 +694,7 @@ public:
     virtual void addIVMat(bool clone);
     virtual void updateSensors();
      virtual void setContactsChanged();
-    void updateAndOuputSensors(QTextStream & qts);
+    void updateAndOuputSensors(std::vector<SensorOutput*> &sensorReadings);
     static LinkT getType(){return SENSORLINK;};
 };
 

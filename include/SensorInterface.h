@@ -15,6 +15,7 @@ class QTextStream;
 
 struct SensorOutput{
 	SensorType stype;
+    position pos[2];
 	double * sensorReading;
 };
 
@@ -29,7 +30,7 @@ public:
 	virtual void resetSensor() = 0;
 	virtual SoSeparator * getVisualIndicator() = 0;
 	virtual int getGroupNumber() = 0;
-	virtual void outputSensorReadings(QTextStream & qts) = 0;
+    virtual SensorOutput* outputSensorReadings() = 0;
 	virtual transf getSensorTran() = 0;
 	virtual void setColor(double maxVal) = 0;
 	virtual double getNormalForce(){return -1;}
@@ -55,12 +56,12 @@ public:
 	virtual void sensorModel();
 	virtual void resetSensor();
 	virtual SoSeparator * getVisualIndicator();
-	virtual void outputSensorReadings(QTextStream & qts);
+    virtual SensorOutput* outputSensorReadings();
 	BodySensor(Link* body);
 	BodySensor(const BodySensor & fs, Link * sl);
     virtual BodySensor * clone(Body* b){Q_UNUSED(b); return new BodySensor(*this);}
 	virtual transf getSensorTran();
-    virtual void setColor(double maxVal){Q_UNUSED(maxVal)};
+    virtual void setColor(double maxVal){Q_UNUSED(maxVal);}
 	virtual double getNormalForce(){return myOutput.sensorReading[2];}
 };
 
@@ -69,7 +70,6 @@ private:
 	void init();
 
 protected:
-	position pos[2];
 	bool filterContact(Contact * cp);
 	bool filterContact(const position & boundaryPos0, const position & boundaryPos1, const position & ps);
 	SoSeparator *visualIndicator;
@@ -84,7 +84,7 @@ public:
 	RegionFilteredSensor(Link * body);
 	RegionFilteredSensor(const RegionFilteredSensor & fs, Link * sl);
 	SoSeparator * getVisualIndicator();
-	virtual void outputSensorReadings(QTextStream & qts);
+    virtual SensorOutput* outputSensorReadings();
 //	SoTransform* tran;
 	SbVec3f sbv[8];
 	virtual BodySensor * clone(SensorLink * sl);
@@ -93,9 +93,6 @@ public:
 	virtual void setColor(double maxVal);
 };
 
-namespace SensorOutputTools{
-	int getSensorReadingNumber(SensorOutput * so);	
-};
 
 
 #endif

@@ -93,15 +93,9 @@ bool BodySensor::setGroupNumber(int gn){
 	return true;
 }
 
-void BodySensor::outputSensorReadings(QTextStream & qts){
+SensorOutput * BodySensor::outputSensorReadings(){
 	SensorOutput * so = Poll();
-	int sNum = SensorOutputTools::getSensorReadingNumber(so);
-	qts << "Body "; 
-	for(int sInd = 0; sInd < sNum; sInd ++){
-		qts << " ";	
-		qts << so->sensorReading[sInd];
-	}
-	qts << endl;
+    return so;
 }
 
 transf BodySensor::getSensorTran(){
@@ -111,7 +105,7 @@ transf BodySensor::getSensorTran(){
 bool
 RegionFilteredSensor::filterContact(Contact * cp){
 	position ps = cp->getPosition();
-	return filterContact(pos[0], pos[1], ps);
+    return filterContact(myOutput.pos[0], myOutput.pos[1], ps);
 }
 
 bool
@@ -138,25 +132,25 @@ RegionFilteredSensor::filterContact(const position & boundaryPos0, const positio
 bool
 RegionFilteredSensor::setFilterParams(QString * params){
 	QStringList qsl = params->split(",");
-	pos[0][0]= qsl[0].toFloat();
-	pos[0][1]= qsl[1].toFloat();
-	pos[0][2]= qsl[2].toFloat();
-	pos[1][0]= qsl[3].toFloat();
-	pos[1][1]= qsl[4].toFloat();
-	pos[1][2]= qsl[5].toFloat();
-	return setFilterParams(pos);
+    myOutput.pos[0][0]= qsl[0].toFloat();
+    myOutput.pos[0][1]= qsl[1].toFloat();
+    myOutput.pos[0][2]= qsl[2].toFloat();
+    myOutput.pos[1][0]= qsl[3].toFloat();
+    myOutput.pos[1][1]= qsl[4].toFloat();
+    myOutput.pos[1][2]= qsl[5].toFloat();
+    return setFilterParams(myOutput.pos);
 }
 
 bool RegionFilteredSensor::setFilterParams(position pos[]){
 	int32_t cIndex[30];
-	sbv[0].setValue(pos[0][0],pos[0][1],pos[0][2]);
-	sbv[1].setValue(pos[0][0],pos[1][1],pos[0][2]);
-	sbv[2].setValue(pos[0][0],pos[1][1],pos[1][2]);
-	sbv[3].setValue(pos[0][0],pos[0][1],pos[1][2]);
-	sbv[4].setValue(pos[1][0],pos[0][1],pos[0][2]);
-	sbv[5].setValue(pos[1][0],pos[1][1],pos[0][2]);
-	sbv[6].setValue(pos[1][0],pos[1][1],pos[1][2]);
-	sbv[7].setValue(pos[1][0],pos[0][1],pos[1][2]);
+    sbv[0].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[0][2]);
+    sbv[1].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[0][2]);
+    sbv[2].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[1][2]);
+    sbv[3].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[1][2]);
+    sbv[4].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[0][2]);
+    sbv[5].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[0][2]);
+    sbv[6].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[1][2]);
+    sbv[7].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[1][2]);
 	//face 1
 	cIndex[0] = 0;
 	cIndex[1] = 1;
@@ -294,7 +288,7 @@ RegionFilteredSensor::sensorModel(){
 					position sampleLocation;
 					sampleLocation.set(sampleInBody1.translation());
 //					renderPoints.push_back(sampleLocation * (*cp)->getBody1Tran());
-					if(filterContact(pos[0],pos[1], sampleLocation))
+                    if(filterContact(myOutput.pos[0],myOutput.pos[1], sampleLocation))
 					{
 						myOutput.sensorReading[2]+= forceVec[pInd];
 					}
@@ -338,9 +332,9 @@ RegionFilteredSensor::RegionFilteredSensor(const RegionFilteredSensor & fs, Link
 	RegionFilteredSensor::init();
 	last_world_time = 0;
 	groupNumber = fs.groupNumber;
-	pos[0] = fs.pos[0];
-	pos[1] = fs.pos[1];
-	setFilterParams(pos);
+    myOutput.pos[0] = fs.myOutput.pos[0];
+    myOutput.pos[1] = fs.myOutput.pos[1];
+    setFilterParams(myOutput.pos);
 }
 
 
@@ -349,16 +343,9 @@ RegionFilteredSensor::getVisualIndicator(){
 	return visualIndicator;
 }
 
-void RegionFilteredSensor::outputSensorReadings(QTextStream & qts){
+SensorOutput * RegionFilteredSensor::outputSensorReadings(){
 	SensorOutput * so = Poll();
-	int sNum = SensorOutputTools::getSensorReadingNumber(so);
-	qts << "Filtered "; 
-	qts << pos[0][0] << " " << pos[0][1] << " " << pos[0][2] << " " << pos[1][0] << " " << pos[1][1] << " " << pos[1][2];
-	for(int sInd = 0; sInd < sNum; sInd ++){
-		qts << " ";	
-		qts << so->sensorReading[sInd];
-	}
-	qts << endl;
+    return so;
 }
 
 BodySensor * RegionFilteredSensor::clone(SensorLink * sl)
@@ -373,17 +360,8 @@ RegionFilteredSensor::~RegionFilteredSensor(){
 
 transf RegionFilteredSensor::getSensorTran()
 {
-	transf sensorInLink(Quaternion::IDENTITY, vec3( (pos[0][0] + pos[1][0])/2.0,  (pos[0][1] + pos[1][1])/2.0, (pos[0][2] + pos[1][2])/2.0 ));
+    transf sensorInLink(Quaternion::IDENTITY, vec3( (myOutput.pos[0][0] + myOutput.pos[1][0])/2.0,  (myOutput.pos[0][1] + myOutput.pos[1][1])/2.0, (myOutput.pos[0][2] + myOutput.pos[1][2])/2.0 ));
 	transf linkInWorld = sbody->getTran();
 	transf res = sensorInLink * linkInWorld; // mathematically should be sensorInWorld = linkInWorld * sensorInLink, but inside GraspIt! it is reversed
 	return res;
-}
-
-int SensorOutputTools::getSensorReadingNumber(SensorOutput * so){
-	switch (so->stype){
-		case BODY: //fall through
-		case TBODY:
-			return 6;
-	}
-	return -1;
 }
