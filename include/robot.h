@@ -49,6 +49,7 @@ class CyberGlove;
 class EigenGraspInterface;
 class Matrix;
 class TiXmlElement;
+class SensorInterface;
 
 //! Base class for all robots which are collections of links connected by moveable joints
 /*! A robot is collection of link bodies orgainized around a base link.
@@ -137,6 +138,9 @@ protected:
   std::vector<DOF *> dofVec;
   //! A pointer to the base link (or palm) of the robot
   Link *base;
+
+  //! A vector of pointers to the sensors defined within this world
+  std::vector<SensorInterface *> sensorVec;
 
   // Save and restore state
   //! Is used to save the current transform if we want to restore it later
@@ -513,6 +517,16 @@ protected:
 
   //! Tells us how far along the approach direction a given object is, within a certain limit
   double getApproachDistance(Body *object, double maxDist);
+
+  //-------------------------Sensors-------------------------------------------------
+
+  //! Returns a pointer to the i-th sensor defined in for this robot
+  SensorInterface * getSensor(int i) const {return sensorVec[i];}
+
+  //! Returns the number of sensors defined for this robot
+  int getNumSensors() const {return sensorVec.size();}
+
+  void addSensor(SensorInterface * si);
 
   //---------------------------Q_EMIT Q_SIGNALS-----------------------------------------
 

@@ -25,7 +25,6 @@ void BodySensor::init(Link * body){
 	myOutput.sensorReading = new double[6];
 	memset(myOutput.sensorReading, 0, 6*sizeof(double));
 	sbody->setBodySensor(this);
-	sbody->getWorld()->addSensor(this);
 }
 
 BodySensor :: BodySensor(Link * body){

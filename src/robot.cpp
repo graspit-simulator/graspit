@@ -124,6 +124,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
                 sensorType.stripWhiteSpace();
                 base = new SensorLink(this, -1, -1, myWorld, (QString(name())+"Base").latin1());
                 BodySensor * bd = new BodySensor(base);
+                addSensor(bd);
                 QString sensorNumber = element->Attribute("groupNumber");
                 sensorNumber = sensorNumber.stripWhiteSpace();
                 if(!sensorNumber.isEmpty())
@@ -2274,6 +2275,14 @@ Robot::contactSlip()
 		}
 	}
 	return false;
+}
+
+/*! Adds to this world a sensor that is already created and initialized.
+*/
+
+void
+Robot::addSensor(SensorInterface * si){
+    sensorVec.push_back(si);
 }
 
 //////////////////////////////////////////////////////////////////////////////
