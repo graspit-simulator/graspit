@@ -190,7 +190,7 @@ ClientSocket::readClient()
     strPtr = lineStrList.begin();
 
 #ifdef GRASPITDBG
-    std::cout <<"Command parser line: "<<line << std::endl;
+    std::cout <<"Command parser line: "<< line.toStdString().c_str() << std::endl;
 #endif
     
     if (*strPtr == "getContacts") {
@@ -199,7 +199,7 @@ ClientSocket::readClient()
       if (!ok) continue;
 
 #ifdef GRASPITDBG
-      std::cout << "Num data: "<<numData<<std::endl;
+      std::cout << "Num data: "<< numData <<std::endl;
 #endif
 
       if (readBodyIndList(bodyVec)) continue;

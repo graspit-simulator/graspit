@@ -422,7 +422,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
 		for (bp=bodyVec.begin();bp!=bodyVec.end();bp++) {
 			if (*bp == e) {
 				bodyVec.erase(bp); numBodies--;
-				DBGP("removed body "<<((Body *)e)->getName()<<" from world");
+				DBGP("removed body "<<((Body *)e)->getName().toStdString().c_str() <<" from world");
 				break;
 			}
 		}
@@ -437,7 +437,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
 							(*hp)->getGrasp()->setObject(NULL);
 					}
 				}
-				DBGP("removed GB " << ((Body *)e)->getName()<<" from world");
+				DBGP("removed GB " << ((Body *)e)->getName().toStdString().c_str()<<" from world");
 				break;
 			}
 		}
@@ -452,7 +452,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
 					if (numHands > 0) currentHand = handVec[0];
 					else currentHand = NULL;
 				}
-				DBGP("removed hand " << ((Robot *)e)->getName() << " from world");  
+				DBGP("removed hand " << ((Robot *)e)->getName().toStdString().c_str() << " from world");
 				Q_EMIT handRemoved();
 				break;
 			}
@@ -460,7 +460,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
 		for (rp=robotVec.begin();rp!=robotVec.end();rp++) {
 			if (*rp == e) {
 				robotVec.erase(rp); numRobots--;
-				DBGP("removed robot " << ((Robot *)e)->getName() << " from world"); 
+				DBGP("removed robot " << ((Robot *)e)->getName().toStdString().c_str() << " from world");
 				break;
 			}
 		}
@@ -1125,8 +1125,8 @@ World::selectElement(WorldElement *e)
 	std::list<WorldElement *>::iterator ep;
 	int c,l;
 
-	DBGP("selecting element "<<e->getName().latin1());
-	if (e->inherits("Body")) {DBGP(" with collision id " << ((Body*)e)->getId());}
+	DBGP("selecting element "<<e->getName().toStdString().c_str());
+	if (e->inherits("Body")) {DBGP(" with collision id " << ((Body*)e)->getName().toStdString().c_str());}
 
 	if (e->inherits("Body")) numSelectedBodyElements++;
 	else if (e->inherits("Robot")) numSelectedRobotElements++;
@@ -1164,7 +1164,7 @@ World::deselectElement(WorldElement *e)
 	std::list<WorldElement *>::iterator ep;
 	int c,l;
 
-	DBGP("deselecting element "<<e->getName().latin1());
+	DBGP("deselecting element "<<e->getName().toStdString().c_str());
 	if (e->inherits("Body")) numSelectedBodyElements--;
 	else if (e->inherits("Robot")) numSelectedRobotElements--;
 	numSelectedElements--;
@@ -1601,13 +1601,13 @@ World::findContacts(CollisionReport &colReport)
 			}
 		}
 		if (duplicate) {
-			DBGP("duplicate: " << (*it).first->getName().latin1() << "--" <<  (*it).second->getName().latin1());
+            DBGP("duplicate: " << (*it).first->getName().toStdString().c_str() << "--" <<  (*it).second->getName().toStdString().c_str());
 			it = colReport.erase(it);
 			continue;
 		}
 
 		if ( getDist( (*it).first, (*it).second ) > Contact::THRESHOLD ) {
-			DBGP("no contact: " << (*it).first->getName().latin1() << "--" << (*it).second->getName().latin1());
+            DBGP("no contact: " << (*it).first->getName().toStdString().c_str()<< "--" << (*it).second->getName().toStdString().c_str());
 			it = colReport.erase(it);
 			continue;
 		}
@@ -1663,7 +1663,7 @@ World::findAllContacts()
 	DBGP("found " << numContacts << " contacts. Adding...");
 	for (int i=0;i<numContacts;i++) {
 		addContacts( report[i].first, report[i].second, report[i].contacts, softContactsAreOn());
-		DBGP( report[i].first->getName().latin1() << " - " << report[i].second->getName().latin1() );
+		DBGP( report[i].first->getName().toStdString().c_str() << " - " << report[i].second->getName().toStdString().c_str() );
 	}
 }
 
@@ -1856,16 +1856,16 @@ World::moveDynamicBodies(double timeStep)
 		if (numCols) {
 			std::cout << "COLLIDE!" << std::endl;
 			for (i=0;i<numCols;i++) {
-				std::cout << colReport[i].first->getName() << " collided with " << 
-					colReport[i].second->getName() << std::endl;
+			  std::cout << colReport[i].first->getName().toStdString().c_str() << " collided with " <<
+			    colReport[i].second->getName().toStdString().c_str() << std::endl;
 			}
 
 			for (i=0;i<numCols;i++) {
 				tmpDist = getDist(colReport[i].first,colReport[i].second);
 				if (tmpDist < minDist) minDist = tmpDist;	
 				std::cout << "minDist: " << tmpDist <<" between " << std::endl;
-				std::cout << colReport[i].first->getName() << " and " <<
-					colReport[i].second->getName() << std::endl;
+				std::cout << colReport[i].first->getName().toStdString().c_str() << " and " <<
+				  colReport[i].second->getName().toStdString().c_str() << std::endl;
 			}      
 		}
 #endif      
@@ -1906,8 +1906,8 @@ World::moveDynamicBodies(double timeStep)
 						minDist = tmpDist;
 						min_body_1 = colReport[i].first->getName().latin1();
 						min_body_2 = colReport[i].second->getName().latin1();
-						DBGP("minDist: " << minDist << " between " << colReport[i].first->getName() << 
-							" and " << colReport[i].second->getName());
+						DBGP("minDist: " << minDist << " between " << colReport[i].first->getName().toStdString().c_str() <<
+						     " and " << colReport[i].second->getName().toStdString().c_str());
 					}
 				}
 			}
@@ -1950,7 +1950,7 @@ World::moveDynamicBodies(double timeStep)
 
 #ifdef GRASPITDBG
 	std::cout << "CHECKING COLLISIONS AT MIDDLE OF STEP: ";
-	numCols = getCollisionReport(colReport);
+	numCols = getCollisionReport(&colReport);
 
 	if (!numCols){ 
 		std::cout << "None." << std::endl;
@@ -1958,8 +1958,8 @@ World::moveDynamicBodies(double timeStep)
 	else {
 		std::cout << numCols <<" found!!!" << std::endl;
 		for (i=0;i<numCols;i++) {
-			std::cout << colReport[i].first->getName() << " collided with " <<
-				colReport[i].second->getName() << std::endl;
+		  std::cout << colReport[i].first->getName().toStdString().c_str() << " collided with " <<
+		    colReport[i].second->getName().toStdString().c_str() << std::endl;
 		}
 	}
 #endif
@@ -2057,11 +2057,11 @@ World::computeNewVelocities(double timeStep)
 #ifdef GRASPITDBG
 			std::cout << "Island "<< ++islandCount<<" Bodies: ";
 			for (i=0;i<numDynBodies;i++)
-				std::cout << dynIsland[i]->getName() <<" ";
+			  std::cout << dynIsland[i]->getName().toStdString().c_str() <<" ";
 			std::cout << std::endl;
-			std::cout << "Island Robots"<< islandCount<<" Robots: ";
-			for (i=0;i<islandRobots.size();;i++)
-				std::cout << islandRobots[i]->getName() <<" ";
+			std::cout << "Island Robots"<< islandCount <<" Robots: ";
+			for (i=0;i<islandRobots.size();i++)
+			  std::cout << islandRobots[i]->getName().toStdString().c_str() <<" ";
 			std::cout << std::endl << std::endl;
 #endif  
 

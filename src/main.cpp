@@ -46,8 +46,6 @@
   to provide feedback to calling program, if desired.
  */
 
-#define GRASPITDBG
-
 #include <iostream>
 #include <graspitApp.h>
 #include "graspitGUI.h"
