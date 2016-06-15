@@ -1626,7 +1626,6 @@ IVmgr::saveDepthImage(QString filename)
 
     unsigned char * data = myRenderer->getBuffer();
 
-
     float scale_factor = 1000.0; // output units to meters conversion factor
 
     int height = myRenderer->getViewportRegion().getWindowSize()[1];
@@ -1634,23 +1633,34 @@ IVmgr::saveDepthImage(QString filename)
 
     QImage *img = new QImage(width, height, QImage::Format_RGB32);
 
-    size_t i = 0;
+    int max_depth = 1.0;
     int index = 0;
+    size_t i = 0;
     for(int h = 0; h < height; ++ h)
     {
        for(int w = 0; w < width; ++ w)
        {
            index = (height-h-1)*width + w;
 
-           int val = 0;
+           float val = 0;
            for (int c =0; c < 3; c++)
            {
-               val += data[i]*pow(255,(3-c-1)) ;
+               val += data[i]*pow(255, (3-c-1)) ;
                ++i;
            }
            ++i; // extra one because 4 channels...
-           QRgb value = qRgb(val/ scale_factor,val/ scale_factor, val/ scale_factor);
-           img->setPixel(w,h, value );
+
+           val = (1.0 * val) / (1.0 * scale_factor);
+
+           if(val > max_depth)
+           {
+               val = max_depth;
+           }
+
+           int int_val =  255 - ((1.0 * val)/ (1.0 * max_depth ) * 255);
+
+           QRgb value = qRgb(int_val, int_val, int_val);
+           img->setPixel(w, height-h-1, value);
        }
     }
 
