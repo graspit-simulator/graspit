@@ -4,6 +4,7 @@
 #include "include/debug.h"
 #include "include/world.h"
 #include "quality.h"
+#include "include/contact/virtualContact.h"
 
 
 double

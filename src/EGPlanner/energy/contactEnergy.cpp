@@ -4,6 +4,7 @@
 #include "include/grasp.h"
 #include "include/debug.h"
 #include "include/world.h"
+#include "include/contact/virtualContact.h"
 
 double ContactEnergy::energy() const
 {

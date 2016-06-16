@@ -66,6 +66,7 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/robots
     ${GSRC}/include/math
     ${GSRC}/include/dynamics
+    ${GSRC}/include/contact
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
@@ -100,7 +101,11 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/body.h 
     ${GSRC}/include/bBox.h 
     ${GSRC}/include/bbox_inl.h 
-    ${GSRC}/include/contact.h 
+    ${GSRC}/include/contact/contact.h 
+    ${GSRC}/include/contact/softContact.h 
+    ${GSRC}/include/contact/pointContact.h 
+    ${GSRC}/include/contact/virtualContact.h 
+    ${GSRC}/include/contact/virtualContactOnObject.h
     ${GSRC}/include/contactSetting.h 
     ${GSRC}/include/debug.h 
     ${GSRC}/include/dof.h 
@@ -333,7 +338,11 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/robots/shadow.cpp 
     ${GSRC}/src/bBox.cpp 
     ${GSRC}/src/body.cpp 
-    ${GSRC}/src/contact.cpp 
+    ${GSRC}/src/contact/contact.cpp
+    ${GSRC}/src/contact/softContact.cpp
+    ${GSRC}/src/contact/pointContact.cpp
+    ${GSRC}/src/contact/virtualContact.cpp 
+    ${GSRC}/src/contact/virtualContactOnObject.cpp
     ${GSRC}/src/contactSetting.cpp 
     ${GSRC}/src/dof.cpp 
     ${GSRC}/src/dynamics/dynamics.cpp 
