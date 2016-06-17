@@ -37,7 +37,7 @@
 
 #include "graspitGUI.h"
 #include "world.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 
 class GraspPlanningState;
 class Hand;

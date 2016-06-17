@@ -26,7 +26,7 @@
 #include <QHBoxLayout>
 #include "qmDlg.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "grasp.h"
 #include "list"
 #include "world.h"

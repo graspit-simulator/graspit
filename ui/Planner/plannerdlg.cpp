@@ -38,7 +38,7 @@
 #include "grasp_planner.h"
 #include "grasp.h"
 #include "world.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "quality.h"
 #include "mytools.h"
 

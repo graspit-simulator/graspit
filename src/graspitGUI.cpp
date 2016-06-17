@@ -24,7 +24,7 @@
 //######################################################################
 
 /*! \file
-  \brief Implements the graspit user interface.  Responsible for creating both MainWindow and IVmgr.
+  \brief Implements the graspit user interface.  Responsible for creating both MainWindow and InteractiveIVManager.
 */
 
 #include <Q3GroupBox>
@@ -40,7 +40,7 @@
 #include "graspitParser.h"
 #include "graspitGUI.h"
 #include "mainWindow.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "mytools.h"
 #include "SoComplexShape.h"
@@ -78,7 +78,7 @@ GraspItGUI *graspItGUI = 0;
   - creates a new MainWindow,
   - starts Coin by initializing SoQt,
   - initializes our Coin add on classes,
-  - creates a new IVmgr,
+  - creates a new InteractiveIVManager,
   - sets the focus policy of the SoQt viewer so keyboard events are accepted
   - calls a method to process the command line arguments.
  */
@@ -93,7 +93,7 @@ GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
     SoArrow::initClass();
     SoTorquePointer::initClass();
 
-    ivmgr = new IVmgr((QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
+    ivmgr = new InteractiveIVManager((QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
 
 //	mainWindow->viewerHolder->setFocusProxy(ivmgr->getViewer()->getWidget());
 //	mainWindow->viewerHolder->setFocusPolicy(QWidget::StrongFocus);
@@ -108,7 +108,7 @@ GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
 }
 
 /*!
-  Deletes both the IVmgr and the MainWindow.
+  Deletes both the InteractiveIVManager and the MainWindow.
 */
 GraspItGUI::~GraspItGUI()
 {

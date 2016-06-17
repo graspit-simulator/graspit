@@ -29,7 +29,7 @@
 
 #include "world.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "robot.h"
 #include "gloveInterface.h"
 

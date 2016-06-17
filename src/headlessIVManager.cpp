@@ -23,10 +23,10 @@
 //######################################################################
 
 /*! \file
-  \brief Implements the IVmgrHeadless class which acts like the original IVmgr class but bypasses all GUI actions.
+  \brief Implements the HeadlessIVManager class which acts like the original IVmgr class but bypasses all GUI actions.
 */
 
-#include "ivmgrHeadless.h"
+#include "headlessIVManager.h"
 #include "world.h"
 #include <Inventor/Qt/SoQt.h>
 #include <Inventor/nodes/SoSeparator.h>
@@ -49,7 +49,7 @@ extern FILE *debugfile;
 #endif
 
 
-IVmgrHeadless::IVmgrHeadless(const char * _name):
+HeadlessIVManager::HeadlessIVManager(const char * _name):
     qapp(NULL) 
 {
 
@@ -73,9 +73,9 @@ IVmgrHeadless::IVmgrHeadless(const char * _name):
   Deselects all elements, and deletes the main world.  Deletes the remaining
   Inventor scene graph and deletes the Inventor viewer.
 */
-IVmgrHeadless::~IVmgrHeadless()
+HeadlessIVManager::~HeadlessIVManager()
 {
-  //std::cout << "deleting IVmgrHeadless" << std::endl;
+  //std::cout << "deleting HeadlessIVManager" << std::endl;
   
   exitMainLoop();
 
@@ -92,7 +92,7 @@ IVmgrHeadless::~IVmgrHeadless()
   Deselects all world elements, deletes the world, and creates a new world.
 */
 void
-IVmgrHeadless::emptyWorld()
+HeadlessIVManager::emptyWorld()
 {
   delete world;
   world = new World(NULL, "MainWorld", this);
@@ -101,7 +101,7 @@ IVmgrHeadless::emptyWorld()
 }
 
 void
-IVmgrHeadless::createNewWorld(const char* name)
+HeadlessIVManager::createNewWorld(const char* name)
 {
 
   delete world;
@@ -117,7 +117,7 @@ IVmgrHeadless::createNewWorld(const char* name)
 
 
 void
-IVmgrHeadless::initSoQt()
+HeadlessIVManager::initSoQt()
 {
     qapp = SoQt::init("Test");   
 
@@ -131,16 +131,13 @@ IVmgrHeadless::initSoQt()
   Starts the main event loop.
 */
 void
-IVmgrHeadless::beginMainLoop()
+HeadlessIVManager::beginMainLoop()
 {
   SoQt::mainLoop();
 }
 
 void
-IVmgrHeadless::exitMainLoop()
+HeadlessIVManager::exitMainLoop()
 {
   SoQt::exitMainLoop();
 }
-
-
-

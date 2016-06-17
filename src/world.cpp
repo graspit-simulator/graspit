@@ -49,7 +49,7 @@
 #include "humanHand.h"
 #include "contact.h"
 #include "contactSetting.h"
-#include "ivmgrBase.h"
+#include "ivManager.h"
 #include "grasp.h"
 #include "barrett.h"
 #include "matvec3D.h"
@@ -107,7 +107,7 @@ char graspitVersionStr[] = "GraspIt! version 2.1";
 that will handle all user interaction. Also initialized collision detection
 system and reads in global settings such as friction coefficients 
 */
-World::World(QObject *parent, const char *name, IVmgrBase *mgr) : QObject(parent,name)
+World::World(QObject *parent, const char *name, IVManager *mgr) : QObject(parent,name)
 {
 	myIVmgr = mgr;
 

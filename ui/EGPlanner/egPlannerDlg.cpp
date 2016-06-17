@@ -45,7 +45,7 @@
 #include "grasp.h"
 #include "world.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "contactExaminerDlg.h"
 #include "onLinePlanner.h"
 #include "timeTest.h"

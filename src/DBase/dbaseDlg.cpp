@@ -36,7 +36,7 @@
 #include <QComboBox>
 
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "robot.h"
 #include "world.h"
 #include "searchState.h"

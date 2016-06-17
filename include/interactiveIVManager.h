@@ -19,14 +19,14 @@
 //
 // Author(s):  Andrew T. Miller 
 //
-// $Id: ivmgr.h,v 1.20 2009/06/16 19:29:41 cmatei Exp $
+// $Id: interactiveIVManager.h,v 1.20 2009/06/16 19:29:41 cmatei Exp $
 //
 //######################################################################
 
 /*! \file 
-  \brief Defines the IVmgr class which handles 3D user interaction.
+  \brief Defines the InteractiveIVManager class which handles 3D user interaction.
  */
-#ifndef IVMGR_HXX
+#ifndef INTERACTIVEIVMANAGER_H
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
 #include <list>
@@ -34,7 +34,7 @@
 #include <qstring.h>
 #include <qwidget.h>
 #include "material.h"
-#include "ivmgrBase.h"
+#include "ivManager.h"
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 
 struct VCReportType;
@@ -117,12 +117,12 @@ enum ToolType {TRANSLATE_TOOL,ROTATE_TOOL,SELECT_TOOL};
   This class also handles the display of contact forces and some other
   indicators, and can render and save an image of the current scene.
  */
-class IVmgr : public QWidget, public IVmgrBase {
+class InteractiveIVManager : public QWidget, public IVManager {
   Q_OBJECT
 
  private:
   //! Global ivmgr pointer for use with static callback routines.  There is only one ivmgr.    
-  static IVmgr *ivmgr;
+  static InteractiveIVManager *ivmgr;
 
   //! Points to the main world associated with this iteraction manager
   World *world;
@@ -241,8 +241,8 @@ public Q_SLOTS:
   void restoreCameraPos();
 
 public:
-  IVmgr(QWidget *parent=0,const char *name=0,Qt::WFlags f=0);
-  ~IVmgr();
+  InteractiveIVManager(QWidget *parent=0,const char *name=0,Qt::WFlags f=0);
+  ~InteractiveIVManager();
 
   void deselectBody(Body *b);
 
@@ -295,5 +295,5 @@ public:
 #endif
   void setStereoWindow(QWidget *parent);
 };
-#define IVMGR_HXX
+#define INTERACTIVEIVMANAGER_H
 #endif

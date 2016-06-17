@@ -42,7 +42,7 @@
 #include "robot.h"
 #include "contact.h"
 #include "world.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"
@@ -60,7 +60,7 @@
 #include "debug.h"
 
 extern FILE *debugfile;
-extern IVmgr *ivmgr;
+extern InteractiveIVManager *ivmgr;
 
 int myLemke(double *M,int n,double *q,double *z,bool usePrediction,bool ldbg, int &iterations);
 //int myNewLemke(double *M,int n,double *q,double *z,bool ldbg);

@@ -69,7 +69,7 @@
 /* graspit includes */
 #include "graspitGUI.h"
 #include "contact.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "body.h"
 #include "robot.h"

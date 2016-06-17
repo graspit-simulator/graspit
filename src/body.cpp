@@ -45,7 +45,7 @@
 #include "robot.h"
 #include "joint.h"
 #include "dynJoint.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "contact.h"
 #include "graspitGUI.h"
 #include "tinyxml.h"

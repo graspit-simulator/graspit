@@ -25,16 +25,13 @@
 /*! \file 
   \brief Defines an abstract superclass for the IVmgr class, which handles 3D user interaction.
  */
-#ifndef IVMGR_BASE_HXX
-#define IVMGR_BASE_HXX
+#ifndef IVMANAGER_HXX
+#define IVMANAGER_HXX
 
-#define MAX_POLYTOPES 15
-#define MAX_COLLISIONS 5
-
-class IVmgrBase {
+class IVManager {
 public:
-  IVmgrBase(const char *name=0){}
-  virtual ~IVmgrBase(){}
+  IVManager(const char *name=0){}
+  virtual ~IVManager(){}
 
   virtual void setCamera(double _px, double _py, double _pz, double _q1, double _q2, double _q3, double _q4, double _fd){
     px=_px;  

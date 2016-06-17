@@ -35,7 +35,6 @@
 
 #include "body.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
 #include "world.h"
 
 DynamicBody *rightBase;

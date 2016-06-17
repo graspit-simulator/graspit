@@ -41,7 +41,7 @@ PROF_DECLARE(QS_TOTAL);
 
 //for the bounding box and drawing forces
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 
 //for debug
 #include "world.h"

@@ -65,7 +65,7 @@
 #include "graspitGUI.h"
 #include "contact.h"
 #include "world.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "robot.h"
 #include "body.h"
 #include "grasp.h"
