@@ -38,6 +38,7 @@
 #include <q3listbox.h>
 #include <QApplication>
 #include <QThread>
+#include <QGLWidget>
 
 #include <Inventor/SoDB.h>
 #include <Inventor/SoInput.h>
@@ -106,6 +107,7 @@
 #include "matvec3D.h"
 //hmmm not sure this is right
 #include "graspitGUI.h"
+
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -1531,13 +1533,6 @@ InteractiveIVManager::saveImage(QString filename)
   myRenderer = new SoOffscreenRenderer(glRend);
   myRenderer->setBackgroundColor(white);
 
-#ifdef GRASPITDBG
-  if (myRenderer->isWriteSupported("jpg"))
-	std::cout << " supports jpg" << std::endl;
-  else
-	std::cout << "no jpg support" << std::endl;
-#endif  
-
   SoSeparator *renderRoot = new SoSeparator;
   renderRoot->ref();
   renderRoot->addChild(myViewer->getCamera());
@@ -1551,10 +1546,15 @@ InteractiveIVManager::saveImage(QString filename)
   renderRoot->addChild(sg);
   
   myRenderer->render(renderRoot);
-  
 
-  myRenderer->writeToFile(SbString(filename.latin1()),
-                          SbName(filename.section('.',-1)));
+  QGLWidget * glWidget = dynamic_cast<QGLWidget *>(renderArea->getGLWidget());
+  if(glWidget){
+      QImage image = glWidget->grabFrameBuffer();
+      image.save(filename);
+  }else{
+        DBGA("Could not save image renderArea was not a GLWidget.");
+  }
+
   
   renderRoot->unref();
   delete myRenderer;

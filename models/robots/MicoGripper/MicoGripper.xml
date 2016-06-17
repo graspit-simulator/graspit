@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot type="Hand">
+<robot type="Hand" DBName="MicoGripper">
     <palm>mico_hand_link.xml</palm>
     <dof type="r">
               <defaultVelocity>1.0</defaultVelocity>
@@ -95,6 +95,6 @@
         <referenceLocation>0 0 -112.0</referenceLocation>
         <direction>0 0 -1</direction>
     </approachDirection>
-<virtualContacts>virtual/gripper_contacts.vgr</virtualContacts>
-
+     <eigenGrasps>eigen/eigen.xml</eigenGrasps>
+    <virtualContacts>virtual/8_contacts.vgr</virtualContacts>
 </robot>
