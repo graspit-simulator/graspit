@@ -114,6 +114,7 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/gws.h 
     ${GSRC}/include/gwsprojection.h 
     ${GSRC}/include/interactiveIVManager.h 
+    ${GSRC}/include/headlessIVManager.h
     ${GSRC}/include/jacobian.h 
     ${GSRC}/include/joint.h 
     ${GSRC}/include/kinematicChain.h 
@@ -348,6 +349,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/gws.cpp 
     ${GSRC}/src/gwsprojection.cpp 
     ${GSRC}/src/interactiveIVManager.cpp 
+    ${GSRC}/src/headlessIVManager.cpp 
     ${GSRC}/src/jacobian.cpp 
     ${GSRC}/src/joint.cpp 
     ${GSRC}/src/kinematicChain.cpp 

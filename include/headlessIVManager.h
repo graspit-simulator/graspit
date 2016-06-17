@@ -22,7 +22,7 @@
 //######################################################################
 
 /*! \file 
-  \brief Defines the IVmgrHeadless class which acts like the original IVmgrHeadless (handling 3D user interaction), but bypasses all GUI related actions.
+  \brief Defines the HeadlessIVManager class which acts like the original HeadlessIVManager (handling 3D user interaction), but bypasses all GUI related actions.
  */
 #ifndef IVMGR_HEADLESS_HXX
 #include <Inventor/SbBasic.h>
@@ -32,14 +32,14 @@
 #include <vector>
 #include <qstring.h>
 #include "material.h"
-#include "ivmgrBase.h"
+#include "ivManager.h"
 
 class World;
 class QWidget;
 class SoSeparator;
 
 //! Handles the inventor files and QT dependencies without requiring a GUI
-class IVmgrHeadless: public IVmgrBase {
+class HeadlessIVManager: public IVManager {
 
 private:
 
@@ -61,8 +61,8 @@ public:
    * Initializes Inventor/Qt environment (for use without Gui) and creates an empty world with given name, which
    * is going to be used as the main world.
    */
-  IVmgrHeadless(const char * name);
-  ~IVmgrHeadless();
+  HeadlessIVManager(const char * name);
+  ~HeadlessIVManager();
 
   /*! 
     Returns a pointer to the main World that the user interacts with through
