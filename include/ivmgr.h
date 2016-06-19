@@ -239,7 +239,7 @@ public Q_SLOTS:
   void restoreCameraPos();
 
 public:
-  IVmgr(QWidget *parent=0,const char *name=0,Qt::WFlags f=0);
+  IVmgr(QWidget *parent=0,const char *name=0,bool headless=false, Qt::WFlags f=0);
   ~IVmgr();
 
   void deselectBody(Body *b);

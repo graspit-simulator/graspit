@@ -1655,7 +1655,10 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 			break;
 		}
 		if (renderIt && (itercount%25==0) && graspItGUI && graspItGUI->getIVmgr()->getWorld()==myWorld) {
-			graspItGUI->getIVmgr()->getViewer()->render();
+            if(!graspItGUI->isHeadless())
+            {
+                graspItGUI->getIVmgr()->getViewer()->render();
+            }
 		}
 	} while (1);
 

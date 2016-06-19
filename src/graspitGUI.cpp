@@ -37,7 +37,7 @@
   #include <unistd.h>
 #endif
 
-#include "graspitParser.h"
+#include "cmdline.h"
 #include "graspitGUI.h"
 #include "mainWindow.h"
 #include "ivmgr.h"
@@ -82,8 +82,9 @@ GraspItGUI *graspItGUI = 0;
   - sets the focus policy of the SoQt viewer so keyboard events are accepted
   - calls a method to process the command line arguments.
  */
-GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
+GraspItGUI::GraspItGUI(int argc, char **argv, cmdline::parser *args) : mDispatch(NULL)
 {
+  headless = args->get<bool>("headless");
   if (!initialized) {
     mainWindow = new MainWindow;
     SoQt::init(mainWindow->mWindow);
@@ -93,17 +94,20 @@ GraspItGUI::GraspItGUI(int argc,char **argv) : mDispatch(NULL)
     SoArrow::initClass();
     SoTorquePointer::initClass();
 
-    ivmgr = new IVmgr((QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
+    ivmgr = new IVmgr((QWidget *)mainWindow->mUI->viewerHolder,"myivmgr", headless);
 
 //	mainWindow->viewerHolder->setFocusProxy(ivmgr->getViewer()->getWidget());
 //	mainWindow->viewerHolder->setFocusPolicy(QWidget::StrongFocus);
 
-    ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
+    if(!headless)
+    {
+        ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
+    }
 
     initialized = true;
     graspItGUI = this;
     mExitCode = 0;
-    initResult = processArgs(argc,argv);
+    initResult = processArgs( argc, argv, args);
   }
 }
 
@@ -141,14 +145,10 @@ GraspItGUI::~GraspItGUI()
 \p [-b obstaclename]
 */
 int
-GraspItGUI::processArgs(int argc, char** argv)
+GraspItGUI::processArgs(int argc, char **argv, cmdline::parser *args)
 {
 
     int errorFlag=0;
-
-    GraspitParser *graspitParser = new GraspitParser();
-    graspitParser->parseArgs(argc, argv);
-    cmdline::parser *args = graspitParser->parseArgs(argc, argv);
 
     //Ensure that $GRASPIT is set.
     QString graspitRoot = QString(getenv("GRASPIT"));
@@ -275,9 +275,14 @@ GraspItGUI::processArgs(int argc, char** argv)
 void
 GraspItGUI::startMainLoop()
 {
-  SoQt::show(mainWindow->mWindow);
+
   mainWindow->setMainWorld(ivmgr->getWorld());
-  mainWindow->mWindow->resize(QSize(1070,937));
+
+  if (!headless){
+      SoQt::show(mainWindow->mWindow);
+      mainWindow->mWindow->resize(QSize(1070,937));
+  }
+
   SoQt::mainLoop();
 }
 

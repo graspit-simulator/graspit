@@ -33,6 +33,10 @@
 #include <vector>
 #include <list>
 
+namespace cmdline{
+    class parser;
+}
+
 class MainWindow;
 class IVmgr;
 class TaskDispatcher;
@@ -82,11 +86,13 @@ class GraspItGUI
   //! Idle sensor for calling the plugins from GraspIt's event loop
   SoIdleSensor *mPluginSensor;
 
+  bool headless;
+
  protected:
-  int processArgs(int argc, char **argv);
+  int processArgs(int argc, char **argv, cmdline::parser *args);
 
  public:
-  GraspItGUI(int argc,char **argv);
+  GraspItGUI(int argc, char **argv, cmdline::parser *args);
   ~GraspItGUI();
   
   /*! Returns whether the UI pieces were successfully initialized. */
@@ -121,6 +127,8 @@ class GraspItGUI
 
   void startMainLoop();
   void exitMainLoop();
+
+  bool isHeadless(){return headless;}
 };
 
 #if defined(WIN32) && !defined(__MINGW32__)

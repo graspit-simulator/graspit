@@ -84,6 +84,7 @@ GraspitParser::GraspitParser()
     parser->add<std::string>("object", 'o', object_help,  is_required_arg);
     parser->add<std::string>("obstacle", 'b', obstacle_help,  is_required_arg);
     parser->add<std::string>("robot", 'r', robot_help,  is_required_arg);
+    parser->add<bool>("headless", 'c', robot_help,  is_required_arg);
     parser->add("version", 'v', version_help);
 
     parser->footer(footer);

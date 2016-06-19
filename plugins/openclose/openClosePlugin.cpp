@@ -53,7 +53,7 @@ int OpenClosePlugin::init(int, char**)
 int OpenClosePlugin::mainLoop()
 {
   static int direction = 1.0;
-
+  std::cout <<"in main loop" << std::endl;
   World *world = graspItGUI->getMainWindow()->getMainWorld();
   if (!world) std::cerr << "Open-close plugin main loop: no world?!?\n";
   else if (!world->getCurrentHand()) std::cerr << "Open-close plugin main loop: no hand selected\n";
