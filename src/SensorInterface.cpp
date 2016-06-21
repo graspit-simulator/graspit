@@ -18,6 +18,7 @@
 #include "qstring.h"
 #include "qstringlist.h"
 
+//!Zero the sensor.  Set all values to 0.
 void
 TactileSensor::resetSensor(){
 	for(int ind =0; ind < 6; ind ++)
@@ -25,12 +26,16 @@ TactileSensor::resetSensor(){
 }
 
 
+//! True if the contact falls within the boundaries of the tactile sensor
+//! otherwise false.
 bool
 TactileSensor::filterContact(Contact * cp){
     position p = cp->getPosition();
     return filterContact(p);
 }
 
+//! True if the position falls within the boundaries of the tactile sensor
+//! otherwise false.
 bool
 TactileSensor::filterContact(position & ps){
 
@@ -56,8 +61,7 @@ TactileSensor::filterContact(position & ps){
 	return false;
 }
 
-
-
+//! Set the 8 points which define the boundary of tactile sensor rectangle.
 bool
 TactileSensor::setFilterParams(QString * params){
 	QStringList qsl = params->split(",");
@@ -70,55 +74,59 @@ TactileSensor::setFilterParams(QString * params){
     return setFilterParams(myOutput.pos);
 }
 
+//! Set the 8 points which define the boundary of tactile sensor rectangle.
 bool TactileSensor::setFilterParams(position pos[]){
-	int32_t cIndex[30];
-    sbv[0].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[0][2]);
-    sbv[1].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[0][2]);
-    sbv[2].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[1][2]);
-    sbv[3].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[1][2]);
-    sbv[4].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[0][2]);
-    sbv[5].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[0][2]);
-    sbv[6].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[1][2]);
-    sbv[7].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[1][2]);
-	//face 1
-	cIndex[0] = 0;
-	cIndex[1] = 1;
-	cIndex[2] = 2;
-	cIndex[3] = 3;
-	cIndex[4] = -1;
-	//face 2
-	cIndex[5] = 0;
-	cIndex[6] = 1;
-	cIndex[7] = 5;
-	cIndex[8] = 4;
-	cIndex[9] = -1;
-	//face 3
-	cIndex[10] = 0;
-	cIndex[11] = 3;
-	cIndex[12] = 7;
-	cIndex[13] = 4;
-	cIndex[14] = -1;
-	//face 4
-	cIndex[15] = 2;
-	cIndex[16] = 6;
-	cIndex[17] = 7;
-	cIndex[18] = 3;
-	cIndex[19] = -1;
-	//face 5
-	cIndex[20] = 1;
-	cIndex[21] = 2;
-	cIndex[22] = 6;
-	cIndex[23] = 5;
-	cIndex[24] = -1;
-	//face 6
-	cIndex[25] = 4;
-	cIndex[26] = 5;
-	cIndex[27] = 6;
-	cIndex[28] = 7;
-	cIndex[29] = -1;
 
-	coords->point.setValues(0,8,sbv);
-	ifs->coordIndex.setValues(0,30,cIndex);
+    mSensorBoundingVolume[0].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[0][2]);
+    mSensorBoundingVolume[1].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[0][2]);
+    mSensorBoundingVolume[2].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[1][2]);
+    mSensorBoundingVolume[3].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[1][2]);
+    mSensorBoundingVolume[4].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[0][2]);
+    mSensorBoundingVolume[5].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[0][2]);
+    mSensorBoundingVolume[6].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[1][2]);
+    mSensorBoundingVolume[7].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[1][2]);
+
+    int32_t coordIndex[30];
+
+	//face 1
+    coordIndex[0] = 0;
+    coordIndex[1] = 1;
+    coordIndex[2] = 2;
+    coordIndex[3] = 3;
+    coordIndex[4] = -1;
+	//face 2
+    coordIndex[5] = 0;
+    coordIndex[6] = 1;
+    coordIndex[7] = 5;
+    coordIndex[8] = 4;
+    coordIndex[9] = -1;
+	//face 3
+    coordIndex[10] = 0;
+    coordIndex[11] = 3;
+    coordIndex[12] = 7;
+    coordIndex[13] = 4;
+    coordIndex[14] = -1;
+	//face 4
+    coordIndex[15] = 2;
+    coordIndex[16] = 6;
+    coordIndex[17] = 7;
+    coordIndex[18] = 3;
+    coordIndex[19] = -1;
+	//face 5
+    coordIndex[20] = 1;
+    coordIndex[21] = 2;
+    coordIndex[22] = 6;
+    coordIndex[23] = 5;
+    coordIndex[24] = -1;
+	//face 6
+    coordIndex[25] = 4;
+    coordIndex[26] = 5;
+    coordIndex[27] = 6;
+    coordIndex[28] = 7;
+    coordIndex[29] = -1;
+
+    coords->point.setValues(0,8,mSensorBoundingVolume);
+    ifs->coordIndex.setValues(0,30,coordIndex);
 	IVMat->emissiveColor.setValue(0.5,0.0,0.0);
 	IVMat->diffuseColor.setValue(0.0,0,0);
 	IVMat->specularColor.setValue(0.0,0.0,0.0);
