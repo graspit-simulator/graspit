@@ -103,8 +103,13 @@ GraspitCore::GraspitCore(int argc, char **argv):
 
     bool headless = args->exist("headless");
 
-      mainWindow = new MainWindow;
-      SoQt::init(mainWindow->mWindow);
+    if(headless){
+        SoQt::init(argc, argv, "SOQT");
+    }
+    else{
+        mainWindow = new MainWindow;
+        SoQt::init(mainWindow->mWindow);
+    }
 
       //Initialize the world.  It has no parent,
       world = new World(NULL, //QObject parent
