@@ -93,8 +93,6 @@ class GraspitCore
   //! Idle sensor for calling the plugins from GraspIt's event loop
   SoIdleSensor *mPluginSensor;
 
-  bool headless;
-
   //! The main and only interface for the CGDB; all interaction with the CGDB should go through this.
   db_planner::DatabaseManager *mDBMgr;
 
@@ -134,8 +132,6 @@ class GraspitCore
 
   void startMainLoop();
   void exitMainLoop();
-
-  bool isHeadless(){return headless;}
 
   void emptyWorld();
 

@@ -101,7 +101,7 @@ GraspitCore::GraspitCore(int argc, char **argv):
     graspitParser->parseArgs(argc, argv);
     cmdline::parser *args = graspitParser->parseArgs(argc, argv);
 
-    headless = args->exist("headless");
+    bool headless = args->exist("headless");
 
       mainWindow = new MainWindow;
       SoQt::init(mainWindow->mWindow);
@@ -259,7 +259,7 @@ GraspitCore::GraspitCore(int argc, char **argv):
 void
 GraspitCore::startMainLoop()
 {
-    if(!headless)
+    if(ivmgr)
     {
         mainWindow->setMainWorld(world);
         SoQt::show(mainWindow->mWindow);
