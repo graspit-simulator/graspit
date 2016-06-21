@@ -1655,7 +1655,7 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 			break;
 		}
 		if (renderIt && (itercount%25==0) && graspitCore && graspitCore->getWorld()==myWorld) {
-            if(!graspitCore->getIVmgr())
+            if(graspitCore->getIVmgr())
             {
                 graspitCore->getIVmgr()->getViewer()->render();
             }
