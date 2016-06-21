@@ -358,15 +358,6 @@ IVmgr::setupPointers()
 }
 
 /*!
-  Starts the main event loop.
-*/
-void
-IVmgr::beginMainLoop()
-{
-  SoQt::mainLoop();
-}
-
-/*!
 	Draws the force pointers that show the resultant static forces applied
 	to objects as a result of coupled robot dofs touching them.
 */

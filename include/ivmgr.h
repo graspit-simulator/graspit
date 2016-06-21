@@ -265,7 +265,6 @@ public:
   transf getCameraTransf();
 
   void saveImage(QString filename);
-  void beginMainLoop();
 
   void setStereo(bool s);
   //! Not implemented
