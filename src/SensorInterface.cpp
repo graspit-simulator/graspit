@@ -155,15 +155,19 @@ TactileSensor::updateSensorModel(){
             for(int ind = 0; ind < 6; ind++){
                 myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
             }
+            if(myOutput.sensorReading[2] > 0)
+            {
+                std::cout << "non zero dynamic sensor reading: " << myOutput.sensorReading[2] << std::endl;
+            }
+
         }
     }
     else{
         resetSensor();
         // loop through all the contacts
 		for(cp = cList.begin(); cp != cList.end(); cp++){
-            std::cout <<"num contacts: " << cList.size() << std::endl;
 			if(sbody->getWorld()->softContactsAreOn() && ((*cp)->getBody1()->isElastic() || (*cp)->getBody2()->isElastic())){
-				std::vector<position> pVec;
+                std::vector<position> pVec;
 				std::vector<double> forceVec;
 				// get the discretized forces and locations within each sub-region of an ellipse
 				(*cp)->getStaticContactInfo(pVec, forceVec);
@@ -207,14 +211,9 @@ TactileSensor::updateSensorModel(){
 //					renderPoints.push_back(sampleLocation * (*cp)->getBody1Tran());
                     if(filterContact(sampleLocation))
 					{
-						myOutput.sensorReading[2]+= forceVec[pInd];
+                        myOutput.sensorReading[2]+= forceVec[pInd] * 1000;
 					}
 				}
-//				if( !(*cp)->getRendered() )
-//					(*cp)->renderEllipse(graspItGUI->getIVmgr()->getWorld()->getIVRoot(), renderPoints);
-//				else
-//					std::cout << "rendered" << std::endl;
-
 			}
 			else if (filterContact(*cp)){
 				myOutput.sensorReading[2] += 1;

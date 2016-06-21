@@ -1231,6 +1231,7 @@ void SoftContact::getStaticContactInfo(std::vector<position> &pVec,std::vector<d
     cpd.distributionSamples(majorAxis, minorAxis, 100, 100, pVec );
     double params[3] = {majorAxis, minorAxis, nForceSimulated};
     cpd.sampleForces(params, majorAxis, minorAxis, 100, 100, pVec, floatVec);
+
 }
 
 

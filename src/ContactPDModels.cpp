@@ -47,9 +47,7 @@ switch(mtype){
 			   The following formula assumes the total load on the whole ellipse area is ONE newton
 			   since P = 1, we have p_0 = 3/2*a*b*pi
 			*/
-			//std::cout << "a: " << a << " b: " << b << " nForce: " << nForce << std::endl;
-
-			return nForce * 3/(2 * M_PI * a * b) * pow(1-pow(x,2)/pow(a,2)-pow(y,2)/pow(b,2), 0.5);
+            return  nForce * 3/(2 * M_PI * a * b) * pow(1-pow(x,2)/pow(a,2)-pow(y,2)/pow(b,2), 0.5);
 			}
 	}
 DBGA("ContactPressureDistributionModels::Unknown contact pressure distribution type");

@@ -1032,13 +1032,13 @@ Body::resetContactList()
 void
 Body::addContact(Contact *c)
 {
-	setContactsChanged();
 	contactList.push_back(c);
 	numContacts++;
 	if (showFC) {
 		assert(IVContactIndicators->getNumChildren() > numContacts-2);
 		IVContactIndicators->insertChild( c->getVisualIndicator(), numContacts-1 );
 	}
+    setContactsChanged();
 }
 
 /*! The number of contacts on this body. If \a b is not null, it only counts
@@ -1077,10 +1077,10 @@ Body::getContacts(Body *b) const
 void
 Body::addVirtualContact(Contact *c)
 {
-	setContactsChanged();
 	virtualContactList.push_back(c);
 	if (showVC)
 		IVContactIndicators->addChild( c->getVisualIndicator() );
+    setContactsChanged();
 }
 
 /*!
@@ -2218,7 +2218,6 @@ Link::~Link()
 void
 Link::setContactsChanged()
 {
-    std::cout << "Link::setContactsChanged" << std::endl;
   WorldElement::setContactsChanged();
   owner->setContactsChanged();
   updateSensors();
