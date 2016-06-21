@@ -43,6 +43,9 @@ protected:
     SoMaterial * IVMat;
     SoIndexedFaceSet * ifs;
 
+    bool updateDynamicSensorModel();
+    bool updateStaticSensorModel();
+
     virtual void setColor();
     bool filterContact(Contact * cp);
     bool filterContact(position & ps);

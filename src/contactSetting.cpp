@@ -224,7 +224,7 @@ addContacts(Body *body1, Body *body2, ContactReport &contactSet, bool softContac
 			c1->setMate(c2);
 			c2->setMate(c1);
 		}
-        std::cout << "In contactSetting.cpp, adding soft contact" << std::endl;
+
 		body1->addContact(c1);
 		body2->addContact(c2);
 

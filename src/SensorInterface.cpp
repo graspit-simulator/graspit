@@ -132,93 +132,96 @@ bool TactileSensor::setFilterParams(position pos[]){
 	return true;
 }
 
+
+//! update sensor values if dynamics are ON
+bool TactileSensor::updateDynamicSensorModel()
+{
+    double forces[6] = {0,0,0,0,0,0};
+    std::list<Contact *>::const_iterator cp;
+    std::list<Contact *> cList = sbody->getContacts();
+
+    for(cp = cList.begin(); cp != cList.end(); cp++){
+        double * contactForce = (*cp)->getDynamicContactWrench();
+        if(filterContact(*cp))
+        {
+            forces[2] = 1.0;
+        }
+    }
+
+    for(int ind = 0; ind < 6; ind++){
+        double forceValue =  forces[ind];
+        myOutput.sensorReading[ind] = forceValue;
+    }
+}
+
+//! update sensor values if dynamics are OFF
+bool TactileSensor::updateStaticSensorModel()
+{
+    std::list<Contact *>::const_iterator cp;
+    std::list<Contact *> cList = sbody->getContacts();
+
+    //Since this in static mode, we want to 0 the sensor first.
+    resetSensor();
+    // loop through all the contacts
+    for(cp = cList.begin(); cp != cList.end(); cp++){
+
+        //If we are dealing with softContacts
+        if(sbody->getWorld()->softContactsAreOn() &&
+                ((*cp)->getBody1()->isElastic() || (*cp)->getBody2()->isElastic())){
+            std::vector<position> pVec;
+            std::vector<double> forceVec;
+
+            // get the discretized forces and locations within each sub-region of an ellipse
+            (*cp)->getStaticContactInfo(pVec, forceVec);
+
+            //get the transform from the body1 to contact
+            transf contactInBody1 = (*cp)->getContactFrame();
+
+            //rotation from the contact to the local curvature frame
+            transf curvatureFrameInContact;
+            mat3 contactRot = (*cp)->getRot();
+            curvatureFrameInContact.set(contactRot.inverse(), vec3::ZERO);
+
+            //transform from local curvature frame to the common frame
+            transf commonFrameInCurvature;
+            mat3 commonFrameRot = (*cp)->getCommonFrameRot();
+            commonFrameInCurvature.set(commonFrameRot.inverse(),vec3::ZERO);
+
+            transf commonFrameInBody1 = commonFrameInCurvature*curvatureFrameInContact*contactInBody1;
+
+            // for the current contact, we loop through all the discretized sub-regions of this contact
+            for (unsigned int pInd = 0; pInd < pVec.size(); pInd ++){
+                //pVec is the discretized locations within the common contact ellipse
+                transf sampleInCommonFrame;
+                sampleInCommonFrame.set(Quaternion::IDENTITY, vec3(1000*pVec[pInd].x(), 1000*pVec[pInd].y(), 1000*pVec[pInd].z()) );
+                transf sampleInBody1 = sampleInCommonFrame*commonFrameInBody1;
+                position sampleLocation;
+                sampleLocation.set(sampleInBody1.translation());
+                if(filterContact(sampleLocation))
+                {
+                    myOutput.sensorReading[2]+= forceVec[pInd] * 1000;
+                }
+            }
+        }
+        //We are dealing with normal contacts, not soft contacts
+        else{
+            if(filterContact(*cp)){
+                myOutput.sensorReading[2] += 1;
+            }
+        }
+    }
+}
+
+
 bool
 TactileSensor::updateSensorModel(){
 
-	double forces[6] = {0,0,0,0,0,0};
-	std::list<Contact *>::const_iterator cp;
-	std::list<Contact *> cList = sbody->getContacts();
-	//Adding contacts
     if(sbody->getWorld()->dynamicsAreOn())
     {
-        for(cp = cList.begin(); cp != cList.end(); cp++){
-            double * contactForce = (*cp)->getDynamicContactWrench();
-            if(filterContact(*cp))
-            {
-                forces[2] = 1;
-            }
-        }
-        //Adding Forces for the current sensor pad
-        double ts = .0025;
-        if (ts > 0.0)
-        {
-            for(int ind = 0; ind < 6; ind++){
-                myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
-            }
-            if(myOutput.sensorReading[2] > 0)
-            {
-                std::cout << "non zero dynamic sensor reading: " << myOutput.sensorReading[2] << std::endl;
-            }
-
-        }
+        updateDynamicSensorModel();
     }
     else{
-        resetSensor();
-        // loop through all the contacts
-		for(cp = cList.begin(); cp != cList.end(); cp++){
-			if(sbody->getWorld()->softContactsAreOn() && ((*cp)->getBody1()->isElastic() || (*cp)->getBody2()->isElastic())){
-                std::vector<position> pVec;
-				std::vector<double> forceVec;
-				// get the discretized forces and locations within each sub-region of an ellipse
-				(*cp)->getStaticContactInfo(pVec, forceVec);
-
-				//get the transform from the body1 to contact
-				transf contactInBody1 = (*cp)->getContactFrame();
-
-				//rotation from the contact to the local curvature frame
-				transf curvatureFrameInContact;
-				mat3 contactRot = (*cp)->getRot();
-				curvatureFrameInContact.set(contactRot.inverse(), vec3::ZERO);
-				//printMat3(contactRot, "fitRot");
-
-				//transform from local curvature frame to the common frame
-				transf commonFrameInCurvature;
-				mat3 commonFrameRot = (*cp)->getCommonFrameRot();
-				commonFrameInCurvature.set(commonFrameRot.inverse(),vec3::ZERO);
-
-				transf commonFrameInBody1 = commonFrameInCurvature*curvatureFrameInContact*contactInBody1;
-
-				//mat3 commonFrameInBody1Rot;
-				//commonFrameInBody1.rotation().inverse().ToRotationMatrix(commonFrameInBody1Rot);
-				//printMat3(commonFrameInBody1Rot, "commonFrameInBody1Rot");
-
-//				std::vector<position> renderPoints;
-//				renderPoints.clear();
-				// for the current contact, we loop through all the discretized sub-regions of this contact
-				for (unsigned int pInd = 0; pInd < pVec.size(); pInd ++){
-					//pos is the location of the current sensor, specifies the boundaries of the current sensor
-					//pVec is the discretized locations within the common contact ellipse
-					//We compute this in body1's coordinate system
-					//position p = ((1000*pVec[pInd]))*commonFrameInCurvature*curvatureFrameInContact*contact;
-					//std::cout << p[0] << "," << p[1] << "," << p[2] << std::endl;
-					//renderPoints.push_back( (1000*pVec[pInd])*commonFrameInCurvature*curvatureFrameInContact*contact*(*cp)->getBody1Tran() );
-
-					transf sampleInCommonFrame;
-					sampleInCommonFrame.set(Quaternion::IDENTITY, vec3(1000*pVec[pInd].x(), 1000*pVec[pInd].y(), 1000*pVec[pInd].z()) );
-					transf sampleInBody1 = sampleInCommonFrame*commonFrameInBody1;
-					position sampleLocation;
-					sampleLocation.set(sampleInBody1.translation());
-//					renderPoints.push_back(sampleLocation * (*cp)->getBody1Tran());
-                    if(filterContact(sampleLocation))
-					{
-                        myOutput.sensorReading[2]+= forceVec[pInd] * 1000;
-					}
-				}
-			}
-			else if (filterContact(*cp)){
-				myOutput.sensorReading[2] += 1;
-			}
-		}
+        updateStaticSensorModel();
     }
     setColor();
 }
