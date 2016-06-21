@@ -40,7 +40,7 @@ class EGPlanner;
 class Hand;
 class Body;
 class GraspableBody;
-class GraspItGUI;
+class GraspitCore;
 class GraspPlanningState;
 class SoSensor;
 class SoTimerSensor;
@@ -60,7 +60,7 @@ private:
 	GraspableBody *mObject;
 	Hand *mHand;
 	IVmgr *ivmgr;
-	GraspItGUI *mGui;
+	GraspitCore *mGui;
 	EGPlanner *mPlanner;
 	//maybe one day we'll use streams here...
 	FILE *mResultFile;
@@ -90,7 +90,7 @@ public Q_SLOTS:
 	//this one gets called when the inner planner stops
 	void plannerComplete();
 public:
-	DBaseBatchPlanner(IVmgr *mgr, GraspItGUI *gui);
+	DBaseBatchPlanner(IVmgr *mgr, GraspitCore *gui);
 	~DBaseBatchPlanner();
 	bool processArguments(int argc, char **argv);
 	bool startPlanner();

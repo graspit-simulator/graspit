@@ -106,7 +106,7 @@
 #include "mainWindow.h"
 #include "matvec3D.h"
 //hmmm not sure this is right
-#include "graspitGUI.h"
+#include "graspitCore.h"
 
 
 //#define GRASPITDBG
@@ -218,7 +218,7 @@ IVmgr *IVmgr::ivmgr = 0;
   for draggers and wireframe models, which indicate when bodies are selected,
   are also created.
 */
-IVmgr::IVmgr(QWidget *parent, const char *name, bool headless, Qt::WFlags f) :
+IVmgr::IVmgr(World *w, QWidget *parent, const char *name, Qt::WFlags f) :
   QWidget(parent,name,f)
 {
   ivmgr = this;
@@ -234,61 +234,60 @@ IVmgr::IVmgr(QWidget *parent, const char *name, bool headless, Qt::WFlags f) :
 #endif
 
   // Initialize the main world
-  world = new World(NULL,"mainWorld", this);
+  world = w;
+  world->setIVMgr(this);
+
   setupPointers();
 
-  if (!headless){
-      // Create the viewer
-      myViewer = new StereoViewer(parent);
+  // Create the viewer
+  myViewer = new StereoViewer(parent);
 
-      //this->setFocusProxy(myViewer->getWidget());
+  //this->setFocusProxy(myViewer->getWidget());
 
-      sceneRoot = new SoSeparator;
-      sceneRoot->ref();
+  sceneRoot = new SoSeparator;
+  sceneRoot->ref();
 
-      //add this before the mouseEventCB which otherwise captures the click!
-      draggerRoot = new SoSeparator;
-      sceneRoot->addChild(draggerRoot);
+  //add this before the mouseEventCB which otherwise captures the click!
+  draggerRoot = new SoSeparator;
+  sceneRoot->addChild(draggerRoot);
 
-      //add keyboard callback
-      SoEventCallback *keyEventNode = new SoEventCallback;
-      keyEventNode->addEventCallback(SoKeyboardEvent::getClassTypeId(), keyPressedCB,NULL);
-      sceneRoot->addChild(keyEventNode);
+  //add keyboard callback
+  SoEventCallback *keyEventNode = new SoEventCallback;
+  keyEventNode->addEventCallback(SoKeyboardEvent::getClassTypeId(), keyPressedCB,NULL);
+  sceneRoot->addChild(keyEventNode);
 
-      // Add callback to detect if modifier keys are held down during mouse clicks
-      SoEventCallback *mouseEventCB = new SoEventCallback;
-      mouseEventCB->addEventCallback(SoMouseButtonEvent::getClassTypeId(), shiftOrCtrlDownCB);
-      sceneRoot->addChild(mouseEventCB);
+  // Add callback to detect if modifier keys are held down during mouse clicks
+  SoEventCallback *mouseEventCB = new SoEventCallback;
+  mouseEventCB->addEventCallback(SoMouseButtonEvent::getClassTypeId(), shiftOrCtrlDownCB);
+  sceneRoot->addChild(mouseEventCB);
 
-      // an empty separator used in the make handlebox routine
-      junk = new SoSeparator; junk->ref();
+  // an empty separator used in the make handlebox routine
+  junk = new SoSeparator; junk->ref();
 
-      // create and set up the selection node
-      selectionRoot = new SoSelection;
-      sceneRoot->addChild(selectionRoot);
+  // create and set up the selection node
+  selectionRoot = new SoSelection;
+  sceneRoot->addChild(selectionRoot);
 
-      // Add selection and deselection callbacks
-      selectionRoot->addSelectionCallback(selectionCB, NULL);
-      selectionRoot->addDeselectionCallback(deselectionCB, NULL);
-      selectionRoot->setPickFilterCallback(pickFilterCB, NULL);
-      selectionRoot->addChild(world->getIVRoot());
+  // Add selection and deselection callbacks
+  selectionRoot->addSelectionCallback(selectionCB, NULL);
+  selectionRoot->addDeselectionCallback(deselectionCB, NULL);
+  selectionRoot->setPickFilterCallback(pickFilterCB, NULL);
+  selectionRoot->addChild(world->getIVRoot());
 
-      wireFrameRoot = new SoSeparator;
-      sceneRoot->addChild(wireFrameRoot);
+  wireFrameRoot = new SoSeparator;
+  sceneRoot->addChild(wireFrameRoot);
 
-      //comment these out if only single-threaded operation will be used
-      //myViewer->setRenderMutex(&mRenderMutex);
-      //world->setRenderMutex(&mRenderMutex);
+  //comment these out if only single-threaded operation will be used
+  //myViewer->setRenderMutex(&mRenderMutex);
+  //world->setRenderMutex(&mRenderMutex);
 
-      myViewer->show();
-      myViewer->setSceneGraph(sceneRoot);
-      myViewer->setTransparencyType(SoGLRenderAction::DELAYED_BLEND);
-      myViewer->setBackgroundColor(SbColor(1,1,1));
+  myViewer->show();
+  myViewer->setSceneGraph(sceneRoot);
+  myViewer->setTransparencyType(SoGLRenderAction::DELAYED_BLEND);
+  myViewer->setBackgroundColor(SbColor(1,1,1));
 
-      myViewer->viewAll();
-  }else{
-      myViewer = NULL;
-  }
+  myViewer->viewAll();
+
   mDBMgr = NULL;
 }
 
@@ -323,20 +322,17 @@ IVmgr::~IVmgr()
   delete myViewer;
 }
 
-/*!
-  Deselects all world elements, deletes the world, and creates a new world.
-*/
 void
-IVmgr::emptyWorld()
+IVmgr::setWorld(World *w)
 {
-  selectionRoot->deselectAll();
-  selectionRoot->removeChild(world->getIVRoot());
-  delete world;
-  world = new World(NULL, "MainWorld", this);
-  //comment out here and where another world is created to stop using mutexes
-  //world->setRenderMutex(&mRenderMutex);
-  selectionRoot->addChild(world->getIVRoot());
+    selectionRoot->deselectAll();
+    selectionRoot->removeChild(world->getIVRoot());
+
+    world = w;
+    selectionRoot->addChild(world->getIVRoot());
 }
+
+
 
 /*!
   Deselects all elements and sets the current tool type.

@@ -43,7 +43,7 @@
 #include "dynJoint.h"
 #include "world.h"
 #include "grasp.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "dynamics.h"
 #include "gloveInterface.h"
@@ -1654,10 +1654,10 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 			DBGA("MoveDOF failsafe hit");
 			break;
 		}
-		if (renderIt && (itercount%25==0) && graspItGUI && graspItGUI->getIVmgr()->getWorld()==myWorld) {
-            if(!graspItGUI->isHeadless())
+		if (renderIt && (itercount%25==0) && graspitCore && graspitCore->getWorld()==myWorld) {
+            if(!graspitCore->isHeadless())
             {
-                graspItGUI->getIVmgr()->getViewer()->render();
+                graspitCore->getIVmgr()->getViewer()->render();
             }
 		}
 	} while (1);

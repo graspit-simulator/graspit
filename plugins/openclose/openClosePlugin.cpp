@@ -26,7 +26,7 @@
 #include "openClosePlugin.h"
 
 #include "mainWindow.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "world.h"
 #include "robot.h"
 
@@ -54,7 +54,7 @@ int OpenClosePlugin::mainLoop()
 {
   static int direction = 1.0;
   std::cout <<"in main loop" << std::endl;
-  World *world = graspItGUI->getMainWindow()->getMainWorld();
+  World *world = graspitCore->getWorld();
   if (!world) std::cerr << "Open-close plugin main loop: no world?!?\n";
   else if (!world->getCurrentHand()) std::cerr << "Open-close plugin main loop: no hand selected\n";
   else world->getCurrentHand()->autoGrasp(true, direction);

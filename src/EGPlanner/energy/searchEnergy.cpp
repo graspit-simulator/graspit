@@ -35,7 +35,7 @@
 #include "world.h"
 #include "quality.h"
 #include "searchState.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "matrix.h"
 

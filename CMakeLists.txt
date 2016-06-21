@@ -137,7 +137,7 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/worldElement.h 
     ${GSRC}/include/worldElementFactory.h 
     ${GSRC}/include/world.h 
-    ${GSRC}/include/graspitGUI.h 
+    ${GSRC}/include/graspitCore.h
     ${GSRC}/include/graspitServer.h 
     ${GSRC}/include/graspitApp.h 
     ${GSRC}/include/arch.h
@@ -341,7 +341,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/eigenGrasp.cpp 
     ${GSRC}/src/gloveInterface.cpp 
     ${GSRC}/src/grasp.cpp 
-    ${GSRC}/src/graspitGUI.cpp 
+    ${GSRC}/src/graspitCore.cpp
     ${GSRC}/src/graspitServer.cpp 
     ${GSRC}/src/graspitApp.cpp 
     ${GSRC}/src/graspRecord.cpp 

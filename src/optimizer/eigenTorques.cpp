@@ -22,7 +22,7 @@
 
 #include "robot.h"
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "grasp.h"
 #include "mcGrip.h"
@@ -40,7 +40,7 @@
 */
 CGDBGraspProcessor::CGDBGraspProcessor(Hand *h) : mHand(h) 
 {
-	mDbMgr = graspItGUI->getIVmgr()->getDBMgr();
+	mDbMgr = graspitCore->getIVmgr()->getDBMgr();
 	mProcessor = new EigenTorqueComputer(mHand);
 	mProcessor = new McGripOptimizer(mHand);
 	//mProcessor = new McGripAnalyzer(mHand);

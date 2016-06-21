@@ -19,15 +19,15 @@
 //
 // Author(s):  Andrew T. Miller 
 //
-// $Id: graspitGUI.h,v 1.5 2010/08/11 02:45:37 cmatei Exp $
+// $Id: graspitCore.h,v 1.5 2010/08/11 02:45:37 cmatei Exp $
 //
 //######################################################################
 
 /*! \file 
-  \brief Defines a graspit user interface class that contains subpieces of the UI.
+  \brief Defines the GraspIt! core class.  It holds pointers the mainwindow, ivmgr, world.
 */
 
-#ifndef GRASPITGUI_HXX
+#ifndef GRASPIT_CORE_H
 
 #include <string>
 #include <vector>
@@ -57,13 +57,16 @@ class World;
   This class can also initialize a task dispatcher which is then in charge of 
   batch execution of tasks based on information form a grasp database.
 */
-class GraspItGUI
+class GraspitCore
 {
   //! A pointer to the MainWindow.
   MainWindow *mainWindow;
 
-  //! A pointer to the IVmgr.
+  //! A pointer to the IVmgr.  This will be NULL if in headless mode.
   IVmgr *ivmgr;
+
+  //! A pointer to the world
+  World *world;
 
   //! A pointer to the Task Dispatcher, if any
   TaskDispatcher *mDispatch;
@@ -88,14 +91,13 @@ class GraspItGUI
 
   bool headless;
 
- protected:
-  int processArgs(int argc, char **argv, cmdline::parser *args);
-
  public:
-  GraspItGUI(int argc, char **argv, cmdline::parser *args);
-  ~GraspItGUI();
+  GraspitCore();
+  ~GraspitCore();
+
+  int init(int argc, char **argv);
   
-  /*! Returns whether the UI pieces were successfully initialized. */
+  /*! Returns whether GraspIt! was successfully initialized. */
   bool terminalFailure() const;
 
   //! Returns the exit code (set internally based on the application)
@@ -104,8 +106,8 @@ class GraspItGUI
   /*! Returns a pointer to the MainWindow. */
   MainWindow *getMainWindow() const {return mainWindow;}
 
-  /*! Returns a pointer to the World (obtained through the main window) */
-  World *getMainWorld() const;
+  /*! Returns a pointer to the World */
+  World *getWorld() const {return world;}
 
   /*! Returns a pointer to the IVmgr. */
   IVmgr *getIVmgr() const {return ivmgr;}
@@ -129,6 +131,9 @@ class GraspItGUI
   void exitMainLoop();
 
   bool isHeadless(){return headless;}
+
+  void emptyWorld();
+
 };
 
 #if defined(WIN32) && !defined(__MINGW32__)
@@ -141,7 +146,7 @@ class GraspItGUI
 #define GRASPIT_API
 #endif
 
-extern GRASPIT_API GraspItGUI *graspItGUI;
+extern GRASPIT_API GraspitCore *graspitCore;
 
-#define GRASPITGUI_HXX
+#define GRASPIT_CORE_H
 #endif

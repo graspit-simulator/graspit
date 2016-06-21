@@ -344,6 +344,9 @@ public:
   //! Sets all world settings to their original default values. 
   void setDefaults();
 
+  //! Sets the ivmgr for the world.
+  void setIVMgr(IVmgr *ivmgr){myIVmgr = ivmgr;}
+
   //! Sets the world modified flag.  Should be done when a change has since the last save. 
   void setModified() {modified = true;}
 

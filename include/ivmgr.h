@@ -239,16 +239,12 @@ public Q_SLOTS:
   void restoreCameraPos();
 
 public:
-  IVmgr(QWidget *parent=0,const char *name=0,bool headless=false, Qt::WFlags f=0);
+  IVmgr(World *w, QWidget *parent=0,const char *name=0, Qt::WFlags f=0);
   ~IVmgr();
 
-  void deselectBody(Body *b);
+  void setWorld(World *w);
 
-  /*! 
-    Returns a pointer to the main World that the user interacts with through
-    this manager.
-   */
-  World *getWorld() const {return world;}
+  void deselectBody(Body *b);
 
   /*!
     Returns a pointer to the Inventor examiner viewer.
@@ -262,7 +258,6 @@ public:
   SoSeparator *getPointers() const {return pointers;}
 
   void setTool(ToolType newTool);
-  void emptyWorld();
   void hilightObjContact(int contactNum);
   void unhilightObjContact(int contactNum);
 

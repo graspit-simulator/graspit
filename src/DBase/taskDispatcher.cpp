@@ -32,7 +32,7 @@
 #endif
 #include "DBPlanner/sql_database_manager.h"
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "graspit_db_model.h"
 
 #include "graspPlanningTask.h"
@@ -214,13 +214,13 @@ void TaskDispatcher::mainLoop()
 	}
 	switch(mStatus) {
 	    case DONE:
-		graspItGUI->exitMainLoop();		
+		graspitCore->exitMainLoop();		
 	        return;
 	    case FAILED:
-		graspItGUI->exitMainLoop();		
+		graspitCore->exitMainLoop();		
 	        return;
 	    case NO_TASK:
-		graspItGUI->exitMainLoop();		
+		graspitCore->exitMainLoop();		
 	        return;
  	    case RUNNING:
 	        mSensor->schedule();			

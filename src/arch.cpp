@@ -34,7 +34,7 @@
 #include <Inventor/nodes/SoTranslation.h>
 
 #include "body.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 

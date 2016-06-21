@@ -47,7 +47,7 @@
 #include "grasp.h"
 #include "gwsprojection.h"
 #include "quality.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "humanHand.h"
 #include "arch.h"
 
@@ -212,7 +212,7 @@ void MainWindow::setMainWorld( World *w )
 {
   world = w;
   QObject::connect(world,SIGNAL(dynamicStepTaken()),this,SLOT(updateTimeReadout()));
-  QObject::connect(world,SIGNAL(dynamicStepTaken()),graspItGUI->getIVmgr(),SLOT(drawDynamicForces())); 
+  QObject::connect(world,SIGNAL(dynamicStepTaken()),graspitCore->getIVmgr(),SLOT(drawDynamicForces())); 
   QObject::connect(world,SIGNAL(dynamicsError(const char *)),this,SLOT(showDynamicsError(const char *)));
   QObject::connect(world,SIGNAL(selectionsChanged()),this,SLOT(updateElementMenu()));
   QObject::connect(world,SIGNAL(selectionsChanged()),this,SLOT(updateMaterialBox()));
@@ -224,7 +224,7 @@ void MainWindow::setMainWorld( World *w )
   QObject::connect(world,SIGNAL(tendonDetailsChanged()),this,SLOT(handleTendonDetailsArea()));
   QObject::connect(world,SIGNAL(handSelectionChanged()),this,SLOT(handleHandSelectionChange()));
   QObject::connect(world,SIGNAL(graspsUpdated()),this,SLOT(updateQualityList()));
-  QObject::connect(world,SIGNAL(graspsUpdated()),graspItGUI->getIVmgr(),SLOT(drawWorstCaseWrenches()));
+  QObject::connect(world,SIGNAL(graspsUpdated()),graspitCore->getIVmgr(),SLOT(drawWorstCaseWrenches()));
   QObject::connect(world,SIGNAL(handRemoved()),this,SLOT(updateQualityList()));
   updateTimeReadout();
   updateMaterialBoxList();
@@ -259,8 +259,8 @@ void MainWindow::setMainWorld( World *w )
 void MainWindow::fileNew()
 {
   if ( saveAndContinue( "New" ) ) {
-    graspItGUI->getIVmgr()->emptyWorld();
-    setMainWorld(graspItGUI->getIVmgr()->getWorld());
+    graspitCore->emptyWorld();
+    setMainWorld(graspitCore->getWorld());
     mUI->worldBox->setTitle("Untitled");
   }
 }
@@ -283,10 +283,10 @@ void MainWindow::fileOpen()
   }
   fileName = fn;
   mUI->worldBox->setTitle(fileName);
-  graspItGUI->getIVmgr()->emptyWorld();
-  graspItGUI->getIVmgr()->getWorld()->load(fileName);
+  graspitCore->emptyWorld();
+  graspitCore->getWorld()->load(fileName);
   //graspItGUI->getIVmgr()->getViewer()->viewAll();
-  setMainWorld(graspItGUI->getIVmgr()->getWorld());
+  setMainWorld(graspitCore->getWorld());
 }
 
 /*!
@@ -298,7 +298,7 @@ void MainWindow::fileSave()
   if ( fileName.isEmpty() ) {
     fileSaveAs();
   } else {
-    graspItGUI->getIVmgr()->getWorld()->save(fileName);
+    graspitCore->getWorld()->save(fileName);
   }
 }
 
@@ -375,7 +375,7 @@ void MainWindow::fileExit()
 {
   if ( saveAndContinue( "Exit" ) )
     //qApp->exit();
-    graspItGUI->exitMainLoop();
+    graspitCore->exitMainLoop();
 }
 
 /*!
@@ -459,7 +459,7 @@ void MainWindow::fileSaveImage()
                                              "Image Files (*.jpg)" );
   if ( !fn.isEmpty() ) {
     if (fn.section('.',-1)!="jpg") fn.append(".jpg");
-    graspItGUI->getIVmgr()->saveImage(fn);
+    graspitCore->getIVmgr()->saveImage(fn);
   }
 }
 
@@ -501,9 +501,9 @@ void MainWindow::helpAboutQT()
 */
 void MainWindow::setTool( QAction *a )
 {
-  if (a==mUI->translateToolAction) graspItGUI->getIVmgr()->setTool(TRANSLATE_TOOL);
-  else if (a==mUI->rotateToolAction) graspItGUI->getIVmgr()->setTool(ROTATE_TOOL);
-  else if (a==mUI->selectToolAction) graspItGUI->getIVmgr()->setTool(SELECT_TOOL);
+  if (a==mUI->translateToolAction) graspitCore->getIVmgr()->setTool(TRANSLATE_TOOL);
+  else if (a==mUI->rotateToolAction) graspitCore->getIVmgr()->setTool(ROTATE_TOOL);
+  else if (a==mUI->selectToolAction) graspitCore->getIVmgr()->setTool(SELECT_TOOL);
 }
 
 /*!
@@ -646,7 +646,7 @@ void MainWindow::graspCreateProjection(Grasp *g)
     w[4] = dlg->tyCoord->text().toDouble();
     w[5] = dlg->tzCoord->text().toDouble();
     
-    GWSprojection *gp = new GWSprojection(graspItGUI->getIVmgr()->getViewer(),gws,w,dlg->whichFixed);  
+    GWSprojection *gp = new GWSprojection(graspitCore->getIVmgr()->getViewer(),gws,w,dlg->whichFixed);  
     grasp->addProjection(gp);
   }    
   delete dlg;
@@ -807,7 +807,7 @@ void MainWindow::dbasePlannerAction_activated()
     QTWARNING("No object selected");
     return;
   }
-  if (!graspItGUI->getIVmgr()->getDBMgr()) {
+  if (!graspitCore->getIVmgr()->getDBMgr()) {
     QTWARNING("Connection to database not established. Connect to database first.");
     return;
   }
@@ -815,7 +815,7 @@ void MainWindow::dbasePlannerAction_activated()
     QTWARNING("DBase Planner currently works only with models loaded from the database");
     return;
   }
-  DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspItGUI->getIVmgr()->getDBMgr(), 
+  DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspitCore->getIVmgr()->getDBMgr(), 
                                              world->getGB(gb)->getDBModel(), world->getCurrentHand());
   dlg->setAttribute(Qt::WA_ShowModal, false);
   dlg->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -898,10 +898,10 @@ void MainWindow::stereoOn()
 	mUI->tendonToolbar->hide();
 
 	mWindow->menuBar()->hide();
-	graspItGUI->getIVmgr()->getViewer()->setDecoration(false);
+	graspitCore->getIVmgr()->getViewer()->setDecoration(false);
 	mWindow->showFullScreen();
 
-	graspItGUI->getIVmgr()->setStereo(true);
+	graspitCore->getIVmgr()->setStereo(true);
 /*
 	StereoWindow* mStereoWindow = new StereoWindow();
 	graspItGUI->getIVmgr()->setStereoWindow( mStereoWindow->viewerHolder );
@@ -923,15 +923,15 @@ void MainWindow::stereoOff()
 
 	mWindow->menuBar()->show();
 	DBGA("Stereo off");
-	graspItGUI->getIVmgr()->getViewer()->setDecoration(true);
+	graspitCore->getIVmgr()->getViewer()->setDecoration(true);
 	mWindow->showNormal();
-	graspItGUI->getIVmgr()->setStereo(false);
+	graspitCore->getIVmgr()->setStereo(false);
 }
 
 void MainWindow::stereoFlip()
 {
 	DBGA("Stereo flip");
-	graspItGUI->getIVmgr()->flipStereo();
+	graspitCore->getIVmgr()->flipStereo();
 }
 
 // --------------------------------- Misc menu ------------------------------------------------
@@ -1011,14 +1011,14 @@ void MainWindow::updateContactsList()
 void MainWindow::contactSelected(int newSelection)
 {
   if (selectedContact == newSelection) {
-    graspItGUI->getIVmgr()->unhilightObjContact(selectedContact);
+    graspitCore->getIVmgr()->unhilightObjContact(selectedContact);
     selectedContact = -1;
   }
   else {
     if (selectedContact >= 0) {
-      graspItGUI->getIVmgr()->unhilightObjContact(selectedContact);
+      graspitCore->getIVmgr()->unhilightObjContact(selectedContact);
     }
-    graspItGUI->getIVmgr()->hilightObjContact(newSelection);
+    graspitCore->getIVmgr()->hilightObjContact(newSelection);
     selectedContact = newSelection;
   }
 }
@@ -1054,7 +1054,7 @@ void MainWindow::toggleDynamics()
   if (world->dynamicsAreOn()) {
     world->turnOffDynamics();
     mUI->dynamicsPlayAction->setText("Start Simulation");
-    graspItGUI->getIVmgr()->drawDynamicForces();
+    graspitCore->getIVmgr()->drawDynamicForces();
     updateContactsList();
   } else {
     world->turnOnDynamics();

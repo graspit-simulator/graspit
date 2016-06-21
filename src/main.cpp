@@ -48,7 +48,7 @@
 
 #include <iostream>
 #include <graspitApp.h>
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "graspitServer.h"
 #include "mainWindow.h"
 #include "cmdline.h"
@@ -85,7 +85,8 @@ int main(int argc, char **argv)
       }
   }
 
-  GraspItGUI gui(argc, argv, parsed_args);
+  GraspitCore core;
+  core.init(argc, argv);
   
   //This is the GraspIt TCP server. It can be used to connect to GraspIt from
   //external programs, such as Matlab.
@@ -98,7 +99,7 @@ int main(int argc, char **argv)
 
   if(!headless)
   {
-      app.setMainWidget(gui.getMainWindow()->mWindow);
+      app.setMainWidget(core.getMainWindow()->mWindow);
       if (app.splashEnabled()) {
         app.closeSplash();
         QApplication::restoreOverrideCursor();
@@ -106,8 +107,8 @@ int main(int argc, char **argv)
   }
 
 
-  if (!gui.terminalFailure()) {
-	  gui.startMainLoop();
+  if (!core.terminalFailure()) {
+      core.startMainLoop();
   }
-  return gui.getExitCode();
+  return core.getExitCode();
 }

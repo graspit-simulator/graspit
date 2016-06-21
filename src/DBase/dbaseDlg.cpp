@@ -35,13 +35,13 @@
 #include <QDir>
 #include <QComboBox>
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "robot.h"
 #include "world.h"
 #include "searchState.h"
 #include "grasp.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "mainWindow.h"
 #include "matvec3D.h"
 
@@ -73,7 +73,7 @@ void DBaseDlg::init()
 	mGraspList.clear();
 	browserGroup->setEnabled(FALSE);
 	graspsGroup->setEnabled(FALSE);
-	mDBMgr = graspItGUI->getIVmgr()->getDBMgr();
+	mDBMgr = graspitCore->getIVmgr()->getDBMgr();
 	if (mDBMgr) {
 		getModelList();
 	}
@@ -92,7 +92,7 @@ void DBaseDlg::destroy()
 void DBaseDlg::exitButton_clicked(){
 	if (mCurrentLoadedModel) {
 		//remove the previously loaded model, but don't delete it
-		graspItGUI->getIVmgr()->getWorld()->destroyElement(mCurrentLoadedModel->getGraspableBody(), false);
+		graspitCore->getWorld()->destroyElement(mCurrentLoadedModel->getGraspableBody(), false);
 	}
 	//delete and release all the memories occupied by the grasps
 	deleteVectorElements<db_planner::Grasp*, GraspitDBGrasp*>(mGraspList);
@@ -146,7 +146,7 @@ void DBaseDlg::getModelList()
 void DBaseDlg::connectButton_clicked()
 {
 	delete mDBMgr;
-	Hand *h = graspItGUI->getIVmgr()->getWorld()->getCurrentHand();
+	Hand *h = graspitCore->getWorld()->getCurrentHand();
 
 #ifndef ROS_DATABASE_MANAGER	
 	mDBMgr = new db_planner::SqlDatabaseManager(hostLineEdit->text().toStdString(),
@@ -176,7 +176,7 @@ void DBaseDlg::connectButton_clicked()
 		delete mDBMgr;
 		mDBMgr = NULL;
 	}
-	graspItGUI->getIVmgr()->setDBMgr(mDBMgr);
+	graspitCore->getIVmgr()->setDBMgr(mDBMgr);
 }
 
 PROF_DECLARE(GET_GRASPS);
@@ -186,7 +186,7 @@ void DBaseDlg::loadGraspButton_clicked(){
 	PROF_RESET_ALL;
 	PROF_START_TIMER(GET_GRASPS);
 	//get the current hand and check its validity
-	Hand *hand = graspItGUI->getIVmgr()->getWorld()->getCurrentHand();
+	Hand *hand = graspitCore->getWorld()->getCurrentHand();
 	if (!hand) {
 		DBGA("Load and select a hand before viewing grasps!");
 		return;
@@ -236,7 +236,7 @@ void DBaseDlg::loadGraspButton_clicked(){
 void DBaseDlg::loadModelButton_clicked(){
 	if (mCurrentLoadedModel) {
 		//remove the previously loaded model, but don't delete it
-		graspItGUI->getIVmgr()->getWorld()->destroyElement(mCurrentLoadedModel->getGraspableBody(), false);
+		graspitCore->getWorld()->destroyElement(mCurrentLoadedModel->getGraspableBody(), false);
 		mCurrentLoadedModel = NULL;
 	}
 	if(mModelList.empty()){
@@ -253,7 +253,7 @@ void DBaseDlg::loadModelButton_clicked(){
 	//check that this model is already loaded into Graspit, if not, load it
 	if (!model->geometryLoaded()) {
 		//this loads the actual geometry in the scene graph of the object
-		if ( model->load(graspItGUI->getIVmgr()->getWorld()) != SUCCESS) {
+		if ( model->load(graspitCore->getWorld()) != SUCCESS) {
 			DBGA("Model load failed");
 			return;
 		}
@@ -263,7 +263,7 @@ void DBaseDlg::loadModelButton_clicked(){
 	//todo: where to dynamic information come from?
 	//model->getGraspableBody()->initDynamics();
 	//this adds the object to the graspit world so that we can see it
-	graspItGUI->getIVmgr()->getWorld()->addBody(model->getGraspableBody());
+	graspitCore->getWorld()->addBody(model->getGraspableBody());
 	//and remember it
 	mCurrentLoadedModel = model;
 	//model->getGraspableBody()->showAxes(false);
@@ -296,7 +296,7 @@ void DBaseDlg::plannerButton_clicked(){
 		return;
 	}
 	//check the hand
-	Hand *h = graspItGUI->getIVmgr()->getWorld()->getCurrentHand();
+	Hand *h = graspitCore->getWorld()->getCurrentHand();
 	if(!h){
 		DBGA("No hand found currently");
 		return;
@@ -376,7 +376,7 @@ void DBaseDlg::sortButton_clicked()
 
 //a shortcut for the GWS display
 void DBaseDlg::createGWSButton_clicked(){
-	graspItGUI->getMainWindow()->graspCreateProjection();
+	graspitCore->getMainWindow()->graspCreateProjection();
 }
 
 //trigger when the selection in the model list combo box is changed, display the corresponding new image
@@ -500,8 +500,8 @@ void DBaseDlg::showGrasp(int i)
 		if(!static_cast<GraspitDBGrasp*>(mGraspList[i])->getFinalGraspPlanningState())//NULL grasp, return
 			return;
 		static_cast<GraspitDBGrasp*>(mGraspList[i])->getFinalGraspPlanningState()->execute();
-		if(graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->isA("Barrett")){
-			graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->autoGrasp(true);
+		if(graspitCore->getWorld()->getCurrentHand()->isA("Barrett")){
+			graspitCore->getWorld()->getCurrentHand()->autoGrasp(true);
 		}
 	}
 
@@ -515,8 +515,8 @@ void DBaseDlg::showGrasp(int i)
 	*/
 
 	//update the world and grasp information
-	graspItGUI->getIVmgr()->getWorld()->findAllContacts();
-	graspItGUI->getIVmgr()->getWorld()->updateGrasps();
+	graspitCore->getWorld()->findAllContacts();
+	graspitCore->getWorld()->updateGrasps();
 	mCurrentFrame = i;
 	updateGraspInfo();
 }
