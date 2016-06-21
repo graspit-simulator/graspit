@@ -24,7 +24,14 @@
 //######################################################################
 
 /*! \file
-  \brief Implements the graspit user interface.  Responsible for creating both MainWindow and IVmgr.
+  \brief Implements core graspit functionality.
+  Responsible for initializating and holding pointers to the following:
+    world,
+    mainWindow,
+    Dbmgr
+
+  This class is also responsible for managing the SOQT mainloop and managing
+  all plugins.
 */
 
 #include <Q3GroupBox>
@@ -246,7 +253,8 @@ GraspitCore::GraspitCore(int argc, char **argv):
 }
 
 /*!
-  Shows the mainWindow, sets its size, and starts the Qt event loop.
+  Starts the Qt event loop.  If using the user interface, this
+  also shows the mainWindow and sets its size.
 */
 void
 GraspitCore::startMainLoop()
@@ -270,14 +278,24 @@ GraspitCore::exitMainLoop()
   SoQt::exitMainLoop();
 }
 
+/*!
+  Deletes the world, and creates a new one.
+*/
 void
 GraspitCore::emptyWorld()
 {
   delete world;
   world = new World(NULL, "MainWorld");
-  ivmgr->setWorld(world);
+  if(ivmgr)
+  {
+    ivmgr->setWorld(world);
+  }
 }
 
+
+/*!
+  Checks if the initialization of graspitCore resulted in a TERMINAL_FAILURE.
+*/
 bool
 GraspitCore::terminalFailure() const
 {
