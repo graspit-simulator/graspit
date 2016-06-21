@@ -61,7 +61,7 @@ public:
 	bool setFilterParams(QString * params);
 	bool setFilterParams(position pos[]);
 
-	SbVec3f sbv[8];
+    SbVec3f mSensorBoundingVolume[8];
 
 	virtual transf getSensorTran();
 
