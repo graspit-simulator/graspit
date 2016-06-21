@@ -85,8 +85,7 @@ int main(int argc, char **argv)
       }
   }
 
-  GraspitCore core;
-  core.init(argc, argv);
+  GraspitCore core(argc, argv);
   
   //This is the GraspIt TCP server. It can be used to connect to GraspIt from
   //external programs, such as Matlab.

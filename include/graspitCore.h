@@ -99,10 +99,8 @@ class GraspitCore
   db_planner::DatabaseManager *mDBMgr;
 
  public:
-  GraspitCore();
+  GraspitCore(int argc, char **argv);
   ~GraspitCore();
-
-  int init(int argc, char **argv);
   
   /*! Returns whether GraspIt! was successfully initialized. */
   bool terminalFailure() const;

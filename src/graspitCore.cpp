@@ -61,25 +61,6 @@ int GraspitCore::initResult = SUCCESS;
 //! This is the system wide pointer to the graspit user interface.
 GraspitCore *graspitCore = 0;
 
-
-/*!
-  If this class hasn't been initialized in another instance, it performs
-  the following operations:
-  - creates a new MainWindow,
-  - starts Coin by initializing SoQt,
-  - initializes our Coin add on classes,
-  - creates a new IVmgr,
-  - sets the focus policy of the SoQt viewer so keyboard events are accepted
-  - calls a method to process the command line arguments.
- */
-GraspitCore::GraspitCore() :
-    mDispatch(NULL),
-    ivmgr(NULL),
-    mainWindow(NULL),
-    world(NULL)
-{
-}
-
 /*!
   Deletes both the IVmgr and the MainWindow.
 */
@@ -103,8 +84,11 @@ GraspitCore::~GraspitCore()
 /*!
   Initializes GraspitCore based on the commandline arguments.
 */
-int
-GraspitCore::init(int argc, char **argv)
+GraspitCore::GraspitCore(int argc, char **argv):
+    mDispatch(NULL),
+    ivmgr(NULL),
+    mainWindow(NULL),
+    world(NULL)
 {
     GraspitParser *graspitParser = new GraspitParser();
     graspitParser->parseArgs(argc, argv);
@@ -138,7 +122,8 @@ GraspitCore::init(int argc, char **argv)
     QString graspitRoot = QString(getenv("GRASPIT"));
     if (graspitRoot.isNull() ) {
         std::cerr << "Please set the GRASPIT environment variable to the root directory of graspIt." << std::endl;
-        return FAILURE;
+        initResult =  FAILURE;
+        return;
     }
 
     if(args->exist("plugin"))
@@ -179,13 +164,15 @@ GraspitCore::init(int argc, char **argv)
           mDispatch = new TaskDispatcher();
           if (mDispatch->connect("wgs36",5432,"willow","willow","household_objects")) {
               std::cerr << "DBase dispatch failed to connect to database\n";
-              return TERMINAL_FAILURE;
+              initResult = TERMINAL_FAILURE;
+              return;
           }
           std::cerr << "DBase dispatch connected to database\n";
           mDispatch->mainLoop();
           if (mDispatch->getStatus() != TaskDispatcher::RUNNING) {
               mExitCode = mDispatch->getStatus();
-              return TERMINAL_FAILURE;
+              initResult = TERMINAL_FAILURE;
+              return;
           }
       }
 #endif
@@ -248,11 +235,13 @@ GraspitCore::init(int argc, char **argv)
   if (errorFlag)
   {
       std::cerr << "Failed to Parse args." << std::endl;
-      return FAILURE;
+      initResult =  FAILURE;
+      return;
   }
 
  #endif // Q_WS_X11
-  return SUCCESS;
+  initResult =  SUCCESS;
+  return;
 }
 
 /*!
