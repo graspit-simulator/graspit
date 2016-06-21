@@ -99,8 +99,7 @@ GraspitCore::GraspitCore(int argc, char **argv):
       mainWindow = new MainWindow;
       SoQt::init(mainWindow->mWindow);
 
-      //Initialize the world.  It has no parent, and ivmgr is not
-      //created until after the world.
+      //Initialize the world.  It has no parent,
       world = new World(NULL, //QObject parent
                       "mainWorld"); // World Name
 
