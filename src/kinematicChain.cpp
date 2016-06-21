@@ -239,33 +239,9 @@ KinematicChain::initChainFromXml(const TiXmlElement* root,QString &linkDir)
     QString linkFilename = (*p)->GetText();
             linkFilename = linkFilename.stripWhiteSpace();
             QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
-            QString sensorType = (*p)->Attribute("sensorType");
-            if(!sensorType.isNull())
-            {
-                if(sensorType == "BodySensor")
-                {
-                    sensorType.stripWhiteSpace();
-                    linkVec[l] = new SensorLink(owner, chainNum, l, owner->getWorld(), linkName.latin1());
-                    BodySensor * bd = new BodySensor(linkVec[l]);
-                    //Set group number of sensor
-                    QString sensorNumber = (*p)->Attribute("groupNumber");
-                    sensorNumber = sensorNumber.stripWhiteSpace();
-                    if(!sensorNumber.isEmpty())
-                {
-                    bd->setGroupNumber(sensorNumber.toInt());
-                }
-                }
-                else if(sensorType == "FilteredSensor"){
-                    sensorType.stripWhiteSpace();
-                    linkVec[l] = new SensorLink(owner, chainNum, l, owner->getWorld(), linkName.latin1());
-                }
-
-
-            }
-            else
-            {
             linkVec[l] = new Link(owner,chainNum,l,owner->getWorld(),linkName.latin1());
-            }
+            QString sensorType = (*p)->Attribute("sensorType");
+
     if (linkVec[l]->load(linkDir + linkFilename)==FAILURE) {
       delete linkVec[l]; linkVec[l] = NULL;
       DBGA("Failed to load file for link " << l);
@@ -344,7 +320,7 @@ KinematicChain::initChainFromXml(const TiXmlElement* root,QString &linkDir)
       QString bodyNumText = (*p)->GetText();
       int linkVecIndex = bodyNumText.toInt();
       QString params = (*p)->Attribute("params");
-      RegionFilteredSensor * bd = new RegionFilteredSensor(linkVec[linkVecIndex]);
+      TactileSensor * bd = new TactileSensor(linkVec[linkVecIndex]);
       bd->setFilterParams(&params);
 
   }

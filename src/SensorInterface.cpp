@@ -18,102 +18,48 @@
 #include "qstring.h"
 #include "qstringlist.h"
 
-
-void BodySensor::init(Link * body){
-	sbody = static_cast<SensorLink*>(body);
-	myOutput.stype = BODY;
-	myOutput.sensorReading = new double[6];
-	memset(myOutput.sensorReading, 0, 6*sizeof(double));
-	sbody->setBodySensor(this);
-}
-
-BodySensor :: BodySensor(Link * body){
-	BodySensor::init(body);
-}
-
-BodySensor::BodySensor(const BodySensor & fs, Link * sl){
-    BodySensor::init(sl);
-    groupNumber = fs.groupNumber;
-}
-
-bool
-BodySensor :: updateSensorModel(){
-    double forces[6] = {0,0,0,0,0,0};
-    std::list<Contact *>::const_iterator cp;
-    std::list<Contact *> cList = sbody->getContacts();
-
-    for(cp = cList.begin(); cp != cList.end(); cp++){
-        forces[2] += 1;
-    }
-
-    double ts = getTimeStep();
-    if (ts > 0.0)
-        for(int ind = 0; ind < 6; ind++){
-            myOutput.sensorReading[ind] = forces[ind] * (retention_level) + myOutput.sensorReading[ind] * (1.0-retention_level);
-            std::cout << myOutput.sensorReading[ind] << " " << std::endl;
-        }
-
-    sbody->setEmColor(myOutput.sensorReading[2]/3.0,0,1);
-    return true;
-}
-
-double
-BodySensor::getTimeStep(){
-	return .0025;
-}
-
-double BodySensor::retention_level = .1;
-
-
 void
-BodySensor::resetSensor(){
+TactileSensor::resetSensor(){
 	for(int ind =0; ind < 6; ind ++)
 		myOutput.sensorReading[ind] = 0;
 }
 
-SoSeparator * 
-BodySensor::getVisualIndicator(){
-	return NULL;
-}
 
-bool BodySensor::setGroupNumber(int gn){
-	groupNumber = gn;
-	return true;
-}
-
-transf BodySensor::getSensorTran(){
-	return sbody->getTran();
+bool
+TactileSensor::filterContact(Contact * cp){
+    position p = cp->getPosition();
+    return filterContact(p);
 }
 
 bool
-RegionFilteredSensor::filterContact(Contact * cp){
-	position ps = cp->getPosition();
-    return filterContact(myOutput.pos[0], myOutput.pos[1], ps);
-}
+TactileSensor::filterContact(position & ps){
 
-bool
-RegionFilteredSensor::filterContact(const position & boundaryPos0, const position & boundaryPos1, const position & ps){
-	double p0x = boundaryPos0.x();
-	double p0y = boundaryPos0.y();
-	double p0z = boundaryPos0.z();
-	double p1x = boundaryPos1.x();
-	double p1y = boundaryPos1.y();
-	double p1z = boundaryPos1.z();
+    double p0x = myOutput.pos[0].x();
+    double p0y = myOutput.pos[0].y();
+    double p0z = myOutput.pos[0].z();
 
+    double p1x = myOutput.pos[1].x();
+    double p1y = myOutput.pos[1].y();
+    double p1z = myOutput.pos[1].z();
+
+#if GRASPITDBG
 	if(p0x > p1x || p0y > p1y || p0z > p1z)
 		std::cout << "WARNING: THE TACTILE SENSORS ARE NOT DEFINED IN THE CORRECT WAY" << std::endl;
+#endif
 
 	if((p0x <= ps[0] && p0y <= ps[1] && p0z <= ps[2]) &&
-		(p1x >= ps.x() && p1y >= ps.y() && p1z >= ps.z())){
+        (p1x >= ps.x() && p1y >= ps.y() && p1z >= ps.z()))
+    {
 		return true;
 	}
+
 	return false;
 }
 
 
 
 bool
-RegionFilteredSensor::setFilterParams(QString * params){
+TactileSensor::setFilterParams(QString * params){
 	QStringList qsl = params->split(",");
     myOutput.pos[0][0]= qsl[0].toFloat();
     myOutput.pos[0][1]= qsl[1].toFloat();
@@ -124,7 +70,7 @@ RegionFilteredSensor::setFilterParams(QString * params){
     return setFilterParams(myOutput.pos);
 }
 
-bool RegionFilteredSensor::setFilterParams(position pos[]){
+bool TactileSensor::setFilterParams(position pos[]){
 	int32_t cIndex[30];
     sbv[0].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[0][2]);
     sbv[1].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[0][2]);
@@ -170,6 +116,7 @@ bool RegionFilteredSensor::setFilterParams(position pos[]){
 	cIndex[27] = 6;
 	cIndex[28] = 7;
 	cIndex[29] = -1;
+
 	coords->point.setValues(0,8,sbv);
 	ifs->coordIndex.setValues(0,30,cIndex);
 	IVMat->emissiveColor.setValue(0.5,0.0,0.0);
@@ -186,7 +133,7 @@ bool RegionFilteredSensor::setFilterParams(position pos[]){
 }
 
 bool
-RegionFilteredSensor::updateSensorModel(){
+TactileSensor::updateSensorModel(){
 
 	double forces[6] = {0,0,0,0,0,0};
 	std::list<Contact *>::const_iterator cp;
@@ -202,7 +149,7 @@ RegionFilteredSensor::updateSensorModel(){
             }
         }
         //Adding Forces for the current sensor pad
-        double ts = getTimeStep();
+        double ts = .0025;
         if (ts > 0.0)
         {
             for(int ind = 0; ind < 6; ind++){
@@ -211,9 +158,10 @@ RegionFilteredSensor::updateSensorModel(){
         }
     }
     else{
-		myOutput.sensorReading[2] = 0;
-		// loop through all the contacts
+        resetSensor();
+        // loop through all the contacts
 		for(cp = cList.begin(); cp != cList.end(); cp++){
+            std::cout <<"num contacts: " << cList.size() << std::endl;
 			if(sbody->getWorld()->softContactsAreOn() && ((*cp)->getBody1()->isElastic() || (*cp)->getBody2()->isElastic())){
 				std::vector<position> pVec;
 				std::vector<double> forceVec;
@@ -257,7 +205,7 @@ RegionFilteredSensor::updateSensorModel(){
 					position sampleLocation;
 					sampleLocation.set(sampleInBody1.translation());
 //					renderPoints.push_back(sampleLocation * (*cp)->getBody1Tran());
-                    if(filterContact(myOutput.pos[0],myOutput.pos[1], sampleLocation))
+                    if(filterContact(sampleLocation))
 					{
 						myOutput.sensorReading[2]+= forceVec[pInd];
 					}
@@ -273,57 +221,45 @@ RegionFilteredSensor::updateSensorModel(){
 			}
 		}
     }
+    setColor();
 }
 
-
-
-void RegionFilteredSensor::setColor(double maxVal)
+void TactileSensor::setColor()
 {
-	IVMat->emissiveColor.setValue(myOutput.sensorReading[2]/maxVal,
-		0.2,
-		1.0-myOutput.sensorReading[2]/maxVal);
+    float r = myOutput.sensorReading[2];
+    float g = 0.2;
+    float b = 1.0-myOutput.sensorReading[2];
+    IVMat->emissiveColor.setValue(r,g,b);
 }
 
-void RegionFilteredSensor::init(){
+TactileSensor::TactileSensor(Link * body) :
+    retention_level(.1)
+{
+    sbody = body;
+    myOutput.sensorReading = new double[6];
+    memset(myOutput.sensorReading, 0, 6*sizeof(double));
+    sbody->addBodySensor(this);
+
     coords = new SoCoordinate3;
     ifs = new SoIndexedFaceSet;
     visualIndicator = new SoSeparator;
     IVMat = new SoMaterial;
-}
-
-RegionFilteredSensor::RegionFilteredSensor(Link * body) : BodySensor(body){
-	RegionFilteredSensor::init();
     return;
 }
 
-RegionFilteredSensor::RegionFilteredSensor(const RegionFilteredSensor & fs, Link * sl):BodySensor(sl)
-{
-	RegionFilteredSensor::init();
-	groupNumber = fs.groupNumber;
-    myOutput.pos[0] = fs.myOutput.pos[0];
-    myOutput.pos[1] = fs.myOutput.pos[1];
-    setFilterParams(myOutput.pos);
-}
-
-SoSeparator * 
-RegionFilteredSensor::getVisualIndicator(){	
-	return visualIndicator;
-}
-
-BodySensor * RegionFilteredSensor::clone(SensorLink * sl)
-{
-	return new RegionFilteredSensor(*this, static_cast<Link *>(sl));
-}
-
-RegionFilteredSensor::~RegionFilteredSensor(){
+TactileSensor::~TactileSensor(){
 	visualIndicator->removeAllChildren();
 	sbody->getIVRoot()->removeChild(visualIndicator);
 }
 
-transf RegionFilteredSensor::getSensorTran()
+transf TactileSensor::getSensorTran()
 {
-    transf sensorInLink(Quaternion::IDENTITY, vec3( (myOutput.pos[0][0] + myOutput.pos[1][0])/2.0,  (myOutput.pos[0][1] + myOutput.pos[1][1])/2.0, (myOutput.pos[0][2] + myOutput.pos[1][2])/2.0 ));
+    transf sensorInLink(Quaternion::IDENTITY,
+                        vec3( (myOutput.pos[0][0] + myOutput.pos[1][0])/2.0,
+                              (myOutput.pos[0][1] + myOutput.pos[1][1])/2.0,
+                              (myOutput.pos[0][2] + myOutput.pos[1][2])/2.0 ));
+
 	transf linkInWorld = sbody->getTran();
-	transf res = sensorInLink * linkInWorld; // mathematically should be sensorInWorld = linkInWorld * sensorInLink, but inside GraspIt! it is reversed
+    transf res = sensorInLink * linkInWorld;
 	return res;
 }

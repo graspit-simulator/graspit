@@ -49,7 +49,7 @@ class CyberGlove;
 class EigenGraspInterface;
 class Matrix;
 class TiXmlElement;
-class SensorInterface;
+class BodySensor;
 
 //! Base class for all robots which are collections of links connected by moveable joints
 /*! A robot is collection of link bodies orgainized around a base link.
@@ -140,7 +140,7 @@ protected:
   Link *base;
 
   //! A vector of pointers to the sensors defined within this world
-  std::vector<SensorInterface *> sensorVec;
+  std::vector<BodySensor *> sensorVec;
 
   // Save and restore state
   //! Is used to save the current transform if we want to restore it later
@@ -521,12 +521,12 @@ protected:
   //-------------------------Sensors-------------------------------------------------
 
   //! Returns a pointer to the i-th sensor defined in for this robot
-  SensorInterface * getSensor(int i) const {return sensorVec[i];}
+  BodySensor * getSensor(int i) const {return sensorVec[i];}
 
   //! Returns the number of sensors defined for this robot
   int getNumSensors() const {return sensorVec.size();}
 
-  void addSensor(SensorInterface * si);
+  void addSensor(BodySensor * si);
 
   //---------------------------Q_EMIT Q_SIGNALS-----------------------------------------
 

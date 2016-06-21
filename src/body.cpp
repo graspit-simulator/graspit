@@ -923,7 +923,6 @@ Body::breakContacts()
 	std::list<Contact *>::iterator cp;
 
 	if (!contactList.empty()) {
-		setContactsChanged();
 		for (cp=contactList.begin();cp!=contactList.end();cp++) {
 			delete *cp; *cp = NULL;
 		}
@@ -942,6 +941,8 @@ Body::breakContacts()
 
 	if (showFC)
 		IVContactIndicators->removeAllChildren();
+
+        setContactsChanged();
 }
 
 /*! Load in all virtual contacts from file fn*/
@@ -1011,7 +1012,6 @@ Body::resetContactList()
 	}
 	prevContactList.clear();
 	if (!contactList.empty()) {
-		setContactsChanged();
 		for (cp=contactList.begin();cp!=contactList.end();cp++) {
 			prevContactList.push_back(*cp);
 		}
@@ -1020,6 +1020,8 @@ Body::resetContactList()
 	numContacts = 0;
 	if (showFC)
 		IVContactIndicators->removeAllChildren();
+
+    setContactsChanged();
 }
 
 /*! 
@@ -1124,8 +1126,6 @@ Body::removeContact(Contact *c)
   int i;
   std::list<Contact *>::iterator cp;
 
-  setContactsChanged();
-
   if (showFC) {
     for (cp=contactList.begin(),i=0;cp!=contactList.end();cp++,i++)
       if (*cp == c) {
@@ -1138,6 +1138,8 @@ Body::removeContact(Contact *c)
 
   delete c;
   numContacts--;
+
+  setContactsChanged();
 }
 
 /*!
@@ -2216,8 +2218,10 @@ Link::~Link()
 void
 Link::setContactsChanged()
 {
+    std::cout << "Link::setContactsChanged" << std::endl;
   WorldElement::setContactsChanged();
   owner->setContactsChanged();
+  updateSensors();
 }
 /*!
 	This acts like contactPreventMotion, except in the case of a link belonging to a robot.
@@ -2268,6 +2272,31 @@ Link::getProximalJointAxis()
 	return r;
 }
 
+
+void Link::getSensorReadings(std::vector<SensorReading*> &sensorReadings)
+{
+    std::vector<BodySensor *>::iterator bi;
+    for(bi = mSensors.begin();bi !=mSensors.end(); bi++)
+    {
+        SensorReading *so = (*bi)->getSensorOutput();
+        sensorReadings.push_back(so);
+    }
+}
+
+void Link::updateSensors()
+{
+    std::vector<BodySensor *>::iterator bi;
+    for(bi = mSensors.begin();bi !=mSensors.end(); bi++)
+    {
+        (*bi)->updateSensorModel();
+    }
+}
+
+void Link::addBodySensor(BodySensor * sensor)
+{
+    mSensors.push_back(sensor);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                            GraspableBody
 ///////////////////////////////////////////////////////////////////////////////
@@ -2316,80 +2345,4 @@ operator<<(QTextStream &os, const GraspableBody &gb)
 {
   os << gb.myFilename << endl;
   return os;
-}
-
-bool SensorLink::setPos(const double *new_q){
-    updateSensors();
-    return Link::setPos(new_q);
-}
-
-SensorLink::SensorLink(Robot *r,int c, int l,World *w,const char *name) : Link(r,c,l,w,name){
- memset(contactForceSum,0,6*sizeof(double));
-}
-
-void SensorLink::resetDynamicsFlag() {
-    updateSensors();
-    dynamicsComputedFlag = false;
-    memset(contactForceSum,0,6*sizeof(double));
-}
-
-void SensorLink::addIVMat(bool clone){
-    Body::addIVMat(clone);
-    IVMat->emissiveColor.setIgnored(false);
-    IVMat->emissiveColor.setValue(0.0,0.0,1.0);
-}
-
-void SensorLink::setEmColor(double x1, double x2, double x3){
-    IVMat->emissiveColor.setValue(x1,x2,x3);
-}
-
-void SensorLink::setBodySensor(BodySensor *si){
-    bdSensor.push_back(si);
-}
-
-void SensorLink::updateSensors(){
-    std::vector<BodySensor *>::iterator bi;
-    double maxVal = 0;
-    for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
-        BodySensor * bs = (*bi);
-        bs->updateSensorModel();
-        double v = bs->getNormalForce() ;
-        if(v > maxVal)
-            maxVal = v;
-    }
-    //no sensor has value
-    if(maxVal < 1e-6)
-    {
-        maxVal = 1e10;
-    }
-    //set the color of each sensor
-    for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++){
-        BodySensor * bs = (*bi);
-        bs->setColor(maxVal);
-    }
-}
-
-void  SensorLink::setContactsChanged(){
-    Link::setContactsChanged();
-    updateSensors();
-}
-
-void SensorLink::updateAndOuputSensors(std::vector<SensorOutput*> &sensorReadings){
-    std::vector<BodySensor *>::iterator bi;
-    for(bi = bdSensor.begin();bi !=bdSensor.end(); bi++) {
-        (*bi)->updateSensorModel();
-        SensorOutput *so = (*bi)->getSensorOutput();
-        sensorReadings.push_back(so);
-    }
-    return;
-}
-
-void SensorLink::cloneFrom(const SensorLink * originalLink){
-    Link::cloneFrom(originalLink);
-
-    for(std::vector<BodySensor *>::const_iterator bdIt = originalLink->bdSensor.begin();
-        bdIt != bdSensor.end(); ++bdIt){
-            bdSensor.push_back((*bdIt)->clone(this));
-
-    }
 }

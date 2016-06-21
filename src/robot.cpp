@@ -117,30 +117,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	if(element){
 		valueStr = element->GetText();	
 		valueStr = valueStr.stripWhiteSpace();
-        if(!sensorType.isNull())
-        {
-            if(sensorType == "BodySensor")
-            {
-                sensorType.stripWhiteSpace();
-                base = new SensorLink(this, -1, -1, myWorld, (QString(name())+"Base").latin1());
-                BodySensor * bd = new BodySensor(base);
-                addSensor(bd);
-                QString sensorNumber = element->Attribute("groupNumber");
-                sensorNumber = sensorNumber.stripWhiteSpace();
-                if(!sensorNumber.isEmpty())
-                {
-                    bd->setGroupNumber(sensorNumber.toInt());
-                }
-            }
-            else if(sensorType == "FilteredSensor"){
-                sensorType.stripWhiteSpace();
-                base = new SensorLink(this, -1, -1, myWorld,  (QString(name())+"Base").latin1());
-            }
-        }
-        else
-        {
-            base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
-        }
+        base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
 		if (!base  || base->load(ivdir+valueStr)==FAILURE) {
 			if (base) delete base; 
 			base = NULL;
@@ -158,7 +135,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
             //Get body number
             QString bodyNumText = (*p)->GetText();
             QString params = (*p)->Attribute("params");
-            RegionFilteredSensor * bd = new RegionFilteredSensor(base);
+            TactileSensor * bd = new TactileSensor(base);
             bd->setFilterParams(&params);
         }
 	}
@@ -1578,14 +1555,6 @@ Robot::jumpDOFToContact(double *desiredVals, int *stoppedJoints, int *numCols)
 		if (numCols) *numCols = (int)lateContacts.size();
 	}
 
-    std::vector<DynamicBody *> robotLinks;
-    getAllLinks(robotLinks);
-    for (int i=0; i<robotLinks.size(); i++) {
-        if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
-            ((SensorLink*)robotLinks.at(i))->setContactsChanged();
-        }
-    }
-
 	delete [] initialDofVals; delete [] newDofVals;
 	delete [] initialJointVals; delete [] newJointVals;
 
@@ -1702,15 +1671,6 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 			graspItGUI->getIVmgr()->getViewer()->render();
 		}
 	} while (1);
-
-    std::vector<DynamicBody *> robotLinks;
-    getAllLinks(robotLinks);
-    for (unsigned int i=0; i<robotLinks.size(); i++) {
-        if (typeid(*robotLinks.at(i)) == typeid(SensorLink)) {
-            SensorLink *sl = (SensorLink*)robotLinks.at(i);
-            sl->setContactsChanged();
-        }
-    }
 
     if(renderIt)
     {
@@ -2281,7 +2241,7 @@ Robot::contactSlip()
 */
 
 void
-Robot::addSensor(SensorInterface * si){
+Robot::addSensor(BodySensor * si){
     sensorVec.push_back(si);
 }
 
