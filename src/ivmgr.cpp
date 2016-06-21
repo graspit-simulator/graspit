@@ -288,7 +288,6 @@ IVmgr::IVmgr(World *w, QWidget *parent, const char *name, Qt::WFlags f) :
 
   myViewer->viewAll();
 
-  mDBMgr = NULL;
 }
 
 //! Not used right now
@@ -364,7 +363,6 @@ IVmgr::setupPointers()
 void
 IVmgr::beginMainLoop()
 {
-  //SoQt::show(MainWindow);
   SoQt::mainLoop();
 }
 

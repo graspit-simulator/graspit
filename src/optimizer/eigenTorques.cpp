@@ -40,7 +40,7 @@
 */
 CGDBGraspProcessor::CGDBGraspProcessor(Hand *h) : mHand(h) 
 {
-	mDbMgr = graspitCore->getIVmgr()->getDBMgr();
+    mDbMgr = graspitCore->getDBMgr();
 	mProcessor = new EigenTorqueComputer(mHand);
 	mProcessor = new McGripOptimizer(mHand);
 	//mProcessor = new McGripAnalyzer(mHand);

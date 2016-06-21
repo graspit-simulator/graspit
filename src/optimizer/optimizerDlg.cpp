@@ -38,7 +38,7 @@ OptimizerDlg::torqueButtonClicked()
 		DBGA("No hand selected");
 		return;
 	}
-	if (!graspitCore->getIVmgr()->getDBMgr()) {
+    if (!graspitCore->getDBMgr()) {
 		DBGA("Connect to database first");
 		return;
 	}

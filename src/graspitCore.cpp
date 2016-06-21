@@ -243,6 +243,8 @@ GraspitCore::init(int argc, char **argv)
       }
   }
 
+  mDBMgr = NULL;
+
   if (errorFlag)
   {
       std::cerr << "Failed to Parse args." << std::endl;

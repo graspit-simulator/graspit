@@ -77,10 +77,6 @@ class GWSprojection;
 class QualityMeasure;
 struct DraggerInfo;
 
-namespace db_planner {
-	class DatabaseManager;
-}
-
 #define HANDS_DIR "../../hands/"
 #define OBJECTS_DIR "../../objects/"
 #define MAX_POLYTOPES 15
@@ -174,9 +170,6 @@ class IVmgr : public QWidget {
 
   //! Pointer to the material node controlling the color of dynamic force indicatores
   SoMaterial *dynForceMat;
-
-  //! The main and only interface for the CGDB; all interaction with the CGDB should go through this.
-  db_planner::DatabaseManager *mDBMgr;
 
   void setupPointers();
   void transRot(DraggerInfo *dInfo);
@@ -278,14 +271,6 @@ public:
   //! Not implemented
   void flipStereo();
 
-  //! Get the main database manager, when CGDB support is enabled
-  db_planner::DatabaseManager* getDBMgr(){return mDBMgr;}
-  //! Set the main database manager. Should only be called by the DB connection dialog
-#ifdef CGDB_ENABLED
-  void setDBMgr(db_planner::DatabaseManager *mgr){mDBMgr = mgr;}
-#else
-  void setDBMgr(db_planner::DatabaseManager*){}
-#endif
   void setStereoWindow(QWidget *parent);
 };
 #define IVMGR_HXX

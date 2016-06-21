@@ -807,7 +807,7 @@ void MainWindow::dbasePlannerAction_activated()
     QTWARNING("No object selected");
     return;
   }
-  if (!graspitCore->getIVmgr()->getDBMgr()) {
+  if (!graspitCore->getDBMgr()) {
     QTWARNING("Connection to database not established. Connect to database first.");
     return;
   }
@@ -815,7 +815,7 @@ void MainWindow::dbasePlannerAction_activated()
     QTWARNING("DBase Planner currently works only with models loaded from the database");
     return;
   }
-  DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspitCore->getIVmgr()->getDBMgr(), 
+  DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspitCore->getDBMgr(),
                                              world->getGB(gb)->getDBModel(), world->getCurrentHand());
   dlg->setAttribute(Qt::WA_ShowModal, false);
   dlg->setAttribute(Qt::WA_DeleteOnClose, true);
