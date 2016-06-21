@@ -73,7 +73,7 @@ void DBaseDlg::init()
 	mGraspList.clear();
 	browserGroup->setEnabled(FALSE);
 	graspsGroup->setEnabled(FALSE);
-    mDBMgr = graspitCore->getDBMgr();
+	mDBMgr = graspitCore->getDBMgr();
 	if (mDBMgr) {
 		getModelList();
 	}
@@ -176,7 +176,7 @@ void DBaseDlg::connectButton_clicked()
 		delete mDBMgr;
 		mDBMgr = NULL;
 	}
-    graspitCore->setDBMgr(mDBMgr);
+	graspitCore->setDBMgr(mDBMgr);
 }
 
 PROF_DECLARE(GET_GRASPS);
