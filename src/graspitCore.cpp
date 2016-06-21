@@ -110,7 +110,7 @@ GraspitCore::init(int argc, char **argv)
     graspitParser->parseArgs(argc, argv);
     cmdline::parser *args = graspitParser->parseArgs(argc, argv);
 
-    headless = args->get<bool>("headless");
+    headless = args->exist("headless");
 
       mainWindow = new MainWindow;
       SoQt::init(mainWindow->mWindow);

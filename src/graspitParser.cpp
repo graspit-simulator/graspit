@@ -71,6 +71,10 @@ const std::string GraspitParser::robot_help =
 const std::string GraspitParser::version_help =
         "print GraspIt! version\n";
 
+const std::string GraspitParser::headless_help =
+        "Run GraspIt! in headless mode if you do not want"
+        "\n\t\t\t the user interface to display.  IVMgr will be NULL";
+
 GraspitParser::GraspitParser()
 {
 
@@ -84,7 +88,7 @@ GraspitParser::GraspitParser()
     parser->add<std::string>("object", 'o', object_help,  is_required_arg);
     parser->add<std::string>("obstacle", 'b', obstacle_help,  is_required_arg);
     parser->add<std::string>("robot", 'r', robot_help,  is_required_arg);
-    parser->add<bool>("headless", 'c', robot_help,  is_required_arg);
+    parser->add("headless", '\0', headless_help);
     parser->add("version", 'v', version_help);
 
     parser->footer(footer);

@@ -75,7 +75,7 @@ int main(int argc, char **argv)
   graspitParser->parseArgs(argc, argv);
   cmdline::parser *parsed_args = graspitParser->parseArgs(argc, argv);
 
-  bool headless = parsed_args->get<bool>("headless");
+  bool headless = parsed_args->exist("headless");
 
   GraspItApp app(argc, argv);
   if(!headless){
