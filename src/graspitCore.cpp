@@ -99,15 +99,17 @@ GraspitCore::GraspitCore(int argc, char **argv):
       mainWindow = new MainWindow;
       SoQt::init(mainWindow->mWindow);
 
+      //Initialize the world.  It has no parent, and ivmgr is not
+      //created until after the world.
       world = new World(NULL, //QObject parent
-                      "mainWorld", // World Name
-                      NULL); //ivmgr
+                      "mainWorld"); // World Name
 
       // initialize Inventor additions
       SoComplexShape::initClass();
       SoArrow::initClass();
       SoTorquePointer::initClass();
 
+      //Do not initialize the IVmgr if we are running headless. ivmgr will stay NULL
       if(!headless){
           ivmgr = new IVmgr(world, (QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
           ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
@@ -273,7 +275,7 @@ void
 GraspitCore::emptyWorld()
 {
   delete world;
-  world = new World(NULL, "MainWorld", ivmgr);
+  world = new World(NULL, "MainWorld");
   ivmgr->setWorld(world);
 }
 

@@ -108,10 +108,10 @@ char graspitVersionStr[] = "GraspIt! version 2.1";
 that will handle all user interaction. Also initialized collision detection
 system and reads in global settings such as friction coefficients 
 */
-World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,name)
+World::World(QObject *parent, const char *name) :
+    QObject(parent,name),
+    myIVmgr(NULL)
 {
-	myIVmgr = mgr;
-
 	numBodies = numGB = numRobots = numHands = 0;
 	numSelectedBodyElements = numSelectedRobotElements = 0;
 	numSelectedElements = 0;
@@ -728,7 +728,9 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 				QTWARNING("Failed to load focal distance");
 				return FAILURE;				
 			}
-			myIVmgr->setCamera(px, py, pz, q1, q2, q3, q4, fd);
+            if (myIVmgr) {
+                myIVmgr->setCamera(px, py, pz, q1, q2, q3, q4, fd);
+            }
 			cameraFound = true;
 		}
 		else {
@@ -739,7 +741,9 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 	}
 
 	if (!cameraFound) {
-		myIVmgr->getViewer()->viewAll();
+        if (myIVmgr) {
+            myIVmgr->getViewer()->viewAll();
+        }
 	}
 	findAllContacts();
 	modified = false;

@@ -228,7 +228,7 @@ Q_SIGNALS:
 
 public:	
   //! public constructor
-  World(QObject *parent=0,const char *name=0, IVmgr *mgr=NULL);
+  World(QObject *parent=0, const char *name=0);
 
   //! Saves the current user settings in the registry and clears the world
   ~World();
