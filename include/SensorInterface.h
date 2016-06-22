@@ -13,7 +13,10 @@ class QTextStream;
 
 struct SensorReading
 {
+    //The position position of the "bottom left" and "upper right" corners
+    //defining the sensor location
     position pos[2];
+    //value of the sensor reading
     double * sensorReading;
 };
 
@@ -35,13 +38,12 @@ class TactileSensor : public BodySensor
 
 protected:
 
-    Link * sbody;
-    SensorReading myOutput;
-    double retention_level;
-    SoSeparator *visualIndicator;
-    SoCoordinate3 *coords;
-    SoMaterial * IVMat;
-    SoIndexedFaceSet * ifs;
+    Link * mBody;
+    SensorReading mOutput;
+    SoSeparator *mVisualIndicator;
+    SoCoordinate3 *mCoords;
+    SoMaterial * mIVMat;
+    SoIndexedFaceSet * mIndexedFaceSet;
 
     bool updateDynamicSensorModel();
     bool updateStaticSensorModel();
@@ -53,9 +55,9 @@ protected:
 public:
     TactileSensor(Link * body);
 
-    virtual SensorReading * getSensorOutput(){return &myOutput;}
+    virtual SensorReading * getSensorOutput(){return &mOutput;}
     virtual bool updateSensorModel();
-    virtual double getNormalForce(){return myOutput.sensorReading[2];}
+    virtual double getNormalForce(){return mOutput.sensorReading[2];}
 
     virtual void resetSensor();
 	bool setFilterParams(QString * params);

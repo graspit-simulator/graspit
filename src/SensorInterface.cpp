@@ -22,7 +22,7 @@
 void
 TactileSensor::resetSensor(){
 	for(int ind =0; ind < 6; ind ++)
-		myOutput.sensorReading[ind] = 0;
+        mOutput.sensorReading[ind] = 0;
 }
 
 
@@ -39,13 +39,13 @@ TactileSensor::filterContact(Contact * cp){
 bool
 TactileSensor::filterContact(position & ps){
 
-    double p0x = myOutput.pos[0].x();
-    double p0y = myOutput.pos[0].y();
-    double p0z = myOutput.pos[0].z();
+    double p0x = mOutput.pos[0].x();
+    double p0y = mOutput.pos[0].y();
+    double p0z = mOutput.pos[0].z();
 
-    double p1x = myOutput.pos[1].x();
-    double p1y = myOutput.pos[1].y();
-    double p1z = myOutput.pos[1].z();
+    double p1x = mOutput.pos[1].x();
+    double p1y = mOutput.pos[1].y();
+    double p1z = mOutput.pos[1].z();
 
 #if GRASPITDBG
 	if(p0x > p1x || p0y > p1y || p0z > p1z)
@@ -65,26 +65,26 @@ TactileSensor::filterContact(position & ps){
 bool
 TactileSensor::setFilterParams(QString * params){
 	QStringList qsl = params->split(",");
-    myOutput.pos[0][0]= qsl[0].toFloat();
-    myOutput.pos[0][1]= qsl[1].toFloat();
-    myOutput.pos[0][2]= qsl[2].toFloat();
-    myOutput.pos[1][0]= qsl[3].toFloat();
-    myOutput.pos[1][1]= qsl[4].toFloat();
-    myOutput.pos[1][2]= qsl[5].toFloat();
-    return setFilterParams(myOutput.pos);
+    mOutput.pos[0][0]= qsl[0].toFloat();
+    mOutput.pos[0][1]= qsl[1].toFloat();
+    mOutput.pos[0][2]= qsl[2].toFloat();
+    mOutput.pos[1][0]= qsl[3].toFloat();
+    mOutput.pos[1][1]= qsl[4].toFloat();
+    mOutput.pos[1][2]= qsl[5].toFloat();
+    return setFilterParams(mOutput.pos);
 }
 
 //! Set the 8 points which define the boundary of tactile sensor rectangle.
 bool TactileSensor::setFilterParams(position pos[]){
 
-    mSensorBoundingVolume[0].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[0][2]);
-    mSensorBoundingVolume[1].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[0][2]);
-    mSensorBoundingVolume[2].setValue(myOutput.pos[0][0],myOutput.pos[1][1],myOutput.pos[1][2]);
-    mSensorBoundingVolume[3].setValue(myOutput.pos[0][0],myOutput.pos[0][1],myOutput.pos[1][2]);
-    mSensorBoundingVolume[4].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[0][2]);
-    mSensorBoundingVolume[5].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[0][2]);
-    mSensorBoundingVolume[6].setValue(myOutput.pos[1][0],myOutput.pos[1][1],myOutput.pos[1][2]);
-    mSensorBoundingVolume[7].setValue(myOutput.pos[1][0],myOutput.pos[0][1],myOutput.pos[1][2]);
+    mSensorBoundingVolume[0].setValue(mOutput.pos[0][0],mOutput.pos[0][1],mOutput.pos[0][2]);
+    mSensorBoundingVolume[1].setValue(mOutput.pos[0][0],mOutput.pos[1][1],mOutput.pos[0][2]);
+    mSensorBoundingVolume[2].setValue(mOutput.pos[0][0],mOutput.pos[1][1],mOutput.pos[1][2]);
+    mSensorBoundingVolume[3].setValue(mOutput.pos[0][0],mOutput.pos[0][1],mOutput.pos[1][2]);
+    mSensorBoundingVolume[4].setValue(mOutput.pos[1][0],mOutput.pos[0][1],mOutput.pos[0][2]);
+    mSensorBoundingVolume[5].setValue(mOutput.pos[1][0],mOutput.pos[1][1],mOutput.pos[0][2]);
+    mSensorBoundingVolume[6].setValue(mOutput.pos[1][0],mOutput.pos[1][1],mOutput.pos[1][2]);
+    mSensorBoundingVolume[7].setValue(mOutput.pos[1][0],mOutput.pos[0][1],mOutput.pos[1][2]);
 
     int32_t coordIndex[30];
 
@@ -125,18 +125,18 @@ bool TactileSensor::setFilterParams(position pos[]){
     coordIndex[28] = 7;
     coordIndex[29] = -1;
 
-    coords->point.setValues(0,8,mSensorBoundingVolume);
-    ifs->coordIndex.setValues(0,30,coordIndex);
-	IVMat->emissiveColor.setValue(0.5,0.0,0.0);
-	IVMat->diffuseColor.setValue(0.0,0,0);
-	IVMat->specularColor.setValue(0.0,0.0,0.0);
-	IVMat->shininess.setValue(0.0);
+    mCoords->point.setValues(0,8,mSensorBoundingVolume);
+    mIndexedFaceSet->coordIndex.setValues(0,30,coordIndex);
+    mIVMat->emissiveColor.setValue(0.5,0.0,0.0);
+    mIVMat->diffuseColor.setValue(0.0,0,0);
+    mIVMat->specularColor.setValue(0.0,0.0,0.0);
+    mIVMat->shininess.setValue(0.0);
 
-	visualIndicator->removeAllChildren();
-	visualIndicator->addChild(IVMat);
-	visualIndicator->addChild(coords);
-	visualIndicator->addChild(ifs);
-	sbody->getIVRoot()->addChild(visualIndicator);
+    mVisualIndicator->removeAllChildren();
+    mVisualIndicator->addChild(mIVMat);
+    mVisualIndicator->addChild(mCoords);
+    mVisualIndicator->addChild(mIndexedFaceSet);
+    mBody->getIVRoot()->addChild(mVisualIndicator);
 	return true;
 }
 
@@ -146,7 +146,7 @@ bool TactileSensor::updateDynamicSensorModel()
 {
     double forces[6] = {0,0,0,0,0,0};
     std::list<Contact *>::const_iterator cp;
-    std::list<Contact *> cList = sbody->getContacts();
+    std::list<Contact *> cList = mBody->getContacts();
 
     for(cp = cList.begin(); cp != cList.end(); cp++){
         double * contactForce = (*cp)->getDynamicContactWrench();
@@ -158,7 +158,7 @@ bool TactileSensor::updateDynamicSensorModel()
 
     for(int ind = 0; ind < 6; ind++){
         double forceValue =  forces[ind];
-        myOutput.sensorReading[ind] = forceValue;
+        mOutput.sensorReading[ind] = forceValue;
     }
 }
 
@@ -166,7 +166,7 @@ bool TactileSensor::updateDynamicSensorModel()
 bool TactileSensor::updateStaticSensorModel()
 {
     std::list<Contact *>::const_iterator cp;
-    std::list<Contact *> cList = sbody->getContacts();
+    std::list<Contact *> cList = mBody->getContacts();
 
     //Since this in static mode, we want to 0 the sensor first.
     resetSensor();
@@ -174,7 +174,7 @@ bool TactileSensor::updateStaticSensorModel()
     for(cp = cList.begin(); cp != cList.end(); cp++){
 
         //If we are dealing with softContacts
-        if(sbody->getWorld()->softContactsAreOn() &&
+        if(mBody->getWorld()->softContactsAreOn() &&
                 ((*cp)->getBody1()->isElastic() || (*cp)->getBody2()->isElastic())){
             std::vector<position> pVec;
             std::vector<double> forceVec;
@@ -207,14 +207,14 @@ bool TactileSensor::updateStaticSensorModel()
                 sampleLocation.set(sampleInBody1.translation());
                 if(filterContact(sampleLocation))
                 {
-                    myOutput.sensorReading[2]+= forceVec[pInd] * 1000;
+                    mOutput.sensorReading[2]+= forceVec[pInd] * 1000;
                 }
             }
         }
         //We are dealing with normal contacts, not soft contacts
         else{
             if(filterContact(*cp)){
-                myOutput.sensorReading[2] += 1;
+                mOutput.sensorReading[2] += 1;
             }
         }
     }
@@ -224,7 +224,7 @@ bool TactileSensor::updateStaticSensorModel()
 bool
 TactileSensor::updateSensorModel(){
 
-    if(sbody->getWorld()->dynamicsAreOn())
+    if(mBody->getWorld()->dynamicsAreOn())
     {
         updateDynamicSensorModel();
     }
@@ -236,40 +236,39 @@ TactileSensor::updateSensorModel(){
 
 void TactileSensor::setColor()
 {
-    float r = myOutput.sensorReading[2];
+    float r = mOutput.sensorReading[2];
     float g = 0.2;
-    float b = 1.0-myOutput.sensorReading[2];
-    IVMat->emissiveColor.setValue(r,g,b);
+    float b = 1.0-mOutput.sensorReading[2];
+    mIVMat->emissiveColor.setValue(r,g,b);
 }
 
-TactileSensor::TactileSensor(Link * body) :
-    retention_level(.1)
+TactileSensor::TactileSensor(Link * body)
 {
-    sbody = body;
-    myOutput.sensorReading = new double[6];
-    memset(myOutput.sensorReading, 0, 6*sizeof(double));
-    sbody->addBodySensor(this);
+    mBody = body;
+    mOutput.sensorReading = new double[6];
+    memset(mOutput.sensorReading, 0, 6*sizeof(double));
+    mBody->addBodySensor(this);
 
-    coords = new SoCoordinate3;
-    ifs = new SoIndexedFaceSet;
-    visualIndicator = new SoSeparator;
-    IVMat = new SoMaterial;
+    mCoords = new SoCoordinate3;
+    mIndexedFaceSet = new SoIndexedFaceSet;
+    mVisualIndicator = new SoSeparator;
+    mIVMat = new SoMaterial;
     return;
 }
 
 TactileSensor::~TactileSensor(){
-	visualIndicator->removeAllChildren();
-	sbody->getIVRoot()->removeChild(visualIndicator);
+    mVisualIndicator->removeAllChildren();
+    mBody->getIVRoot()->removeChild(mVisualIndicator);
 }
 
 transf TactileSensor::getSensorTran()
 {
     transf sensorInLink(Quaternion::IDENTITY,
-                        vec3( (myOutput.pos[0][0] + myOutput.pos[1][0])/2.0,
-                              (myOutput.pos[0][1] + myOutput.pos[1][1])/2.0,
-                              (myOutput.pos[0][2] + myOutput.pos[1][2])/2.0 ));
+                        vec3( (mOutput.pos[0][0] + mOutput.pos[1][0])/2.0,
+                              (mOutput.pos[0][1] + mOutput.pos[1][1])/2.0,
+                              (mOutput.pos[0][2] + mOutput.pos[1][2])/2.0 ));
 
-	transf linkInWorld = sbody->getTran();
+    transf linkInWorld = mBody->getTran();
     transf res = sensorInLink * linkInWorld;
 	return res;
 }
