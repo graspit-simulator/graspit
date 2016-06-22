@@ -169,8 +169,6 @@ protected:
   //! Sets up frictional forces at this contact using a linearized ellipsoid
   int setUpFrictionEllipsoid(int numLatitudes,int numDirs[], double phi[],double eccen[]);
 
-  bool isRendered;
-
 public:
 
   //! 6 x numFrictionEdges matrix of friction cone boundary wrenches used in dynmaics
@@ -197,7 +195,7 @@ public:
 
   //! Initializes an empty contact (not really used)
   Contact() : body1(NULL),body2(NULL),mate(NULL),cof(0.0),
-    contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), isRendered(false), wrench(NULL) {}
+    contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL) {}
 
   //! Constructs a contact between two bodies 
   Contact(Body *b1,Body *b2, position pos, vec3 norm);
@@ -354,8 +352,6 @@ public:
   //! Only used in SoftFinger contact
   virtual mat3 getCommonFrameRot(){ return mat3::IDENTITY; }
 
-  bool getRendered() {return isRendered;}
-  void setRendered() {isRendered = true;}
 };
 
 //! A Point Contact With Friction (PCWF) implementing a Coulomb friction model
