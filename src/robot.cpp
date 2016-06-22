@@ -113,16 +113,16 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	QString ivdir = rootPath + "iv/";
 	// read and load the base; automatically placed at origin
 	DBGA("Creating base...\n");  
-    QString sensorType = element->Attribute("sensorType");
+	QString sensorType = element->Attribute("sensorType");
 	if(element){
 		valueStr = element->GetText();	
 		valueStr = valueStr.stripWhiteSpace();
-        base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
+		base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
 		if (!base  || base->load(ivdir+valueStr)==FAILURE) {
-			if (base) delete base; 
-			base = NULL;
-			DBGA("Failed to load base");
-			return FAILURE;
+		  if (base) delete base; 
+		  base = NULL;
+		  DBGA("Failed to load base");
+		  return FAILURE;
 		}
 		base->addToIvc();
 

@@ -342,8 +342,8 @@ Contact::localToWorldWrenchMatrix() const
 {
 	Matrix Ro(Matrix::ZEROES<Matrix>(6,6));
 	transf contactTran = getContactFrame() * getBody1()->getTran();
-    mat3 R; contactTran.rotation().ToRotationMatrix(R);
-    Matrix Rot( Matrix::ROTATION(R) );
+	mat3 R; contactTran.rotation().ToRotationMatrix(R);
+	Matrix Rot( Matrix::ROTATION(R) );
 	//the force transform is simple, just the matrix that changes coord. systems
 	Ro.copySubMatrix(0, 0, Rot);
 	Ro.copySubMatrix(3, 3, Rot);
@@ -992,20 +992,20 @@ int SoftContact::CalcRprimes()
 	DBGP("Amb: " << AmB << " relPhi: " << relPhi);
 
 	if( AmB > ApB ) {
-		printf( "Invalid relative curvature, ending calculation...\n" );
-		return 1;
+	  printf( "Invalid relative curvature, ending calculation...\n" );
+	  return 1;
 	}
 
 	//by definition r1prime >= r2prime
 	if (ApB + AmB != 0)
-		r1prime = 1/( ApB + AmB );
+	  r1prime = 1/( ApB + AmB );
 	else
-        r1prime = 100000000;
+	  r1prime = 100000000;
 
 	if( ApB == AmB)
-        r2prime = 100000000;
+	  r2prime = 100000000;
 	else
-		r2prime = 1/(ApB - AmB );
+	  r2prime = 1/(ApB - AmB );
 
 	m->r1prime = r1prime;
 	m->r2prime = r2prime;
