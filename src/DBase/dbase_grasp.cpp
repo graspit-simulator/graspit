@@ -27,7 +27,7 @@
  */
 
 #include "dbase_grasp.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "graspitGUI.h"
 #include "world.h"
 #include "searchState.h"
@@ -43,7 +43,7 @@
 #include "debug.h"
 #include <Inventor/sensors/SoTimerSensor.h>
 
-DBaseBatchPlanner::DBaseBatchPlanner(IVmgr *mgr, GraspItGUI *gui)
+DBaseBatchPlanner::DBaseBatchPlanner(InteractiveIVManager *mgr, GraspItGUI *gui)
 {
 	ivmgr = mgr;
 	mGui = gui;

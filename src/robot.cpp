@@ -44,7 +44,7 @@
 #include "world.h"
 #include "grasp.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "dynamics.h"
 #include "gloveInterface.h"
 #include "eigenGrasp.h"

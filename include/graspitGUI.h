@@ -34,7 +34,7 @@
 #include <list>
 
 class MainWindow;
-class IVmgr;
+class InteractiveIVManager;
 class TaskDispatcher;
 class Application;
 class Plugin;
@@ -59,7 +59,7 @@ class GraspItGUI
   MainWindow *mainWindow;
 
   //! A pointer to the IVmgr.
-  IVmgr *ivmgr;
+  InteractiveIVManager *ivmgr;
 
   //! A pointer to the Task Dispatcher, if any
   TaskDispatcher *mDispatch;
@@ -102,7 +102,7 @@ class GraspItGUI
   World *getMainWorld() const;
 
   /*! Returns a pointer to the IVmgr. */
-  IVmgr *getIVmgr() const {return ivmgr;}
+  InteractiveIVManager *getIVmgr() const {return ivmgr;}
 
   //! Static sensor callback, just calls processPlugins()
   static void sensorCB(void *data, SoSensor*);

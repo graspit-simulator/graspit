@@ -196,7 +196,7 @@ private:
   GraspableBody      *my_body;
 
   //! a pointer to the inventor manager
-  IVmgr                *ivmgr;
+  InteractiveIVManager                *ivmgr;
 
   //! a pointer to an Inventor scene graph containing the shape primitives 
   SoGroup *IVGeomPrimitives;

@@ -35,7 +35,7 @@
 
 #include "scanSimulator.h"
 
-class IVmgr;
+class InteractiveIVManager;
 class EGPlanner;
 class Hand;
 class Body;
@@ -59,7 +59,7 @@ private:
 	Type mType;
 	GraspableBody *mObject;
 	Hand *mHand;
-	IVmgr *ivmgr;
+	InteractiveIVManager *ivmgr;
 	GraspItGUI *mGui;
 	EGPlanner *mPlanner;
 	//maybe one day we'll use streams here...
@@ -90,7 +90,7 @@ public Q_SLOTS:
 	//this one gets called when the inner planner stops
 	void plannerComplete();
 public:
-	DBaseBatchPlanner(IVmgr *mgr, GraspItGUI *gui);
+	DBaseBatchPlanner(InteractiveIVManager *mgr, GraspItGUI *gui);
 	~DBaseBatchPlanner();
 	bool processArguments(int argc, char **argv);
 	bool startPlanner();

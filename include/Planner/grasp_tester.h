@@ -68,7 +68,7 @@ class World;
 class Hand;
 class Grasp;
 class GraspableBody;
-class IVmgr;
+class InteractiveIVManager;
 class QualityMeasure;
 class SoQtRenderArea;
 class SoGroup;
@@ -134,7 +134,7 @@ private:
   Grasp              *my_grasp;
 
   //! A pointer to the Inventor manager
-  IVmgr                *ivmgr;
+  InteractiveIVManager                *ivmgr;
 
   //! Index of the quality measure used for evaluation
   int                  whichQM;

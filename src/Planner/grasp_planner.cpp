@@ -67,7 +67,7 @@
 /* graspit includes */
 #include "contact.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "robot.h"
 #include "body.h"
@@ -101,7 +101,7 @@ extern FILE *debugfile;
 grasp_planner::grasp_planner()
 {
     /* get global stuff */
-  ivmgr = graspItGUI->getIVmgr();
+    ivmgr = graspItGUI->getIVmgr();
 
     myViewer = ivmgr->getViewer();
     my_body  = NULL;

@@ -8,7 +8,7 @@
 #include "graspitGUI.h"
 #include <graspitApp.h>
 #include "mainWindow.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "plannerdlg.h"
 #include "quality.h"

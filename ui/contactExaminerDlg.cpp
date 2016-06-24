@@ -34,7 +34,7 @@
 #include "grasp.h"
 #include "quality.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "body.h"
 #include "mainWindow.h"
 

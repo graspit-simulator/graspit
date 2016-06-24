@@ -19,14 +19,14 @@
 //
 // Author(s):  Andrew T. Miller 
 //
-// $Id: ivmgr.h,v 1.20 2009/06/16 19:29:41 cmatei Exp $
+// $Id: interactiveIVManager.h,v 1.20 2009/06/16 19:29:41 cmatei Exp $
 //
 //######################################################################
 
 /*! \file 
-  \brief Defines the IVmgr class which handles 3D user interaction.
+  \brief Defines the InteractiveIVManager class which handles 3D user interaction.
  */
-#ifndef IVMGR_HXX
+#ifndef INTERACTIVEIVMANAGER_H
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
 #include <list>
@@ -34,7 +34,7 @@
 #include <qstring.h>
 #include <qwidget.h>
 #include "material.h"
-
+#include "ivManager.h"
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 
 struct VCReportType;
@@ -83,8 +83,6 @@ namespace db_planner {
 
 #define HANDS_DIR "../../hands/"
 #define OBJECTS_DIR "../../objects/"
-#define MAX_POLYTOPES 15
-#define MAX_COLLISIONS 5
 
 typedef double col_Mat4[4][4];
 
@@ -119,12 +117,12 @@ enum ToolType {TRANSLATE_TOOL,ROTATE_TOOL,SELECT_TOOL};
   This class also handles the display of contact forces and some other
   indicators, and can render and save an image of the current scene.
  */
-class IVmgr : public QWidget {
+class InteractiveIVManager : public QWidget, public IVManager {
   Q_OBJECT
 
  private:
   //! Global ivmgr pointer for use with static callback routines.  There is only one ivmgr.    
-  static IVmgr *ivmgr;
+  static InteractiveIVManager *ivmgr;
 
   //! Points to the main world associated with this iteraction manager
   World *world;
@@ -178,6 +176,10 @@ class IVmgr : public QWidget {
   //! The main and only interface for the CGDB; all interaction with the CGDB should go through this.
   db_planner::DatabaseManager *mDBMgr;
 
+  virtual void viewAll()
+  {
+      getViewer()->viewAll();
+  }
   void setupPointers();
   void transRot(DraggerInfo *dInfo);
   void revoluteJointChanged(DraggerInfo *dInfo);
@@ -239,8 +241,8 @@ public Q_SLOTS:
   void restoreCameraPos();
 
 public:
-  IVmgr(QWidget *parent=0,const char *name=0,Qt::WFlags f=0);
-  ~IVmgr();
+  InteractiveIVManager(QWidget *parent=0,const char *name=0,Qt::WFlags f=0);
+  ~InteractiveIVManager();
 
   void deselectBody(Body *b);
 
@@ -270,9 +272,9 @@ public:
   int saveCameraPositions(const char *filename);
   int useSavedCameraPositions(const char *filename);
   //! Sets the camera position, orientaion and focal distance
-  void setCamera(double px, double py, double pz, double q1, double q2, double q3, double q4, double fd);
+  virtual void setCamera(double px, double py, double pz, double q1, double q2, double q3, double q4, double fd);
   //! Gets the camera position, orientaion and focal distance
-  void getCamera(float &px, float &py, float &pz, float &q1, float &q2, float &q3, float &q4, float &fd);
+  virtual void getCamera(float &px, float &py, float &pz, float &q1, float &q2, float &q3, float &q4, float &fd);
   void setCameraTransf(transf tr);
   transf getCameraTransf();
 
@@ -293,5 +295,5 @@ public:
 #endif
   void setStereoWindow(QWidget *parent);
 };
-#define IVMGR_HXX
+#define INTERACTIVEIVMANAGER_H
 #endif

@@ -29,7 +29,7 @@
 
 #include "scanSimulator.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "matvec3D.h"
 

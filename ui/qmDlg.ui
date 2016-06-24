@@ -221,7 +221,7 @@
  </customwidgets>
  <includes>
   <include location="local" >graspitGUI.h</include>
-  <include location="local" >ivmgr.h</include>
+  <include location="local" >interactiveIVManager.h</include>
   <include location="local" >quality.h</include>
  </includes>
  <resources/>

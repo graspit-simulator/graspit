@@ -113,7 +113,8 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspRecord.h 
     ${GSRC}/include/gws.h 
     ${GSRC}/include/gwsprojection.h 
-    ${GSRC}/include/ivmgr.h 
+    ${GSRC}/include/interactiveIVManager.h 
+    ${GSRC}/include/headlessIVManager.h
     ${GSRC}/include/jacobian.h 
     ${GSRC}/include/joint.h 
     ${GSRC}/include/kinematicChain.h 
@@ -299,7 +300,7 @@ set (MOC_HEADERS
     ${GSRC}/include/grasp.h
     ${GSRC}/include/worldElement.h
     ${GSRC}/include/graspitServer.h
-    ${GSRC}/include/ivmgr.h
+    ${GSRC}/include/interactiveIVManager.h
     ${GSRC}/include/EGPlanner/egPlanner.h
     ${GSRC}/include/EGPlanner/simAnn.h
     ${GSRC}/include/EGPlanner/loopPlanner.h
@@ -347,7 +348,8 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/graspRecord.cpp 
     ${GSRC}/src/gws.cpp 
     ${GSRC}/src/gwsprojection.cpp 
-    ${GSRC}/src/ivmgr.cpp 
+    ${GSRC}/src/interactiveIVManager.cpp 
+    ${GSRC}/src/headlessIVManager.cpp 
     ${GSRC}/src/jacobian.cpp 
     ${GSRC}/src/joint.cpp 
     ${GSRC}/src/kinematicChain.cpp 

@@ -24,7 +24,7 @@
 //######################################################################
 
 /*! \file
-  \brief Implements the IVmgr class which handles 3D user interaction.
+  \brief Implements the InteractiveIVManager class which handles 3D user interaction.
 */
 
 #include <map>
@@ -92,7 +92,7 @@
 #include <Inventor/Qt/SoQt.h>
 
 #include "pointers.dat"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "SoArrow.h"
 #include "SoTorquePointer.h"
 #include "SoComplexShape.h"
@@ -206,11 +206,11 @@ StereoViewer::StereoViewer(QWidget *parent) : SoQtExaminerViewer(parent)
 	mFocalPlane = 200.0;
 }
 
-IVmgr *IVmgr::ivmgr = 0;
+InteractiveIVManager *InteractiveIVManager::ivmgr = 0;
 
 
 /*!
-  Initializes the IVmgr instance.  It creates a new World that is the main
+  Initializes the InteractiveIVManager instance.  It creates a new World that is the main
   world that the user interacts with.  It creates the examiner viewer that
   allows the user to navigate within the world and interact with it. It sets
   up the root of the entire Inventor scene graph tree as well as sub-nodes
@@ -218,7 +218,7 @@ IVmgr *IVmgr::ivmgr = 0;
   for draggers and wireframe models, which indicate when bodies are selected,
   are also created.
 */
-IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) : 
+InteractiveIVManager::InteractiveIVManager(QWidget *parent, const char *name, Qt::WFlags f) : 
   QWidget(parent,name,f)
 {
   ivmgr = this;
@@ -291,7 +291,7 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
 
 //! Not used right now
 void
-IVmgr::setStereoWindow(QWidget *parent)
+InteractiveIVManager::setStereoWindow(QWidget *parent)
 {
 	StereoViewer *sViewer = new StereoViewer(parent);
 	sViewer->show();
@@ -307,10 +307,10 @@ IVmgr::setStereoWindow(QWidget *parent)
   Deselects all elements, and deletes the main world.  Deletes the remaining
   Inventor scene graph and deletes the Inventor viewer.
 */
-IVmgr::~IVmgr()
+InteractiveIVManager::~InteractiveIVManager()
 {
   if (camerafp) fclose(camerafp);
-  std::cout << "deleting IVmgr" << std::endl;
+  std::cout << "deleting InteractiveIVManager" << std::endl;
   selectionRoot->deselectAll();
   delete world;
   junk->unref();
@@ -324,7 +324,7 @@ IVmgr::~IVmgr()
   Deselects all world elements, deletes the world, and creates a new world.
 */
 void
-IVmgr::emptyWorld()
+InteractiveIVManager::emptyWorld()
 {
   selectionRoot->deselectAll();
   selectionRoot->removeChild(world->getIVRoot());
@@ -338,7 +338,7 @@ IVmgr::emptyWorld()
 /*!
   Deselects all elements and sets the current tool type.
 */
-void IVmgr::setTool(ToolType newTool)
+void InteractiveIVManager::setTool(ToolType newTool)
 {
   selectionRoot->deselectAll();
   currTool = newTool;
@@ -350,7 +350,7 @@ void IVmgr::setTool(ToolType newTool)
   and a model of the torque pointer.
 */
 void
-IVmgr::setupPointers()
+InteractiveIVManager::setupPointers()
 {
   SoInput in;
   in.setBuffer((void *) pointersData, (size_t) sizeof(pointersData));
@@ -363,7 +363,7 @@ IVmgr::setupPointers()
   Starts the main event loop.
 */
 void
-IVmgr::beginMainLoop()
+InteractiveIVManager::beginMainLoop()
 {
   //SoQt::show(MainWindow);
   SoQt::mainLoop();
@@ -374,7 +374,7 @@ IVmgr::beginMainLoop()
 	to objects as a result of coupled robot dofs touching them.
 */
 void
-IVmgr::drawUnbalancedForces()
+InteractiveIVManager::drawUnbalancedForces()
 {
 	for (int b=0; b<world->getNumGB(); b++) {
 		drawBodyWrench( world->getGB(b), world->getGB(b)->getExtWrenchAcc() );
@@ -388,7 +388,7 @@ IVmgr::drawUnbalancedForces()
   Inventor sub-graph.
  */
 void
-IVmgr::drawWorstCaseWrenches()
+InteractiveIVManager::drawWorstCaseWrenches()
 {
   Grasp *grasp;
   double minWrench[6];
@@ -417,7 +417,7 @@ IVmgr::drawWorstCaseWrenches()
 }
 
 void
-IVmgr::drawBodyWrench(GraspableBody *body, const double *wrench)
+InteractiveIVManager::drawBodyWrench(GraspableBody *body, const double *wrench)
 {
     SoSeparator *fSep = NULL;
     SoSeparator *tSep = NULL;
@@ -482,7 +482,7 @@ IVmgr::drawBodyWrench(GraspableBody *body, const double *wrench)
   indicator will blink.
 */
 void
-IVmgr::drawDynamicForces()
+InteractiveIVManager::drawDynamicForces()
 {
 	std::list<Contact *> contactList;
 	std::list<Contact *>::iterator cp;
@@ -561,7 +561,7 @@ IVmgr::drawDynamicForces()
   associated contact force indicator to blink.
 */
 void
-IVmgr::hilightObjContact(int contactNum)
+InteractiveIVManager::hilightObjContact(int contactNum)
 {
 	if ((int)contactForceBlinkerVec.size() > contactNum) {
 		contactForceBlinkerVec[contactNum]->on = true;
@@ -576,7 +576,7 @@ IVmgr::hilightObjContact(int contactNum)
   associated contact force indicator to stop blinking.
 */
 void
-IVmgr::unhilightObjContact(int contactNum)
+InteractiveIVManager::unhilightObjContact(int contactNum)
 {
 	if ((int)contactForceBlinkerVec.size() > contactNum) {
 		contactForceBlinkerVec[contactNum]->on = false;
@@ -598,7 +598,7 @@ IVmgr::unhilightObjContact(int contactNum)
   update all grasps, and sets the new dragger position.
 */
 void
-IVmgr::transRot(DraggerInfo *dInfo)
+InteractiveIVManager::transRot(DraggerInfo *dInfo)
 {
 	//static int count = 0;
 	//DBGA("Callback " << count++);
@@ -715,7 +715,7 @@ IVmgr::transRot(DraggerInfo *dInfo)
 }
 
 void 
-IVmgr::revoluteJointClicked(DraggerInfo *dInfo)
+InteractiveIVManager::revoluteJointClicked(DraggerInfo *dInfo)
 {
   SbVec3f axis;
   float angle;
@@ -728,7 +728,7 @@ IVmgr::revoluteJointClicked(DraggerInfo *dInfo)
 }
 
 void 
-IVmgr::revoluteJointFinished(DraggerInfo *dInfo)
+InteractiveIVManager::revoluteJointFinished(DraggerInfo *dInfo)
 {
   Robot *robot = (Robot *) dInfo->selectedElement;
   robot->emitUserInteractionEnd();
@@ -744,7 +744,7 @@ IVmgr::revoluteJointFinished(DraggerInfo *dInfo)
   current angle of the disc dragger.
 */
 void 
-IVmgr::revoluteJointChanged(DraggerInfo *dInfo)
+InteractiveIVManager::revoluteJointChanged(DraggerInfo *dInfo)
 {
   SbVec3f axis;
   float angle;
@@ -852,7 +852,7 @@ IVmgr::revoluteJointChanged(DraggerInfo *dInfo)
   current translation of the arrow dragger.
 */
 void
-IVmgr::prismaticJointChanged(DraggerInfo *dInfo)
+InteractiveIVManager::prismaticJointChanged(DraggerInfo *dInfo)
 {
   SbVec3f transl(0,0,0);
   double desiredTransl;
@@ -910,7 +910,7 @@ IVmgr::prismaticJointChanged(DraggerInfo *dInfo)
   to the base link of the robot.
  */
 void
-IVmgr::makeCenterball(WorldElement *selectedElement,Body *surroundMe)
+InteractiveIVManager::makeCenterball(WorldElement *selectedElement,Body *surroundMe)
 {
 	SoCenterballDragger *myCenterball = new SoCenterballDragger;
 	SoSeparator *sep = new SoSeparator;
@@ -961,7 +961,7 @@ IVmgr::makeCenterball(WorldElement *selectedElement,Body *surroundMe)
   to the base link of the robot.
  */
 void
-IVmgr::makeHandleBox(WorldElement *selectedElement,Body *surroundMe)
+InteractiveIVManager::makeHandleBox(WorldElement *selectedElement,Body *surroundMe)
 {
   SoSeparator *sep = new SoSeparator;
   draggerRoot->addChild(sep);
@@ -1068,7 +1068,7 @@ IVmgr::makeHandleBox(WorldElement *selectedElement,Body *surroundMe)
   of the robot configuration file.
  */
 void
-IVmgr::makeJointDraggers(Robot *robot,KinematicChain *chain)
+InteractiveIVManager::makeJointDraggers(Robot *robot,KinematicChain *chain)
 {
   int j,d;
   int *activeDOFs = new int[robot->getNumDOF()];
@@ -1168,7 +1168,7 @@ IVmgr::makeJointDraggers(Robot *robot,KinematicChain *chain)
   a visual indication when a body has been selected by the user.
  */
 void
-IVmgr::drawWireFrame(SoSeparator *elementRoot)
+InteractiveIVManager::drawWireFrame(SoSeparator *elementRoot)
 {
   SoLightModel *lm = new SoLightModel;
   lm->model = SoLightModel::BASE_COLOR;
@@ -1201,7 +1201,7 @@ IVmgr::drawWireFrame(SoSeparator *elementRoot)
   selected, pick the whole robot.  Otherwise pick the body that was clicked.
 */
 SoPath *
-IVmgr::pickFilter(const SoPickedPoint *pick)
+InteractiveIVManager::pickFilter(const SoPickedPoint *pick)
 {
   int i,l,r,f,b;
   SoPath *p = pick->getPath();
@@ -1283,7 +1283,7 @@ IVmgr::pickFilter(const SoPickedPoint *pick)
   of the body is drawn to indicate the selection.
 */
 void 
-IVmgr::handleSelection(SoPath *p)
+InteractiveIVManager::handleSelection(SoPath *p)
 {
   int r,b,f;
   bool selectionFound=false;
@@ -1372,7 +1372,7 @@ IVmgr::handleSelection(SoPath *p)
   deselected body or robot.
 */
 void
-IVmgr::handleDeselection(SoPath *p)
+InteractiveIVManager::handleDeselection(SoPath *p)
 {
   int r,b,f,j;
   Robot *robot;
@@ -1461,7 +1461,7 @@ IVmgr::handleDeselection(SoPath *p)
   However, if the whole robot is selected, it will be deleted.
 */
 void
-IVmgr::deleteSelections()
+InteractiveIVManager::deleteSelections()
 {
   int i,r,b;
 
@@ -1494,7 +1494,7 @@ IVmgr::deleteSelections()
 }
 
 void
-IVmgr::deselectBody(Body *b)
+InteractiveIVManager::deselectBody(Body *b)
 {
 	int i;
 	for (i=selectionRoot->getNumSelected()-1;i>=0;i--) {
@@ -1513,7 +1513,7 @@ IVmgr::deselectBody(Body *b)
   different camera angles.  One camera headlight is used for lighting.
  */
 void 
-IVmgr::saveImage(QString filename)
+InteractiveIVManager::saveImage(QString filename)
 {
   SoQtRenderArea *renderArea;
   SoNode *sg;                // scene graph
@@ -1568,7 +1568,7 @@ IVmgr::saveImage(QString filename)
   format file extension such as .jpg.
  */
 void
-IVmgr::saveImageSequence(const char *fileStr)
+InteractiveIVManager::saveImageSequence(const char *fileStr)
 {
   imgSeqStr = fileStr;
   imgSeqCounter = 1;
@@ -1581,7 +1581,7 @@ IVmgr::saveImageSequence(const char *fileStr)
   into the filename.
 */
 void
-IVmgr::saveNextImage()
+InteractiveIVManager::saveNextImage()
 {  
   saveImage(QString(imgSeqStr).
 	    arg(world->getWorldTime(),0,'f',4));
@@ -1595,7 +1595,7 @@ IVmgr::saveNextImage()
   follow the saved trajectory.
 */
 int
-IVmgr::saveCameraPositions(const char *filename)
+InteractiveIVManager::saveCameraPositions(const char *filename)
 {
   if (!(camerafp=fopen(filename,"w"))) return FAILURE;
   connect(world,SIGNAL(dynamicStepTaken()),this,SLOT(saveCameraPos()));
@@ -1609,7 +1609,7 @@ IVmgr::saveCameraPositions(const char *filename)
   cannot easily be controlled directly.
 */
 int
-IVmgr::useSavedCameraPositions(const char *filename)
+InteractiveIVManager::useSavedCameraPositions(const char *filename)
 {
   if (!(camerafp=fopen(filename,"r"))) return FAILURE;
   connect(world,SIGNAL(dynamicStepTaken()),this,SLOT(restoreCameraPos()));
@@ -1621,7 +1621,7 @@ IVmgr::useSavedCameraPositions(const char *filename)
   position file.
 */
 void
-IVmgr::saveCameraPos()
+InteractiveIVManager::saveCameraPos()
 {
   float x,y,z;
   float q1,q2,q3,q4;
@@ -1636,7 +1636,7 @@ IVmgr::saveCameraPos()
   sets the viewer camera to that position.
 */
 void
-IVmgr::restoreCameraPos()
+InteractiveIVManager::restoreCameraPos()
 {
   float x,y,z;
   float q1,q2,q3,q4;
@@ -1650,7 +1650,7 @@ IVmgr::restoreCameraPos()
 }
 
 void 
-IVmgr::setCamera(double px, double py, double pz, double q1, double q2, double q3, double q4, double fd)
+InteractiveIVManager::setCamera(double px, double py, double pz, double q1, double q2, double q3, double q4, double fd)
 {
   myViewer->getCamera()->position.setValue(px,py,pz);
   myViewer->getCamera()->orientation.setValue(q1,q2,q3,q4);
@@ -1658,7 +1658,7 @@ IVmgr::setCamera(double px, double py, double pz, double q1, double q2, double q
 }
 
 void 
-IVmgr::getCamera(float &px, float &py, float &pz, float &q1, float &q2, float &q3, float &q4, float &fd)
+InteractiveIVManager::getCamera(float &px, float &py, float &pz, float &q1, float &q2, float &q3, float &q4, float &fd)
 {
   myViewer->getCamera()->position.getValue().getValue(px,py,pz);
   myViewer->getCamera()->orientation.getValue().getValue(q1,q2,q3,q4);
@@ -1666,7 +1666,7 @@ IVmgr::getCamera(float &px, float &py, float &pz, float &q1, float &q2, float &q
 }
 
 void 
-IVmgr::setCameraTransf(transf tr)
+InteractiveIVManager::setCameraTransf(transf tr)
 {
 	const vec3 t = tr.translation();
 	const Quaternion q = tr.rotation();
@@ -1675,7 +1675,7 @@ IVmgr::setCameraTransf(transf tr)
 }
 
 transf
-IVmgr::getCameraTransf()
+InteractiveIVManager::getCameraTransf()
 {
 	transf tr;
 	float px, py, pz, qx, qy, qz, qw;
@@ -1693,7 +1693,7 @@ IVmgr::getCameraTransf()
   The G key starts an autograps of the current hand.
 */
 void
-IVmgr::keyPressed(SoEventCallback *eventCB)
+InteractiveIVManager::keyPressed(SoEventCallback *eventCB)
 {
   const SoEvent *event = eventCB->getEvent();
 
@@ -1799,48 +1799,48 @@ IVmgr::keyPressed(SoEventCallback *eventCB)
 
 // static callback routines
 void
-IVmgr::keyPressedCB(void *,SoEventCallback *eventCB)
+InteractiveIVManager::keyPressedCB(void *,SoEventCallback *eventCB)
 {
   ivmgr->keyPressed(eventCB);
 }
 
 void
-IVmgr::transRotCB(void *dInfo,SoDragger *dragger)
+InteractiveIVManager::transRotCB(void *dInfo,SoDragger *dragger)
 { 
   ((DraggerInfo *)dInfo)->dragger = dragger;  //to avoid compiler warning
   ivmgr->transRot((DraggerInfo *)dInfo);
 }
 
 void
-IVmgr::revoluteJointChangedCB(void *dInfo,SoDragger *dragger)
+InteractiveIVManager::revoluteJointChangedCB(void *dInfo,SoDragger *dragger)
 {
   ((DraggerInfo *)dInfo)->dragger = dragger;  //to avoid compiler warning
   ivmgr->revoluteJointChanged((DraggerInfo *)dInfo);
 }
 
 void
-IVmgr::revoluteJointClickedCB(void *dInfo,SoDragger *dragger)
+InteractiveIVManager::revoluteJointClickedCB(void *dInfo,SoDragger *dragger)
 {
   ((DraggerInfo *)dInfo)->dragger = dragger;  //to avoid compiler warning
   ivmgr->revoluteJointClicked((DraggerInfo *)dInfo);
 }
 
 void
-IVmgr::revoluteJointFinishedCB(void *dInfo,SoDragger *dragger)
+InteractiveIVManager::revoluteJointFinishedCB(void *dInfo,SoDragger *dragger)
 {
   ((DraggerInfo *)dInfo)->dragger = dragger;  //to avoid compiler warning
   ivmgr->revoluteJointFinished((DraggerInfo *)dInfo);
 }
 
 void
-IVmgr::prismaticJointChangedCB(void *dInfo,SoDragger *dragger)
+InteractiveIVManager::prismaticJointChangedCB(void *dInfo,SoDragger *dragger)
 {
   ((DraggerInfo *)dInfo)->dragger = dragger;  //to avoid compiler warning
   ivmgr->prismaticJointChanged((DraggerInfo *)dInfo);
 }
 
 void
-IVmgr::shiftOrCtrlDownCB(void *,SoEventCallback *eventCB)
+InteractiveIVManager::shiftOrCtrlDownCB(void *,SoEventCallback *eventCB)
 {
   const SoEvent *event = eventCB->getEvent();
   if (SO_MOUSE_RELEASE_EVENT(event,BUTTON1))
@@ -1850,28 +1850,28 @@ IVmgr::shiftOrCtrlDownCB(void *,SoEventCallback *eventCB)
 }
 
 SoPath*
-IVmgr::pickFilterCB(void *,const SoPickedPoint *pick)
+InteractiveIVManager::pickFilterCB(void *,const SoPickedPoint *pick)
 {
   return ivmgr->pickFilter(pick);
 }
 
 void
-IVmgr::selectionCB(void *,SoPath *path)
+InteractiveIVManager::selectionCB(void *,SoPath *path)
 {
   ivmgr->handleSelection(path);
 }
 
 void
-IVmgr::deselectionCB(void *,SoPath *path)
+InteractiveIVManager::deselectionCB(void *,SoPath *path)
 {
   ivmgr->handleDeselection(path);
 }
 
-void IVmgr::setStereo(bool s)
+void InteractiveIVManager::setStereo(bool s)
 {
 	myViewer->setStereo(s);
 }
 
-void IVmgr::flipStereo()
+void InteractiveIVManager::flipStereo()
 {
 }

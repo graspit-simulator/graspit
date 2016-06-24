@@ -61,7 +61,7 @@ class grasp_presenter
   World              *my_world;
 
   //! A pointer the Inventor manager
-  IVmgr              *ivmgr;
+  InteractiveIVManager              *ivmgr;
 
   //! A pointer to the render area for this presentation (not used yet)
   SoQtRenderArea     *graspViewer;

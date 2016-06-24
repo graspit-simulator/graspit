@@ -26,7 +26,7 @@
 #include "tableCheckTask.h"
 
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "robot.h"
 #include "body.h"

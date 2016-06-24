@@ -31,7 +31,7 @@
 #include <iostream>
 #include "graspitServer.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "robot.h"
 #include "grasp.h"

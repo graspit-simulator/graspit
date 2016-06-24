@@ -31,7 +31,7 @@
 #include "robot.h"
 #include "world.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "body.h"
 #include "barrett.h"
 #include "Flock.h"

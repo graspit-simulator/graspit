@@ -30,7 +30,7 @@
 #include "settingsDlg.h"
 #include "world.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 
 #include <QValidator>
 #include <QMessageBox>

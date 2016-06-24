@@ -28,7 +28,7 @@
 #include <QInputDialog>
 
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "robot.h"
 #include "grasp.h"
 #include "body.h"

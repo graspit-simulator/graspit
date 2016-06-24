@@ -41,7 +41,7 @@
 #include "defines.h"
 #include "mytools.h"
 #include "robot.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "world.h"
 #include "body.h"
 #include "grasp.h"

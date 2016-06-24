@@ -35,7 +35,7 @@
 #include "contact.h"
 #include "quality.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "mytools.h"
 
 #include "debug.h"

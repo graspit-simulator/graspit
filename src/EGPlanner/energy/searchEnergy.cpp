@@ -36,7 +36,7 @@
 #include "quality.h"
 #include "searchState.h"
 #include "graspitGUI.h"
-#include "ivmgr.h"
+#include "interactiveIVManager.h"
 #include "matrix.h"
 
 #include "include/EGPlanner/energy/contactEnergy.h"
