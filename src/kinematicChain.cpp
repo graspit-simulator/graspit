@@ -36,7 +36,7 @@
 #include "humanHand.h"
 #include "math/matrix.h"
 #include "tinyxml.h"
-#include "SensorInterface.h"
+#include "bodySensor.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"

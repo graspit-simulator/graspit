@@ -13,7 +13,7 @@
 
 #include "body.h"
 #include "world.h"
-#include "SensorInterface.h"
+#include "bodySensor.h"
 #include "matvec3D.h"
 #include "qstring.h"
 #include "qstringlist.h"

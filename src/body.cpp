@@ -39,7 +39,7 @@
 
 #include "body.h"
 #include "collisionInterface.h"
-#include "SensorInterface.h"
+#include "bodySensor.h"
 #include "bBox.h"
 #include "triangle.h"
 #include "world.h"

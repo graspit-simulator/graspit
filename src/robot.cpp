@@ -52,7 +52,7 @@
 #include "matrix.h"
 #include "tinyxml.h"
 #include "collisionInterface.h"
-#include "SensorInterface.h"
+#include "bodySensor.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"

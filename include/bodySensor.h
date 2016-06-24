@@ -1,5 +1,5 @@
-#ifndef GRASPIT_SENSORINTERFACE_H
-#define GRASPIT_SENSORINTERFACE_H
+#ifndef BODY_SENSOR_H
+#define BODY_SENSOR_H
 
 class Link;
 class SoSeparator;
@@ -13,10 +13,11 @@ class QTextStream;
 
 struct SensorReading
 {
-    //The position position of the "bottom left" and "upper right" corners
-    //defining the sensor location
+    //! The position position of the "bottom left" and "upper right" corners
+    //! defining the sensor location
     position pos[2];
-    //value of the sensor reading
+
+    //! value of the sensor reading
     double * sensorReading;
 };
 
