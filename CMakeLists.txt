@@ -880,20 +880,31 @@ endif (PLY)
 install(TARGETS
     graspit 
     PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
-    EXPORT graspit-lib-targets
+    EXPORT graspit-targets
     DESTINATION ${LIB_DESTINATION})
 
-install(EXPORT graspit-lib-targets
+install(EXPORT graspit-targets
     DESTINATION ${LIB_DESTINATION})
+
+set (GRASPIT_CONFIG_CMAKE graspitConfig.cmake)
+install(FILES
+    cmake/${GRASPIT_CONFIG_CMAKE}
+    CMakeMacros/FindBULLET.cmake
+    CMakeMacros/FindSoQt4.cmake
+    CMakeMacros/FindQhull.cmake
+    DESTINATION ${LIB_DESTINATION}/${PROJECT_NAME}
+)
+
+
 
 
 ## ---
 ## comment for future reference: This is required to build a static library
 # install(TARGETS
 #     graspit_static 
-#     EXPORT graspit-static-lib-targets
+#     EXPORT graspit-static-targets
 #     DESTINATION ${LIB_DESTINATION})
-# install(EXPORT graspit-static-lib-targets
+# install(EXPORT graspit-static-targets
 #     DESTINATION ${LIB_DESTINATION})
 ## ---
 
