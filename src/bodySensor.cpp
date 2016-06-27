@@ -18,7 +18,7 @@
 #include "qstring.h"
 #include "qstringlist.h"
 
-//!Zero the sensor.  Set all values to 0.
+//!Zero the sensor.  Sets all the sensor reading values to 0.
 void
 TactileSensor::resetSensor(){
 	for(int ind =0; ind < 6; ind ++)
@@ -48,23 +48,25 @@ TactileSensor::filterContact(position & ps){
     double p1z = mOutput.pos[1].z();
 
 #if GRASPITDBG
-	if(p0x > p1x || p0y > p1y || p0z > p1z)
-		std::cout << "WARNING: THE TACTILE SENSORS ARE NOT DEFINED IN THE CORRECT WAY" << std::endl;
+    if(p0x > p1x || p0y > p1y || p0z > p1z){
+        std::cout << "ERROR: THE TACTILE SENSORS ARE NOT DEFINED IN THE CORRECT WAY" << std::endl;
+        std::cout << "p0 must be less than p1 in x,y, and z, or else contacts will not be filtered correctly." << std::endl;
+    }
 #endif
 
-	if((p0x <= ps[0] && p0y <= ps[1] && p0z <= ps[2]) &&
-        (p1x >= ps.x() && p1y >= ps.y() && p1z >= ps.z()))
-    {
-		return true;
-	}
-
-	return false;
+    if((p0x <= ps[0] && p0y <= ps[1] && p0z <= ps[2]) &&
+       (p1x >= ps.x() && p1y >= ps.y() && p1z >= ps.z()))
+      {
+	  return true;
+      }
+    
+    return false;
 }
 
 //! Set the 8 points which define the boundary of tactile sensor rectangle.
 bool
 TactileSensor::setFilterParams(QString * params){
-	QStringList qsl = params->split(",");
+    QStringList qsl = params->split(",");
     mOutput.pos[0][0]= qsl[0].toFloat();
     mOutput.pos[0][1]= qsl[1].toFloat();
     mOutput.pos[0][2]= qsl[2].toFloat();
@@ -74,7 +76,7 @@ TactileSensor::setFilterParams(QString * params){
     return setFilterParams(mOutput.pos);
 }
 
-//! Set the 8 points which define the boundary of tactile sensor rectangle.
+//! Set the 8 points which define the boundary of tactile sensor rectanglular prism.
 bool TactileSensor::setFilterParams(position pos[]){
 
     mSensorBoundingVolume[0].setValue(mOutput.pos[0][0],mOutput.pos[0][1],mOutput.pos[0][2]);
@@ -88,37 +90,37 @@ bool TactileSensor::setFilterParams(position pos[]){
 
     int32_t coordIndex[30];
 
-	//face 1
+    //face 1
     coordIndex[0] = 0;
     coordIndex[1] = 1;
     coordIndex[2] = 2;
     coordIndex[3] = 3;
     coordIndex[4] = -1;
-	//face 2
+    //face 2
     coordIndex[5] = 0;
     coordIndex[6] = 1;
     coordIndex[7] = 5;
     coordIndex[8] = 4;
     coordIndex[9] = -1;
-	//face 3
+    //face 3
     coordIndex[10] = 0;
     coordIndex[11] = 3;
     coordIndex[12] = 7;
     coordIndex[13] = 4;
     coordIndex[14] = -1;
-	//face 4
+    //face 4
     coordIndex[15] = 2;
     coordIndex[16] = 6;
     coordIndex[17] = 7;
     coordIndex[18] = 3;
     coordIndex[19] = -1;
-	//face 5
+    //face 5
     coordIndex[20] = 1;
     coordIndex[21] = 2;
     coordIndex[22] = 6;
     coordIndex[23] = 5;
     coordIndex[24] = -1;
-	//face 6
+    //face 6
     coordIndex[25] = 4;
     coordIndex[26] = 5;
     coordIndex[27] = 6;
@@ -137,7 +139,7 @@ bool TactileSensor::setFilterParams(position pos[]){
     mVisualIndicator->addChild(mCoords);
     mVisualIndicator->addChild(mIndexedFaceSet);
     mBody->getIVRoot()->addChild(mVisualIndicator);
-	return true;
+    return true;
 }
 
 
@@ -220,7 +222,9 @@ bool TactileSensor::updateStaticSensorModel()
     }
 }
 
-
+//!Checks to see if there are any contacts that affect this sensor,
+//! If any contacts affect this sensor, then the sensorOutput is updated accordingly
+//! finally there is a call to setColor to ensure that the sensor is displayed correctly. 
 bool
 TactileSensor::updateSensorModel(){
 
@@ -234,6 +238,9 @@ TactileSensor::updateSensorModel(){
     setColor();
 }
 
+//! sets the display color of the tactile sensor
+//! if the sensor is not active, it will be blue
+//! as more force is applied, it will turn to red. 
 void TactileSensor::setColor()
 {
     float r = mOutput.sensorReading[2];
@@ -247,6 +254,10 @@ TactileSensor::TactileSensor(Link * body)
     mBody = body;
     mOutput.sensorReading = new double[6];
     memset(mOutput.sensorReading, 0, 6*sizeof(double));
+
+    //! The sensor adds itself to the body's list of sensors
+    //! This way when the body detects a new contact, it can inform
+    //! this sensor which can check to see if it is affected by the contact.
     mBody->addBodySensor(this);
 
     mCoords = new SoCoordinate3;
@@ -256,11 +267,13 @@ TactileSensor::TactileSensor(Link * body)
     return;
 }
 
+//clean up the related IV objects used for visualization
 TactileSensor::~TactileSensor(){
     mVisualIndicator->removeAllChildren();
     mBody->getIVRoot()->removeChild(mVisualIndicator);
 }
 
+//! Get the position of the sensor in the world frame of reference. 
 transf TactileSensor::getSensorTran()
 {
     transf sensorInLink(Quaternion::IDENTITY,
@@ -270,5 +283,5 @@ transf TactileSensor::getSensorTran()
 
     transf linkInWorld = mBody->getTran();
     transf res = sensorInLink * linkInWorld;
-	return res;
+    return res;
 }

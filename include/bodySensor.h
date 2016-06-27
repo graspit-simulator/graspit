@@ -61,17 +61,16 @@ public:
     virtual double getNormalForce(){return mOutput.sensorReading[2];}
 
     virtual void resetSensor();
-	bool setFilterParams(QString * params);
-	bool setFilterParams(position pos[]);
+    bool setFilterParams(QString * params);
+    bool setFilterParams(position pos[]);
 
     SbVec3f mSensorBoundingVolume[8];
 
-	virtual transf getSensorTran();
+    virtual transf getSensorTran();
 
     ~TactileSensor();
 
 };
-
 
 
 #endif
