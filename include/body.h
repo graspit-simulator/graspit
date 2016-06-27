@@ -80,7 +80,6 @@ class Body : public WorldElement {
 public:
   //! Parameter to control the height of friction cones
   static const float CONE_HEIGHT;
-  double contactForceSum[6];
 
 protected:
   //! The surface material of the body specified as an index to the world material list
@@ -360,8 +359,6 @@ public:
   /*! Returns all the vertices of the scene graph geometry of this object*/
   void getGeometryVertices(std::vector<position> *vertices) const;
 };
-
-enum LinkT {LINK, SENSORLINK};
 
 //! The superclass for all bodies that take part in the dynamics.
 /*! A dynamic body adds mass parameters to the generic body description.
