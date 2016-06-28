@@ -896,17 +896,16 @@ install(TARGETS
 install(EXPORT graspit-targets
     DESTINATION ${LIB_DESTINATION})
 
-set (GRASPIT_CONFIG_CMAKE graspitConfig.cmake)
+# For future reference: install graspitConfig.cmake as well as soon
+# as it is added to the repository.
+# set (GRASPIT_CONFIG_CMAKE graspitConfig.cmake)
 install(FILES
-    cmake/${GRASPIT_CONFIG_CMAKE}
+    # cmake/${GRASPIT_CONFIG_CMAKE}
     CMakeMacros/FindBULLET.cmake
     CMakeMacros/FindSoQt4.cmake
     CMakeMacros/FindQhull.cmake
     DESTINATION ${LIB_DESTINATION}/${PROJECT_NAME}
 )
-
-
-
 
 ## ---
 ## comment for future reference: This is required to build a static library
