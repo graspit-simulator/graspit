@@ -837,15 +837,16 @@ World::save(const QString &filename)
 			}
 		}
 	}
-	stream<<"\t<camera>"<<endl;
-	float px, py, pz, q1, q2, q3, q4, fd;
+
 	if (myIVmgr) {
+        stream<<"\t<camera>"<<endl;
+        float px, py, pz, q1, q2, q3, q4, fd;
 		myIVmgr->getCamera(px, py, pz, q1, q2, q3, q4, fd);
 		stream<<"\t\t<position>"<<px<<" "<<py<<" "<<pz<<"</position>"<<endl;
 		stream<<"\t\t<orientation>"<<q1<<" "<<q2<<" "<<q3<<" "<<q4<<"</orientation>"<<endl;
 		stream<<"\t\t<focalDistance>"<<fd<<"</focalDistance>"<<endl;
+        stream<<"\t</camera>"<<endl;
 	}
-	stream<<"\t</camera>"<<endl;
 	stream<<"</world>"<<endl;
 	file.close();
 	modified = false;
