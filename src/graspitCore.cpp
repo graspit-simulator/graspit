@@ -104,30 +104,39 @@ GraspitCore::GraspitCore(int argc, char **argv):
     bool headless = args->exist("headless");
 
     if(headless){
-        SoQt::init(argc, argv, "SOQT");
+        if (argc < 1)
+        {
+            DBGA("At least 1 command line argument required");
+            initResult=FAILURE;
+            return;
+        }
+        // need to initialize with this init() instead of passing argc, argv
+        // or it segfaults
+        SoQt::init(argv[0], "SOQT");
     }
     else{
         mainWindow = new MainWindow;
         SoQt::init(mainWindow->mWindow);
     }
 
-      //Initialize the world.  It has no parent,
-      world = new World(NULL, //QObject parent
-                      "mainWorld"); // World Name
+    //Initialize the world.  It has no parent,
+    world = new World(NULL, //QObject parent
+                  "mainWorld"); // World Name
 
-      // initialize Inventor additions
-      SoComplexShape::initClass();
-      SoArrow::initClass();
-      SoTorquePointer::initClass();
+    // initialize Inventor additions
+    SoComplexShape::initClass();
+    SoArrow::initClass();
+    SoTorquePointer::initClass();
 
-      //Do not initialize the IVmgr if we are running headless. ivmgr will stay NULL
-      if(!headless){
-          ivmgr = new IVmgr(world, (QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
-          ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
-      }
+    //Do not initialize the IVmgr if we are running headless. ivmgr will stay NULL
+    if(!headless){
+      ivmgr = new IVmgr(world, (QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
+      ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
+      world->setIVMgr(ivmgr);
+    }
 
-      graspitCore = this;
-      mExitCode = 0;
+    graspitCore = this;
+    mExitCode = 0;
 
     int errorFlag=0;
 
@@ -286,17 +295,19 @@ GraspitCore::exitMainLoop()
   SoQt::exitMainLoop();
 }
 
+
 /*!
   Deletes the world, and creates a new one.
 */
 void
-GraspitCore::emptyWorld()
+GraspitCore::emptyWorld(const char * name)
 {
   delete world;
-  world = new World(NULL, "MainWorld");
+  world = new World(NULL, name);
   if(ivmgr)
   {
     ivmgr->setWorld(world);
+    world->setIVMgr(ivmgr);
   }
 }
 
