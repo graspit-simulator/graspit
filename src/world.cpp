@@ -192,7 +192,7 @@ World::~World()
 
 /*! Returns axis-aligned bounding box min and max points of the world
  */
-void World::getBoundigBox(vec3& minPoint, vec3& maxPoint)
+void World::getBoundingBox(vec3& minPoint, vec3& maxPoint)
 {
     minPoint.set(0,0,0);
     maxPoint.set(0,0,0);
