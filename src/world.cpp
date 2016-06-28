@@ -861,9 +861,10 @@ World::save(const QString &filename)
 			}
 		}
 	}
-	stream<<"\t<camera>"<<endl;
-	float px, py, pz, q1, q2, q3, q4, fd;
+
+    stream<<"\t<camera>"<<endl;
 	if (myIVmgr) {
+        float px, py, pz, q1, q2, q3, q4, fd;
 		myIVmgr->getCamera(px, py, pz, q1, q2, q3, q4, fd);
 		stream<<"\t\t<position>"<<px<<" "<<py<<" "<<pz<<"</position>"<<endl;
 		stream<<"\t\t<orientation>"<<q1<<" "<<q2<<" "<<q3<<" "<<q4<<"</orientation>"<<endl;

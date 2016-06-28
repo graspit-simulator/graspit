@@ -209,7 +209,10 @@ GraspitCore::GraspitCore(int argc, char **argv):
           ++errorFlag;
       }
       else{
-          mainWindow->mUI->worldBox->setTitle(filename);
+          if(!headless)
+          {
+              mainWindow->mUI->worldBox->setTitle(filename);
+          }
       }
   }
 
