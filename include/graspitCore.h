@@ -133,7 +133,8 @@ class GraspitCore
   void startMainLoop();
   void exitMainLoop();
 
-  void emptyWorld();
+  /*! Deletes the existing world and creates a new (empty) one */
+  void emptyWorld(const char* name="MainWorld");
 
   //! Get the main database manager, when CGDB support is enabled
   db_planner::DatabaseManager* getDBMgr(){return mDBMgr;}

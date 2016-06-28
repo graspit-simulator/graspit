@@ -159,7 +159,6 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/simAnn.h 
     ${GSRC}/include/EGPlanner/searchState.h 
     ${GSRC}/include/EGPlanner/searchStateImpl.h 
-    ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/onLinePlanner.h 
     ${GSRC}/include/EGPlanner/egPlanner.h 
     ${GSRC}/include/EGPlanner/simAnnPlanner.h 
@@ -169,6 +168,11 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/graspTesterThread.h 
     ${GSRC}/include/EGPlanner/onLineGraspInterface.h 
     ${GSRC}/include/EGPlanner/listPlanner.h 
+ 
+)
+
+set (GRASPIT_EGPLANNER_ENERGY_HEADERS
+    ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/energy/autograspQualityEnergy.h 
     ${GSRC}/include/EGPlanner/energy/closureSearchEnergy.h
     ${GSRC}/include/EGPlanner/energy/compliantEnergy.h
@@ -177,9 +181,8 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/energy/guidedAutoGraspEnergy.h 
     ${GSRC}/include/EGPlanner/energy/guidedPotentialQualityEnergy.h 
     ${GSRC}/include/EGPlanner/energy/potentialQualityEnergy.h
-    ${GSRC}/include/EGPlanner/energy/strictAutoGraspEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/strictAutoGraspEnergy.h
 )
-
 
 # all headers which are in the  cmdline
 # directory and should be included
@@ -825,6 +828,13 @@ install(FILES
     ${GRASPIT_EGPLANNER_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/EGPlanner
 )
+
+install(FILES
+    ${GRASPIT_EGPLANNER_ENERGY_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}/EGPlanner/energy
+)
+
+
 
 if (PQP_COLLISION)
     install(FILES

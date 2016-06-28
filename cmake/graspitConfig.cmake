@@ -84,7 +84,7 @@ endif (graspit_LIBRARY_RELEASE)
 if (NOT CATKIN_DEVEL_PREFIX)
     # We also need to include the graspit targets file if not using catkin
     get_filename_component(LIB_SUFFIX ${graspit_LIBRARY_RELEASE} EXT)
-    message("Graspit library suffix: ${LIB_SUFFIX}, shared lib suffix: ${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    # message("Graspit library suffix: ${LIB_SUFFIX}, shared lib suffix: ${CMAKE_SHARED_LIBRARY_SUFFIX}")
     if (LIB_SUFFIX STREQUAL CMAKE_SHARED_LIBRARY_SUFFIX)
         message(STATUS "Using graspit SHARED lib")
         include(${SELF_DIR}/../graspit-targets.cmake)
