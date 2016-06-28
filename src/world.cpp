@@ -879,7 +879,7 @@ World::save(const QString &filename)
             angle = 10;
         }
         vec3 minPoint, maxPoint, center;  // min/max points of AABB
-        getBoundigBox(minPoint, maxPoint);
+        getBoundingBox(minPoint, maxPoint);
         center = (minPoint + maxPoint) * 0.5;
         float xLen = fabs(maxPoint.x()-minPoint.x());  // lenght of BB along x
         float zLen = fabs(maxPoint.z()-minPoint.z());  // lenght of BB along z
