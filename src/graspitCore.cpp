@@ -132,6 +132,7 @@ GraspitCore::GraspitCore(int argc, char **argv):
     if(!headless){
       ivmgr = new IVmgr(world, (QWidget *)mainWindow->mUI->viewerHolder,"myivmgr");
       ivmgr->getViewer()->getWidget()->setFocusPolicy(Qt::StrongFocus);
+      world->setIVMgr(ivmgr);
     }
 
     graspitCore = this;
@@ -303,6 +304,7 @@ GraspitCore::emptyWorld(const char * name)
   if(ivmgr)
   {
     ivmgr->setWorld(world);
+    world->setIVMgr(ivmgr);
   }
 }
 

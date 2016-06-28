@@ -314,6 +314,9 @@ public:
   //! Returns the root of the Inventor scene graph for this world 
   SoSeparator *getIVRoot() const {return IVRoot;}
 
+  //! Returns axis-aligned bounding box min and max points of the world
+  void getBoundigBox(vec3& minPoint, vec3& maxPoint);
+
   //! Returns a pointer to the i-th body defined in this world 
   Body *getBody(int i) const {return bodyVec[i];}
 
