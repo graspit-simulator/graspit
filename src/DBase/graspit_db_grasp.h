@@ -35,7 +35,7 @@
 #include <vector>
 #include <string>
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "world.h"
 #include "ivmgr.h"
 

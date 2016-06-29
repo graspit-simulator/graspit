@@ -74,7 +74,7 @@
 #include "matvec3D.h"
 #include "grasp.h"
 #include "quality.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "grasp_visualization.h"
 #include "grasp_tester.h"
 
@@ -93,7 +93,7 @@ extern grasp_tester *myTester;
 */
 grasp_tester::grasp_tester() : QObject() {
 
-	ivmgr = graspItGUI->getIVmgr();
+	ivmgr = graspitCore->getIVmgr();
 
 	projectionViewer = NULL;
     idleSensor = NULL;
@@ -135,7 +135,7 @@ grasp_tester::~grasp_tester(){
 void
 grasp_tester::updateGlobals(){
     myViewer = ivmgr->getViewer();
-    my_world = ivmgr->getWorld();
+    my_world = graspitCore->getWorld();
     my_hand  = my_world->getCurrentHand();
     my_grasp = my_hand->getGrasp();
     

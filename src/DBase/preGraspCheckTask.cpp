@@ -25,7 +25,7 @@
 
 #include "preGraspCheckTask.h"
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
@@ -66,7 +66,7 @@ void PreGraspCheckTask::emptyGraspList(std::vector<db_planner::Grasp*> &graspLis
 
 void PreGraspCheckTask::loadHand()
 {
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand we need
@@ -96,7 +96,7 @@ void PreGraspCheckTask::loadHand()
 
 void PreGraspCheckTask::loadObject()
 {
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
 
   GraspitDBModel *model = static_cast<GraspitDBModel*>(mPlanningTask.model);
   if (model->load(world) != SUCCESS) {

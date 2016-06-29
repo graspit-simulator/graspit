@@ -29,7 +29,7 @@
 
 #include "settingsDlg.h"
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 
 #include <QValidator>
@@ -48,7 +48,7 @@ void SettingsDlg::init()
 {   
   int i,j;
   QString val;
-    World *w = graspItGUI->getIVmgr()->getWorld();
+    World *w = graspitCore->getWorld();
    
     dlgUI->staticFrictionTable->horizontalHeader()->hide();
     dlgUI->staticFrictionTable->verticalHeader()->hide();

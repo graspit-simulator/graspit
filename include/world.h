@@ -228,7 +228,7 @@ Q_SIGNALS:
 
 public:	
   //! public constructor
-  World(QObject *parent=0,const char *name=0, IVmgr *mgr=NULL);
+  World(QObject *parent=0, const char *name=0);
 
   //! Saves the current user settings in the registry and clears the world
   ~World();
@@ -314,6 +314,9 @@ public:
   //! Returns the root of the Inventor scene graph for this world 
   SoSeparator *getIVRoot() const {return IVRoot;}
 
+  //! Returns axis-aligned bounding box min and max points of the world
+  void getBoundingBox(vec3& minPoint, vec3& maxPoint);
+
   //! Returns a pointer to the i-th body defined in this world 
   Body *getBody(int i) const {return bodyVec[i];}
 
@@ -343,6 +346,9 @@ public:
 
   //! Sets all world settings to their original default values. 
   void setDefaults();
+
+  //! Sets the ivmgr for the world.
+  void setIVMgr(IVmgr *ivmgr){myIVmgr = ivmgr;}
 
   //! Sets the world modified flag.  Should be done when a change has since the last save. 
   void setModified() {modified = true;}

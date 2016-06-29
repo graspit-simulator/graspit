@@ -62,7 +62,7 @@
 #endif
 
 /* graspit includes */
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "contact.h"
 #include "world.h"
 #include "ivmgr.h"
@@ -215,12 +215,12 @@ grasp_manager::readCandidateGraspsFile(const QString& filename)
 
   QTextStream stream( &file );
 
-  my_body = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp()->getObject();
+  my_body = graspitCore->getWorld()->getCurrentHand()->getGrasp()->getObject();
 
   if (my_body == NULL){
     int whichObject = 0;
-    if (graspItGUI->getIVmgr()->getWorld()->getNumGB())
-      my_body = graspItGUI->getIVmgr()->getWorld()->getGB(whichObject);
+    if (graspitCore->getWorld()->getNumGB())
+      my_body = graspitCore->getWorld()->getGB(whichObject);
     else{
 #ifdef GRASPITDBG
       std::cout << "PL_OUT: Nothing selected and no graspable bodies exist. Stop." << std::endl;
@@ -278,12 +278,12 @@ grasp_manager::generateGrasps(){
     
     std::list<plannedGrasp*> tmpList;
 
-    my_body = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp()->getObject();
+    my_body = graspitCore->getWorld()->getCurrentHand()->getGrasp()->getObject();
 
     if (my_body == NULL){
 	int whichObject = 0;
-	if (graspItGUI->getIVmgr()->getWorld()->getNumGB())
-	    my_body = graspItGUI->getIVmgr()->getWorld()->getGB(whichObject);
+	if (graspitCore->getWorld()->getNumGB())
+	    my_body = graspitCore->getWorld()->getGB(whichObject);
 	else{
 #ifdef GRASPITDBG
 	    std::cout << "PL_OUT: Nothing selected and no graspable bodies exist. Stop." << std::endl;
