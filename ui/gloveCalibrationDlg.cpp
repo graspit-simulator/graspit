@@ -28,7 +28,7 @@
 #include <QFileDialog>
 
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "robot.h"
 #include "gloveInterface.h"
@@ -37,7 +37,7 @@ void GloveCalibrationDlg::init()
 {
 //	calibrateButton->setEnabled(false);
 
-	World *w=graspItGUI->getIVmgr()->getWorld();
+	World *w=graspitCore->getWorld();
 	mInterface = w->getCurrentHand()->getGloveInterface();
 
 	mInterface->saveRobotPose();

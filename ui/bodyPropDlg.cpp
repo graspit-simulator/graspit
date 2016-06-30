@@ -30,7 +30,7 @@
 
 #include "robot.h"
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "qvalidator.h"
 #include "collisionStructures.h"
@@ -52,7 +52,7 @@
 void BodyPropDlg::init()
 {
   int i,c,l;
-  World *w=graspItGUI->getIVmgr()->getWorld();
+  World *w=graspitCore->getWorld();
   std::list<WorldElement *> elemList = w->getSelectedElementList();
   std::list<WorldElement *>::iterator ep;
   
@@ -230,7 +230,7 @@ void BodyPropDlg::setShowDynContactForces( int state )
 */
 void BodyPropDlg::setMaterial( int choice )
 {
-  World *w=graspItGUI->getIVmgr()->getWorld();
+  World *w=graspitCore->getWorld();
   
   if (choice == w->getNumMaterials()) {
     for (int i=0;i<numBodies;i++) 
@@ -274,7 +274,7 @@ void
 BodyPropDlg::showBvs()
 {
 	std::vector<BoundingBox> bvs;
-	World *w=graspItGUI->getIVmgr()->getWorld();
+	World *w=graspitCore->getWorld();
 	int depth = -1;
 	if (!boundingCheckBox->isChecked()) {
 		boundingSpinBox->setEnabled(false);

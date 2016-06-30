@@ -31,7 +31,7 @@
 #include <QObject>
 
 #include "search.h"
-#include "include/matvec3D.h"
+#include "matvec3D.h"
 
 class Hand;
 class Body;

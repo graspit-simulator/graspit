@@ -20,6 +20,7 @@ public:
     static const std::string obstacle_help;
     static const std::string robot_help;
     static const std::string version_help;
+    static const std::string headless_help;
 
 private:
      cmdline::parser *parser;

@@ -28,7 +28,7 @@
 #include <Inventor/SoPickedPoint.h>
 
 #include "scanSimulator.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "matvec3D.h"
@@ -134,12 +134,12 @@ void ScanSimulator::computeRayDirection(float hAngle, float vAngle, vec3 &rayDir
 
 bool ScanSimulator::shootRay(const vec3 &rayDirection, position &rayPoint)
 {
-	SoRayPickAction action( graspItGUI->getIVmgr()->getViewer()->getViewportRegion() );
+	SoRayPickAction action( graspitCore->getIVmgr()->getViewer()->getViewportRegion() );
 
 	action.setRay( mPosition.toSbVec3f(), rayDirection.toSbVec3f(), 0.0, -1.0 );
 	action.setPickAll(false);
 
-	action.apply( (SoNode*)graspItGUI->getIVmgr()->getWorld()->getIVRoot() );
+	action.apply( (SoNode*)graspitCore->getWorld()->getIVRoot() );
 
 	SoPickedPoint *pp = action.getPickedPoint();
 	if (!pp) return false;

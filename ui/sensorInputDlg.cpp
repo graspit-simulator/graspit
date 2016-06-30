@@ -30,7 +30,7 @@
 
 #include "robot.h"
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "body.h"
 #include "barrett.h"

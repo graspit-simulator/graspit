@@ -33,7 +33,7 @@
 #include "contact.h"
 #include "grasp.h"
 #include "quality.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "body.h"
 #include "mainWindow.h"
@@ -44,7 +44,7 @@
 
 void ContactExaminerDlg::init()
 {
-	mWorld = graspItGUI->getIVmgr()->getWorld();
+	mWorld = graspitCore->getWorld();
 	//check the hand
 	if(mWorld->getCurrentHand()){
 		mHand = mWorld->getCurrentHand();
@@ -242,7 +242,7 @@ void ContactExaminerDlg::destroy()
 void ContactExaminerDlg::showGWSButton_clicked()
 {
 	mGrasp->update();
-	graspItGUI->getMainWindow()->graspCreateProjection(mGrasp);
+	graspitCore->getMainWindow()->graspCreateProjection(mGrasp);
 }
 
 void ContactExaminerDlg::modeSelected()

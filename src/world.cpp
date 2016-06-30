@@ -38,6 +38,8 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <Inventor/sensors/SoIdleSensor.h>
+#include <Inventor/SbBox.h>
+#include <Inventor/actions/SoGetBoundingBoxAction.h>
 
 #include "myRegistry.h"
 #include "matvecIO.h"
@@ -108,10 +110,10 @@ char graspitVersionStr[] = "GraspIt! version 2.1";
 that will handle all user interaction. Also initialized collision detection
 system and reads in global settings such as friction coefficients 
 */
-World::World(QObject *parent, const char *name, IVmgr *mgr) : QObject(parent,name)
+World::World(QObject *parent, const char *name) :
+    QObject(parent,name),
+    myIVmgr(NULL)
 {
-	myIVmgr = mgr;
-
 	numBodies = numGB = numRobots = numHands = 0;
 	numSelectedBodyElements = numSelectedRobotElements = 0;
 	numSelectedElements = 0;
@@ -185,6 +187,26 @@ World::~World()
 	delete mCollisionInterface;
     delete mDynamicsEngine;
 	IVRoot->unref();
+}
+
+
+/*! Returns axis-aligned bounding box min and max points of the world
+ */
+void World::getBoundingBox(vec3& minPoint, vec3& maxPoint)
+{
+    minPoint.set(0,0,0);
+    maxPoint.set(0,0,0);
+
+    // viewport required for any viewport-dependent 
+    // nodes (eg text), but not required for others
+    SbViewportRegion anyVP(0,0);  
+    SoGetBoundingBoxAction bbAction( anyVP );
+    bbAction.apply( IVRoot );
+    SbBox3f bbox = bbAction.getBoundingBox();
+    const SbVec3f& minIV = bbox.getMin();
+    const SbVec3f& maxIV = bbox.getMax();
+    minPoint.set(minIV[0], minIV[1], minIV[2]);
+    maxPoint.set(maxIV[0], maxIV[1], maxIV[2]);
 }
 
 /*! Returns the material id of a material with name \a matName 
@@ -728,7 +750,11 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 				QTWARNING("Failed to load focal distance");
 				return FAILURE;				
 			}
-			myIVmgr->setCamera(px, py, pz, q1, q2, q3, q4, fd);
+            if (myIVmgr) {
+                myIVmgr->setCamera(px, py, pz, q1, q2, q3, q4, fd);
+            }else{
+                DBGA("Could not set camera");
+            }
 			cameraFound = true;
 		}
 		else {
@@ -739,7 +765,9 @@ World::loadFromXml(const TiXmlElement* root,QString rootPath)
 	}
 
 	if (!cameraFound) {
-		myIVmgr->getViewer()->viewAll();
+        if (myIVmgr) {
+            myIVmgr->getViewer()->viewAll();
+        }
 	}
 	findAllContacts();
 	modified = false;
@@ -833,14 +861,39 @@ World::save(const QString &filename)
 			}
 		}
 	}
-	stream<<"\t<camera>"<<endl;
-	float px, py, pz, q1, q2, q3, q4, fd;
+
+    stream<<"\t<camera>"<<endl;
 	if (myIVmgr) {
+        float px, py, pz, q1, q2, q3, q4, fd;
 		myIVmgr->getCamera(px, py, pz, q1, q2, q3, q4, fd);
 		stream<<"\t\t<position>"<<px<<" "<<py<<" "<<pz<<"</position>"<<endl;
 		stream<<"\t\t<orientation>"<<q1<<" "<<q2<<" "<<q3<<" "<<q4<<"</orientation>"<<endl;
 		stream<<"\t\t<focalDistance>"<<fd<<"</focalDistance>"<<endl;
-	}
+	} else {
+        // the object will be viewed along the negative z-axis from a distance
+        // determined by a target angle between the view point and the
+        // x-coordinate corners of the world bounding box.
+        static float angle = 60;  // angle (degrees) between rays cast to two corners of the bounding box
+        if (fabs(angle)<1e-05) {
+            DBGA("Cannot choose zero angle, forcing to 10 as minimum");
+            angle = 10;
+        }
+        vec3 minPoint, maxPoint, center;  // min/max points of AABB
+        getBoundingBox(minPoint, maxPoint);
+        center = (minPoint + maxPoint) * 0.5;
+        float xLen = fabs(maxPoint.x()-minPoint.x());  // lenght of BB along x
+        float zLen = fabs(maxPoint.z()-minPoint.z());  // lenght of BB along z
+        float dist = fabs(xLen*0.5 / tan (angle * 0.5 * M_PI/180));  // distance along z
+        // std::cout<<"xLen: "<<xLen<<", zLen: "<<zLen<<", dist = "<<dist<<std::endl;
+
+        // write results to stream
+        vec3 pos(center.x(), center.y(), center.z() + zLen*0.5 + dist);
+		stream<<"\t\t<position>"<<pos.x()<<" "<<pos.y()<<" "<<pos.z()<<"</position>"<<endl;
+        // orientation along negative z (with y as up vector) is default in Inventor, so
+        // keep identity quaternion
+		stream<<"\t\t<orientation>"<<0<<" "<<0<<" "<<0<<" "<<1<<"</orientation>"<<endl;
+		stream<<"\t\t<focalDistance>"<<dist<<"</focalDistance>"<<endl;
+    }
 	stream<<"\t</camera>"<<endl;
 	stream<<"</world>"<<endl;
 	file.close();

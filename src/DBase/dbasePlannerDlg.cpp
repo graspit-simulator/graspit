@@ -37,7 +37,7 @@
 #include "graspit_db_grasp.h"
 #include "searchState.h"
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "mainWindow.h"
 
 #include "DBPlanner/caching_neighbor_finder.h"
@@ -211,7 +211,7 @@ void DBasePlannerDlg::nextGraspButton_clicked(){
 
 // shortcut for the GWS display
 void DBasePlannerDlg::createGWSButton_clicked(){
-	graspItGUI->getMainWindow()->graspCreateProjection();
+	graspitCore->getMainWindow()->graspCreateProjection();
 }
 
 // put the entries into the distance function combo box
@@ -295,7 +295,7 @@ void DBasePlannerDlg::showGrasp(db_planner::Grasp* grasp){
 	static_cast<GraspitDBModel*>(mPlanningModel)->getGraspableBody()->setTran(transf::IDENTITY);
 	g->getPreGraspPlanningState()->execute();
 	if(mHand->isA("Barrett") && testedGraspRadioButton->isChecked()){
-		graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->autoGrasp(true);
+		graspitCore->getWorld()->getCurrentHand()->autoGrasp(true);
 	}
 	mHand->getWorld()->findAllContacts();
 	mHand->getWorld()->updateGrasps();
