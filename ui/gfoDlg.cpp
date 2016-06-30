@@ -27,7 +27,7 @@
 
 #include <QInputDialog>
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "robot.h"
 #include "grasp.h"
@@ -127,10 +127,10 @@ GFODlg::displayResults(int result)
     statusLabel->setText("Status: problem unfeasible");
   } else {
     statusLabel->setText("Status: optimization successful");
-    graspItGUI->getIVmgr()->drawDynamicForces();
+    graspitCore->getIVmgr()->drawDynamicForces();
     //keep in mind that World::updateGrasps() will overwrite this and use the wrenches
     //to draw the worst case disturbance instead
-    graspItGUI->getIVmgr()->drawUnbalancedForces();
+    graspitCore->getIVmgr()->drawUnbalancedForces();
     mMainWindow->updateContactsList();
   }
 }

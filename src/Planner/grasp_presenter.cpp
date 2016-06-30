@@ -67,7 +67,7 @@
 #endif
 
 /* graspit includes */
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "contact.h"
 #include "ivmgr.h"
 #include "world.h"
@@ -119,9 +119,9 @@ grasp_presenter::~grasp_presenter(){
 */
 void
 grasp_presenter::updateGlobals(){
-    ivmgr    = graspItGUI->getIVmgr();
+    ivmgr    = graspitCore->getIVmgr();
     myViewer = ivmgr->getViewer();
-    my_world = ivmgr->getWorld();
+    my_world = graspitCore->getWorld();
     my_hand  = my_world->getCurrentHand();
 }
 

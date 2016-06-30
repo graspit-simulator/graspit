@@ -25,7 +25,7 @@
 
 #include <QHBoxLayout>
 #include "qmDlg.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "grasp.h"
 #include "list"
@@ -45,7 +45,7 @@
 void QMDlg::init()
 {
   std::list<QualityMeasure *>::iterator qp;
-  Grasp *g = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+  Grasp *g = graspitCore->getWorld()->getCurrentHand()->getGrasp();
   int i;
   
   qmListBox->insertItem("New quality measure");
@@ -105,7 +105,7 @@ void QMDlg::updateSettingsBox()
 */
 void QMDlg::addEditQM()
 {
-  Grasp *g = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+  Grasp *g = graspitCore->getWorld()->getCurrentHand()->getGrasp();
   QualityMeasure *newQM;
   int selectedQM;
 
@@ -138,7 +138,7 @@ void QMDlg::deleteQM()
   int numItems;
   
   selectedQM = qmListBox->currentItem();
-  graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp()->
+  graspitCore->getWorld()->getCurrentHand()->getGrasp()->
     removeQM(selectedQM-1);
   qmListBox->removeItem(selectedQM);
 
@@ -166,7 +166,7 @@ void QMDlg::selectQM( int which)
   }
   else {
     DeleteButton->setEnabled(true);
-    Grasp *g = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+    Grasp *g = graspitCore->getWorld()->getCurrentHand()->getGrasp();
     qmDlgData.currQM = g->getQM(which-1);
 
 	for (int i=0;QualityMeasure::TYPE_LIST[i];i++) {
@@ -183,7 +183,7 @@ void QMDlg::selectQM( int which)
 
 void QMDlg::gravityBox_clicked()
 {
-    Grasp *g = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+    Grasp *g = graspitCore->getWorld()->getCurrentHand()->getGrasp();
 	g->setGravity( gravityBox->isChecked() );
 	if ( gravityBox->isChecked() ) {
 		fprintf(stderr,"Gravity on\n");

@@ -25,7 +25,7 @@
 
 #include "tableCheckTask.h"
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
@@ -40,7 +40,7 @@ TableCheckTask::TableCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager
 			       db_planner::TaskRecord rec) : PreGraspCheckTask (disp, mgr, rec)
 {
   //load the table
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   QString path = QString(getenv("GRASPIT")) + QString("/models/objects/plane.xml");
   mTable = world->importBody("Body", path);
   if (!mTable) {
@@ -51,7 +51,7 @@ TableCheckTask::TableCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager
 
 TableCheckTask::~TableCheckTask()
 {
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   if (mTable) {
     world->destroyElement(mTable, true);
   }
@@ -80,7 +80,7 @@ void TableCheckTask::start()
   //and move up until it touches the object
   transf tr( Quaternion::IDENTITY, vec3(0.0, 0.0, 100.0) );
   
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   world->toggleCollisions(false, mHand, mTable);
   mTable->moveTo( tr, 5.0, M_PI/36.0 );
   world->toggleCollisions(true, mHand, mTable);
@@ -129,7 +129,7 @@ double TableCheckTask::getTableClearance(db_planner::Grasp *grasp)
   graspState->execute();  
 
   //check distance for grasp
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   double distance = world->getDist(mHand, mTable);
   if (distance < 0) {
     DBGA(" Grasp is in collision with table");

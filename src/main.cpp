@@ -48,9 +48,11 @@
 
 #include <iostream>
 #include <graspitApp.h>
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "graspitServer.h"
 #include "mainWindow.h"
+#include "cmdline.h"
+#include "graspitParser.h"
 
 #ifdef Q_WS_WIN
 #include <windows.h>
@@ -69,14 +71,21 @@ int main(int argc, char **argv)
 #endif
 #endif
 
+  GraspitParser *graspitParser = new GraspitParser();
+  graspitParser->parseArgs(argc, argv);
+  cmdline::parser *parsed_args = graspitParser->parseArgs(argc, argv);
+
+  bool headless = parsed_args->exist("headless");
+
   GraspItApp app(argc, argv);
- 
-  if (app.splashEnabled()) {
-    app.showSplash();
-    QApplication::setOverrideCursor( Qt::waitCursor );
+  if(!headless){
+      if (app.splashEnabled()) {
+        app.showSplash();
+        QApplication::setOverrideCursor( Qt::waitCursor );
+      }
   }
 
-  GraspItGUI gui(argc,argv);
+  GraspitCore core(argc, argv);
   
   //This is the GraspIt TCP server. It can be used to connect to GraspIt from
   //external programs, such as Matlab.
@@ -84,16 +93,21 @@ int main(int argc, char **argv)
   //default
   //GraspItServer server(4765);
  
-  app.setMainWidget(gui.getMainWindow()->mWindow);
+
   QObject::connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
 
-  if (app.splashEnabled()) {
-    app.closeSplash();
-    QApplication::restoreOverrideCursor();
+  if(!headless)
+  {
+      app.setMainWidget(core.getMainWindow()->mWindow);
+      if (app.splashEnabled()) {
+        app.closeSplash();
+        QApplication::restoreOverrideCursor();
+      }
   }
 
-  if (!gui.terminalFailure()) {
-	  gui.startMainLoop();
+
+  if (!core.terminalFailure()) {
+      core.startMainLoop();
   }
-  return gui.getExitCode();
+  return core.getExitCode();
 }
