@@ -47,7 +47,10 @@
 #include "dynJoint.h"
 #include "ivmgr.h"
 #include "contact.h"
+#include "virtualContact.h"
+#include "virtualContactOnObject.h"
 #include "graspitCore.h"
+
 #include "tinyxml.h"
 
 #ifdef PLY_READER

@@ -4,6 +4,7 @@
 #include "include/debug.h"
 #include "include/world.h"
 #include "quality.h"
+#include "include/contact/virtualContact.h"
 
 
 /*!	This formulation combines virtual contact energy with autograsp energy. Virtual contact energy is used to "guide"

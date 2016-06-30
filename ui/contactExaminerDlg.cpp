@@ -37,6 +37,8 @@
 #include "ivmgr.h"
 #include "body.h"
 #include "mainWindow.h"
+#include "include/contact/virtualContact.h"
+#include "include/contact/virtualContactOnObject.h"
 
 #include "debug.h"
 
