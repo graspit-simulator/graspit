@@ -45,6 +45,7 @@
 #include "joint.h"
 #include "body.h"
 #include "contact.h"
+#include "virtualContact.h"
 #include "gws.h"
 #include "quality.h"
 #include "gwsprojection.h"

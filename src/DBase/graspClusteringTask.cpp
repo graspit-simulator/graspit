@@ -29,7 +29,7 @@
 
 #include "world.h"
 #include "robot.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "matvec3D.h"
 #include "searchState.h"
 #include "DBPlanner/db_manager.h"
@@ -59,7 +59,7 @@ void GraspClusteringTask::start()
     return;
   }
 
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   Hand *hand;
  
   //check if the currently selected hand is the same as the one we need

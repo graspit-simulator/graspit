@@ -28,7 +28,7 @@
 #include <QString>
 
 #include "mytools.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
@@ -74,7 +74,7 @@ void GraspPlanningTask::start()
     return;
   }
 
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
 
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand we need

@@ -25,7 +25,7 @@
 
 #include "graspTransferCheckTask.h"
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
@@ -75,7 +75,7 @@ void GraspTransferCheckTask::start()
     return;
   }
 
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
 
   if ( !world->getNumHands()) {
     QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
@@ -168,7 +168,7 @@ bool GraspTransferCheckTask::checkGraspCombo(db_planner::Grasp* grasp1, db_plann
   graspState2->execute();
 
   //check for collisions
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   if (!world->noCollision()) {
     DBGA("  initial grasps are in collision");
     return false;

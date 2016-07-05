@@ -66,7 +66,7 @@
 
 /* graspit includes */
 #include "contact.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
@@ -101,7 +101,7 @@ extern FILE *debugfile;
 grasp_planner::grasp_planner()
 {
     /* get global stuff */
-  ivmgr = graspItGUI->getIVmgr();
+  ivmgr = graspitCore->getIVmgr();
 
     myViewer = ivmgr->getViewer();
     my_body  = NULL;
@@ -139,7 +139,7 @@ std::list<plannedGrasp*>
 grasp_planner::planIt(GraspableBody* gb,SoGroup *IVPrimitives)
 {
 #ifdef PLAN_GRASP_ON_ALL_BODIES    
-  int numGB = ivmgr->getWorld()->getNumGB();
+  int numGB = graspitCore->getWorld()->getNumGB();
 #endif
   std::list <GraspDirection*> gd_list;
   std::list <plannedGrasp*> graspList;
@@ -666,7 +666,7 @@ grasp_planner::getGlobalPath(SoNode *node)
   /* Search for node */
   saction.setNode(node);
   saction.setInterest(SoSearchAction::ALL);
-  saction.apply(ivmgr->getWorld()->getIVRoot());
+  saction.apply(graspitCore->getWorld()->getIVRoot());
   pl     = saction.getPaths();
   
   //for (int i=0; i<pl.getLength(); i++)

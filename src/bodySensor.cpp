@@ -8,7 +8,6 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSphere.h>
 
-#include "graspitGUI.h"
 #include "ivmgr.h"
 
 #include "body.h"

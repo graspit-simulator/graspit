@@ -32,7 +32,7 @@
 
 #include "robot.h"
 #include "mainWindow.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "grasp_manager.h"
 #include "grasp_tester.h"
 #include "grasp_planner.h"
@@ -85,7 +85,7 @@ void PlannerDlg::init()
   backstepSizeLine->setValidator(new QDoubleValidator(0,1000,6,this));
   
   qmComboBox->clear();
-  grasp = graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+  grasp = graspitCore->getWorld()->getCurrentHand()->getGrasp();
   if (grasp->getNumQM() == 0) GenerateButton->setEnabled(false);
   else {
       for (i=0;i<grasp->getNumQM();i++)
@@ -180,8 +180,8 @@ void PlannerDlg::showGrasp()
 */
 void PlannerDlg::newQM()
 {
-  Grasp *grasp=graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
-  graspItGUI->getMainWindow()->graspQualityMeasures();
+  Grasp *grasp=graspitCore->getWorld()->getCurrentHand()->getGrasp();
+  graspitCore->getMainWindow()->graspQualityMeasures();
   if (grasp->getNumQM()>0) GenerateButton->setEnabled(true);
   qmComboBox->clear();
   for (int i=0;i<grasp->getNumQM();i++)
@@ -217,7 +217,7 @@ void PlannerDlg::chooseSaveFile()
 void PlannerDlg::testGrasps()
 {
   QString planFilename,quadFilename;
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
  /*  
   if (TestButton->text() == "Pause") {
 	TestButton->setText("Continue");

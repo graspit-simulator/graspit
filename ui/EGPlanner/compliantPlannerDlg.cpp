@@ -40,7 +40,7 @@
 PROF_DECLARE(QS_TOTAL);
 
 //for the bounding box and drawing forces
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 
 //for debug
@@ -171,7 +171,7 @@ CompliantPlannerDlg::generateButtonClicked()
 	}
 	//get object bbox dimensions
 	SoGetBoundingBoxAction *bba = 
-		new SoGetBoundingBoxAction(graspItGUI->getIVmgr()->getViewer()->getViewportRegion());
+		new SoGetBoundingBoxAction(graspitCore->getIVmgr()->getViewer()->getViewportRegion());
 	bba->apply(mObject->getIVGeomRoot());
 	SbVec3f bbmin,bbmax;
 	bba->getBoundingBox().getBounds(bbmin,bbmax);
@@ -299,8 +299,8 @@ CompliantPlannerDlg::testOneButtonClicked()
 	DBGA("Testing pre-grasp #" << num);
 	mPlanner->testState(num);
 	mHand->getWorld()->updateGrasps();
-	graspItGUI->getIVmgr()->drawDynamicForces();
-	graspItGUI->getIVmgr()->drawUnbalancedForces();
+	graspitCore->getIVmgr()->drawDynamicForces();
+	graspitCore->getIVmgr()->drawUnbalancedForces();
 }
 
 void
