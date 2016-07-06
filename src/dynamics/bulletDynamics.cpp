@@ -580,46 +580,28 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
         //! Robot Translation and Rotations
         btRigidBody* btbase=btBodyMap.find(robot->getBase())->second;
 
-        //! convert the impulse from along the robot's approach direction (+z sticking out of palm) to the world frame.
-        transf impulseInWorldFrame = translate_transf(robot->getRobotImpulse() * robot->getApproachTran()) * robot->getTran();
-        transf robotBase =  robot->getApproachTran() * robot->getTran();
-        //transf impulseInWorldFrame = (robot->getApproachTran()) * robot->getTran();
+        //! convert the velocity from along the robot's approach direction (+z sticking out of palm) to the world frame.
+        transf velocityInWorldFrame = translate_transf(robot->getLinearVelocity() * robot->getApproachTran()) * robot->getTran();
 
-        //! this impulse is applied at the origin of the base of the robot.
-        btVector3 relpose(robotBase.translation().x(),
-                          robotBase.translation().y(),
-                          robotBase.translation().z());
-        btVector3 impulse(impulseInWorldFrame.translation().x(),
-                          impulseInWorldFrame.translation().y(),
-                          impulseInWorldFrame.translation().z());
-        btbase->applyImpulse(impulse, relpose);
-        //btbase->setLinearVelocity(impulse);
+        btVector3 velocity(velocityInWorldFrame.translation().x() - robot->getTran().translation().x(),
+                           velocityInWorldFrame.translation().y() - robot->getTran().translation().y(),
+                           velocityInWorldFrame.translation().z() - robot->getTran().translation().z());
 
-        double r,p,y;
-        vec3 rAxis = vec3(1,0,0) * robot->getApproachTran() * robot->getTran();
-        vec3 pAxis = vec3(0,1,0) * robot->getApproachTran() * robot->getTran();
-        vec3 yAxis = vec3(0,0,1) * robot->getApproachTran() * robot->getTran();
+        btbase->setLinearVelocity(velocity);
 
-        std::cout << rAxis << std::endl;
-        std::cout << pAxis << std::endl;
-        std::cout << yAxis << std::endl;
+        //! Convert the angular velocity defined  in the approach frame of reference to the world frame.
+        transf rotFrame = rotXYZ(robot->getAngularVelocity().x(), robot->getAngularVelocity().y(), robot->getAngularVelocity().z());
+        transf rotFrameInWorld = rotFrame  * robot->getApproachTran() * robot->getTran();
 
-        impulseInWorldFrame.rotation().ToAngleAxis(r, rAxis);
-        impulseInWorldFrame.rotation().ToAngleAxis(p, pAxis);
-        impulseInWorldFrame.rotation().ToAngleAxis(y, yAxis);
+        double r;
+        vec3 rAxis;
+        rotFrameInWorld.rotation().ToAngleAxis(r, rAxis);
 
-        std::cout << r << std::endl;
-        std::cout << p << std::endl;
-        std::cout << y << std::endl;
-        std::cout << impulseInWorldFrame.rotation() << std::endl;
+        btVector3 angularVelocity(r*rAxis.x(), r*rAxis.y(), r*rAxis.z());
 
-        btVector3 torqueNext(1.0, p, y);
-        btbase->applyTorqueImpulse(torqueNext);
-        //btbase->setAngularVelocity(torqueNext);
+        btbase->setAngularVelocity(angularVelocity);
 
     }
-
-
 
     return 0;
 }
