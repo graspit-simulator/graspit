@@ -445,13 +445,13 @@ void BulletDynamics::addChain(KinematicChain *chain, btRigidBody *btbase)
 
                 mBtDynamicsWorld->addConstraint(newjoint, true);
             } else if (djtype == DynJoint::BALL) {
-                DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: BALL \n");
+                DBGP(" %d link: "<< l << "  type: BALL \n");
                 jointind+=3;
             } else if (djtype == DynJoint::PRISMATIC) {
-                DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: PRISMATIC \n");
+                DBGP("%d link: "<< l << "  type: PRISMATIC \n");
                 jointind++;
             } else if (djtype == DynJoint::FIXED) {
-                DBGP("~~~~~~chain: "<< f << "%d link: "<< l << "  type: FIXED \n");
+                DBGP("%d link: "<< l << "  type: FIXED \n");
                 jointind++;
             }
         }

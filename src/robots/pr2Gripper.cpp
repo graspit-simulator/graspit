@@ -30,7 +30,7 @@
 #include "pr2Gripper.h"
 #include "world.h"
 #include "collisionInterface.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "mainWindow.h"
 #include "contact.h"
 

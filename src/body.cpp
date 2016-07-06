@@ -47,7 +47,10 @@
 #include "dynJoint.h"
 #include "ivmgr.h"
 #include "contact.h"
-#include "graspitGUI.h"
+#include "virtualContact.h"
+#include "virtualContactOnObject.h"
+#include "graspitCore.h"
+
 #include "tinyxml.h"
 
 #ifdef PLY_READER
@@ -1248,7 +1251,7 @@ void Body::createAxesGeometry()
 {  
   IVWorstCase = new SoSeparator;  
   IVAxes = new SoSwitch;  
-  if (graspItGUI) {
+  if (graspitCore) {
     SoSeparator *axesSep = new SoSeparator;
     axesTranToCOG = new SoTranslation;
     axesTranToCOG->translation.setValue(0,0,0);
@@ -1258,7 +1261,10 @@ void Body::createAxesGeometry()
     axesScale = new SoScale;
 	axesScale->scaleFactor = SbVec3f(1,1,1);
     axesSep->addChild(axesScale);
-    axesSep->addChild(graspItGUI->getIVmgr()->getPointers()->getChild(2));
+    if(graspitCore->getIVmgr())
+    {
+        axesSep->addChild(graspitCore->getIVmgr()->getPointers()->getChild(2));
+    }
     IVAxes->addChild(axesSep);
   }
   if (!IVRoot) IVRoot = new SoSeparator;

@@ -47,7 +47,7 @@
             <a>44.1015</a>
             <alpha>0</alpha>
             <minValue>0</minValue>
-            <maxValue>140</maxValue>
+            <maxValue>60</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
         </joint>
         <joint type="Revolute">
@@ -56,7 +56,7 @@
             <a>0.0</a>
             <alpha>0</alpha>
             <minValue>0</minValue>
-            <maxValue>140</maxValue>
+            <maxValue>70</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
         </joint>
         <link dynamicJointType="Revolute">mico_finger_proximal_link.xml</link>
@@ -75,7 +75,7 @@
             <a>44.1015</a>
             <alpha>0</alpha>
             <minValue>0</minValue>
-            <maxValue>140</maxValue>
+            <maxValue>60</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
         </joint>
         <joint type="Revolute">
@@ -84,7 +84,7 @@
             <a>0.0</a>
             <alpha>0</alpha>
             <minValue>0</minValue>
-            <maxValue>140</maxValue>
+            <maxValue>70</maxValue>
             <viscousFriction>5.0e+7</viscousFriction>
         </joint>
         <link dynamicJointType="Revolute">mico_finger_proximal_link.xml</link>
@@ -95,6 +95,6 @@
         <referenceLocation>0 0 -112.0</referenceLocation>
         <direction>0 0 -1</direction>
     </approachDirection>
-<virtualContacts>virtual/gripper_contacts.vgr</virtualContacts>
-
+     <eigenGrasps>eigen/eigen.xml</eigenGrasps>
+    <virtualContacts>virtual/8_contacts.vgr</virtualContacts>
 </robot>

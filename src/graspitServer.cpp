@@ -30,7 +30,7 @@
 #include <QTextStream>
 #include <iostream>
 #include "graspitServer.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
@@ -62,7 +62,7 @@ ClientSocket::readBodyIndList(std::vector<Body *> &bodyVec)
   QTextStream os(this);
   int i,numBodies,bodNum;
   bool ok;
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   std::cout << "ReadBodyIndList Line:"<<line.latin1() << std::endl;
 
   /* if the index list is empty, use every body and send
@@ -121,7 +121,7 @@ ClientSocket::readRobotIndList(std::vector<Robot *> &robVec)
   QTextStream os(this);
   int i,robNum,numRobots;
   bool ok;
-  World *world = graspItGUI->getIVmgr()->getWorld();
+  World *world = graspitCore->getWorld();
   std::cout << "ReadRobotIndList Line:"<<line.latin1() << std::endl;
 
   /* if the index list is empty, use every robot and send
@@ -190,7 +190,7 @@ ClientSocket::readClient()
     strPtr = lineStrList.begin();
 
 #ifdef GRASPITDBG
-    std::cout <<"Command parser line: "<<line << std::endl;
+    std::cout <<"Command parser line: "<< line.toStdString().c_str() << std::endl;
 #endif
     
     if (*strPtr == "getContacts") {
@@ -199,7 +199,7 @@ ClientSocket::readClient()
       if (!ok) continue;
 
 #ifdef GRASPITDBG
-      std::cout << "Num data: "<<numData<<std::endl;
+      std::cout << "Num data: "<< numData <<std::endl;
 #endif
 
       if (readBodyIndList(bodyVec)) continue;
@@ -246,7 +246,7 @@ ClientSocket::readClient()
     }
     
     else if (*strPtr == "render")
-      graspItGUI->getIVmgr()->getViewer()->render();
+      graspitCore->getIVmgr()->getViewer()->render();
     
     else if (*strPtr == "setDOFForces") {
       strPtr++;
@@ -256,7 +256,7 @@ ClientSocket::readClient()
 	if (readDOFForces(robVec[i])==FAILURE) continue;
     }
     else if (*strPtr == "moveToContacts")
-      graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->approachToContact(30, true);
+      graspitCore->getWorld()->getCurrentHand()->approachToContact(30, true);
  
     else if ((*strPtr) == "moveDynamicBodies") {
       strPtr++;
@@ -429,11 +429,11 @@ ClientSocket::readDOFVals()
   if (ok) robNum = (*strPtr).toInt(&ok);
 
   if (!ok || robNum < 0 ||
-    robNum >= graspItGUI->getIVmgr()->getWorld()->getNumRobots()) {
+    robNum >= graspitCore->getWorld()->getNumRobots()) {
 	os <<"Error: Robot does not exist.\n";
     return FAILURE;
   }
-  rob = graspItGUI->getIVmgr()->getWorld()->getRobot(robNum);
+  rob = graspitCore->getWorld()->getRobot(robNum);
 
 #ifdef GRASPITDBG
   std::cout << "robnum: "<<robNum<<std::endl;
@@ -489,8 +489,8 @@ ClientSocket::readDOFVals()
   rob->moveDOFToContacts(val,stepby,true);
 
   // these should be separate commands
-  graspItGUI->getIVmgr()->getWorld()->findAllContacts();
-  graspItGUI->getIVmgr()->getWorld()->updateGrasps();
+  graspitCore->getWorld()->findAllContacts();
+  graspitCore->getWorld()->updateGrasps();
 
   for (i=0;i<rob->getNumDOF();i++) {
     os << rob->getDOF(i)->getVal() << "\n";
@@ -590,10 +590,10 @@ ClientSocket::moveDynamicBodies(double timeStep)
 {
   QTextStream os(this);
   if (timeStep<0)
-    timeStep = graspItGUI->getIVmgr()->getWorld()->getTimeStep();
+    timeStep = graspitCore->getWorld()->getTimeStep();
 
   double actualTimeStep =
-    graspItGUI->getIVmgr()->getWorld()->moveDynamicBodies(timeStep);
+    graspitCore->getWorld()->moveDynamicBodies(timeStep);
   if (actualTimeStep < 0)
     os << "Error: Timestep failsafe reached.\n";
   else 
@@ -609,7 +609,7 @@ void
 ClientSocket::computeNewVelocities(double timeStep)
 {
   QTextStream os(this);
-  int result = graspItGUI->getIVmgr()->getWorld()->computeNewVelocities(timeStep);
+  int result = graspitCore->getWorld()->computeNewVelocities(timeStep);
   os << result << "\n";
 }
 

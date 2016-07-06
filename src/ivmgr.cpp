@@ -38,6 +38,7 @@
 #include <q3listbox.h>
 #include <QApplication>
 #include <QThread>
+#include <QGLWidget>
 
 #include <Inventor/SoDB.h>
 #include <Inventor/SoInput.h>
@@ -105,7 +106,8 @@
 #include "mainWindow.h"
 #include "matvec3D.h"
 //hmmm not sure this is right
-#include "graspitGUI.h"
+#include "graspitCore.h"
+
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -216,7 +218,7 @@ IVmgr *IVmgr::ivmgr = 0;
   for draggers and wireframe models, which indicate when bodies are selected,
   are also created.
 */
-IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) : 
+IVmgr::IVmgr(World *w, QWidget *parent, const char *name, Qt::WFlags f) :
   QWidget(parent,name,f)
 {
   ivmgr = this;
@@ -232,7 +234,9 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
 #endif
 
   // Initialize the main world
-  world = new World(NULL,"mainWorld", this);
+  world = w;
+  world->setIVMgr(this);
+
   setupPointers();
 
   // Create the viewer
@@ -258,7 +262,7 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
   sceneRoot->addChild(mouseEventCB);
 
   // an empty separator used in the make handlebox routine
-  junk = new SoSeparator; junk->ref(); 
+  junk = new SoSeparator; junk->ref();
 
   // create and set up the selection node
   selectionRoot = new SoSelection;
@@ -283,8 +287,7 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
   myViewer->setBackgroundColor(SbColor(1,1,1));
 
   myViewer->viewAll();
-  mDBMgr = NULL;
-  mDBMgr = NULL;
+
 }
 
 //! Not used right now
@@ -318,20 +321,17 @@ IVmgr::~IVmgr()
   delete myViewer;
 }
 
-/*!
-  Deselects all world elements, deletes the world, and creates a new world.
-*/
 void
-IVmgr::emptyWorld()
+IVmgr::setWorld(World *w)
 {
-  selectionRoot->deselectAll();
-  selectionRoot->removeChild(world->getIVRoot());
-  delete world;
-  world = new World(NULL, "MainWorld", this);
-  //comment out here and where another world is created to stop using mutexes
-  //world->setRenderMutex(&mRenderMutex);
-  selectionRoot->addChild(world->getIVRoot());
+    selectionRoot->deselectAll();
+    selectionRoot->removeChild(world->getIVRoot());
+
+    world = w;
+    selectionRoot->addChild(world->getIVRoot());
 }
+
+
 
 /*!
   Deselects all elements and sets the current tool type.
@@ -355,16 +355,6 @@ IVmgr::setupPointers()
   pointers = SoDB::readAll(&in);
   //pointers = new SoSeparator;
   pointers->ref();
-}
-
-/*!
-  Starts the main event loop.
-*/
-void
-IVmgr::beginMainLoop()
-{
-  //SoQt::show(MainWindow);
-  SoQt::mainLoop();
 }
 
 /*!
@@ -1531,13 +1521,6 @@ IVmgr::saveImage(QString filename)
   myRenderer = new SoOffscreenRenderer(glRend);
   myRenderer->setBackgroundColor(white);
 
-#ifdef GRASPITDBG
-  if (myRenderer->isWriteSupported("jpg"))
-	std::cout << " supports jpg" << std::endl;
-  else
-	std::cout << "no jpg support" << std::endl;
-#endif  
-
   SoSeparator *renderRoot = new SoSeparator;
   renderRoot->ref();
   renderRoot->addChild(myViewer->getCamera());
@@ -1551,10 +1534,15 @@ IVmgr::saveImage(QString filename)
   renderRoot->addChild(sg);
   
   myRenderer->render(renderRoot);
-  
 
-  myRenderer->writeToFile(SbString(filename.latin1()),
-                          SbName(filename.section('.',-1)));
+  QGLWidget * glWidget = dynamic_cast<QGLWidget *>(renderArea->getGLWidget());
+  if(glWidget){
+      QImage image = glWidget->grabFrameBuffer();
+      image.save(filename);
+  }else{
+        DBGA("Could not save image renderArea was not a GLWidget.");
+  }
+
   
   renderRoot->unref();
   delete myRenderer;
