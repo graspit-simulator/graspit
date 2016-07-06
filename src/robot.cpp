@@ -212,7 +212,7 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
         forceDefaultDOFVals();
 
 	//reset the dynamics: fix the base and set desired dof's to current values
-	getBase()->fix();
+    //getBase()->fix();
 	for (int i=0; i<getNumDOF(); i++) {
 		getDOF(i)->setDesiredPos( getDOF(i)->getVal() );
 	}
@@ -495,7 +495,7 @@ Robot::cloneFrom(Robot *original)
 
 	base->setTran(transf::IDENTITY);
 	//careful: clones robots have never been tested with the dynamics engine
-	getBase()->fix();
+    //getBase()->fix();
 	for (int i=0; i<getNumDOF(); i++) {
 		getDOF(i)->setDesiredPos( getDOF(i)->getVal() );
 	}

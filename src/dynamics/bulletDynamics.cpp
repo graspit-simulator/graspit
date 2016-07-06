@@ -40,7 +40,7 @@
 #include "robot.h"
 #include "triangle.h"
 #include "world.h"
-
+#include "matvec3D.h"
 #include "debug.h"
 #include "dynamics.h"
 #include "humanHand.h"
@@ -65,7 +65,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, -10));
+    mBtDynamicsWorld->setGravity(btVector3(0,0, 0));
 }
 
 BulletDynamics::~BulletDynamics()
@@ -147,8 +147,8 @@ void BulletDynamics::addRobot(Robot *robot)
     btRigidBody* btbase=NULL;
 
     if (robot->getBase()) {
-        btScalar mass(0.);
-        btVector3 localInertia(0, 0, 0);
+        btScalar mass(10.);
+        btVector3 localInertia(0,0,0);
         if ((btbase=btBodyMap.find(robot->getBase())->second) == NULL) {
             DBGA("error, base is not in the btBodyMap\n");
         }
@@ -502,6 +502,7 @@ void BulletDynamics::btApplyInternalWrench (Joint * activeJoint, double magnitud
 
         btVector3 torqueNext(magnitude*worldAxis.x(),magnitude*worldAxis.y(), magnitude*worldAxis.z());
         btNextLink->applyTorqueImpulse(torqueNext);
+
 }
 
 int BulletDynamics::stepDynamics()
@@ -575,7 +576,51 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
                 btApplyInternalWrench(tempjoint, springForce,btBodyMap);
             }
         }
+
+        //! Robot Translation and Rotations
+        btRigidBody* btbase=btBodyMap.find(robot->getBase())->second;
+
+        //! convert the impulse from along the robot's approach direction (+z sticking out of palm) to the world frame.
+        transf impulseInWorldFrame = translate_transf(robot->getRobotImpulse() * robot->getApproachTran()) * robot->getTran();
+        transf robotBase =  robot->getApproachTran() * robot->getTran();
+        //transf impulseInWorldFrame = (robot->getApproachTran()) * robot->getTran();
+
+        //! this impulse is applied at the origin of the base of the robot.
+        btVector3 relpose(robotBase.translation().x(),
+                          robotBase.translation().y(),
+                          robotBase.translation().z());
+        btVector3 impulse(impulseInWorldFrame.translation().x(),
+                          impulseInWorldFrame.translation().y(),
+                          impulseInWorldFrame.translation().z());
+        btbase->applyImpulse(impulse, relpose);
+        //btbase->setLinearVelocity(impulse);
+
+        double r,p,y;
+        vec3 rAxis = vec3(1,0,0) * robot->getApproachTran() * robot->getTran();
+        vec3 pAxis = vec3(0,1,0) * robot->getApproachTran() * robot->getTran();
+        vec3 yAxis = vec3(0,0,1) * robot->getApproachTran() * robot->getTran();
+
+        std::cout << rAxis << std::endl;
+        std::cout << pAxis << std::endl;
+        std::cout << yAxis << std::endl;
+
+        impulseInWorldFrame.rotation().ToAngleAxis(r, rAxis);
+        impulseInWorldFrame.rotation().ToAngleAxis(p, pAxis);
+        impulseInWorldFrame.rotation().ToAngleAxis(y, yAxis);
+
+        std::cout << r << std::endl;
+        std::cout << p << std::endl;
+        std::cout << y << std::endl;
+        std::cout << impulseInWorldFrame.rotation() << std::endl;
+
+        btVector3 torqueNext(1.0, p, y);
+        btbase->applyTorqueImpulse(torqueNext);
+        //btbase->setAngularVelocity(torqueNext);
+
     }
+
+
+
     return 0;
 }
 
