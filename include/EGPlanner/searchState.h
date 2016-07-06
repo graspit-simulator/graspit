@@ -285,8 +285,6 @@ public:
 	//! This HandObjectState becomes a snapshot of the CURRENT world state when the function is called.
 	void saveCurrentHandState();
 
-	bool dynamicExecute(Hand *h) const;
-
 	void changeHand(Hand *h, bool sticky = false);
 	Hand *getHand() const {return mHand;}
 	void setObject(GraspableBody *b){mTargetObject = b;}
@@ -301,6 +299,9 @@ public:
 
 	//! Places the given hand in the given state; if no hand is given it places its own hand
 	bool execute(Hand *h = NULL) const;
+
+    //! Moves the hand in the given state; with dynamics on; if no hand is given, it places its own hand
+    bool dynamicExecute(Hand *h) const;
 
 	//! Gives the inner transform (stored in mPosition) multiplied by the reference transform
 	transf getTotalTran() const {return mPosition->getCoreTran() * mRefTran;}
