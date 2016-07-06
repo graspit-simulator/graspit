@@ -158,9 +158,9 @@ protected:
   double defaultRotVel;
 
   //! magnitude of dynamic movement of the base of the robot
-  vec3 linearVelocity;
+  vec3 mLinearVelocity;
   //! direction of dynamic movement of the base of the robot
-  vec3 angularVelocity;
+  vec3 mAngularVelocity;
 
   // Input from external hardware
   //! Shows if this robot is to be controlled via a CyberGlove
@@ -240,8 +240,8 @@ protected:
 	approachTran = transf::IDENTITY;
 	// temporary
 	defaultTranslVel = 50; defaultRotVel = M_PI/4.0;
-    linearVelocity = vec3(0,0,0);
-    angularVelocity = vec3(0,0,0);
+    mLinearVelocity = vec3(0,0,0);
+    mAngularVelocity = vec3(0,0,0);
   }
   
   //! Deletes all kinematic chains, the base and mount piece, etc.
@@ -279,11 +279,11 @@ protected:
   void setDesiredDOFVals(double *dofVals);
 
   //! The main way to move the robot pose IN DYNAMICS mode.
-  void setRobotImpulse(vec3 dynamicImpulse){linearVelocity = dynamicImpulse;}
-  void setRobotImpulseRelPose(vec3 dynamicImpulseRelPose){angularVelocity = dynamicImpulseRelPose;}
+  void setLinearVelocity(vec3 velocity){mLinearVelocity = velocity;}
+  void setAngularVelocity(vec3 angularVelocity){mAngularVelocity = angularVelocity;}
 
-  vec3 getLinearVelocity(){return linearVelocity;}
-  vec3 getAngularVelocity(){return angularVelocity;}
+  vec3 getLinearVelocity(){return mLinearVelocity;}
+  vec3 getAngularVelocity(){return mAngularVelocity;}
 
   //! Returns true if any of the contacts on the fingers are slipping during dynamics
   bool contactSlip();
