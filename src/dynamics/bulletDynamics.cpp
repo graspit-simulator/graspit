@@ -40,7 +40,7 @@
 #include "robot.h"
 #include "triangle.h"
 #include "world.h"
-#include "matvec3D.h"
+
 #include "debug.h"
 #include "dynamics.h"
 #include "humanHand.h"
@@ -65,7 +65,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, 0));
+    mBtDynamicsWorld->setGravity(btVector3(0,0,0));
 }
 
 BulletDynamics::~BulletDynamics()
@@ -148,7 +148,7 @@ void BulletDynamics::addRobot(Robot *robot)
 
     if (robot->getBase()) {
         btScalar mass(10.);
-        btVector3 localInertia(0,0,0);
+        btVector3 localInertia(0, 0, 0);
         if ((btbase=btBodyMap.find(robot->getBase())->second) == NULL) {
             DBGA("error, base is not in the btBodyMap\n");
         }
