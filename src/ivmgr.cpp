@@ -113,7 +113,7 @@
 #include "mainWindow.h"
 #include "matvec3D.h"
 //hmmm not sure this is right
-#include "graspitGUI.h"
+#include "graspitCore.h"
 
 
 //#define GRASPITDBG
@@ -225,7 +225,7 @@ IVmgr *IVmgr::ivmgr = 0;
   for draggers and wireframe models, which indicate when bodies are selected,
   are also created.
 */
-IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) : 
+IVmgr::IVmgr(World *w, QWidget *parent, const char *name, Qt::WFlags f) :
   QWidget(parent,name,f)
 {
   ivmgr = this;
@@ -241,7 +241,9 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
 #endif
 
   // Initialize the main world
-  world = new World(NULL,"mainWorld", this);
+  world = w;
+  world->setIVMgr(this);
+
   setupPointers();
 
   // Create the viewer
@@ -267,7 +269,7 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
   sceneRoot->addChild(mouseEventCB);
 
   // an empty separator used in the make handlebox routine
-  junk = new SoSeparator; junk->ref(); 
+  junk = new SoSeparator; junk->ref();
 
   // create and set up the selection node
   selectionRoot = new SoSelection;
@@ -292,8 +294,7 @@ IVmgr::IVmgr(QWidget *parent, const char *name, Qt::WFlags f) :
   myViewer->setBackgroundColor(SbColor(1,1,1));
 
   myViewer->viewAll();
-  mDBMgr = NULL;
-  mDBMgr = NULL;
+
 }
 
 //! Not used right now
@@ -327,20 +328,17 @@ IVmgr::~IVmgr()
   delete myViewer;
 }
 
-/*!
-  Deselects all world elements, deletes the world, and creates a new world.
-*/
 void
-IVmgr::emptyWorld()
+IVmgr::setWorld(World *w)
 {
-  selectionRoot->deselectAll();
-  selectionRoot->removeChild(world->getIVRoot());
-  delete world;
-  world = new World(NULL, "MainWorld", this);
-  //comment out here and where another world is created to stop using mutexes
-  //world->setRenderMutex(&mRenderMutex);
-  selectionRoot->addChild(world->getIVRoot());
+    selectionRoot->deselectAll();
+    selectionRoot->removeChild(world->getIVRoot());
+
+    world = w;
+    selectionRoot->addChild(world->getIVRoot());
 }
+
+
 
 /*!
   Deselects all elements and sets the current tool type.
@@ -364,16 +362,6 @@ IVmgr::setupPointers()
   pointers = SoDB::readAll(&in);
   //pointers = new SoSeparator;
   pointers->ref();
-}
-
-/*!
-  Starts the main event loop.
-*/
-void
-IVmgr::beginMainLoop()
-{
-  //SoQt::show(MainWindow);
-  SoQt::mainLoop();
 }
 
 /*!
@@ -1585,7 +1573,7 @@ IVmgr::saveDepthImage(QString filename)
     SoSeparator *shaderSep;
     SoDepthBuffer * depthBuffer;
 
-    renderArea = graspItGUI->getIVmgr()->getViewer();
+    renderArea = getViewer();
 
     depthBuffer = new SoDepthBuffer;
     depthBuffer->function = SoDepthBufferElement::LESS;
@@ -1608,7 +1596,7 @@ IVmgr::saveDepthImage(QString filename)
     shaderSep->ref();
     shaderSep->addChild(depthBuffer);
     shaderSep->addChild(shaderProgram);
-    shaderSep->addChild(graspItGUI->getIVmgr()->getViewer()->getCamera());
+    shaderSep->addChild(getViewer()->getCamera());
     shaderSep->addChild(renderArea->getSceneGraph());
 
     glRend = new SoGLRenderAction(renderArea->getViewportRegion());

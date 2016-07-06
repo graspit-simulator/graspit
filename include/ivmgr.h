@@ -77,10 +77,6 @@ class GWSprojection;
 class QualityMeasure;
 struct DraggerInfo;
 
-namespace db_planner {
-	class DatabaseManager;
-}
-
 #define HANDS_DIR "../../hands/"
 #define OBJECTS_DIR "../../objects/"
 #define MAX_POLYTOPES 15
@@ -175,9 +171,6 @@ class IVmgr : public QWidget {
   //! Pointer to the material node controlling the color of dynamic force indicatores
   SoMaterial *dynForceMat;
 
-  //! The main and only interface for the CGDB; all interaction with the CGDB should go through this.
-  db_planner::DatabaseManager *mDBMgr;
-
   void setupPointers();
   void transRot(DraggerInfo *dInfo);
   void revoluteJointChanged(DraggerInfo *dInfo);
@@ -239,16 +232,12 @@ public Q_SLOTS:
   void restoreCameraPos();
 
 public:
-  IVmgr(QWidget *parent=0,const char *name=0,Qt::WFlags f=0);
+  IVmgr(World *w, QWidget *parent=0,const char *name=0, Qt::WFlags f=0);
   ~IVmgr();
 
-  void deselectBody(Body *b);
+  void setWorld(World *w);
 
-  /*! 
-    Returns a pointer to the main World that the user interacts with through
-    this manager.
-   */
-  World *getWorld() const {return world;}
+  void deselectBody(Body *b);
 
   /*!
     Returns a pointer to the Inventor examiner viewer.
@@ -262,7 +251,6 @@ public:
   SoSeparator *getPointers() const {return pointers;}
 
   void setTool(ToolType newTool);
-  void emptyWorld();
   void hilightObjContact(int contactNum);
   void unhilightObjContact(int contactNum);
 
@@ -278,20 +266,13 @@ public:
 
   void saveImage(QString filename);
   void saveDepthImage(QString filename);
+
   void beginMainLoop();
 
   void setStereo(bool s);
   //! Not implemented
   void flipStereo();
 
-  //! Get the main database manager, when CGDB support is enabled
-  db_planner::DatabaseManager* getDBMgr(){return mDBMgr;}
-  //! Set the main database manager. Should only be called by the DB connection dialog
-#ifdef CGDB_ENABLED
-  void setDBMgr(db_planner::DatabaseManager *mgr){mDBMgr = mgr;}
-#else
-  void setDBMgr(db_planner::DatabaseManager*){}
-#endif
   void setStereoWindow(QWidget *parent);
 };
 #define IVMGR_HXX

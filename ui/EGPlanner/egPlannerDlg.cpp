@@ -44,7 +44,7 @@
 #include "eigenGrasp.h"
 #include "grasp.h"
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "contactExaminerDlg.h"
 #include "onLinePlanner.h"

@@ -34,7 +34,7 @@
 #include "searchState.h"
 #include "contact.h"
 #include "quality.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "mytools.h"
 
@@ -60,7 +60,7 @@ GraspCaptureDlg::init(World *w) {
 	mCurrentHand = NULL;
 	saveToDBaseButton->setEnabled(FALSE);
 
-	if (graspItGUI->getIVmgr()->getDBMgr()) {
+    if (graspitCore->getDBMgr()) {
 		saveToDBaseButton->setEnabled(TRUE);
 	} else {
 		QTWARNING("DBase connection not found; only Save to File possible.");
@@ -123,7 +123,7 @@ GraspCaptureDlg::captureButtonClicked()
 	mGrasps.push_back(newState);
 	updateNumGrasps();
 
-	if (graspItGUI->getIVmgr()->getDBMgr()) {
+    if (graspitCore->getDBMgr()) {
 		saveToDBaseButton->setEnabled(TRUE);
 	} else {
 		saveToDBaseButton->setEnabled(FALSE);
@@ -165,7 +165,7 @@ GraspCaptureDlg::saveToDBaseButtonClicked()
 #ifndef CGDB_ENABLED
 	return;
 #else
-	db_planner::DatabaseManager *dbMgr = graspItGUI->getIVmgr()->getDBMgr();
+    db_planner::DatabaseManager *dbMgr = graspitCore->getDBMgr();
 	if (!dbMgr) return;
 	std::list<GraspPlanningState*>::iterator it;
 	std::vector<db_planner::Grasp*> graspList;

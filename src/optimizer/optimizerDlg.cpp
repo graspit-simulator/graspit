@@ -18,7 +18,7 @@
 
 #include "eigenTorques.h"
 #include "world.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 
 #include "debug.h"
@@ -38,7 +38,7 @@ OptimizerDlg::torqueButtonClicked()
 		DBGA("No hand selected");
 		return;
 	}
-	if (!graspItGUI->getIVmgr()->getDBMgr()) {
+    if (!graspitCore->getDBMgr()) {
 		DBGA("Connect to database first");
 		return;
 	}

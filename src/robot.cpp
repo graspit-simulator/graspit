@@ -43,13 +43,14 @@
 #include "dynJoint.h"
 #include "world.h"
 #include "grasp.h"
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include "ivmgr.h"
 #include "dynamics.h"
 #include "gloveInterface.h"
 #include "eigenGrasp.h"
 #include "matrix.h"
 #include "tinyxml.h"
+#include "virtualContact.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -1654,8 +1655,11 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 			DBGA("MoveDOF failsafe hit");
 			break;
 		}
-		if (renderIt && (itercount%25==0) && graspItGUI && graspItGUI->getIVmgr()->getWorld()==myWorld) {
-			graspItGUI->getIVmgr()->getViewer()->render();
+		if (renderIt && (itercount%25==0) && graspitCore && graspitCore->getWorld()==myWorld) {
+            if(graspitCore->getIVmgr())
+            {
+                graspitCore->getIVmgr()->getViewer()->render();
+            }
 		}
 	} while (1);
 

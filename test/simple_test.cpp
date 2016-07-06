@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <Inventor/Qt/SoQt.h>
 
-#include "graspitGUI.h"
+#include "graspitCore.h"
 #include <graspitApp.h>
 #include "mainWindow.h"
 #include "ivmgr.h"

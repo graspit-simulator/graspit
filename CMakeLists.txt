@@ -31,7 +31,7 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set (GRASPIT_DEFINES  
-	    -DGRASPIT_DEBUG 
+	    -DGRASPIT_DEBUG
 	    -DGRASPIT_EXPORTS)
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
@@ -66,6 +66,7 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/robots
     ${GSRC}/include/math
     ${GSRC}/include/dynamics
+    ${GSRC}/include/contact
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
@@ -100,7 +101,11 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/body.h 
     ${GSRC}/include/bBox.h 
     ${GSRC}/include/bbox_inl.h 
-    ${GSRC}/include/contact.h 
+    ${GSRC}/include/contact/contact.h 
+    ${GSRC}/include/contact/softContact.h 
+    ${GSRC}/include/contact/pointContact.h 
+    ${GSRC}/include/contact/virtualContact.h 
+    ${GSRC}/include/contact/virtualContactOnObject.h
     ${GSRC}/include/contactSetting.h 
     ${GSRC}/include/debug.h 
     ${GSRC}/include/dof.h 
@@ -137,7 +142,7 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/worldElement.h 
     ${GSRC}/include/worldElementFactory.h 
     ${GSRC}/include/world.h 
-    ${GSRC}/include/graspitGUI.h 
+    ${GSRC}/include/graspitCore.h
     ${GSRC}/include/graspitServer.h 
     ${GSRC}/include/graspitApp.h 
     ${GSRC}/include/arch.h
@@ -159,7 +164,6 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/simAnn.h 
     ${GSRC}/include/EGPlanner/searchState.h 
     ${GSRC}/include/EGPlanner/searchStateImpl.h 
-    ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/onLinePlanner.h 
     ${GSRC}/include/EGPlanner/egPlanner.h 
     ${GSRC}/include/EGPlanner/simAnnPlanner.h 
@@ -169,6 +173,11 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/graspTesterThread.h 
     ${GSRC}/include/EGPlanner/onLineGraspInterface.h 
     ${GSRC}/include/EGPlanner/listPlanner.h 
+ 
+)
+
+set (GRASPIT_EGPLANNER_ENERGY_HEADERS
+    ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/energy/autograspQualityEnergy.h 
     ${GSRC}/include/EGPlanner/energy/closureSearchEnergy.h
     ${GSRC}/include/EGPlanner/energy/compliantEnergy.h
@@ -177,9 +186,8 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/energy/guidedAutoGraspEnergy.h 
     ${GSRC}/include/EGPlanner/energy/guidedPotentialQualityEnergy.h 
     ${GSRC}/include/EGPlanner/energy/potentialQualityEnergy.h
-    ${GSRC}/include/EGPlanner/energy/strictAutoGraspEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/strictAutoGraspEnergy.h
 )
-
 
 # all headers which are in the  cmdline
 # directory and should be included
@@ -333,7 +341,11 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/robots/shadow.cpp 
     ${GSRC}/src/bBox.cpp 
     ${GSRC}/src/body.cpp 
-    ${GSRC}/src/contact.cpp 
+    ${GSRC}/src/contact/contact.cpp
+    ${GSRC}/src/contact/softContact.cpp
+    ${GSRC}/src/contact/pointContact.cpp
+    ${GSRC}/src/contact/virtualContact.cpp 
+    ${GSRC}/src/contact/virtualContactOnObject.cpp
     ${GSRC}/src/contactSetting.cpp 
     ${GSRC}/src/dof.cpp 
     ${GSRC}/src/dynamics/dynamics.cpp 
@@ -341,7 +353,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/eigenGrasp.cpp 
     ${GSRC}/src/gloveInterface.cpp 
     ${GSRC}/src/grasp.cpp 
-    ${GSRC}/src/graspitGUI.cpp 
+    ${GSRC}/src/graspitCore.cpp
     ${GSRC}/src/graspitServer.cpp 
     ${GSRC}/src/graspitApp.cpp 
     ${GSRC}/src/graspRecord.cpp 
@@ -826,6 +838,13 @@ install(FILES
     DESTINATION ${INCLUDE_DESTINATION}/EGPlanner
 )
 
+install(FILES
+    ${GRASPIT_EGPLANNER_ENERGY_HEADERS}
+    DESTINATION ${INCLUDE_DESTINATION}/EGPlanner/energy
+)
+
+
+
 if (PQP_COLLISION)
     install(FILES
         ${GRASPIT_INCLUDEDIR_HEADERS}
@@ -880,20 +899,30 @@ endif (PLY)
 install(TARGETS
     graspit 
     PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
-    EXPORT graspit-lib-targets
+    EXPORT graspit-targets
     DESTINATION ${LIB_DESTINATION})
 
-install(EXPORT graspit-lib-targets
+install(EXPORT graspit-targets
     DESTINATION ${LIB_DESTINATION})
 
+# For future reference: install graspitConfig.cmake as well as soon
+# as it is added to the repository.
+# set (GRASPIT_CONFIG_CMAKE graspitConfig.cmake)
+install(FILES
+    # cmake/${GRASPIT_CONFIG_CMAKE}
+    CMakeMacros/FindBULLET.cmake
+    CMakeMacros/FindSoQt4.cmake
+    CMakeMacros/FindQhull.cmake
+    DESTINATION ${LIB_DESTINATION}/${PROJECT_NAME}
+)
 
 ## ---
 ## comment for future reference: This is required to build a static library
 # install(TARGETS
 #     graspit_static 
-#     EXPORT graspit-static-lib-targets
+#     EXPORT graspit-static-targets
 #     DESTINATION ${LIB_DESTINATION})
-# install(EXPORT graspit-static-lib-targets
+# install(EXPORT graspit-static-targets
 #     DESTINATION ${LIB_DESTINATION})
 ## ---
 
