@@ -147,7 +147,7 @@ void BulletDynamics::addRobot(Robot *robot)
     btRigidBody* btbase=NULL;
 
     if (robot->getBase()) {
-        btScalar mass(10.);
+        btScalar mass(robot->getBase()->getMass());
         btVector3 localInertia(0, 0, 0);
         if ((btbase=btBodyMap.find(robot->getBase())->second) == NULL) {
             DBGA("error, base is not in the btBodyMap\n");
