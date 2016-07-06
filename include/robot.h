@@ -241,7 +241,7 @@ protected:
 	// temporary
 	defaultTranslVel = 50; defaultRotVel = M_PI/4.0;
     linearVelocity = vec3(0,0,0);
-    angularVelocity = vec3(1,0,0);
+    angularVelocity = vec3(0,0,0);
   }
   
   //! Deletes all kinematic chains, the base and mount piece, etc.
