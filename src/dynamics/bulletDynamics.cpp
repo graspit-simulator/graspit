@@ -502,7 +502,6 @@ void BulletDynamics::btApplyInternalWrench (Joint * activeJoint, double magnitud
 
         btVector3 torqueNext(magnitude*worldAxis.x(),magnitude*worldAxis.y(), magnitude*worldAxis.z());
         btNextLink->applyTorqueImpulse(torqueNext);
-
 }
 
 int BulletDynamics::stepDynamics()
@@ -602,7 +601,6 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
         btbase->setAngularVelocity(angularVelocity);
 
     }
-
     return 0;
 }
 
