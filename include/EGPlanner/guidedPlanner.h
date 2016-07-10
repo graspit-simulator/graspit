@@ -137,7 +137,7 @@ public:
 	bool resetPlanner();
 	void setMaxChildren(int c){mMaxChildren=c;}
 
-    void setEnergyType(SearchEnergyType s);
+	void setEnergyType(SearchEnergyType s);
 };
 
 #endif

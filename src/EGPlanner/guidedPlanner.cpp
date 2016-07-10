@@ -37,13 +37,13 @@ GuidedPlanner::GuidedPlanner(Hand *h)
 {
 	mHand = h;
 	init();
-    mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
-    mEnergyCalculator->setAvoidList( &mAvoidList );
+	mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
+	mEnergyCalculator->setAvoidList( &mAvoidList );
 	mSimAnn = new SimAnn();
 	mChildClones = true;
 	mChildThreads = true;
 	mMaxChildren = 1;
-    mRepeat = false;
+	mRepeat = false;
 
 	//default values set up for columbia dbase project
 	mBestListSize = 20;
@@ -53,7 +53,7 @@ GuidedPlanner::GuidedPlanner(Hand *h)
 	mChildEnergyType = ENERGY_STRICT_AUTOGRASP;
 	mMaxChildSteps = 200;
 
-    mEnergyCalculator->setThreshold(mDistanceThreshold);
+	mEnergyCalculator->setThreshold(mDistanceThreshold);
 }
 
 void
