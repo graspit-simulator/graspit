@@ -28,7 +28,6 @@
 #include "guidedPlanner.h"
 #include "searchState.h"
 #include "searchEnergy.h"
-#include "energy/closureSearchEnergy.h"
 #include "simAnn.h"
 
 //#define GRASPITDBG
@@ -39,12 +38,12 @@ GuidedPlanner::GuidedPlanner(Hand *h)
 	mHand = h;
 	init();
     mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
-	((ClosureSearchEnergy*)mEnergyCalculator)->setAvoidList( &mAvoidList );
+    mEnergyCalculator->setAvoidList( &mAvoidList );
 	mSimAnn = new SimAnn();
 	mChildClones = true;
 	mChildThreads = true;
 	mMaxChildren = 1;
-	mRepeat = true;
+    mRepeat = false;
 
 	//default values set up for columbia dbase project
 	mBestListSize = 20;
@@ -54,7 +53,20 @@ GuidedPlanner::GuidedPlanner(Hand *h)
 	mChildEnergyType = ENERGY_STRICT_AUTOGRASP;
 	mMaxChildSteps = 200;
 
-	((ClosureSearchEnergy*)mEnergyCalculator)->setThreshold(mDistanceThreshold);
+    mEnergyCalculator->setThreshold(mDistanceThreshold);
+}
+
+void
+GuidedPlanner::setEnergyType(SearchEnergyType s)
+{
+    assert (mEnergyCalculator);
+    if (!mEnergyCalculator->isType(s))
+    {
+        delete mEnergyCalculator;
+        mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
+        mEnergyCalculator->setThreshold(mDistanceThreshold);
+        mEnergyCalculator->setAvoidList( &mAvoidList );
+    }
 }
 
 GuidedPlanner::~GuidedPlanner()
