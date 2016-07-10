@@ -246,7 +246,6 @@ public:
 class HandObjectState
 {
 private:
-	void init();
 	//! The variables that define the hand posture
 	PostureState *mPosture;
 	//! The variables that define the hand position relative to mRefTran
@@ -276,7 +275,7 @@ private:
 	
 public:
 	HandObjectState(Hand *h);
-	HandObjectState(const HandObjectState *s){init();copyFrom(s);}
+	HandObjectState(const HandObjectState *s);
 	virtual ~HandObjectState();
 	inline void copyFrom(const HandObjectState *s);
 	//! Resets both posture and position (currently sets all variables to 0)
