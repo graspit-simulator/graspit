@@ -27,7 +27,7 @@
 \brief Implements the special %Robonaut robot class
 */
 
-#include "robonaut.h"
+#include "robots/robonaut.h"
 #include "world.h"
 
 int

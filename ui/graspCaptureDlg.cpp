@@ -31,7 +31,7 @@
 #include "robot.h"
 #include "grasp.h"
 #include "quality.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "contact/contact.h"
 #include "quality.h"
 #include "graspitCore.h"

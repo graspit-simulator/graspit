@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "humanHand.h"
+#include "robots/humanHand.h"
 
 #include <QFile>
 #include <QTextStream>

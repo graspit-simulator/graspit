@@ -33,7 +33,7 @@
 #include "mytools.h"
 #include "contact/contact.h"
 #include "body.h"
-#include "collisionInterface.h"
+#include "Collision/collisionInterface.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"

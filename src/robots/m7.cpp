@@ -27,7 +27,7 @@
   \brief Defines the special %M7 class
  */
 
-#include "m7.h"
+#include "robots/m7.h"
 #include "world.h"
 
 int

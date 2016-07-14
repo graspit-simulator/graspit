@@ -27,7 +27,7 @@
   \brief Implements the Puma560 robot subclass that has an analytic IK solution.
 */
 
-#include "puma560.h"
+#include "robots/puma560.h"
 
 const int Puma560::NUM_SOLUTIONS=8;
 

@@ -29,7 +29,7 @@
 
 #include <QTextStream>
 
-#include "barrett.h"
+#include "robots/barrett.h"
 #include "world.h"
 
 #ifdef HARDWARE_LIB
