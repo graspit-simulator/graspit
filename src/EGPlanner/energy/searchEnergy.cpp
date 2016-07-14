@@ -47,7 +47,6 @@
 #include "include/EGPlanner/energy/dynamicAutograspEnergy.h"
 #include "include/EGPlanner/energy/compliantEnergy.h"
 #include "include/EGPlanner/energy/strictAutoGraspEnergy.h"
-#include "include/EGPlanner/energy/closureSearchEnergy.h"
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -70,6 +69,8 @@ SearchEnergy::SearchEnergy()
     mEpsQual = NULL;
     mDisableRendering = true;
     mOut = NULL;
+    mThreshold = 0;
+    mAvoidList = NULL;
 }
 
 void
@@ -144,6 +145,19 @@ SearchEnergy::analyzeCurrentPosture(Hand *h, Body *o, bool &isLegal, double &sta
 
 void SearchEnergy::analyzeState(bool &isLegal, double &stateEnergy, const GraspPlanningState *state, bool noChange)
 {
+    if (mAvoidList) {
+        std::list<GraspPlanningState*>::const_iterator it; int i=0;
+        for (it = mAvoidList->begin(); it!=mAvoidList->end(); it++){
+            if ( (*it)->distance(state) < mThreshold ) {
+                isLegal = false;
+                stateEnergy = 0.0;
+                DBGP("State rejected; close to state " << i);
+                return;
+            }
+            i++;
+        }
+    }
+
     Hand *h = state->getHand();
     setHandAndObject( h, state->getObject() );
     h->saveState();
@@ -213,9 +227,6 @@ SearchEnergy * SearchEnergy::getSearchEnergy(SearchEnergyType type)
         break;
     case ENERGY_DYNAMIC:
         se =  new DynamicAutoGraspEnergy();
-        break;
-    case ENERGY_CLOSURE:
-        se =  new ClosureSearchEnergy();
         break;
     default:
         std::cout << "INVALID SEARCH ENERGY TYPE: " <<  type << std::endl;

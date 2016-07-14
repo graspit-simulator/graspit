@@ -54,6 +54,9 @@ protected:
     SearchEnergyType mType;
     SearchContactType mContactType;
 
+    const std::list<GraspPlanningState*> *mAvoidList;
+    double mThreshold;
+
     /*! If this flag is set, the hand is disconnected from the scene graph while
         the calculator does energy computations */
     bool mDisableRendering;
@@ -82,6 +85,10 @@ public:
     void setContactType(SearchContactType t){mContactType = t;}
     double getEpsQual();
     double getVolQual();
+
+    void setThreshold(double t){mThreshold=t;}
+    void setAvoidList(const std::list<GraspPlanningState*> *l){mAvoidList = l;}
+
     SearchContactType getContactType() const {return mContactType;}
     void disableRendering(bool dr){mDisableRendering = dr;}
 

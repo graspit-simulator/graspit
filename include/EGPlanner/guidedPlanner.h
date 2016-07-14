@@ -136,6 +136,8 @@ public:
 	//! Also clears the list of states to be avoided
 	bool resetPlanner();
 	void setMaxChildren(int c){mMaxChildren=c;}
+
+	void setEnergyType(SearchEnergyType s);
 };
 
 #endif
