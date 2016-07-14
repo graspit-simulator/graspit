@@ -302,13 +302,16 @@ GraspitCore::exitMainLoop()
 void
 GraspitCore::emptyWorld(const char * name)
 {
-  delete world;
-  world = new World(NULL, name);
+  World * new_world = new World(NULL, name);
+
   if(ivmgr)
   {
-    ivmgr->setWorld(world);
-    world->setIVMgr(ivmgr);
+    ivmgr->setWorld(new_world);
+    new_world->setIVMgr(ivmgr);
   }
+
+  delete world;
+  world = new_world;
 }
 
 
