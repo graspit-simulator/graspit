@@ -354,26 +354,30 @@ PositionState* PositionState::createInstance(StateType type, const Hand *h)
 }
 
 //----------------------------------------------------------------------------------
-HandObjectState::HandObjectState(Hand *h)
+HandObjectState::HandObjectState(Hand *h):
+    mRefTran(transf::IDENTITY),
+    mTargetObject(NULL),
+    mPosture(PostureState::createInstance(POSE_EIGEN,h)),
+    mPosition(PositionState::createInstance(SPACE_COMPLETE,h)),
+    mAttributes(new AttributeSet(h)),
+    IVRoot(NULL),
+    IVMat(NULL),
+    IVTran(NULL),
+    mHand(h)
 {
-	init();
-	mPosture = PostureState::createInstance(POSE_EIGEN,h);
-	mPosition = PositionState::createInstance(SPACE_COMPLETE,h);
-	mAttributes = new AttributeSet(h);
-	mHand = h;
 }
 
-void
-HandObjectState::init()
+HandObjectState::HandObjectState(const HandObjectState *s):
+    mRefTran(transf::IDENTITY),
+    mTargetObject(NULL),
+    mPosture(NULL),
+    mPosition(NULL),
+    mAttributes(NULL),
+    IVRoot(NULL),
+    IVMat(NULL),
+    IVTran(NULL)
 {
-	mRefTran = transf::IDENTITY;
-	mTargetObject = NULL;
-	mPosture = NULL;
-	mPosition = NULL;
-	mAttributes = NULL;
-	IVRoot = NULL;
-	IVMat = NULL;
-	IVTran = NULL;
+    copyFrom(s);
 }
 
 HandObjectState::~HandObjectState()
