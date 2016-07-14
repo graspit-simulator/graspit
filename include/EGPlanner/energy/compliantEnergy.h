@@ -2,7 +2,7 @@
 #ifndef _complientenergy_h_
 #define _complientenergy_h_
 
-#include "include/EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/energy/searchEnergy.h"
 
 class CompliantEnergy: public SearchEnergy
 {

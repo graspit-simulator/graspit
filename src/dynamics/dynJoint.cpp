@@ -29,7 +29,7 @@
 
 #include <math.h>
 
-#include "dynJoint.h"
+#include "dynamics/dynJoint.h"
 #include "joint.h"
 #include "body.h"
 #include "matrix.h"

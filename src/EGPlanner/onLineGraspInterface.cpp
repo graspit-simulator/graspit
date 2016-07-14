@@ -25,9 +25,9 @@
 
 #include "robot.h"
 #include "matvec3D.h"
-#include "barrett.h"
-#include "onLineGraspInterface.h"
-#include "searchState.h"
+#include "robots/barrett.h"
+#include "EGPlanner/onLineGraspInterface.h"
+#include "EGPlanner/searchState.h"
 
 #ifdef HARDWARE_LIB
 #include "BarrettHand.h"

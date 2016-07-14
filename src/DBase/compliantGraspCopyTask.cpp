@@ -30,8 +30,8 @@
 #include "world.h"
 #include "robot.h"
 #include "matvec3D.h"
-#include "searchState.h"
-#include "pr2Gripper.h"
+#include "EGPlanner/searchState.h"
+#include "robots/pr2Gripper.h"
 
 #include "DBPlanner/db_manager.h"
 #include "graspit_db_grasp.h"

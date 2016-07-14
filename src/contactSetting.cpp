@@ -24,10 +24,10 @@
 //######################################################################
 
 #include "contactSetting.h"
-#include "contact.h"
-#include "softContact.h"
-#include "virtualContact.h"
-#include "pointContact.h"
+#include "contact/contact.h"
+#include "contact/softContact.h"
+#include "contact/virtualContact.h"
+#include "contact/pointContact.h"
 #include "matvec3D.h"
 #include "world.h"
 #include "body.h"

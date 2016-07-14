@@ -37,7 +37,7 @@
 #include "robot.h"
 #include "grasp.h"
 #include "quality.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "collisionInterface.h"
 #include "DBPlanner/sql_database_manager.h"
 #include "graspit_db_grasp.h"

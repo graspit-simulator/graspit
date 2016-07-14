@@ -1,7 +1,7 @@
 #ifndef _dynamicautograspenergy_h_
 #define _dynamicautograspenergy_h_
 
-#include "include/EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/energy/searchEnergy.h"
 
 class DynamicAutoGraspEnergy: public SearchEnergy
 {

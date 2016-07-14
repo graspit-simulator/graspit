@@ -31,7 +31,7 @@
 #include "robot.h"
 #include "graspitCore.h"
 #include "matvec3D.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "DBPlanner/db_manager.h"
 
 #include "graspit_db_grasp.h"

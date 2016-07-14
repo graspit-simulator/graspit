@@ -30,8 +30,8 @@
 #include <list>
 #include <QObject>
 
-#include "search.h"
-#include "simAnnPlanner.h"
+#include "EGPlanner/search.h"
+#include "EGPlanner/simAnnPlanner.h"
 
 class Hand;
 class GraspPlanningState;

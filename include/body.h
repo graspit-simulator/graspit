@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "worldElement.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 #ifdef CGDB_ENABLED
 #include "DBase/graspit_db_model.h"

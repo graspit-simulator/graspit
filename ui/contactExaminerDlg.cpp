@@ -30,15 +30,15 @@
 
 #include "world.h"
 #include "robot.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "grasp.h"
 #include "quality.h"
 #include "graspitCore.h"
 #include "ivmgr.h"
 #include "body.h"
 #include "mainWindow.h"
-#include "include/contact/virtualContact.h"
-#include "include/contact/virtualContactOnObject.h"
+#include "contact/virtualContact.h"
+#include "contact/virtualContactOnObject.h"
 
 #include "debug.h"
 

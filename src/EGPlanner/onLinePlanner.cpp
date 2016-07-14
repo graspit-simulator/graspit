@@ -23,17 +23,17 @@
 //
 //######################################################################
 
-#include "onLinePlanner.h"
+#include "EGPlanner/onLinePlanner.h"
 
 #include <Inventor/nodes/SoSeparator.h>
 
 #include "world.h"
 #include "robot.h"
 #include "simAnn.h"
-#include "searchState.h"
-#include "searchEnergy.h"
-#include "graspTesterThread.h"
-#include "onLineGraspInterface.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/graspTesterThread.h"
+#include "EGPlanner/onLineGraspInterface.h"
 #include "grasp.h"
 #include "eigenGrasp.h"
 #include "matvec3D.h"

@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "searchStateImpl.h"
+#include "EGPlanner/searchStateImpl.h"
 #include "robot.h"
 #include "eigenGrasp.h"
 

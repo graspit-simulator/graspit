@@ -23,8 +23,8 @@
 //
 //######################################################################
 
-#include "searchState.h"
-#include "searchStateImpl.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/searchStateImpl.h"
 
 #include <QString>
 //for the visual marker

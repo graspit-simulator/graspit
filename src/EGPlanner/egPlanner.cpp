@@ -25,19 +25,19 @@
 
 #include <Inventor/sensors/SoIdleSensor.h>
 
-#include "egPlanner.h"
-#include "searchState.h"
-#include "searchEnergy.h"
+#include "EGPlanner/egPlanner.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/energy/searchEnergy.h"
 #include "robot.h"
-#include "barrett.h"
-#include "robotiq.h"
-#include "pr2Gripper.h"
+#include "robots/barrett.h"
+#include "robots/robotiq.h"
+#include "robots/pr2Gripper.h"
 #include "body.h"
-#include "simAnn.h"
+#include "EGPlanner/simAnn.h"
 #include "world.h"
 #include "gloveInterface.h" //for glove input
 #include "eigenGrasp.h" //for glove input
-#include "collisionInterface.h"
+#include "Collision/collisionInterface.h"
 
 //#define GRASPITDBG
 #include "debug.h"

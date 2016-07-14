@@ -26,7 +26,7 @@
 #ifndef _listplanner_h_
 #define _listplanner_h_
 
-#include "egPlanner.h"
+#include "EGPlanner/egPlanner.h"
 
 #include <list>
 

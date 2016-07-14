@@ -1,7 +1,7 @@
 #ifndef _guidedautograspenergy_h_
 #define _guidedautograspenergy_h_
 
-#include "include/EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/energy/searchEnergy.h"
 
 class GuidedAutoGraspQualityEnergy: public SearchEnergy
 {
