@@ -31,7 +31,7 @@
 #include "matvec3D.h"
 #include "world.h"
 #include "mytools.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "body.h"
 #include "collisionInterface.h"
 

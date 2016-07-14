@@ -30,7 +30,7 @@
 #include <QMutex>
 #include <list>
 
-#include "egPlanner.h"
+#include "EGPlanner/egPlanner.h"
 
 class GraspPlanningState;
 class Hand;

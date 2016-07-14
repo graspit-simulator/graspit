@@ -32,7 +32,7 @@
 #include "collisionInterface.h"
 #include "graspitCore.h"
 #include "mainWindow.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 //#define GRASPITDBG
 #include "debug.h"

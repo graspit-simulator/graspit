@@ -27,7 +27,7 @@
 #include <time.h>
 #include <list>
 
-#include "simAnnPlanner.h"
+#include "EGPlanner/simAnnPlanner.h"
 
 class Hand;
 class GraspTester;

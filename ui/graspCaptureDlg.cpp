@@ -32,7 +32,7 @@
 #include "grasp.h"
 #include "quality.h"
 #include "searchState.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "quality.h"
 #include "graspitCore.h"
 #include "ivmgr.h"

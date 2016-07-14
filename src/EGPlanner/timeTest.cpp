@@ -23,10 +23,10 @@
 //
 //######################################################################
 
-#include "timeTest.h"
+#include "EGPlanner/timeTest.h"
 
-#include "searchState.h"
-#include "searchEnergy.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/energy/searchEnergy.h"
 #include "robot.h"
 
 //#define GRASPITDBG

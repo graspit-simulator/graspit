@@ -31,7 +31,7 @@
 #include "DBase/graspit_db_grasp.h"
 #include "DBase/graspit_db_model.h"
 #include "DBase/DBPlanner/sql_database_manager.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "matrix.h"
 
 #include "debug.h"

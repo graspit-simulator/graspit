@@ -27,7 +27,7 @@
 #define _onlinegraspinterface_h_
 
 #include <list>
-#include "search.h"
+#include "EGPlanner/search.h"
 
 class Hand;
 class GraspPlanningState;

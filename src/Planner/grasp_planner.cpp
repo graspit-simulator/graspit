@@ -65,7 +65,7 @@
 #endif
 
 /* graspit includes */
-#include "contact.h"
+#include "contact/contact.h"
 #include "graspitCore.h"
 #include "ivmgr.h"
 #include "world.h"

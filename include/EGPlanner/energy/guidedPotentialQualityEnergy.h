@@ -1,7 +1,7 @@
 #ifndef _guidedpotentialenergy_h_
 #define _guidedpotentialenergy_h_
 
-#include "include/EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/energy/searchEnergy.h"
 
 class GuidedPotentialQualityEnergy: public SearchEnergy
 {

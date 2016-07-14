@@ -50,7 +50,7 @@
 #include "eigenGrasp.h"
 #include "matrix.h"
 #include "tinyxml.h"
-#include "virtualContact.h"
+#include "contact/virtualContact.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"

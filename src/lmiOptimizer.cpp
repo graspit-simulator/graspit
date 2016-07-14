@@ -28,7 +28,7 @@
 #include "grasp.h"
 #include "matvec3D.h"
 #include "robot.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"

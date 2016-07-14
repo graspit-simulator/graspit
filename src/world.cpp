@@ -49,7 +49,7 @@
 #include "body.h"
 #include "robot.h"
 #include "humanHand.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "contactSetting.h"
 #include "ivmgr.h"
 #include "grasp.h"

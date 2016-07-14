@@ -1,10 +1,10 @@
-#include "include/EGPlanner/energy/potentialQualityEnergy.h"
-#include "include/robot.h"
-#include "include/grasp.h"
-#include "include/debug.h"
-#include "include/world.h"
+#include "EGPlanner/energy/potentialQualityEnergy.h"
+#include "robot.h"
+#include "grasp.h"
+#include "debug.h"
+#include "world.h"
 #include "quality.h"
-#include "include/contact/virtualContact.h"
+#include "contact/virtualContact.h"
 
 
 double

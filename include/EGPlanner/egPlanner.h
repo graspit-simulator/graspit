@@ -35,7 +35,7 @@
 #include <QMutex>
 #include <QObject>
 
-#include "search.h"
+#include "EGPlanner/search.h"
 
 class Hand;
 class Body;

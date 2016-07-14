@@ -25,10 +25,10 @@
 
 #include "robot.h"
 #include "world.h"
-#include "guidedPlanner.h"
-#include "searchState.h"
-#include "searchEnergy.h"
-#include "simAnn.h"
+#include "EGPlanner/guidedPlanner.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/simAnn.h"
 
 //#define GRASPITDBG
 #include "debug.h"

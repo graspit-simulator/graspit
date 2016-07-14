@@ -33,7 +33,7 @@
 #include "world.h"
 #include "robot.h"
 #include "body.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "loopPlanner.h"
 #include "DBPlanner/db_manager.h"
 

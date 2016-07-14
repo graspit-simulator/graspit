@@ -31,7 +31,7 @@
 #include "robot.h"
 #include "body.h"
 #include "debug.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 
 #include "DBPlanner/db_manager.h"
 #include "graspit_db_grasp.h"

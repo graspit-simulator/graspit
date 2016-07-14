@@ -23,13 +23,13 @@
 //
 //######################################################################
 
-#include "loopPlanner.h"
+#include "EGPlanner/loopPlanner.h"
 
 #include "robot.h"
 #include "world.h"
-#include "simAnn.h"
-#include "searchEnergy.h"
-#include "searchState.h"
+#include "EGPlanner/simAnn.h"
+#include "EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/searchState.h"
 
 //#define GRASPITDBG
 #include "debug.h"

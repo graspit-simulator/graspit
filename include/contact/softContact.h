@@ -3,7 +3,7 @@
 #define SOFT_CONTACT_H
 
 #include "matvec3D.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 class Body;
 class SoSeparator;

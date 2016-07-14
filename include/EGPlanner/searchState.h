@@ -30,7 +30,7 @@
 #include <list>
 #include <QString>
 
-#include "search.h"
+#include "EGPlanner/search.h"
 #include "matvec3D.h"
 
 class Hand;
