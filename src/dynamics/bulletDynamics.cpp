@@ -147,7 +147,7 @@ void BulletDynamics::addRobot(Robot *robot)
     btRigidBody* btbase=NULL;
 
     if (robot->getBase()) {
-        btScalar mass(0.);
+        btScalar mass(robot->getBase()->getMass());
         btVector3 localInertia(0, 0, 0);
         if ((btbase=btBodyMap.find(robot->getBase())->second) == NULL) {
             DBGA("error, base is not in the btBodyMap\n");
@@ -575,6 +575,31 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
                 btApplyInternalWrench(tempjoint, springForce,btBodyMap);
             }
         }
+
+        //! Robot Translation and Rotations
+        btRigidBody* btbase=btBodyMap.find(robot->getBase())->second;
+
+        //! convert the velocity from along the robot's approach direction (+z sticking out of palm) to the world frame.
+        transf velocityInWorldFrame = translate_transf(robot->getLinearVelocity() * robot->getApproachTran()) * robot->getTran();
+
+        btVector3 velocity(velocityInWorldFrame.translation().x() - robot->getTran().translation().x(),
+                           velocityInWorldFrame.translation().y() - robot->getTran().translation().y(),
+                           velocityInWorldFrame.translation().z() - robot->getTran().translation().z());
+
+        btbase->setLinearVelocity(velocity);
+
+        //! Convert the angular velocity defined  in the approach frame of reference to the world frame.
+        transf rotFrame = rotXYZ(robot->getAngularVelocity().x(), robot->getAngularVelocity().y(), robot->getAngularVelocity().z());
+        transf rotFrameInWorld = rotFrame  * robot->getApproachTran() * robot->getTran();
+
+        double r;
+        vec3 rAxis;
+        rotFrameInWorld.rotation().ToAngleAxis(r, rAxis);
+
+        btVector3 angularVelocity(r*rAxis.x(), r*rAxis.y(), r*rAxis.z());
+
+        btbase->setAngularVelocity(angularVelocity);
+
     }
     return 0;
 }
