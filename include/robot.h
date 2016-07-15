@@ -157,9 +157,11 @@ protected:
   //! The default rotational velocity (rad/sec) to use when generating cartesian trajectories
   double defaultRotVel;
 
-  //! magnitude of dynamic movement of the base of the robot
+  //! linear velocity for dynamic movement of the base of the robot
+  //! this is only used when dynamics is on, and with the bullet dynamics engine
   vec3 mLinearVelocity;
-  //! direction of dynamic movement of the base of the robot
+  //! angular velocity for dynamic movement of the base of the robot
+  //! this is only used when dynamics is on, and with the bullet dynamics engine
   vec3 mAngularVelocity;
 
   // Input from external hardware
