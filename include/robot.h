@@ -161,6 +161,13 @@ protected:
   //! The default rotational velocity (rad/sec) to use when generating cartesian trajectories
   double defaultRotVel;
 
+  //! linear velocity for dynamic movement of the base of the robot
+  //! this is only used when dynamics is on, and with the bullet dynamics engine
+  vec3 mLinearVelocity;
+  //! angular velocity for dynamic movement of the base of the robot
+  //! this is only used when dynamics is on, and with the bullet dynamics engine
+  vec3 mAngularVelocity;
+
   // Input from external hardware
   //! Shows if this robot is to be controlled via a CyberGlove
   bool mUseCyberGlove;
@@ -239,6 +246,8 @@ protected:
 	approachTran = transf::IDENTITY;
 	// temporary
 	defaultTranslVel = 50; defaultRotVel = M_PI/4.0;
+    mLinearVelocity = vec3(0,0,0);
+    mAngularVelocity = vec3(0,0,0);
   }
   
   //! Deletes all kinematic chains, the base and mount piece, etc.
@@ -274,6 +283,13 @@ protected:
 
   //! The main way to move the robot dofs IN DYNAMICS mode. 
   void setDesiredDOFVals(double *dofVals);
+
+  //! The main way to move the robot pose IN DYNAMICS mode.
+  void setLinearVelocity(vec3 velocity){mLinearVelocity = velocity;}
+  void setAngularVelocity(vec3 angularVelocity){mAngularVelocity = angularVelocity;}
+
+  vec3 getLinearVelocity(){return mLinearVelocity;}
+  vec3 getAngularVelocity(){return mAngularVelocity;}
 
   //! Returns true if any of the contacts on the fingers are slipping during dynamics
   bool contactSlip();

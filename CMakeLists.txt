@@ -70,14 +70,15 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
-    ${GSRC}/src/Collision
+    ${GSRC}/include/Collision
     ${GSRC}/cmdline
     ${GSRC}/ui
     # following needs to be included because basic
     # files wouldn't compile without main window
     ${GSRC}/ui/Planner
     ${GSRC}/ui/EGPlanner
-    ${GSRC}/src/optimizer
+    ${GSRC}/ui/optimizer
+    ${GSRC}/include/optimizer
 )
 
 
@@ -181,7 +182,6 @@ set (GRASPIT_EGPLANNER_HEADERS
 set (GRASPIT_EGPLANNER_ENERGY_HEADERS
     ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/energy/autograspQualityEnergy.h 
-    ${GSRC}/include/EGPlanner/energy/closureSearchEnergy.h
     ${GSRC}/include/EGPlanner/energy/compliantEnergy.h
     ${GSRC}/include/EGPlanner/energy/contactEnergy.h 
     ${GSRC}/include/EGPlanner/energy/dynamicAutograspEnergy.h 
@@ -204,8 +204,8 @@ set (GRASPIT_CMDLINE_HEADERS
 # in the installation should be listed in the
 # variable GRASPIT_SRC_COLLISION_HEADERS
 set (GRASPIT_SRC_COLLISION_HEADERS
-    ${GSRC}/src/Collision/collisionInterface.h 
-    ${GSRC}/src/Collision/collisionStructures.h
+    ${GSRC}/include/Collision/collisionInterface.h
+    ${GSRC}/include/Collision/collisionStructures.h
 )
 
 
@@ -220,53 +220,53 @@ set (GRASPIT_INCLUDE_MATH_HEADERS
 
 if (CGDB)  
     set(CGDB_HEADERS
-        src/DBase/graspit_db_model.h 
-        src/DBase/graspit_db_grasp.h 
-        src/DBase/graspit_db_planner.h 
-        src/DBase/taskDispatcher.h 
-        src/DBase/preGraspCheckTask.h 
-        src/DBase/graspClusteringTask.h 
-        src/DBase/graspTransferCheckTask.h 
-        src/DBase/tableCheckTask.h 
-        src/DBase/compliantGraspCopyTask.h 
+        include/DBase/graspit_db_model.h
+        include/DBase/graspit_db_grasp.h
+        include/DBase/graspit_db_planner.h
+        include/DBase/taskDispatcher.h
+        include/DBase/preGraspCheckTask.h
+        include/DBase/graspClusteringTask.h
+        include/DBase/graspTransferCheckTask.h
+        include/DBase/tableCheckTask.h
+        include/DBase/compliantGraspCopyTask.h
     )
     set(CGDB_MOC_HEADERS
-        src/DBase/dbaseDlg.h 
-        src/DBase/dbasePlannerDlg.h 
-        src/DBase/dbase_grasp.h 
-        src/DBase/graspit_db_planner.h 
-        src/DBase/graspPlanningTask.h 
+        ui/DBase/dbaseDlg.h
+        ui/DBase/dbasePlannerDlg.h
+        include/DBase/dbase_grasp.h
+        include/DBase/graspit_db_planner.h
+        include/DBase/graspPlanningTask.h
     )
 
     set(CGDB_PLANNER_HEADERS
-        src/DBase/DBPlanner/grasp.h 
-        src/DBase/DBPlanner/model.h 
-        src/DBase/DBPlanner/db_manager.h 
-        src/DBase/DBPlanner/database.h 
-        src/DBase/DBPlanner/sql_database_manager.h 
-        src/DBase/DBPlanner/task.h 
+        include/DBase/DBPlanner/grasp.h
+        include/DBase/DBPlanner/model.h
+        include/DBase/DBPlanner/db_manager.h
+        include/DBase/DBPlanner/database.h
+        include/DBase/DBPlanner/sql_database_manager.h
+        include/DBase/DBPlanner/task.h
     )
 
     set(CGDB_SOURCES
-        src/DBase/dbaseDlg.cpp 
-        src/DBase/dbasePlannerDlg.cpp 
-        src/DBase/dbase_grasp.cpp 
-        src/DBase/graspit_db_model.cpp 
-        src/DBase/graspit_db_grasp.cpp 
-        src/DBase/DBPlanner/database.cpp 
-        src/DBase/DBPlanner/sql_database_manager.cpp 
-        src/DBase/graspit_db_planner.cpp 
-        src/DBase/taskDispatcher.cpp 
-        src/DBase/graspPlanningTask.cpp 
-        src/DBase/preGraspCheckTask.cpp 
-        src/DBase/graspClusteringTask.cpp 
-        src/DBase/graspTransferCheckTask.cpp 
-        src/DBase/tableCheckTask.cpp 
-        src/DBase/compliantGraspCopyTask.cpp 
+        ui/DBase/dbaseDlg.cpp
+        ui/DBase/dbasePlannerDlg.cpp
+        src/DBase/dbase_grasp.cpp
+        src/DBase/graspit_db_model.cpp
+        src/DBase/graspit_db_grasp.cpp
+        src/DBase/DBPlanner/database.cpp
+        src/DBase/DBPlanner/sql_database_manager.cpp
+        src/DBase/graspit_db_planner.cpp
+        src/DBase/taskDispatcher.cpp
+        src/DBase/graspPlanningTask.cpp
+        src/DBase/preGraspCheckTask.cpp
+        src/DBase/graspClusteringTask.cpp
+        src/DBase/graspTransferCheckTask.cpp
+        src/DBase/tableCheckTask.cpp
+        src/DBase/compliantGraspCopyTask.cpp
     )
     set(CGDB_FORMS 
-        src/DBase/dbaseDlg.ui
-        src/DBase/dbasePlannerDlg.ui
+        ui/DBase/dbaseDlg.ui
+        ui/DBase/dbasePlannerDlg.ui
     )
 
     # you can also define BATCH_PROCESSING in order to supress error output which requires user attention
@@ -277,9 +277,9 @@ if (CGDB)
     )
 
     set (GRASPIT_CGDB_INCLUDES
-        ${GSRC}/src/
-        ${GSRC}/src/DBase/
-        ${GSRC}/src/DBase/DBPlanner/
+        ${GSRC}/include/
+        ${GSRC}/include/DBase/
+        ${GSRC}/include/DBase/DBPlanner/
     )
 endif (CGDB)  
 
@@ -408,7 +408,6 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/onLineGraspInterface.cpp 
     ${GSRC}/src/EGPlanner/listPlanner.cpp 
     ${GSRC}/src/EGPlanner/energy/autograspQualityEnergy.cpp 
-    ${GSRC}/src/EGPlanner/energy/closureSearchEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/compliantEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/contactEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/dynamicAutograspEnergy.cpp 
@@ -453,12 +452,12 @@ else (COLLISION_ENGINE STREQUAL PQP_COLLISION)
         -DGRASPIT_COLLISION)
     set (GRASPIT_INCLUDES
         ${GRASPIT_INCLUDES}
-        ${GSRC}/src/Collision/Graspit)
+        ${GSRC}/include/Collision/Graspit)
     set (COLLISION_GRASPIT_HEADERS
-        ${GSRC}/src/Collision/Graspit/collisionModel.h 
-        ${GSRC}/src/Collision/Graspit/collisionAlgorithms.h 
-        ${GSRC}/src/Collision/Graspit/collisionAlgorithms_inl.h 
-        ${GSRC}/src/Collision/Graspit/graspitCollision.h)
+        ${GSRC}/include/Collision/Graspit/collisionModel.h
+        ${GSRC}/include/Collision/Graspit/collisionAlgorithms.h
+        ${GSRC}/include/Collision/Graspit/collisionAlgorithms_inl.h
+        ${GSRC}/include/Collision/Graspit/graspitCollision.h)
     set (GRASPIT_COLLISION_SOURCES
         ${GSRC}/src/Collision/Graspit/collisionModel.cpp 
         ${GSRC}/src/Collision/Graspit/collisionAlgorithms.cpp 
@@ -636,18 +635,18 @@ set (GRASPIT_CORE_SOURCES
 
 set (GRASPIT_INCLUDES
     ${GRASPIT_INCLUDES}
-    ${GSRC}/src/optimizer
+    ${GSRC}/include/optimizer
 )
 set (OPTIMIZER_HEADERS 
-    ${GSRC}/src/optimizer/optimizerDlg.h
+    ${GSRC}/ui/optimizer/optimizerDlg.h
 )
 
 set (GRASPIT_OPTIMIZER_SOURCES
-    ${GSRC}/src/optimizer/optimizerDlg.cpp
+    ${GSRC}/ui/optimizer/optimizerDlg.cpp
 )
 
 set (OPTIMIZER_FORMS
-    ${GSRC}/src/optimizer/optimizerDlg.ui)
+    ${GSRC}/ui/optimizer/optimizerDlg.ui)
 
 if (CGDB)  
     set (GRASPIT_OPTIMIZER_SOURCES
@@ -656,13 +655,13 @@ if (CGDB)
 
     set (OPTIMIZER_HEADERS 
         ${OPTIMIZER_HEADERS} 
-        ${GSRC}/src/optimizer/eigenTorques.h
+        ${GSRC}/include/optimizer/eigenTorques.h
 )
 endif (CGDB)    
 
 set (MOC_HEADERS
     ${MOC_HEADERS}
-    ${GSRC}/src/optimizer/optimizerDlg.h
+    ${GSRC}/ui/optimizer/optimizerDlg.h
 )
 
 

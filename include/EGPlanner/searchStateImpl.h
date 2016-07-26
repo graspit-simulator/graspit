@@ -26,7 +26,7 @@
 #ifndef _HandObjectStateimpl_h_
 #define _HandObjectStateimpl_h_
 
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 
 /*! \file These are implementations of the various interfaces 
 	for storing hand poature and hand position. 

@@ -47,9 +47,9 @@
 #include "joint.h"
 #include "dynJoint.h"
 #include "ivmgr.h"
-#include "contact.h"
-#include "virtualContact.h"
-#include "virtualContactOnObject.h"
+#include "contact/contact.h"
+#include "contact/virtualContact.h"
+#include "contact/virtualContactOnObject.h"
 #include "graspitCore.h"
 
 #include "tinyxml.h"

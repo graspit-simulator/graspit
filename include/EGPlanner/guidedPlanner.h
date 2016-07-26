@@ -30,8 +30,8 @@
 #include <list>
 #include <QObject>
 
-#include "search.h"
-#include "simAnnPlanner.h"
+#include "EGPlanner/search.h"
+#include "EGPlanner/simAnnPlanner.h"
 
 class Hand;
 class GraspPlanningState;
@@ -136,6 +136,8 @@ public:
 	//! Also clears the list of states to be avoided
 	bool resetPlanner();
 	void setMaxChildren(int c){mMaxChildren=c;}
+
+	void setEnergyType(SearchEnergyType s);
 };
 
 #endif

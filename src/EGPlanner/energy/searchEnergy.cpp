@@ -31,7 +31,7 @@
 #include "barrett.h"
 #include "body.h"
 #include "grasp.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "world.h"
 #include "quality.h"
 #include "searchState.h"
@@ -39,15 +39,14 @@
 #include "ivmgr.h"
 #include "matrix.h"
 
-#include "include/EGPlanner/energy/contactEnergy.h"
-#include "include/EGPlanner/energy/potentialQualityEnergy.h"
-#include "include/EGPlanner/energy/guidedPotentialQualityEnergy.h"
-#include "include/EGPlanner/energy/autograspQualityEnergy.h"
-#include "include/EGPlanner/energy/guidedAutoGraspEnergy.h"
-#include "include/EGPlanner/energy/dynamicAutograspEnergy.h"
-#include "include/EGPlanner/energy/compliantEnergy.h"
-#include "include/EGPlanner/energy/strictAutoGraspEnergy.h"
-#include "include/EGPlanner/energy/closureSearchEnergy.h"
+#include "EGPlanner/energy/contactEnergy.h"
+#include "EGPlanner/energy/potentialQualityEnergy.h"
+#include "EGPlanner/energy/guidedPotentialQualityEnergy.h"
+#include "EGPlanner/energy/autograspQualityEnergy.h"
+#include "EGPlanner/energy/guidedAutoGraspEnergy.h"
+#include "EGPlanner/energy/dynamicAutograspEnergy.h"
+#include "EGPlanner/energy/compliantEnergy.h"
+#include "EGPlanner/energy/strictAutoGraspEnergy.h"
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -70,6 +69,8 @@ SearchEnergy::SearchEnergy()
     mEpsQual = NULL;
     mDisableRendering = true;
     mOut = NULL;
+    mThreshold = 0;
+    mAvoidList = NULL;
 }
 
 void
@@ -144,6 +145,19 @@ SearchEnergy::analyzeCurrentPosture(Hand *h, Body *o, bool &isLegal, double &sta
 
 void SearchEnergy::analyzeState(bool &isLegal, double &stateEnergy, const GraspPlanningState *state, bool noChange)
 {
+    if (mAvoidList) {
+        std::list<GraspPlanningState*>::const_iterator it; int i=0;
+        for (it = mAvoidList->begin(); it!=mAvoidList->end(); it++){
+            if ( (*it)->distance(state) < mThreshold ) {
+                isLegal = false;
+                stateEnergy = 0.0;
+                DBGP("State rejected; close to state " << i);
+                return;
+            }
+            i++;
+        }
+    }
+
     Hand *h = state->getHand();
     setHandAndObject( h, state->getObject() );
     h->saveState();
@@ -213,9 +227,6 @@ SearchEnergy * SearchEnergy::getSearchEnergy(SearchEnergyType type)
         break;
     case ENERGY_DYNAMIC:
         se =  new DynamicAutoGraspEnergy();
-        break;
-    case ENERGY_CLOSURE:
-        se =  new ClosureSearchEnergy();
         break;
     default:
         std::cout << "INVALID SEARCH ENERGY TYPE: " <<  type << std::endl;

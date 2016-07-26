@@ -27,7 +27,7 @@
 \brief Implements the special %RobotIQ robot class
 */
 
-#include "robotiq.h"
+#include "robots/robotiq.h"
 #include "world.h"
 #include "debug.h"
 

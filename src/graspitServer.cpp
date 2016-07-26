@@ -35,7 +35,7 @@
 #include "world.h"
 #include "robot.h"
 #include "grasp.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 /*!
   Stub destructor.

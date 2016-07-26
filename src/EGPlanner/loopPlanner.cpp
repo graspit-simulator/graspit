@@ -23,14 +23,13 @@
 //
 //######################################################################
 
-#include "loopPlanner.h"
+#include "EGPlanner/loopPlanner.h"
 
 #include "robot.h"
 #include "world.h"
-#include "simAnn.h"
-#include "searchEnergy.h"
-#include "searchState.h"
-#include "energy/closureSearchEnergy.h"
+#include "EGPlanner/simAnn.h"
+#include "EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/searchState.h"
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -39,24 +38,37 @@ LoopPlanner::LoopPlanner(Hand *h)
 {
   mHand = h;
   init();
-  mEnergyCalculator = new ClosureSearchEnergy();
+
   mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
-  ((ClosureSearchEnergy*)mEnergyCalculator)->setAvoidList( &mAvoidList );
+  mEnergyCalculator->setAvoidList( &mAvoidList );
   
   mSimAnn = new SimAnn();
   mSimAnn->setParameters(ANNEAL_LOOP);
   mRepeat = true;
   
   mDistanceThreshold = 0.1f;
-  ((ClosureSearchEnergy*)mEnergyCalculator)->setThreshold(mDistanceThreshold);
+  mEnergyCalculator->setThreshold(mDistanceThreshold);
 
   mSaveThreshold = 10.0f;
+}
+
+void
+LoopPlanner::setEnergyType(SearchEnergyType s)
+{
+    assert (mEnergyCalculator);
+    if (!mEnergyCalculator->isType(s))
+    {
+        delete mEnergyCalculator;
+        mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
+        mEnergyCalculator->setThreshold(mDistanceThreshold);
+        mEnergyCalculator->setAvoidList( &mAvoidList );
+    }
 }
 
 void LoopPlanner::setDistanceThreshold(float t)
 {
   mDistanceThreshold = t;
-  ((ClosureSearchEnergy*)mEnergyCalculator)->setThreshold(mDistanceThreshold);
+  mEnergyCalculator->setThreshold(mDistanceThreshold);
 }
 
 LoopPlanner::~LoopPlanner()

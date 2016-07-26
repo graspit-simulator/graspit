@@ -30,7 +30,7 @@
 #include <list>
 #include <QString>
 
-#include "search.h"
+#include "EGPlanner/search.h"
 #include "matvec3D.h"
 
 class Hand;
@@ -246,7 +246,6 @@ public:
 class HandObjectState
 {
 private:
-	void init();
 	//! The variables that define the hand posture
 	PostureState *mPosture;
 	//! The variables that define the hand position relative to mRefTran
@@ -276,7 +275,7 @@ private:
 	
 public:
 	HandObjectState(Hand *h);
-	HandObjectState(const HandObjectState *s){init();copyFrom(s);}
+	HandObjectState(const HandObjectState *s);
 	virtual ~HandObjectState();
 	inline void copyFrom(const HandObjectState *s);
 	//! Resets both posture and position (currently sets all variables to 0)
@@ -299,6 +298,9 @@ public:
 
 	//! Places the given hand in the given state; if no hand is given it places its own hand
 	bool execute(Hand *h = NULL) const;
+
+	//! Moves the hand in the given state; with dynamics on; if no hand is given, it places its own hand
+	bool dynamicExecute(Hand *h) const;
 
 	//! Gives the inner transform (stored in mPosition) multiplied by the reference transform
 	transf getTotalTran() const {return mPosition->getCoreTran() * mRefTran;}

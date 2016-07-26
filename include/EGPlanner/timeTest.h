@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "simAnnPlanner.h"
+#include "EGPlanner/simAnnPlanner.h"
 #include <time.h>
 
 class Hand;

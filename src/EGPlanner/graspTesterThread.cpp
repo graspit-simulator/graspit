@@ -27,8 +27,8 @@
 #include "body.h"
 #include "robot.h"
 #include "graspTesterThread.h"
-#include "searchState.h"
-#include "searchEnergy.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/energy/searchEnergy.h"
 
 //#define GRASPITDBG
 #include "debug.h"

@@ -27,12 +27,12 @@
 \brief Implements the special %Pr2Gripper robot class
 */
 
-#include "pr2Gripper.h"
+#include "robots/pr2Gripper.h"
 #include "world.h"
-#include "collisionInterface.h"
+#include "Collision/collisionInterface.h"
 #include "graspitCore.h"
 #include "mainWindow.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 //#define GRASPITDBG
 #include "debug.h"

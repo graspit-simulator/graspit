@@ -2,7 +2,7 @@
 <robot type="Barrett" DBName="Barrett">
     <palm>palm.xml</palm>
     <dof type="r">
-        <defaultVelocity>0.0</defaultVelocity>
+        <defaultVelocity>1.0</defaultVelocity>
         <maxEffort>5.0e+10</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>

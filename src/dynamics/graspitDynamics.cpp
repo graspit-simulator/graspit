@@ -23,17 +23,17 @@
 //
 //######################################################################
 
-#include "graspitDynamics.h"
+#include "dynamics/graspitDynamics.h"
 
 #include "body.h"
-#include "dynJoint.h"
+#include "dynamics/dynJoint.h"
 #include "robot.h"
 #include "triangle.h"
 #include "world.h"
 
 #include "debug.h"
-#include "dynamics.h"
-#include "humanHand.h"
+#include "dynamics/dynamics.h"
+#include "robots/humanHand.h"
 GraspitDynamics::GraspitDynamics(World *world) {
   mWorld = world;
 }

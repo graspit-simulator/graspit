@@ -63,7 +63,7 @@
 
 /* graspit includes */
 #include "graspitCore.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "world.h"
 #include "ivmgr.h"
 #include "robot.h"

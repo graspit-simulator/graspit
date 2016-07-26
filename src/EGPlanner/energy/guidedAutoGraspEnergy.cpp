@@ -1,10 +1,10 @@
-#include "include/EGPlanner/energy/guidedAutoGraspEnergy.h"
-#include "include/robot.h"
-#include "include/grasp.h"
-#include "include/debug.h"
-#include "include/world.h"
+#include "EGPlanner/energy/guidedAutoGraspEnergy.h"
+#include "robot.h"
+#include "grasp.h"
+#include "debug.h"
+#include "world.h"
 #include "quality.h"
-#include "include/contact/virtualContact.h"
+#include "contact/virtualContact.h"
 
 
 /*!	This formulation combines virtual contact energy with autograsp energy. Virtual contact energy is used to "guide"

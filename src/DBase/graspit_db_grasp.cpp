@@ -32,7 +32,7 @@
 #include <QtSql>
 #include <list>
 
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "matvec3D.h"
 #include "body.h"
 #include "robot.h"
