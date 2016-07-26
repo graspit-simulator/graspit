@@ -29,8 +29,6 @@
 #ifndef CONTACT_HXX
 #define CONTACT_HXX
 
-#include <QtGlobal>
-
 #include <Inventor/nodes/SoSeparator.h>
 #include <list>
 #include <vector>

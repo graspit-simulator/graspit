@@ -30,7 +30,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <fstream>
-#include <typeinfo>
 
 //needed just for the image of the Flock of Birds sensor and the approach direction
 #include "SoArrow.h"
