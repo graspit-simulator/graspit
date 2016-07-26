@@ -235,12 +235,11 @@ KinematicChain::initChainFromXml(const TiXmlElement* root,QString &linkDir)
       return FAILURE;
     }
     
-
     QString linkFilename = (*p)->GetText();
-            linkFilename = linkFilename.stripWhiteSpace();
-            QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
-            linkVec[l] = new Link(owner,chainNum,l,owner->getWorld(),linkName.latin1());
-            QString sensorType = (*p)->Attribute("sensorType");
+    linkFilename = linkFilename.stripWhiteSpace();
+    QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
+    linkVec[l] = new Link(owner,chainNum,l,owner->getWorld(),linkName.latin1());
+    QString sensorType = (*p)->Attribute("sensorType");
 
     if (linkVec[l]->load(linkDir + linkFilename)==FAILURE) {
       delete linkVec[l]; linkVec[l] = NULL;

@@ -128,16 +128,16 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 		//init my IVRoot and add the base
 		IVRoot = new SoSeparator;
 		IVRoot->addChild(base->getIVRoot());
-        std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "filter");
-        std::list<const TiXmlElement*>::iterator p;
-        for(p = elementList.begin(); p!=elementList.end(); p++){
-            //Get body number
-            QString bodyNumText = (*p)->GetText();
-            QString params = (*p)->Attribute("params");
-            TactileSensor * bd = new TactileSensor(base);
-            bd->setFilterParams(&params);
-        }
-	}
+		std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "filter");
+		std::list<const TiXmlElement*>::iterator p;
+		for(p = elementList.begin(); p!=elementList.end(); p++){
+		  //Get body number
+		  QString bodyNumText = (*p)->GetText();
+		  QString params = (*p)->Attribute("params");
+		  TactileSensor * bd = new TactileSensor(base);
+		  bd->setFilterParams(&params);
+		}
+    }
 	else{
 		QTWARNING("Base not found");
 		return FAILURE;
