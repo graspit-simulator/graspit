@@ -1839,43 +1839,6 @@ World::popDynamicState()
 	}
 }
 
-/*! One of the two main functions of the dynamics time step. This function is 
-called to move the bodies according to the velocities and accelerations found
-in the previous step. The move is attempted for the duration of the time step 
-given in \a timeStep.
-
-After all the bodies are moved, then collisions are checked. If any collisions
-are found, the move is traced back and the value of the times step is 
-interpolated until the exact moment of contact is found. The actual value
-of the time step until contact is made is returned. If interpolation fails,
-a negative actual time step is returned. All the resulting contacts are added
-to the bodies that are in contact to be used for subsequent computations.
-
-The same procedure is carried out if, by executing a full time step, a joint
-ends up outside of its legal range.
-*/
-double
-World::moveDynamicBodies(double timeStep)
-{
-    return mDynamicsEngine->moveDynamicBodies(timeStep);
-}
-
-/*! Asks the dynamics engine to compute the velocities of all bodies at
-the current time step. These will be used in the next time step when
-the bodies are moved by World::moveDynamicBodies.
-
-The bodies are separated into "islands" of bodies connected by contacts 
-or joints.	Two dynamic bodies are connected if they share a contact or
-a joint.  Then for each island, this calls the iterate dynamics routine
-to build and solve the LCP to find the velocities of all the bodies
-in the next iteration.
-*/	
-int
-World::computeNewVelocities(double timeStep)
-{
-    return mDynamicsEngine->computeNewVelocities(timeStep);
-}
-
 void
 World::resetDynamicWrenches()
 {
@@ -1884,6 +1847,12 @@ World::resetDynamicWrenches()
 			((DynamicBody*)bodyVec[i])->resetExtWrenchAcc();
 		}
 	}
+}
+
+DynamicsEngine *
+World::getDynamicsEngine()
+{
+    return mDynamicsEngine;
 }
 
 /*! A complete dynamics step:
