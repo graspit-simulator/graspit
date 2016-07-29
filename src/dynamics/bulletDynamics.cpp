@@ -23,7 +23,6 @@
 //
 //######################################################################
 
-#ifdef BULLET_DYNAMICS
 
 #include "bulletDynamics.h"
 
@@ -653,4 +652,3 @@ int BulletDynamics::computeNewVelocities(double timeStep) {
     return 0;
 }
 
-#endif
