@@ -23,7 +23,6 @@
 //
 //######################################################################
 
-#ifdef BULLET_DYNAMICS
 
 #include "bulletDynamics.h"
 
@@ -513,6 +512,8 @@ int BulletDynamics::stepDynamics()
     computeNewVelocities(timeStep);
     moveDynamicBodies(mWorld->getTimeStep());
 
+    mWorld->resetDynamicWrenches();
+
     return 0;
 }
 
@@ -536,8 +537,6 @@ ends up outside of its legal range.
 double BulletDynamics::moveDynamicBodies(double timeStep) {
     mWorld->findAllContacts();
 
-    mWorld->resetDynamicWrenches();
-
     for (int i = 0; i < mWorld->getNumRobots(); i++) {
 
         Robot* robot=mWorld->getRobot(i);
@@ -550,8 +549,11 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
         for (int d=0; d<robot->getNumDOF(); d++) {
 
             DOF * dof=robot->getDOF(d);
-            dof->updateSetPoint();
-            dof->callController(timeStep);
+            if(runController)
+            {
+                dof->updateSetPoint();
+                dof->callController(timeStep);
+            }
 
             double magnitude=dof->getForce()/10e6;
             if (magnitude !=0)
@@ -653,4 +655,3 @@ int BulletDynamics::computeNewVelocities(double timeStep) {
     return 0;
 }
 
-#endif
