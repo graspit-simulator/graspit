@@ -1930,7 +1930,7 @@ Robot::setDesiredDOFVals(double *dofVals)
             // TimeNeeded can be invalid if desired velocity is 0:
             if (isinf(timeNeeded)) {
                 std::cout << "Infinite time needed to set DOF (possibly due to value of desired DOF velocity)" << d << ".  Skipping it.\n";
-                continue
+                continue;
             }
 
 			//make this a whole number of timesteps
