@@ -382,6 +382,7 @@ Robot::loadContactData(QString filename)
     return FAILURE;
   }
   
+  // First line is the robot name:
   char robotName[500];
   ; //yes, I know, can seg fault...
   inFile >> robotName;
@@ -1915,7 +1916,7 @@ Robot::setDesiredDOFVals(double *dofVals)
 	for (d=0;d<numDOF;d++) {
 		if (dofVec[d]->getDefaultVelocity() == 0.0) continue;
 
-		DBGP("DOF "<<d<<" trajectory");
+        	DBGP("DOF "<<d<<" trajectory");
 		dofVec[d]->setDesiredPos(dofVals[d]);
 		if (dofVec[d]->getVal() != dofVals[d]) {
 
@@ -1925,6 +1926,12 @@ Robot::setDesiredDOFVals(double *dofVals)
 			qd1 = 0.0;
 
 			timeNeeded = fabs(dofVals[d]-dofVec[d]->getVal()) / fabs( dofVec[d]->getDesiredVelocity() );
+            
+            		// TimeNeeded can be invalid if desired velocity is 0:
+            		if (isinf(timeNeeded)) {
+               		 std::cout << "Infinite time needed to set DOF (due to dofVec[d]->getDesiredVelocity() returning 0)" << d << ".  Skipping it.\n";
+                		continue;
+            		}
 
 			//make this a whole number of timesteps
 			numSteps = (int)ceil(timeNeeded/myWorld->getTimeStep());
