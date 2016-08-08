@@ -1916,7 +1916,7 @@ Robot::setDesiredDOFVals(double *dofVals)
 	for (d=0;d<numDOF;d++) {
 		if (dofVec[d]->getDefaultVelocity() == 0.0) continue;
 
-        	DBGP( <<"DOF "<<d<<" trajectory");
+        	DBGP("DOF "<<d<<" trajectory");
 		dofVec[d]->setDesiredPos(dofVals[d]);
 		if (dofVec[d]->getVal() != dofVals[d]) {
 
