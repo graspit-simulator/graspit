@@ -95,8 +95,8 @@ SearchEnergy::setHandAndObject(Hand *h, Body *o)
 
 SearchEnergy::~SearchEnergy()
 {
-    delete mVolQual;
-    delete mEpsQual;
+    if (mVolQual) delete mVolQual;
+    if (mEpsQual) delete mEpsQual;
 }
 
 bool

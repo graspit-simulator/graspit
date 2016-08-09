@@ -36,6 +36,7 @@
 #include <Inventor/nodes/SoGroup.h>
 #include "SoArrow.h"
 
+#include "graspitCore.h"
 #include "robot.h"
 #include "body.h"
 #include "world.h"
@@ -708,11 +709,11 @@ void
 HandObjectState::hideVisualMarker()
 {
 	if (!IVRoot) return;
-	int i = mHand->getWorld()->getIVRoot()->findChild( IVRoot );
+	int i = graspitCore->getWorld()->getIVRoot()->findChild( IVRoot );
 	if ( i < 0 ) {
 		DBGP("Could not find search state marker in the world root");
 	} else {
-		mHand->getWorld()->getIVRoot()->removeChild(i);
+		graspitCore->getWorld()->getIVRoot()->removeChild(i);
 	}
 }
 
