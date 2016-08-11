@@ -64,3 +64,16 @@ Distribution Contents
 **worlds**: A place to save GraspIt! worlds.  Also includes a few
 		examples.
 
+Examples of How to Integrate GraspIt! into your own Project
+---------------------
+https://github.com/graspit-simulator/graspit-ros
+
+https://github.com/ros-interactive-manipulation/graspit_simulator
+
+https://github.com/JenniferBuehler/graspit-pkgs
+
+https://github.com/curg/graspit_interface
+
+https://github.com/OSUrobotics/graspit_ros_plannings
+
+Let me know if there are others that are missing.
