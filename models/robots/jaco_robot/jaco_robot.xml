@@ -73,6 +73,10 @@
 		</joint>
 		<link dynamicJointType='Revolute'>8_finger_pinkie.xml</link>
 	</chain>
+    <approachDirection>
+        <referenceLocation>-100.0 0 0</referenceLocation>
+        <direction>-1 0 0</direction>
+    </approachDirection>
 	<eigenGrasps>eigen/eigen.xml</eigenGrasps>
 	<virtualContacts>virtual/contacts.vgr</virtualContacts>
 </robot>
