@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "compliantPlannerDlg.h"
+#include "listPlannerDlg.h"
 
 #include <iostream>
 
@@ -53,11 +53,13 @@ PROF_DECLARE(QS_TOTAL);
 #include "searchState.h"
 
 void
-CompliantPlannerDlg::init()
+ListPlannerDlg::init()
 {
 	mPlanner = new ListPlanner(mHand);
+    energyTypeBox->insertItem("AutoGrasp");
 	energyTypeBox->insertItem("Quasistatic");
-	energyTypeBox->insertItem("Dynamic");
+    samplingTypeBox->insertItem("Ellipsoid");
+    samplingTypeBox->insertItem("Grid");
 	mPlanner->setRenderType(RENDER_ALWAYS);
 	mPlanner->setStatStream(&std::cerr);
 	mOut = NULL;
@@ -69,32 +71,14 @@ CompliantPlannerDlg::init()
 	currentLabel->setText("0/0");
 	QIntValidator* val = new QIntValidator(2, 99, this);
 	resolutionEdit->setValidator(val);
-	resolutionEdit->setText("8");
-	QIntValidator* val2 = new QIntValidator(this);
-	testOneEdit->setValidator(val2);
-	testOneEdit->setText("0");
+    resolutionEdit->setText("3");;
 	resultsBox->insertItem("console");
 	resultsBox->insertItem("file:");
 	resultsFileEdit->setText("comp_plan.txt");
 
-	QDoubleValidator* dVal = new QDoubleValidator(0.5, 1.5, 3, this);
-	tFromEdit->setValidator(dVal);
-	tToEdit->setValidator(dVal);
-	tStepEdit->setValidator(dVal);
-	sFromEdit->setValidator(dVal);
-	sToEdit->setValidator(dVal);
-	sStepEdit->setValidator(dVal);
-
-	tFromEdit->setText("0.5");
-	tToEdit->setText("1.5");
-	tStepEdit->setText("0.1");
-	sFromEdit->setText("0.5");
-	sToEdit->setText("1.5");
-	sStepEdit->setText("0.1");
-
 }
 
-CompliantPlannerDlg::~CompliantPlannerDlg()
+ListPlannerDlg::~ListPlannerDlg()
 {
 	if (mOut) {
 		mOut->close();
@@ -104,7 +88,7 @@ CompliantPlannerDlg::~CompliantPlannerDlg()
 }
 
 void 
-CompliantPlannerDlg::addCartesianSamples(const GraspPlanningState &seed, 
+ListPlannerDlg::addCartesianSamples(const GraspPlanningState &seed,
 										 std::list<GraspPlanningState*> *sampling, 
 										 int samples, double x, double y, double z)
 {
@@ -137,7 +121,7 @@ CompliantPlannerDlg::addCartesianSamples(const GraspPlanningState &seed,
 	ratio and projecting the resulting points on the ellipsoid. Not ideal,
 	but at least much better then sampling angular variables directly */
 void 
-CompliantPlannerDlg::gridEllipsoidSampling(const GraspPlanningState &seed,
+ListPlannerDlg::gridEllipsoidSampling(const GraspPlanningState &seed,
 										   std::list<GraspPlanningState*> *sampling, 
 										   int samples)
 {
@@ -162,7 +146,7 @@ CompliantPlannerDlg::gridEllipsoidSampling(const GraspPlanningState &seed,
 }
 
 void
-CompliantPlannerDlg::generateButtonClicked()
+ListPlannerDlg::generateButtonClicked()
 {
 	int resolution = resolutionEdit->text().toInt();
 	if (resolution < 1) {
@@ -179,18 +163,24 @@ CompliantPlannerDlg::generateButtonClicked()
 	double a = 0.5*(bbmax[0] - bbmin[0]);
 	double b = 0.5*(bbmax[1] - bbmin[1]);
 	double c = 0.5*(bbmax[2] - bbmin[2]);
-	//ellipsoidSampling(a,b,c,resolution);
-	boxSampling(a,b,c, resolution);
+
+    if (samplingTypeBox->currentText() == "Grid") {
+        boxSampling(a,b,c, resolution);
+    } else if (samplingTypeBox->currentText() == "Ellipsoid") {
+        ellipsoidSampling(a,b,c,resolution);
+    } else {
+        DBGA("Invalid Sampling Type");
+        assert(0);
+    }
+    mPlanner->showVisualMarkers( true);
 
 	mPlanner->resetPlanner();
-	if (visualMarkersBox->isChecked()) {
-		visualMarkersBoxClicked();
-	}
+
 	update();
 }
 
 void 
-CompliantPlannerDlg::ellipsoidSampling(double a, double b, double c, double resolution)
+ListPlannerDlg::ellipsoidSampling(double a, double b, double c, double resolution)
 {
 	//generate a list of grasps by sampling an ellipsoid around the object
 	GraspPlanningState seed(mHand);
@@ -222,7 +212,7 @@ CompliantPlannerDlg::ellipsoidSampling(double a, double b, double c, double reso
 }
 
 void
-CompliantPlannerDlg::sampleFace(vec3 x, vec3 y, vec3 z, 
+ListPlannerDlg::sampleFace(vec3 x, vec3 y, vec3 z,
 								double sz1, double sz2, vec3 tln, double res,
 								std::list<GraspPlanningState*> *sampling)
 {
@@ -257,7 +247,7 @@ CompliantPlannerDlg::sampleFace(vec3 x, vec3 y, vec3 z,
 }
 
 void 
-CompliantPlannerDlg::boxSampling(double a, double b, double c, double res)
+ListPlannerDlg::boxSampling(double a, double b, double c, double res)
 {
 	std::list<GraspPlanningState*> sampling;
 	res = 30;
@@ -276,46 +266,18 @@ CompliantPlannerDlg::boxSampling(double a, double b, double c, double res)
 }
 
 void
-CompliantPlannerDlg::testOneButtonClicked()
-{
-	if (energyTypeBox->currentText() == "Quasistatic") {
-		mPlanner->setEnergyType(ENERGY_COMPLIANT);
-	} else if (energyTypeBox->currentText() == "Dynamic") {
-		mPlanner->setEnergyType(ENERGY_DYNAMIC);
-	} else {
-		assert(0);
-	}
-	if (mPlanner->isActive()) {
-		DBGA("Stop planner first!");
-		return;
-	}
-	int num = testOneEdit->text().toInt();
-	if (num < 0 || num >= mNumCandidates) {
-		DBGA("Wrong test number selected");
-		return;
-	}
-	//single tests are always printed out to console
-	mPlanner->setStatStream(&std::cerr);
-	DBGA("Testing pre-grasp #" << num);
-	mPlanner->testState(num);
-	mHand->getWorld()->updateGrasps();
-	graspitCore->getIVmgr()->drawDynamicForces();
-	graspitCore->getIVmgr()->drawUnbalancedForces();
-}
-
-void
-CompliantPlannerDlg::startPlanner()
+ListPlannerDlg::startPlanner()
 {
 	mPlanner->startPlanner();
 }
 
 void
-CompliantPlannerDlg::testButtonClicked()
+ListPlannerDlg::testButtonClicked()
 {
 	if (energyTypeBox->currentText() == "Quasistatic") {
 		mPlanner->setEnergyType(ENERGY_COMPLIANT);
-	} else if (energyTypeBox->currentText() == "Dynamic") {
-		mPlanner->setEnergyType(ENERGY_DYNAMIC);
+    } else if (energyTypeBox->currentText() == "AutoGrasp") {
+        mPlanner->setEnergyType(ENERGY_STRICT_AUTOGRASP);
 	} else {
 		assert(0);
 	}
@@ -337,7 +299,7 @@ CompliantPlannerDlg::testButtonClicked()
 }
 
 void
-CompliantPlannerDlg::update()
+ListPlannerDlg::update()
 {
 	QString n1,n2;
 	n1.setNum(mPlanner->getCurrentStep());
@@ -346,7 +308,7 @@ CompliantPlannerDlg::update()
 }
 
 void
-CompliantPlannerDlg::showResult()
+ListPlannerDlg::showResult()
 {
 	int d = mPlanner->getListSize();
 	int rank, size, iteration; double energy;
@@ -361,6 +323,7 @@ CompliantPlannerDlg::showResult()
  
 	if ( d!=0 ){
 		const GraspPlanningState *s = mPlanner->getGrasp(mBestGraspNum);
+        mPlanner->showState(mBestGraspNum);
 		rank = mBestGraspNum+1;
 		size = d;
 		energy = s->getEnergy();
@@ -374,77 +337,49 @@ CompliantPlannerDlg::showResult()
 	n1.setNum(energy,'f',3);
 	energyLabel->setText("Energy: " + n1);
 	n1.setNum(iteration);
-	testOneEdit->setText(n1);
-	showOneButtonClicked();
+    showOne();
 	iterationLabel->setText("Iteration: " + n1);
 
 }
 
 void
-CompliantPlannerDlg::prevButtonClicked()
+ListPlannerDlg::showOne()
+{
+    if (mPlanner->isActive()) {
+        DBGA("Stop planner first!");
+        return;
+    }
+    int num = mBestGraspNum;
+    if (num < 0 || num >= mNumCandidates) {
+        DBGA("Wrong test number selected");
+        return;
+    }
+    DBGA("Testing pre-grasp #" << num);
+    mPlanner->showState(num);
+}
+
+void
+ListPlannerDlg::prevButtonClicked()
 {
 	mBestGraspNum--;
 	showResult();
 }
 void
-CompliantPlannerDlg::nextButtonClicked()
+ListPlannerDlg::nextButtonClicked()
 {
 	mBestGraspNum++;
 	showResult();
 }
 void
-CompliantPlannerDlg::bestButtonClicked()
+ListPlannerDlg::bestButtonClicked()
 {
 	mBestGraspNum=0;
 	showResult();
 }
 
-void 
-CompliantPlannerDlg::showOneButtonClicked()
-{
-	if (mPlanner->isActive()) {
-		DBGA("Stop planner first!");
-		return;
-	}
-	int num = testOneEdit->text().toInt();
-	if (num < 0 || num >= mNumCandidates) {
-		DBGA("Wrong test number selected");
-		return;
-	}
-	DBGA("Testing pre-grasp #" << num);
-	mPlanner->showState(num);
-}
-
-void 
-CompliantPlannerDlg::prepareOneButtonClicked()
-{
-	if (mPlanner->isActive()) {
-		DBGA("Stop planner first!");
-		return;
-	}
-	int num = testOneEdit->text().toInt();
-	if (num < 0 || num >= mNumCandidates) {
-		DBGA("Wrong test number selected");
-		return;
-	}
-	DBGA("Testing pre-grasp #" << num);
-	mPlanner->prepareState(num);
-}
-
-void 
-CompliantPlannerDlg::visualMarkersBoxClicked()
-{
-	mPlanner->showVisualMarkers( visualMarkersBox->isChecked());
-}
-
-void 
-CompliantPlannerDlg::resetObjectButtonClicked()
-{
-	mObject->setTran(mObjectRefTran);
-}
 
 void
-CompliantPlannerDlg::updateOut()
+ListPlannerDlg::updateOut()
 {
 	if (mOut) {
 		mOut->close();
@@ -465,30 +400,8 @@ CompliantPlannerDlg::updateOut()
 	}
 }
 
-void 
-CompliantPlannerDlg::designTestButtonClicked()
-{
-	if (!mOut) {
-		DBGA("Set output file first!!!!");
-		return;
-	}
-	mTFrom = tFromEdit->text().toDouble();
-	mTTo = tToEdit->text().toDouble();
-	mTStep = tStepEdit->text().toDouble();
-	mSFrom = sFromEdit->text().toDouble();
-	mSTo = sToEdit->text().toDouble();
-	mSStep = sStepEdit->text().toDouble();
-	DBGA("Starting batch testing");
-	mBatch = true;
-	mTR = mTFrom;
-	mSR = mSFrom;
-	mPlanner->setEnergyType(ENERGY_COMPLIANT);
-	mPlanner->setStatStream(NULL);
-	startPlanner();
-}
-
 void
-CompliantPlannerDlg::plannerFinished()
+ListPlannerDlg::plannerFinished()
 {
 	PROF_STOP_TIMER(QS_TOTAL);
 	PROF_PRINT(QS_TOTAL);

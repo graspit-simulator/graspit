@@ -522,7 +522,7 @@ set (GRASPIT_FORMS
     ${GSRC}/ui/settingsDlg.ui 
     ${GSRC}/ui/Planner/plannerdlg.ui 
     ${GSRC}/ui/EGPlanner/egPlannerDlg.ui 
-    ${GSRC}/ui/EGPlanner/compliantPlannerDlg.ui
+    ${GSRC}/ui/EGPlanner/listPlannerDlg.ui
 )
 
 set (GRASPIT_FORM_HEADERS 
@@ -540,7 +540,7 @@ set (GRASPIT_FORM_HEADERS
     ${GSRC}/ui/qmDlg.h 
     ${GSRC}/ui/Planner/plannerdlg.h 
     ${GSRC}/ui/EGPlanner/egPlannerDlg.h 
-    ${GSRC}/ui/EGPlanner/compliantPlannerDlg.h
+    ${GSRC}/ui/EGPlanner/listPlannerDlg.h
 )
 
 set (GRASPIT_FORM_SOURCES
@@ -558,7 +558,7 @@ set (GRASPIT_FORM_SOURCES
     ${GSRC}/ui/settingsDlg.cpp 
     ${GSRC}/ui/Planner/plannerdlg.cpp 
     ${GSRC}/ui/EGPlanner/egPlannerDlg.cpp 
-    ${GSRC}/ui/EGPlanner/compliantPlannerDlg.cpp
+    ${GSRC}/ui/EGPlanner/listPlannerDlg.cpp
 )
 
 set (MOC_HEADERS
@@ -568,7 +568,7 @@ set (MOC_HEADERS
     ${GSRC}/ui/bodyPropDlg.h
     ${GSRC}/ui/eigenGraspDlg.h
     ${GSRC}/ui/EGPlanner/egPlannerDlg.h
-    ${GSRC}/ui/EGPlanner/compliantPlannerDlg.h
+    ${GSRC}/ui/EGPlanner/listPlannerDlg.h
     ${GSRC}/ui/Planner/plannerdlg.h
     ${GSRC}/ui/graspCaptureDlg.h
     ${GSRC}/ui/contactExaminerDlg.h

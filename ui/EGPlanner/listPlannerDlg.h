@@ -30,7 +30,7 @@
 #include <list>
 #include <fstream>
 
-#include "ui_compliantPlannerDlg.h"
+#include "ui_listPlannerDlg.h"
 
 #include "matvec3D.h"
 
@@ -39,12 +39,12 @@ class Hand;
 class GraspableBody;
 class GraspPlanningState;
 
-//! Used for running tests with compliant hands
+//! Used for uniformly sampling approach directions around an object
 /*! This dialog is used for running various tests of the compliant hand
 	solver framework. It is not finished, and currently not in a very
 	well-engineered state. It is in bad need of a re-design.
 */
-class CompliantPlannerDlg : public QDialog, public Ui::CompliantPlannerDlgUI
+class ListPlannerDlg : public QDialog, public Ui::ListPlannerDlgUI
 {
 	Q_OBJECT
 private:
@@ -88,53 +88,36 @@ private:
 	void showResult();
 	void startPlanner();
 public:
-	CompliantPlannerDlg(Hand *h, GraspableBody *gb, QWidget *parent = 0) : 
+    ListPlannerDlg(Hand *h, GraspableBody *gb, QWidget *parent = 0) :
 	    QDialog(parent), mHand(h), mObject(gb) {
 		setupUi(this);
 		QObject::connect(generateButton, SIGNAL(clicked()), 
 						 this, SLOT(generateButtonClicked()));
 		QObject::connect(testButton, SIGNAL(clicked()), 
 						 this, SLOT(testButtonClicked()));
-		QObject::connect(testOneButton, SIGNAL(clicked()),
-						 this, SLOT(testOneButtonClicked()));
 		QObject::connect(nextButton, SIGNAL(clicked()), 
 						 this, SLOT(nextButtonClicked()));
 		QObject::connect(prevButton, SIGNAL(clicked()), 
 						 this, SLOT(prevButtonClicked()));
 		QObject::connect(bestButton, SIGNAL(clicked()), 
 						 this, SLOT(bestButtonClicked()));
-		QObject::connect(designTestButton, SIGNAL(clicked()), 
-						 this, SLOT(designTestButtonClicked()));
-		QObject::connect(showOneButton, SIGNAL(clicked()), 
-						 this, SLOT(showOneButtonClicked()));
-		QObject::connect(prepareOneButton, SIGNAL(clicked()), 
-						 this, SLOT(prepareOneButtonClicked()));
-		QObject::connect(visualMarkersBox, SIGNAL(clicked()), 
-						 this, SLOT(visualMarkersBoxClicked()));
-		QObject::connect(resetObjectButton, SIGNAL(clicked()), 
-						 this, SLOT(resetObjectButtonClicked()));
 		QObject::connect(resultsFileEdit, SIGNAL(editingFinished()),
 						 this, SLOT(updateOut()));
 		QObject::connect(resultsBox, SIGNAL(activated(int)), 
 						 this, SLOT(updateOut()));
 		init();
 	}
-	~CompliantPlannerDlg();
+    ~ListPlannerDlg();
 
 public Q_SLOTS:
 	void generateButtonClicked();
 	void testButtonClicked();
-	void testOneButtonClicked();
 	void nextButtonClicked();
 	void prevButtonClicked();
 	void bestButtonClicked();
+    void showOne();
 	void update();
 	void plannerFinished();
-	void showOneButtonClicked();
-	void prepareOneButtonClicked();
-	void visualMarkersBoxClicked();
-	void resetObjectButtonClicked();
-	void designTestButtonClicked();
 	void updateOut();
 };
 

@@ -34,7 +34,7 @@
 
 //this should be a parameter of the EGPlanner
 //iros09
-#define BEST_LIST_SIZE 2000
+#define BEST_LIST_SIZE 20000
 
 ListPlanner::ListPlanner(Hand *h)
 {
@@ -116,7 +116,7 @@ void
 ListPlanner::prepareState(int index)
 {
 	showState(index);
-	mHand->findInitialContact(200);
+    mHand->findInitialContact(200);
 }
 
 /*! The main planning function. Simply takes the next input grasp from the list,
@@ -136,7 +136,13 @@ ListPlanner::mainLoop()
 	//so that after dynamics object gets put back
 	bool legal; double energy;
 	PRINT_STAT(mOut, mCurrentStep);
-	mEnergyCalculator->analyzeState(legal, energy, *mPlanningIterator, true);
+
+
+//    (*mPlanningIterator)->execute();
+//    mHand->findInitialContact(200);
+
+
+    mEnergyCalculator->analyzeState(legal, energy, *mPlanningIterator, false);
 
 	//for rendering purposes; will see later if it's needed
 	mCurrentState->copyFrom(*mPlanningIterator);
@@ -147,7 +153,7 @@ ListPlanner::mainLoop()
 	//this whole thing could go into a higher level fctn in EGPlanner
 	if (legal) {
 		double worstEnergy;
-		if ((int)mBestList.size() < BEST_LIST_SIZE) worstEnergy = 1.0e5;
+        if ((int)mBestList.size() < BEST_LIST_SIZE) worstEnergy = 1.0e5;
 		else worstEnergy = mBestList.back()->getEnergy();
 		if (energy < worstEnergy) {
 			GraspPlanningState *insertState = new GraspPlanningState(*mPlanningIterator);
@@ -156,7 +162,7 @@ ListPlanner::mainLoop()
 			DBGP("Solution at step " << mCurrentStep);
 			mBestList.push_back(insertState);
 			mBestList.sort(GraspPlanningState::compareStates);
-			while ((int)mBestList.size() > BEST_LIST_SIZE) {
+            while ((int)mBestList.size() > BEST_LIST_SIZE) {
 				delete(mBestList.back());
 				mBestList.pop_back();
 			}
@@ -164,7 +170,7 @@ ListPlanner::mainLoop()
 	}
 
 	//advance the planning iterator
-	mPlanningIterator++;
+    mPlanningIterator++;
 	mCurrentStep++;
 	Q_EMIT update();
 	PRINT_STAT(mOut, std::endl);

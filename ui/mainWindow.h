@@ -111,7 +111,7 @@ public Q_SLOTS:
 	void eigenGraspActivated();
 	void graspContactExaminer_activated();
 	void eigenGraspPlannerActivated();
-	void graspCompliantPlanner();
+    void graspListPlannerActivated();
 	//-------------
 	void dbaseGUIAction_activated();
 	void dbasePlannerAction_activated();
