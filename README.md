@@ -23,60 +23,40 @@ more details.
 Distribution Contents
 ---------------------
 
-**CMakeLists.txt**: Used to compile GraspIt!, multiple flags that can be set with ccmake. 
-
-**CMakeMacros**: contains .cmake files used to find GraspIt! dependencies. 
-
-**cmdline**: command line parser used by GraspIt!. 
-
-**ci**: contains scripts used by travis ci. 
-
-**doc**: Documentation.  Contains both the User Manual and code Reference Manual. The User Manual contains installation instructions, pointers for getting started, examples, and trouble shooting and contact information.
-
-**images**: A place to put images saved from GraspIt!
-
-**include**: Header files for the main GraspIt! source code
-
-**LICENSE.txt**: A copy of the license you accepted when you downloaded this.
-
+**CMakeLists.txt**: Used to compile GraspIt!, multiple flags that can be set with ccmake. <br />
+**CMakeMacros**: contains .cmake files used to find GraspIt! dependencies.  <br />
+**cmdline**: command line parser used by GraspIt!.  <br />
+**ci**: contains scripts used by travis ci.  <br />
+**doc**: Documentation.  Contains both the User Manual and code Reference Manual. The User Manual contains installation instructions, pointers for getting started, examples, and trouble shooting and contact information. <br />
+**images**: A place to put images saved from GraspIt! <br />
+**include**: Header files for the main GraspIt! source code <br />
+**LICENSE.txt**: A copy of the license you accepted when you downloaded this. <br />
 **models**: The geometry and configuration files for all the robots and
-		objects.
-
+		objects. <br />
 **plugins**:  Examples for creating plugins that can be loaded into GraspIt! 
                  at run time, and can use GraspIt! without being statically linked
-		 into GraspIt's main executable.
-
+		 into GraspIt's main executable. <br />
 **ply**:  Code for loading .ply files; see header files for authorship 
-                information and detail.
-
+                information and detail. <br />
 **qhull**: A popular package for computing n-dimensional convex hulls.
 		This is used both for the contact system and to create grasp
-	      wrench spaces.
-
-**README.md**:  This file.
-
-**src**:  The source code for GraspIt!.
-
+	      wrench spaces. <br />
+**README.md**:  This file. <br />
+**src**:  The source code for GraspIt!. <br />
 **src/DBase**: source code for the interface between GraspIt and the Columbia 
-		Grasp Database
-
+		Grasp Database <br />
 **tinyxml**: a library for processing XML documents. See the header files 
-		therein for license and author information for this package.
-
-**ui**:	The dialog windows and interfaces for GraspIt!.
-
+		therein for license and author information for this package. <br />
+**ui**:	The dialog windows and interfaces for GraspIt!. <br />
 **worlds**: A place to save GraspIt! worlds.  Also includes a few
-		examples.
+		examples. <br />
 
 Examples of How to Integrate GraspIt! into your own Project
 ---------------------
 
-https://github.com/JenniferBuehler/graspit-pkgs
-
-https://github.com/curg/graspit_interface
-
-https://github.com/ros-interactive-manipulation/graspit_simulator
-
-https://github.com/OSUrobotics/graspit_ros_plannings
+https://github.com/JenniferBuehler/graspit-pkgs <br />
+https://github.com/curg/graspit_interface <br />
+https://github.com/ros-interactive-manipulation/graspit_simulator <br />
+https://github.com/OSUrobotics/graspit_ros_plannings <br />
 
 Let me know if there are others that are missing.
