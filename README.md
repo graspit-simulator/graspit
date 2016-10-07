@@ -45,5 +45,3 @@ https://github.com/JenniferBuehler/graspit-pkgs <br />
 https://github.com/curg/graspit_interface <br />
 https://github.com/ros-interactive-manipulation/graspit_simulator <br />
 https://github.com/OSUrobotics/graspit_ros_plannings <br />
-
-Let me know if there are others that are missing.
