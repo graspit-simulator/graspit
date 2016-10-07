@@ -31,7 +31,6 @@ Distribution Contents
 		 into GraspIt's main executable. <br />
 **ply**:  Code for loading .ply files; see header files for authorship 
                 information and detail. <br />
-**cmdline**:  Code for loading reading command line arguments. <br />
 **qhull**: A popular package for computing n-dimensional convex hulls.
 		This is used both for the contact system and to create grasp
 	      wrench spaces. <br />
