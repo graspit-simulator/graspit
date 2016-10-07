@@ -13,13 +13,6 @@ http://graspit-simulator.github.io/
 for an introduction to GraspIt!, a list of
 features, installation instructions, getting started examples, etc.
 
-Disclaimer
-----------
-This is code that has been, and is currently being used, for research. There 
-are still many unfinished pieces and plenty of ways to crash the system.  It's
-by no means bullet proof. Please see the Introduction in the User Manual for 
-more details.
-
 Distribution Contents
 ---------------------
 
