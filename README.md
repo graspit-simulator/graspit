@@ -2,8 +2,6 @@
 
 <h1>GraspIt!</h1>
 
-<h2>Version 2.2.0</h2>
-
 Introduction
 ------------
 Please see the User Manual found at http://graspit-simulator.github.io/ for an introduction to GraspIt!, a list of
