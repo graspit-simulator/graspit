@@ -34,7 +34,6 @@
 #include <vector>
 
 #include "Collision/collisionStructures.h"
-#include "ContactPDModels.h"
 
 class transf;
 class Body;
