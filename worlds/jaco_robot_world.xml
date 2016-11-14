@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<world>
+<!--
+	<graspableBody>
+		<filename>models/objects/cube.xml</filename>
+		<transform>
+			<fullTransform>(+1 0 0 0)[+100 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+-->
+	<robot>
+		<filename>models/robots/jaco_robot/jaco_robot.xml</filename>
+		<dofValues>-0.52275 -0.52275 -0.52275 </dofValues>
+		<transform>
+			<fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>+0 +0 +500</position>
+		<orientation>0 0 0 1</orientation>
+		<focalDistance>+500</focalDistance>
+	</camera>
+</world>
+
