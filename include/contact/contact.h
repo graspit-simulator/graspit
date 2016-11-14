@@ -195,7 +195,7 @@ public:
 
   //! Initializes an empty contact (not really used)
   Contact() : body1(NULL),body2(NULL),mate(NULL),sCof(0.0),
-	contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL) {}
+    contactForcePointers(NULL), optimalCoeffs(NULL), prevBetas(NULL), wrench(NULL) {}
 
   //! Constructs a contact between two bodies 
   Contact(Body *b1,Body *b2, position pos, vec3 norm);
@@ -325,6 +325,8 @@ public:
   //! Returns the IV root of the visual markers that shows the location of this contact
   virtual SoSeparator* getVisualIndicator(){return NULL;}
 
+  virtual mat3 getRot(){return mat3::IDENTITY;}
+
   //! Get dynamic sovler LCP information from the previous time step
   double getPrevCn(){return prevCn;}
   //! Get dynamic sovler LCP information from the previous time step
@@ -344,8 +346,11 @@ public:
   SoMaterial *coneMat;
   //! A debug tool to see that contact inheritance works right
   float coneR, coneG, coneB;
+
+  //! Testing static force output.  Default implementation for baseclass is trivial
+  virtual void getStaticContactInfo(std::vector<position> &pVec,std::vector<double> &floatVec){pVec.push_back(loc);floatVec.push_back(1);}
+  //! Only used in SoftFinger contact
+  virtual mat3 getCommonFrameRot(){ return mat3::IDENTITY; }
+
 };
-
 #endif
-
-
