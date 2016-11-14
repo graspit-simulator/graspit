@@ -173,50 +173,8 @@ bool TactileSensor::updateStaticSensorModel()
     resetSensor();
     // loop through all the contacts
     for(cp = cList.begin(); cp != cList.end(); cp++){
-
-        //If we are dealing with softContacts
-        if(mBody->getWorld()->softContactsAreOn() &&
-                ((*cp)->getBody1()->isElastic() || (*cp)->getBody2()->isElastic())){
-            std::vector<position> pVec;
-            std::vector<double> forceVec;
-
-            // get the discretized forces and locations within each sub-region of an ellipse
-            (*cp)->getStaticContactInfo(pVec, forceVec);
-
-            //get the transform from the body1 to contact
-            transf contactInBody1 = (*cp)->getContactFrame();
-
-            //rotation from the contact to the local curvature frame
-            transf curvatureFrameInContact;
-            mat3 contactRot = (*cp)->getRot();
-            curvatureFrameInContact.set(contactRot.inverse(), vec3::ZERO);
-
-            //transform from local curvature frame to the common frame
-            transf commonFrameInCurvature;
-            mat3 commonFrameRot = (*cp)->getCommonFrameRot();
-            commonFrameInCurvature.set(commonFrameRot.inverse(),vec3::ZERO);
-
-            transf commonFrameInBody1 = commonFrameInCurvature*curvatureFrameInContact*contactInBody1;
-
-            // for the current contact, we loop through all the discretized sub-regions of this contact
-            for (unsigned int pInd = 0; pInd < pVec.size(); pInd ++){
-                //pVec is the discretized locations within the common contact ellipse
-                transf sampleInCommonFrame;
-                sampleInCommonFrame.set(Quaternion::IDENTITY, vec3(1000*pVec[pInd].x(), 1000*pVec[pInd].y(), 1000*pVec[pInd].z()) );
-                transf sampleInBody1 = sampleInCommonFrame*commonFrameInBody1;
-                position sampleLocation;
-                sampleLocation.set(sampleInBody1.translation());
-                if(filterContact(sampleLocation))
-                {
-                    mOutput.sensorReading[2]+= forceVec[pInd] * 1000;
-                }
-            }
-        }
-        //We are dealing with normal contacts, not soft contacts
-        else{
-            if(filterContact(*cp)){
-                mOutput.sensorReading[2] += 1;
-            }
+        if(filterContact(*cp)){
+            mOutput.sensorReading[2] += 1;
         }
     }
 }
