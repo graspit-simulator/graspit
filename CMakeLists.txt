@@ -147,7 +147,9 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspitServer.h 
     ${GSRC}/include/graspitApp.h 
     ${GSRC}/include/arch.h
-    ${GSRC}/include/FitParabola.h 
+    ${GSRC}/include/FitParabola.h
+    ${GSRC}/include/bodySensor.h
+    ${GSRC}/ContactPDModels.h
 )
 set (GRASPIT_PLANNER_HEADERS
     ${GSRC}/include/Planner/grasp_visualization.h 
@@ -413,6 +415,8 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/energy/guidedPotentialQualityEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/potentialQualityEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/strictAutoGraspEnergy.cpp 
+    ${GSRC}/src/ContactPDModels.cpp
+    ${GSRC}/src/bodySensor.cpp
 )
 
 #--------------------------------------- Collision library ---------------------------------
