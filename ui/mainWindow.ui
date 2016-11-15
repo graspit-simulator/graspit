@@ -466,7 +466,6 @@
         <addaction name="dynamicsArch_BuilderAction" />
         <addaction name="miscOptimizerAction" />
         <addaction name="miscEigengridsAction" />
-        <addaction name="staubliControl" />
       </widget>
       <widget class="QMenu" name="helpMenu" >
         <property name="title" >
@@ -707,17 +706,6 @@
       </property>
       <property name="text" >
         <string>Optimizer...</string>
-      </property>
-    </action>
-    <action name="staubliControl" >
-      <property name="name" >
-        <cstring>staubliControl</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Staubli Control Panel...</string>
-      </property>
-      <property name="text" >
-        <string>Staubli Control Panel...</string>
       </property>
     </action>
     <action name="graspGFOAction" >

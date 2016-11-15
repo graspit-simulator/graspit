@@ -70,9 +70,6 @@
 #include "DBase/dbasePlannerDlg.h"
 #include "graspit_db_model.h"
 #endif
-#ifdef STAUBLI_CONTROL_ENABLED
-#include "staubli/staubliControlDlg.h"
-#endif
 #include "gloveCalibrationDlg.h"
 #include "graspCaptureDlg.h"
 #include "barrettHandDlg.h"
@@ -149,8 +146,6 @@ MainWindow::MainWindow(QWidget *parent)
   // -- misc menu
   QObject::connect(mUI->dynamicsArch_BuilderAction, SIGNAL(triggered()), this, SLOT(archBuilder()));
   QObject::connect(mUI->miscOptimizerAction, SIGNAL(triggered()), this, SLOT(miscOptimizer()));
-  QObject::connect(mUI->staubliControl, SIGNAL(triggered()), 
-                   this, SLOT(misStaubliControlDlg()));
   QObject::connect(mUI->miscEigengridsAction, SIGNAL(triggered()), this, SLOT(miscEigengridsAction_activated()));
   // -- contacts
   QObject::connect(mUI->contactsListBox, SIGNAL(highlighted(int)), this, SLOT(contactSelected(int)));
@@ -812,15 +807,6 @@ void MainWindow::dbasePlannerAction_activated()
 #endif
 }
 
-void MainWindow::misStaubliControlDlg()
-{
-#ifdef STAUBLI_CONTROL_ENABLED
-  StaubliControlDlg *dlg = new StaubliControlDlg(mWindow);
-  dlg->setAttribute(Qt::WA_ShowModal, false);
-  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-  dlg->show();
-#endif
-}
 //--------------------------------------- Sensors menu -------------------------------
 
 void MainWindow::sensorsSensor_InputAction_activated()
