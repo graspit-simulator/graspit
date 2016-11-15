@@ -50,7 +50,8 @@
 #include "eigenGrasp.h"
 #include "matrix.h"
 #include "tinyxml.h"
-#include "virtualContact.h"
+#include "bodySensor.h"
+#include "contact/virtualContact.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -111,22 +112,32 @@ Robot::loadFromXml(const TiXmlElement* root,QString rootPath)
 	QString ivdir = rootPath + "iv/";
 	// read and load the base; automatically placed at origin
 	DBGA("Creating base...\n");  
+	QString sensorType = element->Attribute("sensorType");
 	if(element){
 		valueStr = element->GetText();	
 		valueStr = valueStr.stripWhiteSpace();
 		base = new Link(this,-1,-1,myWorld,(QString(name())+"Base").latin1());
 		if (!base  || base->load(ivdir+valueStr)==FAILURE) {
-			if (base) delete base; 
-			base = NULL;
-			DBGA("Failed to load base");
-			return FAILURE;
+		  if (base) delete base; 
+		  base = NULL;
+		  DBGA("Failed to load base");
+		  return FAILURE;
 		}
 		base->addToIvc();
 
 		//init my IVRoot and add the base
 		IVRoot = new SoSeparator;
 		IVRoot->addChild(base->getIVRoot());
-	}
+		std::list<const TiXmlElement*> elementList = findAllXmlElements(root, "filter");
+		std::list<const TiXmlElement*>::iterator p;
+		for(p = elementList.begin(); p!=elementList.end(); p++){
+		  //Get body number
+		  QString bodyNumText = (*p)->GetText();
+		  QString params = (*p)->Attribute("params");
+		  TactileSensor * bd = new TactileSensor(base);
+		  bd->setFilterParams(&params);
+		}
+    }
 	else{
 		QTWARNING("Base not found");
 		return FAILURE;
@@ -382,6 +393,7 @@ Robot::loadContactData(QString filename)
     return FAILURE;
   }
   
+  // First line is the robot name:
   char robotName[500];
   ; //yes, I know, can seg fault...
   inFile >> robotName;
@@ -1663,6 +1675,14 @@ Robot::moveDOFToContacts(double *desiredVals, double *desiredSteps, bool stopAtC
 		}
 	} while (1);
 
+    if(renderIt)
+    {
+        if(graspitCore->getIVmgr())
+        {
+            graspitCore->getIVmgr()->getViewer()->render();
+        }
+    }
+
 	//	PROF_STOP_TIMER(MOVE_DOF);
 	//	PROF_PRINT_ALL;
 
@@ -1915,7 +1935,7 @@ Robot::setDesiredDOFVals(double *dofVals)
 	for (d=0;d<numDOF;d++) {
 		if (dofVec[d]->getDefaultVelocity() == 0.0) continue;
 
-		DBGP("DOF "<<d<<" trajectory");
+        	DBGP("DOF "<<d<<" trajectory");
 		dofVec[d]->setDesiredPos(dofVals[d]);
 		if (dofVec[d]->getVal() != dofVals[d]) {
 
@@ -1925,6 +1945,12 @@ Robot::setDesiredDOFVals(double *dofVals)
 			qd1 = 0.0;
 
 			timeNeeded = fabs(dofVals[d]-dofVec[d]->getVal()) / fabs( dofVec[d]->getDesiredVelocity() );
+            
+            		// TimeNeeded can be invalid if desired velocity is 0:
+            		if (isinf(timeNeeded)) {
+               		 std::cout << "Infinite time needed to set DOF (due to dofVec[d]->getDesiredVelocity() returning 0)" << d << ".  Skipping it.\n";
+                		continue;
+            		}
 
 			//make this a whole number of timesteps
 			numSteps = (int)ceil(timeNeeded/myWorld->getTimeStep());
@@ -2221,6 +2247,14 @@ Robot::contactSlip()
 		}
 	}
 	return false;
+}
+
+/*! Adds to this world a sensor that is already created and initialized.
+*/
+
+void
+Robot::addSensor(BodySensor * si){
+    sensorVec.push_back(si);
 }
 
 //////////////////////////////////////////////////////////////////////////////

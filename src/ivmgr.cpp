@@ -107,7 +107,7 @@
 #include "joint.h"
 #include "humanHand.h"
 #include "body.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "grasp.h"
 #include "world.h"
 #include "mainWindow.h"

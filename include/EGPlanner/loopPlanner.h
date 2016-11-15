@@ -29,8 +29,8 @@
 #include <list>
 #include <QObject>
 
-#include "simAnnPlanner.h"
-#include "search.h"
+#include "EGPlanner/simAnnPlanner.h"
+#include "EGPlanner/search.h"
 
 class Hand;
 class GraspPlanningState;
@@ -72,6 +72,8 @@ public:
   //! Also clears the avoid list
   virtual void clearSolutions();
   
+  void setEnergyType(SearchEnergyType s);
+
   //! Sets the threshold for saving solutions from each loop
   void setSaveThreshold(float t){mSaveThreshold = t;}
   //! Gets the threshold for saving solutions from each loop

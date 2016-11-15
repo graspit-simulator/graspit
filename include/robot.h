@@ -49,6 +49,7 @@ class CyberGlove;
 class EigenGraspInterface;
 class Matrix;
 class TiXmlElement;
+class BodySensor;
 
 //! Base class for all robots which are collections of links connected by moveable joints
 /*! A robot is collection of link bodies orgainized around a base link.
@@ -138,6 +139,9 @@ protected:
   //! A pointer to the base link (or palm) of the robot
   Link *base;
 
+  //! A vector of pointers to the sensors defined within this world
+  std::vector<BodySensor *> sensorVec;
+
   // Save and restore state
   //! Is used to save the current transform if we want to restore it later
   transf savedTran;
@@ -156,6 +160,13 @@ protected:
   double defaultTranslVel;
   //! The default rotational velocity (rad/sec) to use when generating cartesian trajectories
   double defaultRotVel;
+
+  //! linear velocity for dynamic movement of the base of the robot
+  //! this is only used when dynamics is on, and with the bullet dynamics engine
+  vec3 mLinearVelocity;
+  //! angular velocity for dynamic movement of the base of the robot
+  //! this is only used when dynamics is on, and with the bullet dynamics engine
+  vec3 mAngularVelocity;
 
   // Input from external hardware
   //! Shows if this robot is to be controlled via a CyberGlove
@@ -235,6 +246,8 @@ protected:
 	approachTran = transf::IDENTITY;
 	// temporary
 	defaultTranslVel = 50; defaultRotVel = M_PI/4.0;
+    mLinearVelocity = vec3(0,0,0);
+    mAngularVelocity = vec3(0,0,0);
   }
   
   //! Deletes all kinematic chains, the base and mount piece, etc.
@@ -270,6 +283,13 @@ protected:
 
   //! The main way to move the robot dofs IN DYNAMICS mode. 
   void setDesiredDOFVals(double *dofVals);
+
+  //! The main way to move the robot pose IN DYNAMICS mode.
+  void setLinearVelocity(vec3 velocity){mLinearVelocity = velocity;}
+  void setAngularVelocity(vec3 angularVelocity){mAngularVelocity = angularVelocity;}
+
+  vec3 getLinearVelocity(){return mLinearVelocity;}
+  vec3 getAngularVelocity(){return mAngularVelocity;}
 
   //! Returns true if any of the contacts on the fingers are slipping during dynamics
   bool contactSlip();
@@ -513,6 +533,16 @@ protected:
 
   //! Tells us how far along the approach direction a given object is, within a certain limit
   double getApproachDistance(Body *object, double maxDist);
+
+  //-------------------------Sensors-------------------------------------------------
+
+  //! Returns a pointer to the i-th sensor defined in for this robot
+  BodySensor * getSensor(int i) const {return sensorVec[i];}
+
+  //! Returns the number of sensors defined for this robot
+  int getNumSensors() const {return sensorVec.size();}
+
+  void addSensor(BodySensor * si);
 
   //---------------------------Q_EMIT Q_SIGNALS-----------------------------------------
 

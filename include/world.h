@@ -278,6 +278,9 @@ public:
   //! returns the name of the i-th tendon of the currently selected hand 
   QString getSelectedHandTendonName(int i);
 
+  //! returns a pointer to the dynamics engine
+  DynamicsEngine * getDynamicsEngine();
+
   //! query whether a tendon is selected or not 
   bool queryTendonSelected(){return isTendonSelected;}
 
@@ -463,12 +466,6 @@ public:
 
   //! One complete step of the dynamics simulation. 
   void stepDynamics();
-
-  //! Moves all dynamic bodies based on their velocity and the length of the current timestep.
-  double moveDynamicBodies(double timeStep);
-
-  //! Calls the dynamics routine to build and solve the LCP to find the velocities of the bodies
-  int computeNewVelocities(double timeStep);
 
   //! Calls upon each dynamic body to save its current dynamic state to the top of its stack of states.
   void pushDynamicState();

@@ -27,7 +27,7 @@
   \brief Implements the special %Shadow robot class
  */
 
-#include "shadow.h"
+#include "robots/shadow.h"
 #include "world.h"
 
 

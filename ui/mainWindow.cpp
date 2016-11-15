@@ -61,7 +61,6 @@
 #include "plannerdlg.h"
 #include "eigenGraspDlg.h"
 #include "compliantPlannerDlg.h"
-#include "optimizerDlg.h"
 #include "gfoDlg.h"
 #include "contactExaminerDlg.h"
 #include "egPlannerDlg.h"
@@ -70,19 +69,10 @@
 #include "DBase/dbasePlannerDlg.h"
 #include "graspit_db_model.h"
 #endif
-#ifdef ARIZONA_PROJECT_ENABLED
-#include "arizona/arizonaProjectDlg.h"
-#endif
-#ifdef STAUBLI_CONTROL_ENABLED
-#include "staubli/staubliControlDlg.h"
-#endif
 #include "gloveCalibrationDlg.h"
 #include "graspCaptureDlg.h"
 #include "barrettHandDlg.h"
 #include "archBuilderDlg.h"
-#ifdef EIGENGRIDS
-#include "eigenGridsDlg.h"
-#endif
 #ifdef HARDWARE_LIB
 #include "sensorInputDlg.h"
 #endif
@@ -152,12 +142,6 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(mUI->stereoFlip_leftrightAction, SIGNAL(triggered()), this, SLOT(stereoFlip()));
   // -- misc menu
   QObject::connect(mUI->dynamicsArch_BuilderAction, SIGNAL(triggered()), this, SLOT(archBuilder()));
-  QObject::connect(mUI->miscOptimizerAction, SIGNAL(triggered()), this, SLOT(miscOptimizer()));
-  QObject::connect(mUI->actionArizona_Project, SIGNAL(triggered()), 
-                   this, SLOT(miscArizonaProjectDlg_activated()));
-  QObject::connect(mUI->staubliControl, SIGNAL(triggered()), 
-                   this, SLOT(misStaubliControlDlg()));
-  QObject::connect(mUI->miscEigengridsAction, SIGNAL(triggered()), this, SLOT(miscEigengridsAction_activated()));
   // -- contacts
   QObject::connect(mUI->contactsListBox, SIGNAL(highlighted(int)), this, SLOT(contactSelected(int)));
   // -- dynamics
@@ -235,12 +219,6 @@ void MainWindow::setMainWorld( World *w )
   updateGraspMenu();
   updateTendonNamesBox();
   handleTendonSelectionArea();
-
-#ifdef EIGENGRIDS
-  mUI->miscEigengridsAction->setEnabled(TRUE);
-#else
-  mUI->miscEigengridsAction->setEnabled(FALSE);
-#endif
 
 #ifdef HARDWARE_LIB
   mUI->sensorsSensor_InputAction->setEnabled(TRUE);
@@ -629,12 +607,6 @@ void MainWindow::updateGraspMenu()
     mUI->dbasePlannerAction->setEnabled(false);
 #endif
     
-#ifdef ARIZONA_PROJECT_ENABLED
-    mUI->actionArizona_Project->setEnabled(true);
-#else
-    mUI->actionArizona_Project->setEnabled(false);
-#endif
-    
     mUI->dbaseGraspCaptureAction->setEnabled(handFound);
     mUI->sensorsBarrett_HandAction->setEnabled(handFound);
 }
@@ -841,26 +813,6 @@ void MainWindow::dbasePlannerAction_activated()
 #endif
 }
 
-
-void MainWindow::miscArizonaProjectDlg_activated()
-{
-#ifdef ARIZONA_PROJECT_ENABLED
-  ArizonaProjectDlg *dlg = new ArizonaProjectDlg(mWindow);
-  dlg->setAttribute(Qt::WA_ShowModal, false);
-  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-  dlg->show();
-#endif
-}
-
-void MainWindow::misStaubliControlDlg()
-{
-#ifdef STAUBLI_CONTROL_ENABLED
-  StaubliControlDlg *dlg = new StaubliControlDlg(mWindow);
-  dlg->setAttribute(Qt::WA_ShowModal, false);
-  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-  dlg->show();
-#endif
-}
 //--------------------------------------- Sensors menu -------------------------------
 
 void MainWindow::sensorsSensor_InputAction_activated()
@@ -973,24 +925,6 @@ void MainWindow::archBuilder()
 	}
 	bool addSupports = dlg.supportsCheckBox->isChecked();
 	create_arch(world, innerRadius, outerRadius, thickness, nBlocks, addSupports);
-}
-
-void MainWindow::miscOptimizer()
-{
-	OptimizerDlg* dlg = new OptimizerDlg(world, mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();  
-}
-
-void MainWindow::miscEigengridsAction_activated()
-{
-#ifdef EIGENGRIDS
-	EigenGridsDlg *dlg = new EigenGridsDlg(mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show(); 
-#endif
 }
 
 /*!

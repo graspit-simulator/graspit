@@ -3,7 +3,7 @@
 #ifndef _potentialenergy_h_
 #define _potentialenergy_h_
 
-#include "include/EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/energy/searchEnergy.h"
 
 class PotentialQualityEnergy: public SearchEnergy
 {

@@ -23,11 +23,11 @@
 //
 //######################################################################
 
-#include "simAnnPlanner.h"
+#include "EGPlanner/simAnnPlanner.h"
 
-#include "searchState.h"
-#include "searchEnergy.h"
-#include "simAnn.h"
+#include "EGPlanner/searchState.h"
+#include "EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/simAnn.h"
 
 //#define GRASPITDBG
 #include "debug.h"

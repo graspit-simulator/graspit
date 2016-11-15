@@ -1,10 +1,10 @@
 
-#include "include/EGPlanner/energy/contactEnergy.h"
-#include "include/robot.h"
-#include "include/grasp.h"
-#include "include/debug.h"
-#include "include/world.h"
-#include "include/contact/virtualContact.h"
+#include "EGPlanner/energy/contactEnergy.h"
+#include "robot.h"
+#include "grasp.h"
+#include "debug.h"
+#include "world.h"
+#include "contact/virtualContact.h"
 
 double ContactEnergy::energy() const
 {

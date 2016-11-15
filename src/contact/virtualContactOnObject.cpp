@@ -102,57 +102,6 @@ VirtualContactOnObject::readFromFile(std::ifstream& inFile)
     return true;
 }
 
-#ifdef ARIZONA_PROJECT_ENABLED
-void
-VirtualContactOnObject::readFromRawData(ArizonaRawExp* are, QString file, int index, bool flipNormal)
-{
-
-    float v;
-    FILE *fp = fopen(file.latin1(), "r");
-    if (!fp) {
-        fprintf(stderr,"Could not open filename %s\n",file.latin1());
-        return;
-    }
-
-    //numFCVectors
-    if(fscanf(fp,"%d",&numFrictionEdges) <= 0) {
-      DBGA("VirtualContactOnObject::readFromRawData - Failed to read virtual contact orientation");
-      return;
-    }
-
-    //frictionEdges
-    for (int i=0; i<numFrictionEdges; i++) {
-        for (int j=0; j<6; j++) {
-          if(fscanf(fp,"%f",&v) <= 0)
-            {
-              DBGA("VirtualContactOnObject::readFromRawData - Failed to read number of friction edges for virtual contacts");
-              return;
-            }
-          frictionEdges[6*i+j] = v;
-        }
-    }
-
-    Quaternion q;
-    vec3 t;
-    q = are->getQuaternion(index);
-    t = are->getContact(index);
-    loc = position(t.x(),t.y(),t.z());
-    frame.set(q,t);
-
-    //normal
-    normal = are->getNormal(index);
-    if(flipNormal){
-        std::cout << "flipped normal" << std::endl;
-        normal = - normal;
-    }
-
-    //sCof, need further consideration
-    sCof = 0.5;
-
-    fclose(fp);
-
-}
-#endif
 
 void
 VirtualContactOnObject::writeToFile(std::ofstream& outFile){

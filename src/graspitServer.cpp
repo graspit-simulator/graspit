@@ -31,11 +31,12 @@
 #include <iostream>
 #include "graspitServer.h"
 #include "graspitCore.h"
+#include "dynamicsEngine.h"
 #include "ivmgr.h"
 #include "world.h"
 #include "robot.h"
 #include "grasp.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 /*!
   Stub destructor.
@@ -593,7 +594,7 @@ ClientSocket::moveDynamicBodies(double timeStep)
     timeStep = graspitCore->getWorld()->getTimeStep();
 
   double actualTimeStep =
-    graspitCore->getWorld()->moveDynamicBodies(timeStep);
+    graspitCore->getWorld()->getDynamicsEngine()->moveDynamicBodies(timeStep);
   if (actualTimeStep < 0)
     os << "Error: Timestep failsafe reached.\n";
   else 
@@ -609,7 +610,7 @@ void
 ClientSocket::computeNewVelocities(double timeStep)
 {
   QTextStream os(this);
-  int result = graspitCore->getWorld()->computeNewVelocities(timeStep);
+  int result = graspitCore->getWorld()->getDynamicsEngine()->computeNewVelocities(timeStep);
   os << result << "\n";
 }
 

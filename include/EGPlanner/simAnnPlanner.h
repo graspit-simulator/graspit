@@ -30,8 +30,8 @@
 #include <list>
 
 #include "QObject"
-#include "search.h"
-#include "egPlanner.h"
+#include "EGPlanner/search.h"
+#include "EGPlanner/egPlanner.h"
 
 class Hand;
 class Body;

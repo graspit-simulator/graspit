@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "worldElement.h"
-#include "contact.h"
+#include "contact/contact.h"
 
 #ifdef CGDB_ENABLED
 #include "DBase/graspit_db_model.h"
@@ -51,6 +51,8 @@ class SoTranslation;
 class SoTransform;
 
 class Contact;
+class BodySensor;
+class SensorReading;
 class Robot;
 class DynJoint;
 class World;
@@ -645,6 +647,9 @@ class Link : public DynamicBody {
   //! Identifies what part of the robot this link is
   int chainNum,linkNum;
 
+  //! List of Sensors attached to this link
+  std::vector<BodySensor *> mSensors;
+
  public:
   Link(Robot *r,int c, int l,World *w,const char *name=0);
   virtual ~Link();
@@ -672,8 +677,16 @@ class Link : public DynamicBody {
 
   /*! Returns the z axis of the proximal joint in link's coordinate system */
   vec3 getProximalJointAxis();
-};
 
+  /*! gathers the readings for the sensors attached to this link*/
+  void getSensorReadings(std::vector<SensorReading*> &sensorReadings);
+
+  /*! updates the readings of the sensors attached to this link*/
+  void updateSensors();
+
+  /*! add new sensors to this link*/
+  void addBodySensor(BodySensor * sensor);
+};
 
 
 #ifdef CGDB_ENABLED

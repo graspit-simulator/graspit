@@ -36,11 +36,11 @@
   #include <unistd.h>
 #endif
 #include "mytools.h"
-#include "dynamics.h"
-#include "dynJoint.h"
+#include "dynamics/dynamics.h"
+#include "dynamics/dynJoint.h"
 #include "body.h"
 #include "robot.h"
-#include "contact.h"
+#include "contact/contact.h"
 #include "world.h"
 #include "ivmgr.h"
 

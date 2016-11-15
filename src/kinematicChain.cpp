@@ -36,6 +36,7 @@
 #include "humanHand.h"
 #include "math/matrix.h"
 #include "tinyxml.h"
+#include "bodySensor.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"
@@ -238,6 +239,8 @@ KinematicChain::initChainFromXml(const TiXmlElement* root,QString &linkDir)
     linkFilename = linkFilename.stripWhiteSpace();
     QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
     linkVec[l] = new Link(owner,chainNum,l,owner->getWorld(),linkName.latin1());
+    QString sensorType = (*p)->Attribute("sensorType");
+
     if (linkVec[l]->load(linkDir + linkFilename)==FAILURE) {
       delete linkVec[l]; linkVec[l] = NULL;
       DBGA("Failed to load file for link " << l);
@@ -308,6 +311,17 @@ KinematicChain::initChainFromXml(const TiXmlElement* root,QString &linkDir)
     }
     
     IVRoot->addChild(linkVec[l]->getIVRoot());
+  }
+
+  elementList = findAllXmlElements(root, "filter");
+  for(p = elementList.begin(); p!=elementList.end(); p++){
+      //Get body number
+      QString bodyNumText = (*p)->GetText();
+      int linkVecIndex = bodyNumText.toInt();
+      QString params = (*p)->Attribute("params");
+      TactileSensor * bd = new TactileSensor(linkVec[linkVecIndex]);
+      bd->setFilterParams(&params);
+
   }
   
   DBGA("  Creating dynamic joints");

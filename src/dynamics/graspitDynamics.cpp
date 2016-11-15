@@ -23,17 +23,17 @@
 //
 //######################################################################
 
-#include "graspitDynamics.h"
+#include "dynamics/graspitDynamics.h"
 
 #include "body.h"
-#include "dynJoint.h"
+#include "dynamics/dynJoint.h"
 #include "robot.h"
 #include "triangle.h"
 #include "world.h"
 
 #include "debug.h"
-#include "dynamics.h"
-#include "humanHand.h"
+#include "dynamics/dynamics.h"
+#include "robots/humanHand.h"
 GraspitDynamics::GraspitDynamics(World *world) {
   mWorld = world;
 }
@@ -375,7 +375,7 @@ int GraspitDynamics::computeNewVelocities(double timeStep) {
 
 
 int GraspitDynamics::stepDynamics() {
-  mWorld->resetDynamicWrenches();
+
   double actualTimeStep = moveDynamicBodies(mWorld->getTimeStep());
   if (actualTimeStep < 0) {
     GraspitDynamics::turnOffDynamics();
@@ -384,7 +384,10 @@ int GraspitDynamics::stepDynamics() {
   }
 
   for (int i = 0; i < mWorld->getNumRobots(); i++) {
-    mWorld->getRobot(i)->DOFController(actualTimeStep);
+    if(runController)
+    {
+      mWorld->getRobot(i)->DOFController(actualTimeStep);
+    }
     mWorld->getRobot(i)->applyJointPassiveInternalWrenches();
   }
 
@@ -392,5 +395,8 @@ int GraspitDynamics::stepDynamics() {
     mWorld->emitdynamicsError("LCP could not be solved.");
     return -1;
   }
+
+  mWorld->resetDynamicWrenches();
+
   return 0;
 }

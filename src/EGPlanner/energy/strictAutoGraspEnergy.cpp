@@ -1,4 +1,4 @@
-#include "include/EGPlanner/energy/strictAutoGraspEnergy.h"
+#include "EGPlanner/energy/strictAutoGraspEnergy.h"
 
 #include "robot.h"
 #include "debug.h"

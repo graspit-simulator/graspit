@@ -30,7 +30,7 @@
 #include "ivmgr.h"
 #include "graspitCore.h"
 #include "world.h"
-#include "searchState.h"
+#include "EGPlanner/searchState.h"
 #include "egPlanner.h"
 #include "guidedPlanner.h"
 #include "body.h"

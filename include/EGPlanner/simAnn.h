@@ -24,7 +24,7 @@
 //######################################################################
 
 #include <QObject>
-#include "search.h"
+#include "EGPlanner/search.h"
 
 class GraspPlanningState;
 class VariableSet;

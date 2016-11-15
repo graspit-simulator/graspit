@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+<material>plastic</material>
+<mass>20</mass>
+<cog>0 0 0</cog>
+<inertia_matrix>10 0 0 0  10 0 0  0 10</inertia_matrix>
+<geometryFile>r_gripper_l_finger.iv</geometryFile>
+</root>

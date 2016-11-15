@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>200</mass>
+	<cog>-55.5917 -0.0725587 -3.17412</cog>
+	<inertia_matrix>0.785264 0 0 0  0.785264 0 0  0 1.21</inertia_matrix>
+	<geometryFile>6_hand_limb.iv</geometryFile>
+</root>

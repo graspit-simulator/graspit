@@ -23,7 +23,6 @@
 //
 //######################################################################
 
-#ifdef BULLET_DYNAMICS
 
 #include "bulletDynamics.h"
 
@@ -65,7 +64,7 @@ BulletDynamics::BulletDynamics(World *world)
     mBtDynamicsWorld =
             new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-    mBtDynamicsWorld->setGravity(btVector3(0,0, -10));
+    mBtDynamicsWorld->setGravity(btVector3(0,0,0));
 }
 
 BulletDynamics::~BulletDynamics()
@@ -147,7 +146,7 @@ void BulletDynamics::addRobot(Robot *robot)
     btRigidBody* btbase=NULL;
 
     if (robot->getBase()) {
-        btScalar mass(0.);
+        btScalar mass(robot->getBase()->getMass());
         btVector3 localInertia(0, 0, 0);
         if ((btbase=btBodyMap.find(robot->getBase())->second) == NULL) {
             DBGA("error, base is not in the btBodyMap\n");
@@ -513,6 +512,8 @@ int BulletDynamics::stepDynamics()
     computeNewVelocities(timeStep);
     moveDynamicBodies(mWorld->getTimeStep());
 
+    mWorld->resetDynamicWrenches();
+
     return 0;
 }
 
@@ -536,8 +537,6 @@ ends up outside of its legal range.
 double BulletDynamics::moveDynamicBodies(double timeStep) {
     mWorld->findAllContacts();
 
-    mWorld->resetDynamicWrenches();
-
     for (int i = 0; i < mWorld->getNumRobots(); i++) {
 
         Robot* robot=mWorld->getRobot(i);
@@ -550,8 +549,11 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
         for (int d=0; d<robot->getNumDOF(); d++) {
 
             DOF * dof=robot->getDOF(d);
-            dof->updateSetPoint();
-            dof->callController(timeStep);
+            if(runController)
+            {
+                dof->updateSetPoint();
+                dof->callController(timeStep);
+            }
 
             double magnitude=dof->getForce()/10e6;
             if (magnitude !=0)
@@ -575,6 +577,31 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
                 btApplyInternalWrench(tempjoint, springForce,btBodyMap);
             }
         }
+
+        //! Robot Translation and Rotations
+        btRigidBody* btbase=btBodyMap.find(robot->getBase())->second;
+
+        //! convert the velocity from along the robot's approach direction (+z sticking out of palm) to the world frame.
+        transf velocityInWorldFrame = translate_transf(robot->getLinearVelocity() * robot->getApproachTran()) * robot->getTran();
+
+        btVector3 velocity(velocityInWorldFrame.translation().x() - robot->getTran().translation().x(),
+                           velocityInWorldFrame.translation().y() - robot->getTran().translation().y(),
+                           velocityInWorldFrame.translation().z() - robot->getTran().translation().z());
+
+        btbase->setLinearVelocity(velocity);
+
+        //! Convert the angular velocity defined  in the approach frame of reference to the world frame.
+        transf rotFrame = rotXYZ(robot->getAngularVelocity().x(), robot->getAngularVelocity().y(), robot->getAngularVelocity().z());
+        transf rotFrameInWorld = rotFrame  * robot->getApproachTran() * robot->getTran();
+
+        double r;
+        vec3 rAxis;
+        rotFrameInWorld.rotation().ToAngleAxis(r, rAxis);
+
+        btVector3 angularVelocity(r*rAxis.x(), r*rAxis.y(), r*rAxis.z());
+
+        btbase->setAngularVelocity(angularVelocity);
+
     }
     return 0;
 }
@@ -628,4 +655,3 @@ int BulletDynamics::computeNewVelocities(double timeStep) {
     return 0;
 }
 
-#endif

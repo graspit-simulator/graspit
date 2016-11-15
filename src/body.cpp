@@ -39,6 +39,7 @@
 
 #include "body.h"
 #include "collisionInterface.h"
+#include "bodySensor.h"
 #include "bBox.h"
 #include "triangle.h"
 #include "world.h"
@@ -46,9 +47,9 @@
 #include "joint.h"
 #include "dynJoint.h"
 #include "ivmgr.h"
-#include "contact.h"
-#include "virtualContact.h"
-#include "virtualContactOnObject.h"
+#include "contact/contact.h"
+#include "contact/virtualContact.h"
+#include "contact/virtualContactOnObject.h"
 #include "graspitCore.h"
 
 #include "tinyxml.h"
@@ -925,7 +926,6 @@ Body::breakContacts()
 	std::list<Contact *>::iterator cp;
 
 	if (!contactList.empty()) {
-		setContactsChanged();
 		for (cp=contactList.begin();cp!=contactList.end();cp++) {
 			delete *cp; *cp = NULL;
 		}
@@ -944,6 +944,8 @@ Body::breakContacts()
 
 	if (showFC)
 		IVContactIndicators->removeAllChildren();
+
+        setContactsChanged();
 }
 
 /*! Load in all virtual contacts from file fn*/
@@ -1013,7 +1015,6 @@ Body::resetContactList()
 	}
 	prevContactList.clear();
 	if (!contactList.empty()) {
-		setContactsChanged();
 		for (cp=contactList.begin();cp!=contactList.end();cp++) {
 			prevContactList.push_back(*cp);
 		}
@@ -1022,6 +1023,8 @@ Body::resetContactList()
 	numContacts = 0;
 	if (showFC)
 		IVContactIndicators->removeAllChildren();
+
+    setContactsChanged();
 }
 
 /*! 
@@ -1032,13 +1035,13 @@ Body::resetContactList()
 void
 Body::addContact(Contact *c)
 {
-	setContactsChanged();
 	contactList.push_back(c);
 	numContacts++;
 	if (showFC) {
 		assert(IVContactIndicators->getNumChildren() > numContacts-2);
 		IVContactIndicators->insertChild( c->getVisualIndicator(), numContacts-1 );
 	}
+    setContactsChanged();
 }
 
 /*! The number of contacts on this body. If \a b is not null, it only counts
@@ -1077,10 +1080,10 @@ Body::getContacts(Body *b) const
 void
 Body::addVirtualContact(Contact *c)
 {
-	setContactsChanged();
 	virtualContactList.push_back(c);
 	if (showVC)
 		IVContactIndicators->addChild( c->getVisualIndicator() );
+    setContactsChanged();
 }
 
 /*!
@@ -1126,8 +1129,6 @@ Body::removeContact(Contact *c)
   int i;
   std::list<Contact *>::iterator cp;
 
-  setContactsChanged();
-
   if (showFC) {
     for (cp=contactList.begin(),i=0;cp!=contactList.end();cp++,i++)
       if (*cp == c) {
@@ -1140,6 +1141,8 @@ Body::removeContact(Contact *c)
 
   delete c;
   numContacts--;
+
+  setContactsChanged();
 }
 
 /*!
@@ -2223,6 +2226,7 @@ Link::setContactsChanged()
 {
   WorldElement::setContactsChanged();
   owner->setContactsChanged();
+  updateSensors();
 }
 /*!
 	This acts like contactPreventMotion, except in the case of a link belonging to a robot.
@@ -2271,6 +2275,31 @@ Link::getProximalJointAxis()
 	Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
 	vec3 r = vec3(0,0,1) * j->getTran().inverse();
 	return r;
+}
+
+
+void Link::getSensorReadings(std::vector<SensorReading*> &sensorReadings)
+{
+    std::vector<BodySensor *>::iterator bi;
+    for(bi = mSensors.begin();bi !=mSensors.end(); bi++)
+    {
+        SensorReading *so = (*bi)->getSensorOutput();
+        sensorReadings.push_back(so);
+    }
+}
+
+void Link::updateSensors()
+{
+    std::vector<BodySensor *>::iterator bi;
+    for(bi = mSensors.begin();bi !=mSensors.end(); bi++)
+    {
+        (*bi)->updateSensorModel();
+    }
+}
+
+void Link::addBodySensor(BodySensor * sensor)
+{
+    mSensors.push_back(sensor);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
