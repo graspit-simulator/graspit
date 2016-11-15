@@ -13,9 +13,6 @@ public:
     VirtualContactOnObject ();
     ~VirtualContactOnObject ();
     bool readFromFile(std::ifstream& infile);
-#ifdef ARIZONA_PROJECT_ENABLED
-    void readFromRawData(ArizonaRawExp* are, QString file, int index, bool flipNormal = false);
-#endif
     void writeToFile(std::ofstream& outfile);
 };
 
