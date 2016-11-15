@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+<material>plastic</material>
+<mass>350.93</mass>
+<cog>1.98 1.25 18.55</cog>
+<inertia_matrix>0.252892 0.00575311 -0.00159345 0.00575311  0.26886 -0.00519818 -0.00159345  -0.00519818 0.307412</inertia_matrix>
+<geometryFile>right_wrist.iv</geometryFile>
+</root>

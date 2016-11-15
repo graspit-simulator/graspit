@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!-- d0: finger_joint_0, min=-1.05, max=0.0045 -->
+<!-- d1: finger_joint_2, min=-1.05, max=0.0045 -->
+<!-- d2: finger_joint_4, min=-1.05, max=0.0045 -->
+<EigenGrasps dimensions="3">
+	<EG>
+		<EigenValue value="0.5"/> <!--EigenValue is not used in the code at this stage -->
+		<!--Limits min="0" max="0"/-->
+		<DimVals d0="-0.52275" d1="-0.52275" d2="-0.52275"/>
+	</EG>
+	<ORIGIN>
+		<EigenValue value="0.5"/> 
+		<DimVals d0="-0.52275" d1="-0.52275" d2="-0.52275"/>
+	</ORIGIN>
+</EigenGrasps>

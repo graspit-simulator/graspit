@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+	<palm>6_hand_limb.xml</palm>
+	<dof type='r'>
+		<defaultVelocity>-0.2</defaultVelocity>
+		<maxEffort>-1.5</maxEffort>
+		<Kp>1e+09</Kp>
+		<Kd>1e+07</Kd>
+		<draggerScale>20</draggerScale>
+	</dof>
+
+	<dof type='r'>
+		<defaultVelocity>-0.2</defaultVelocity>
+		<maxEffort>-1.5</maxEffort>
+		<Kp>1e+09</Kp>
+		<Kd>1e+07</Kd>
+		<draggerScale>20</draggerScale>
+	</dof>
+
+	<dof type='r'>
+		<defaultVelocity>-0.2</defaultVelocity>
+		<maxEffort>-1.5</maxEffort>
+		<Kp>1e+09</Kp>
+		<Kd>1e+07</Kd>
+		<draggerScale>20</draggerScale>
+	</dof>
+
+	<chain> 
+		<transform> 
+			<translation>-110 27.6 20.4</translation>
+			<rotationMatrix>-0.333487 -0.925434 -0.179886 -0.942755 0.32736 0.0636323 5.74125e-12 0.190809 -0.981627 </rotationMatrix> 
+		</transform>
+		<joint type='Revolute'>
+			<theta> d0+0</theta>
+			<d>0</d>
+			<a>0</a>
+			<alpha>0</alpha>
+			<minValue>-60.1606</minValue>
+			<maxValue>0.257831</maxValue>
+			<viscousFriction>5.0e+7</viscousFriction>
+		</joint>
+		<link dynamicJointType='Revolute'>8_finger_index.xml</link>
+	</chain>
+	<chain> 
+		<transform> 
+			<translation>-110 -31.9 3</translation>
+			<rotationMatrix>-0.361615 0.908432 0.209727 -0.932327 -0.352347 -0.0813455 -5.87227e-12 -0.22495 0.97437 </rotationMatrix> 
+		</transform>
+		<joint type='Revolute'>
+			<theta> d1+0</theta>
+			<d>0</d>
+			<a>0</a>
+			<alpha>0</alpha>
+			<minValue>-60.1606</minValue>
+			<maxValue>0.257831</maxValue>
+			<viscousFriction>5.0e+7</viscousFriction>
+		</joint>
+		<link dynamicJointType='Revolute'>8_finger_thumb.xml</link>
+	</chain>
+	<chain> 
+		<transform> 
+			<translation>-110 27.6 -20.4</translation>
+			<rotationMatrix>-0.333487 -0.925434 0.179886 -0.942755 0.32736 -0.0636323 3.87219e-12 -0.190809 -0.981627 </rotationMatrix> 
+		</transform>
+		<joint type='Revolute'>
+			<theta> d2+0</theta>
+			<d>0</d>
+			<a>0</a>
+			<alpha>0</alpha>
+			<minValue>-60.1606</minValue>
+			<maxValue>0.257831</maxValue>
+			<viscousFriction>5.0e+7</viscousFriction>
+		</joint>
+		<link dynamicJointType='Revolute'>8_finger_pinkie.xml</link>
+	</chain>
+    <approachDirection>
+        <referenceLocation>-100.0 0 0</referenceLocation>
+        <direction>-1 0 0</direction>
+    </approachDirection>
+	<eigenGrasps>eigen/eigen.xml</eigenGrasps>
+	<virtualContacts>virtual/contacts.vgr</virtualContacts>
+</robot>
