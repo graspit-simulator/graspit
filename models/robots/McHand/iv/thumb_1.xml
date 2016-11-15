@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<root>
-    <material>rubber</material>
-    <mass>200</mass>
-    <cog>0 0 0</cog>
-    <geometryFile type="Inventor">thumb_1.iv</geometryFile>
-</root>
