@@ -464,7 +464,6 @@
           <string>Misc.</string>
         </property>
         <addaction name="dynamicsArch_BuilderAction" />
-        <addaction name="miscEigengridsAction" />
       </widget>
       <widget class="QMenu" name="helpMenu" >
         <property name="title" >
@@ -963,17 +962,6 @@
       </property>
       <property name="text" >
         <string>Primitives...</string>
-      </property>
-    </action>
-    <action name="miscEigengridsAction" >
-      <property name="name" >
-        <cstring>miscEigengridsAction</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Eigengrids...</string>
-      </property>
-      <property name="text" >
-        <string>Eigengrids...</string>
       </property>
     </action>
     <action name="dbaseGUIAction" >
