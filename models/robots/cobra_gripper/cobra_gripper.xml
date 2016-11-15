@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<robot type="Pr2Gripper">
+  <palm>palm.xml</palm>
+  <dof type="r">
+    <defaultVelocity>-1.0</defaultVelocity>
+    <maxEffort>2.5e+9</maxEffort>
+    <Kp>1.0e+11</Kp>
+    <Kd>1.0e+7</Kd>
+    <draggerScale>60</draggerScale>
+  </dof>
+  <dof type="r">
+    <defaultVelocity>1.0</defaultVelocity>
+    <maxEffort>2.5e+9</maxEffort>
+    <Kp>1.0e+11</Kp>
+    <Kd>1.0e+7</Kd>
+    <draggerScale>60</draggerScale>
+  </dof>
+  <chain>
+    <transform>
+      <translation>0 0 0</translation>
+      <rotation>0 x</rotation>
+    </transform>
+    <joint type="Revolute">
+      <theta>d0</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>0</alpha>
+      <minValue>0.5</minValue>
+      <maxValue>22.5</maxValue>
+      <viscousFriction>5.0e+7</viscousFriction>
+    </joint>
+    <link dynamicJointType="Revolute">rotating_jaw.xml</link>
+  </chain>
+  <chain>
+    <transform>
+      <translation>0 0 0</translation>
+      <rotation>0 x</rotation>
+    </transform>
+    <joint type="Revolute">
+      <theta>d1</theta>
+      <d>0</d>
+      <a>0</a>
+      <alpha>0</alpha>
+      <minValue>-22.5</minValue>
+      <maxValue>-0.5</maxValue>
+      <viscousFriction>5.0e+7</viscousFriction>
+    </joint>
+    <link dynamicJointType="Revolute">fixed_jaw.xml</link>
+  </chain>
+  <approachDirection>
+    <referenceLocation>0.0 0.0 0.0</referenceLocation>
+    <direction>1.0 0.0 0.0</direction>
+  </approachDirection>
+  <virtualContacts>virtual/gripper.vgr</virtualContacts>
+</robot>

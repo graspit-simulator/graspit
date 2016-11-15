@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <youngs>1500000</youngs>
+    <mass>20</mass>
+    <cog>-15 0 0</cog>
+    <inertia_matrix>15000 10 10 10 15000 10 10 10 15000</inertia_matrix>
+    <geometryFile type="Inventor">RIQ_link_0.iv</geometryFile>
+</root>

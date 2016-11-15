@@ -1,0 +1,32 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 450
+#cog 0 0 0
+
+
+Separator { 
+	Material {
+		ambientColor	0.4 0.4 0.4
+		diffuseColor	0.4 0.4 0.6
+	  }
+	RotationXYZ { axis X angle 1.5708 }
+	#Transform { rotation 0.7071 0.7071 0 0 }
+
+	Separator { # cylinder BASE
+
+		#Transform { translation 0 140 0 }
+		Cylinder { radius 90 height 5 }
+	}
+
+	Separator { # cylinder SUPPORT
+
+		Transform { translation 0 44.895 0 }
+		Cylinder { radius 17.2 height 89.79 }
+	}
+
+	Separator { # sphere TOP
+		Transform{ translation 0 89.79 0}
+		Sphere { radius 34.4 }
+	}
+}
+}

@@ -1,0 +1,44 @@
+\section{Installation}
+
+\htmlmenu{2}
+
+The GraspIt! installation process consists of two steps. First, you
+must install a set of external libraries, listed below. The
+installation for each library is further detailed in the system
+specific sections of this installation guide. Then, you must compile
+the GraspIt! code itself and set up the environment variables.
+
+GraspIt! needs the following external libraries:
+
+\begin{description}
+\item[Qt] Qt is a cross-platform application and UI framework. It
+  allows GraspIt! to have a platform-independent windowing system,
+  dialogs etc. GraspIt! currently uses Qt version 4, which is
+  available under two different licenses. This installer assumes you
+  will be using the open source version, see the \xlink{Qt
+    website}{http://www.qtsoftware.com} for more details on licensing
+  options.
+
+\item[Coin] Coin is a Scene Graph API that GraspIt! uses for all of
+  its 3D rendering needs. It is an Open Inventor clone. Like Qt, Coin
+  is available under a dual licensing model; here we assume you will
+  be using the open source license. See the
+  \xlink{Coin3D}{http://www.coin3d.org} website for more licensing
+  details.
+
+\item[SoQt] SoQt is a GUI binding, essentially the "glue" between Qt
+  and Coin. It is available, under the same conditions as Coin, from
+  the Coin website. The latest version of SoQt that we have tested
+  GraspIt! with is SoQt 1.4.2, which provides seamless integration
+  with Qt4.
+
+\item[Lapack] Lapack is a library for scientific computing that
+  GraspIt! uses for various matrix related tasks, such as matrix
+  multiplication, linear system solving, singular value decomposition,
+  etc.
+\end{description}
+
+The GraspIt! project information comes in the form of a cross-platform
+Qt project file, which is processed by QMake. Depending on your
+system, you will convert this into either a Makefile or a Microsoft
+Visual Studio project file.

@@ -1,0 +1,15 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 1000
+
+
+Separator {
+	  Material { 
+	  diffuseColor 0.4 0.4 0.4
+	  }
+	  Cube { width 10 height 80 depth 80}
+  	  Translation {
+		translation 0 30 40
+	  }
+  	  Sphere { radius 5 }
+}

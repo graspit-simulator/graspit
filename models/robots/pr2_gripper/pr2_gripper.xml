@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<robot type="Pr2Gripper">
+    <palm>2008/wrist.xml</palm>
+    <dof type="r">
+        <defaultVelocity>-1.0</defaultVelocity>
+        <maxEffort>5.0e+10</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>77 10 25</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+32.75</theta>
+            <d>-25</d>
+            <a>91</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*-1+-32.75</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>-90</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">2008/finger_left.xml</link>
+        <link dynamicJointType="Revolute">2008/finger_tip.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>77 -10 -25</translation>
+            <rotation>180 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+32.75</theta>
+            <d>-25</d>
+            <a>91</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*-1+-32.75</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>-90</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">2008/finger_left.xml</link>
+        <link dynamicJointType="Revolute">2008/finger_tip.xml</link>
+    </chain>
+    <approachDirection>
+        <referenceLocation>119.0 0.0 0.0</referenceLocation>
+        <direction>1.0 0.0 0.0</direction>
+    </approachDirection>
+    <virtualContacts>virtual/pr2_set.vgr</virtualContacts>
+</robot>

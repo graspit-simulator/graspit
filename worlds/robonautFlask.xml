@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+    <graspableBody>
+        <filename>models/objects/flask.xml</filename>
+        <transform>
+            <fullTransform>(+0.521566 +0.83541 +0.0918163 +0.147065)[+135.378 -3.41013 +176.507]</fullTransform>
+        </transform>
+    </graspableBody>
+    <robot>
+        <filename>models/robots/Robonaut/Robonaut.xml</filename>
+        <dofValues>-1.0472 0 0 0 0 0 0 0 0 0 0 0 0 0</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </robot>
+    <camera>
+        <position>+512.727 +11.2119 +92.4714</position>
+        <orientation>+0.494626 +0.482173 +0.511852 +0.510746</orientation>
+        <focalDistance>+501</focalDistance>
+    </camera>
+</world>

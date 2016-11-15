@@ -1,0 +1,13 @@
+#Inventor V2.1 ascii
+#material rubber
+#mass 440
+#cog 0 0 0
+
+Separator { # Body
+
+	Material {
+		ambientColor	0.7 0.6 0.0
+		diffuseColor	0.7 0.6 0.0
+	  }
+	  Cube { width 58.5 height 90.25 depth 60.96 }
+}

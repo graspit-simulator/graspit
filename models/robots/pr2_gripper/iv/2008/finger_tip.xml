@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <youngs>1500000</youngs>
+    <mass>1000</mass>
+    <cog>0 0 0</cog>
+    <geometryFile>finger_tip.iv</geometryFile>
+</root>

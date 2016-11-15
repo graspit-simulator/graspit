@@ -1,0 +1,115 @@
+\section{Matlab interface}
+
+\textbf{Warning}: The Matlab interface has not been been maintained or
+tested recently. We hope to bring it up to date at some point, but for
+now you might have to fix it yourself to get it working again.
+
+On some machines, the GraspIt TCP server segfaults on exit (due to
+what seems to be a Qt Socket problem that we have not been able to
+track down). Therefore, we have commented it out; if you want to use
+this feature you must bring the declaration back. In the file
+\texttt{\$GRASPIT/src/main.cpp}, find the relevant line and uncomment
+it.
+
+When GraspIt! begins, this will start up a TCP server that accepts
+connections. A text protocol, which will be described in future
+documentation, allows external programs to issue commands and collect
+data from the simulation. These programs could run on the same machine
+that GraspIt! is running on or on a separate machine. The functions
+described in this document allow MATLAB to communicate with
+GraspIt. The functions are implemented as C language MEX files. Each
+one opens a connection to the GraspIt! server (which for now must be
+running on the same machine), issues a command to either change or
+query the world state, and closes the connection.
+
+To use these functions, be sure to set your MATLAB working directory
+to the "matlab" folder within the GraspIt root installation
+folder. Type "help matlab" to get a summary of the available
+functions, and type "help" and the name of a function to find more
+detailed information.
+
+\subsection{Commands}
+\begin{itemize}
+\item \texttt{computeNewVelocities} - solves for the new velocity of
+  each dynamic body
+\item \texttt{getAverageContacts} - returns the average contact force
+  and position for a body or bodies.
+\item \texttt{getBodyName} - returns the name of a body or bodies.
+\item \texttt{getContacts} - returns all contact forces and positions
+  for a body or bodies.
+\item \texttt{getDOFVals} - returns the current positions of the
+  degrees of freedom of a robot or robots.
+\item \texttt{getRobotName} - returns the name of a robot or robots.
+\item \texttt{moveDOFs} - kinematically moves the DOFs of one robot to
+  desired positions.
+\item \texttt{moveDynamicBodies} - moves every dynamic body by one
+  timestep or until contact occurs.
+\item \texttt{render} - instructs GraspIt! to render the scene.
+\item \texttt{setDOFForces} - sets the forces acting on the degrees of
+  freedom of a robot or robots.
+\item \textbf{Body related commands}: \texttt{getAverageContacts,
+  getBodyName, getContacts} - These commands can be used on a specific
+  set of bodies if they are given a body index vector, or if none is
+  supplied they operate on every body currently defined in the
+  GraspIt! world. The \texttt{getBodyName} function can be used
+  without arguments to see which body corresponds to which index. The
+  position of the body name in the returned array is the index of the
+  body in the world.
+\item \textbf{Robot related commands}: \texttt{getDOFVals,
+  getRobotName, setDOFForces} - These commands can be used on a
+  specific set of robots if they are given a robot index vector, or if
+  none is supplied they operate on every robot currently defined in
+  the GraspIt! world. The \texttt{getRobotName} function can be used
+  without arguments to see which robot corresponds to which index. The
+  position of the robot name in the returned array is the index of the
+  robot in the world.
+
+The moveDOFs function requires a single robot index, because GraspIt!
+is not setup to kinematically move multiple robots at once.  
+
+\item \textbf{Dynamics related commands}: \texttt{moveDynamicBodies,
+  computeNewVelocities} - These two functions are used to advance the
+  dynamic simulation by one time step. The user supplies
+  moveDynamicBodies with a maximum time step, and the fuction moves
+  each body along its current trajectory for that amount of
+  time. However, if a contact occurs during that period, the function
+  moves the bodies up to that point, adds the new contact, and returns
+  the amount of time that passed until the event occurred. A similar
+  process occurrs a joint limit is reached. The time value returned
+  should be passed to the \texttt{computeNewVelocities} command when
+  it is called. This command solves for the impulses acting on each
+  body and the resulting velocity of each body given the current
+  constraints.
+\end{itemize}
+
+\subsection{One time step}
+
+A script that performs a dynamic simulation will contain a loop, where
+each iteration of the loop advances the simulation by one time
+step. The following is a possible example script:
+
+\begin{verbatim}
+%the maximum time step is commonly 2.5 milliseconds
+maxdt = 0.0025;  
+      		
+while 1
+  % advance the simulation	
+  h = moveDynamicBodies(maxdt);
+  computeNewVelocities(h);
+      		  
+  % compute the control forces
+  %where 6 9 12 are the indices of the fingertip bodies
+  [CF,CP] = getAverageContacts([6; 9; 12]);  
+
+  DP = getDOFVals;
+  DF = computeControlForces(DP,CF,CP);
+  %This would be a user supplied function that computes the new
+  %DOF forces based on the current DOF positions, the contact forces,
+  %and positions.
+
+  setDOFForces(DF);   
+  %the computed forces are applied to the bodies and will affect 
+  %the next velocity computation.
+end
+\end{verbatim}
+

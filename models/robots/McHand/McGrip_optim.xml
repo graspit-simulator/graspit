@@ -1,0 +1,231 @@
+<?xml version="1.0" ?>
+<robot type="McGrip">
+    <palm>finger_link_pad_scaled.xml</palm>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>7</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>7</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>7</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>7</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>7</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>7</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>-30 0 0</translation>
+            <rotation>180 y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+20</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>10.0</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+20</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>90.8</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2+20</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>211.3</springStiffness>
+        </joint>
+        <link dynamicJointType="Revolute">finger_link_pad_scaled.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad_scaled.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad_scaled_last.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>0 0 0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3+20</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>10.0</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d4+20</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>90.3</springStiffness>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5+20</theta>
+            <d>0</d>
+            <a>30</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+            <CoulombFriction>0</CoulombFriction>
+            <springStiffness>211.3</springStiffness>
+        </joint>
+        <link dynamicJointType="Revolute">finger_link_pad_scaled.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad_scaled.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad_scaled_last.xml</link>
+    </chain>
+    <tendon name="Finger 0">
+        <insertionPoint>
+			<chain>-1</chain>
+			<link>-1</link>
+			<position>-20 -30 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>-1</chain>
+			<link>-1</link>
+			<position>-20 5 0</position>
+        </insertionPoint>
+        <!-- --------------- l0 --------------- -->
+        <insertionPoint>
+			<chain>-1</chain>
+			<link>-1</link>
+			<position>-25 5 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>0</chain>
+			<link>0</link>
+			<position>-25 5 0</position>
+        </insertionPoint>
+        <!-- --------------- l1 --------------- -->
+        <insertionPoint>
+			<chain>0</chain>
+			<link>0</link>
+			<position>-5 5 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>0</chain>
+			<link>1</link>
+			<position>-25 5 0</position>
+        </insertionPoint>
+        <!-- --------------- l2 --------------- -->
+        <insertionPoint>
+			<chain>0</chain>
+			<link>1</link>
+			<position>-5 1.65 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>0</chain>
+			<link>2</link>
+			<position>-25 1.65 0</position>
+        </insertionPoint>
+    </tendon>
+    <tendon name="Finger 1">
+        <insertionPoint>
+			<chain>-1</chain>
+			<link>-1</link>
+			<position>-10 -30 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>-1</chain>
+			<link>-1</link>
+			<position>-10 5 0</position>
+        </insertionPoint>
+        <!-- --------------- l3 --------------- -->
+        <insertionPoint>
+			<chain>-1</chain>
+			<link>-1</link>
+			<position>-5 5 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>1</chain>
+			<link>0</link>
+			<position>-25 5 0</position>
+        </insertionPoint>
+        <!-- --------------- l4 --------------- -->
+        <insertionPoint>
+			<chain>1</chain>
+			<link>0</link>
+			<position>-5 5 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>1</chain>
+			<link>1</link>
+			<position>-25 5 0</position>
+        </insertionPoint>
+        <!-- --------------- l5 --------------- -->
+        <insertionPoint>
+			<chain>1</chain>
+			<link>1</link>
+			<position>-5 1.65 0</position>
+        </insertionPoint>
+        <insertionPoint>
+			<chain>1</chain>
+			<link>2</link>
+			<position>-25 1.65 0</position>
+        </insertionPoint>
+    </tendon>
+    <approachDirection>
+        <referenceLocation>-15 5 0</referenceLocation>
+        <direction>0 1 0</direction>
+    </approachDirection>
+    <!--virtualContacts>virtual/grip_contacts.vgr</virtualContacts-->
+    <!--flockOfBirds number="1">
+        <transform>
+            <translation>-15 -6 0</translation>
+		<rotation>-90 x</rotation>
+        </transform>
+    </flockOfBirds-->
+    <cyberGlove>cyberglove/human_middle.txt</cyberGlove>
+</robot>

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>1000</mass>
+    <geometryFile>finger_left.iv</geometryFile>
+</root>

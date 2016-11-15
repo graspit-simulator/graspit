@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<robot type="Pr2Gripper2010">
+    <palm>2010/gripper_palm.xml</palm>
+    <dof type="r">
+        <defaultVelocity>-1.0</defaultVelocity>
+        <maxEffort>5.0e+10</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>76.91 10.0 35.0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0+3.100986421</theta>
+            <d>-35</d>
+            <a>91.503986</a>
+            <alpha>0</alpha>
+            <minValue>0.0</minValue>
+            <maxValue>31.398087179</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0*-1+-3.100986421</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-31.398087179</minValue>
+            <maxValue>0.0</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">2010/upper_finger_l.xml</link>
+        <link dynamicJointType="Revolute">2010/finger_tip_l.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>76.91 -10.0 -35.0</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0*-1+-3.100986421</theta>
+            <d>35</d>
+            <a>91.503986</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d0+3.100986421</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">2010/upper_finger_r.xml</link>
+        <link dynamicJointType="Revolute">2010/finger_tip_r.xml</link>
+    </chain>
+    <approachDirection>
+        <referenceLocation>123.5 0.0 0.0</referenceLocation>
+        <direction>1.0 0.0 0.0</direction>
+    </approachDirection>
+    <virtualContacts>virtual/pr2_2010_set.vgr</virtualContacts>
+</robot>

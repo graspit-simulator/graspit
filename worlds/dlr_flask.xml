@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+    <graspableBody>
+        <filename>models/objects/flask.xml</filename>
+        <transform>
+            <fullTransform>(+0.702043 -0.712135 0 0)[-124.849 +145.862 -0.000865237]</fullTransform>
+        </transform>
+    </graspableBody>
+    <robot>
+        <filename>models/robots/DLR/DLR.xml</filename>
+        <dofValues>-0.0605386 0 +0.322379 +0.21407 0 +0.0894097 +0.187575 0 +0.0497547 +0.215765 0 +0.0406351</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[+6.19415 +20.5516 0]</fullTransform>
+        </transform>
+    </robot>
+    <camera>
+        <position>-223.854 +268.717 +542.897</position>
+        <orientation>-0.108179 -0.127917 -0.0339105 +0.985284</orientation>
+        <focalDistance>+632.204</focalDistance>
+    </camera>
+</world>

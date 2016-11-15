@@ -1,0 +1,46 @@
+#Inventor V2.1 ascii
+#glass
+#200
+#0 0 0
+#1584.3     -17.107 0.0
+#-17.107    1910.6  0.0
+#0.0        0.0     1746.5
+
+    Separator { # Body
+        Transform { translation 0 0 0 }
+        Material { # A bronze color:
+            ambientColor .33 .22 .27
+            diffuseColor .78 .57 .11
+            specularColor .99 .94 .81
+            shininess .28
+	    transparency .6
+        }
+        Cylinder { radius 50 height 100 }
+
+        Separator { # handle
+            Transform { translation 65 0 0 }
+                Cube { width 30 height 60 depth 15 }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

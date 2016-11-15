@@ -1,0 +1,47 @@
+#Inventor V2.1 ascii
+
+Separator {
+    Material {
+	ambientColor	0.0819828 0.0149796 0.274924
+	diffuseColor	0.100902 0.0184365 0.338369
+	shininess	0
+    }
+    Separator {
+	Translation {
+	    translation	105 435 355
+	}
+	DEF arm+0 Cube {
+	    width	210
+	    height	870
+	    depth	710
+	}
+    }
+    Separator {
+	Translation {
+	    translation	1795 435 355
+	}
+	USE arm+0
+    }
+    Separator {
+	Translation {
+	    translation	950 435 200
+	}
+	Cube {
+	    width	1490
+	    height	860
+	    depth	400
+	}
+    }
+    Separator {
+	Translation {
+	    translation	950 105 355
+	}
+	Cube {
+	    width	1490
+	    height	210
+	    depth	710
+	}
+    }
+    EventCallback {
+    }
+}

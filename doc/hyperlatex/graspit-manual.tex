@@ -1,0 +1,72 @@
+\documentclass[12pt]{article}
+
+\usepackage{hyperlatex}
+\usepackage[pdftex]{graphicx}
+
+\T \topmargin      0.0in
+\T \headheight     0.0in
+\T \headsep        0.0in
+\T \oddsidemargin  0.0in
+\T \evensidemargin 0.0in
+\T \textheight     9.0in
+\T \textwidth      6.5in
+
+\newcommand{\HlxIcons}{../images/}
+
+\htmltitle{GraspIt! User Manual}
+\htmladdress{Copyright (C) 2002-2009 Columbia University}
+
+\htmldirectory{../html-manual}
+\htmlname{graspit-manual}
+\htmlpanelfield{Contents}{hlxcontents}
+
+\setcounter{htmldepth}{2}
+\setcounter{htmlautomenu}{2}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+\title{
+%GraspIt!
+\texorhtml{
+\centerline{
+\includegraphics[width=50mm]{../images/logo.jpg}}
+}
+{\htmlimg{../images/logo.jpg}\\
+}
+User Manual}
+\date{Version 2.2}
+
+\begin{document}
+\label{hlxcontents}
+
+\maketitle
+
+\T \tableofcontents
+
+\texonly{\newpage}
+
+\input{intro.tex}
+\input{installation.tex}
+\input{installation_linux.tex}
+\input{installation_windows.tex}
+\input{installation_ros.tex}
+\input{getting_started.tex}
+\input{data_files.tex}
+\input{data_files_bodies.tex}
+\input{data_files_robots.tex}
+\input{data_files_worlds.tex}
+\input{collision.tex}
+\input{soft_fingers.tex}
+\input{grasp_quality.tex}
+\input{gfo.tex}
+\input{grasp_planning.tex}
+\input{dynamics.tex}
+\input{eigengrasps.tex}
+\input{grasp_planning_eg.tex}
+\input{joint_coupling.tex}
+\input{matlab.tex}
+\input{hardware.tex}
+\input{cgdb.tex}
+\input{cgdb_in_depth.tex}
+\input{publications.tex}
+\end{document}

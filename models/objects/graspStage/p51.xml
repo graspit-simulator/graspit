@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>glass</material>
+    <mass>750</mass>
+    <cog>0 0 0</cog>
+    <inertia_matrix>4289.0 264.18 6.7154 264.18 9112.3 -7.3286 6.7154 -7.3286 5466.1</inertia_matrix>
+    <geometryFile type="Inventor">p51.iv</geometryFile>
+</root>

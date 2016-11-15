@@ -1,0 +1,166 @@
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>BarrettHandDlgUI</class>
+  <widget class="QDialog" name="BarrettHandDlgUI" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>330</width>
+        <height>157</height>
+      </rect>
+    </property>
+    <property name="windowTitle" >
+      <string>Barrett Hand</string>
+    </property>
+    <widget class="QPushButton" name="pushButton17" >
+      <property name="geometry" >
+        <rect>
+          <x>10</x>
+          <y>80</y>
+          <width>100</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Update simulation</string>
+      </property>
+    </widget>
+    <widget class="QLabel" name="textLabel1" >
+      <property name="geometry" >
+        <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>101</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Step size (in degrees)</string>
+      </property>
+      <property name="wordWrap" >
+        <bool>false</bool>
+      </property>
+    </widget>
+    <widget class="QLineEdit" name="stepSize" >
+      <property name="geometry" >
+        <rect>
+          <x>120</x>
+          <y>50</y>
+          <width>26</width>
+          <height>20</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>15</string>
+      </property>
+    </widget>
+    <widget class="QPushButton" name="continuousOperationButton" >
+      <property name="geometry" >
+        <rect>
+          <x>10</x>
+          <y>120</y>
+          <width>151</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Begin continuous operation</string>
+      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton18" >
+      <property name="geometry" >
+        <rect>
+          <x>120</x>
+          <y>80</y>
+          <width>100</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Update real hand</string>
+      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton19" >
+      <property name="geometry" >
+        <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>82</width>
+          <height>26</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Initialize hand</string>
+      </property>
+    </widget>
+    <widget class="QPushButton" name="smoothButton" >
+      <property name="geometry" >
+        <rect>
+          <x>100</x>
+          <y>10</y>
+          <width>101</width>
+          <height>30</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>Smooth Spread</string>
+      </property>
+    </widget>
+    <widget class="QPushButton" name="initSpreadButton" >
+      <property name="geometry" >
+        <rect>
+          <x>210</x>
+          <y>10</y>
+          <width>111</width>
+          <height>31</height>
+        </rect>
+      </property>
+      <property name="text" >
+        <string>pushButton6</string>
+      </property>
+    </widget>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+  <connections>
+    <connection>
+      <sender>pushButton18</sender>
+      <signal>clicked()</signal>
+      <receiver>BarrettHandDlgUI</receiver>
+      <slot>realHandFromSimulation()</slot>
+    </connection>
+    <connection>
+      <sender>continuousOperationButton</sender>
+      <signal>clicked()</signal>
+      <receiver>BarrettHandDlgUI</receiver>
+      <slot>toggleContinuousOperation()</slot>
+    </connection>
+    <connection>
+      <sender>pushButton17</sender>
+      <signal>clicked()</signal>
+      <receiver>BarrettHandDlgUI</receiver>
+      <slot>simulationFromRealHand()</slot>
+    </connection>
+    <connection>
+      <sender>pushButton19</sender>
+      <signal>clicked()</signal>
+      <receiver>BarrettHandDlgUI</receiver>
+      <slot>initializeHand()</slot>
+    </connection>
+    <connection>
+      <sender>smoothButton</sender>
+      <signal>clicked()</signal>
+      <receiver>BarrettHandDlgUI</receiver>
+      <slot>smoothButton_clicked()</slot>
+    </connection>
+    <connection>
+      <sender>initSpreadButton</sender>
+      <signal>clicked()</signal>
+      <receiver>BarrettHandDlgUI</receiver>
+      <slot>initSpreadButton_clicked()</slot>
+    </connection>
+  </connections>
+</ui>

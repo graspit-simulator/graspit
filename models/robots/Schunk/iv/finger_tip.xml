@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <youngs>1500000</youngs>
+    <mass>1000</mass>
+    <cog>0.003360 -3.736 -47.83</cog>
+    <inertia_matrix>3540.1 0 0 0 3350.1 -42.614 0 -42.614 1056.9</inertia_matrix>
+    <geometryFile>finger_tip.wrl</geometryFile>
+</root>

@@ -1,0 +1,120 @@
+#Inventor V2.1 ascii
+Separator {
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }    
+    Separator {
+        Translation {
+	    translation 200 197 440
+        }
+	Cube {
+            width	410
+	    height	404
+	    depth	40
+	}
+    }
+    Separator {
+	Translation {
+	    translation 17.5 17.5 210.5
+        }
+        DEF front_leg Separator {
+	    Cube {
+		width	35
+		height	35
+		depth	421
+	    }
+        }
+    }
+    Separator {
+	Translation {
+	    translation 382.5 17.5 210.5
+	}
+	USE front_leg
+    }
+    Separator {
+	Translation {
+	    translation 17.5 382.5 475
+	}
+	DEF back_leg Separator {
+	    Cube {
+		width	35
+		height	35
+		depth	950
+	    }
+	}
+    }
+    Separator {
+        Translation {
+	    translation 382.5 382.5 475
+	}
+	USE back_leg
+    }
+    Separator {
+        Translation {
+	    translation 17.5 200 137.5
+	}
+	DEF support1 Separator {
+	    Cube {
+		width	15
+		height	332
+		depth	15
+	    }
+        }
+    }
+    Separator {
+        Translation {
+	    translation 382.5 200 137.5
+        }
+	USE support1
+    }
+    Separator {
+        Translation {
+	    translation 17.5 200 395.5
+	}
+	DEF support2 Separator {
+	    Cube {
+		 width	25
+		 height 332
+		 depth	51
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation 382.5 200 395.5
+        }
+        USE support2
+    }
+    Separator {
+	Translation {
+	    translation 200 382.5 557.5
+        }
+	DEF support3 Separator {
+	    Cube {
+		 width	332
+		 height 15
+		 depth	15
+	    }
+	}
+    }
+    Separator {
+	Translation {
+	    translation 200 382.5 667.5
+        }
+	USE support3
+    }
+    Separator {
+	Translation {
+	    translation 200 382.5 787.5
+        }
+	USE support3
+    }
+    Separator {
+        Translation {
+	    translation 200 382.5 897.5
+	}
+	USE support3
+    }
+}
+
+

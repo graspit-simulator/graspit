@@ -1,0 +1,1117 @@
+<ui version="4.0" stdsetdef="1" >
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>MainWindowUI</class>
+  <widget class="Q3MainWindow" name="MainWindowUI" >
+    <property name="geometry" >
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>879</width>
+        <height>710</height>
+      </rect>
+    </property>
+    <property name="windowTitle" >
+      <string>GraspIt!</string>
+    </property>
+    <widget class="QWidget" >
+      <layout class="QVBoxLayout" >
+        <property name="margin" >
+          <number>1</number>
+        </property>
+        <property name="spacing" >
+          <number>0</number>
+        </property>
+        <item>
+          <widget class="Q3GroupBox" name="worldBox" >
+            <property name="sizePolicy" >
+              <sizepolicy>
+                <hsizetype>7</hsizetype>
+                <vsizetype>7</vsizetype>
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+              </sizepolicy>
+            </property>
+            <property name="title" >
+              <string>Untitled</string>
+            </property>
+            <layout class="QHBoxLayout" >
+              <property name="margin" >
+                <number>1</number>
+              </property>
+              <property name="spacing" >
+                <number>0</number>
+              </property>
+              <item>
+                <widget class="QWidget" name="viewerHolder" >
+                  <property name="sizePolicy" >
+                    <sizepolicy>
+                      <hsizetype>7</hsizetype>
+                      <vsizetype>7</vsizetype>
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize" >
+                    <size>
+                      <width>300</width>
+                      <height>200</height>
+                    </size>
+                  </property>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+        </item>
+        <item>
+          <layout class="QHBoxLayout" >
+            <property name="margin" >
+              <number>0</number>
+            </property>
+            <property name="spacing" >
+              <number>6</number>
+            </property>
+            <item>
+              <widget class="Q3GroupBox" name="qualityGroupBox" >
+                <property name="sizePolicy" >
+                  <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>2</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="minimumSize" >
+                  <size>
+                    <width>100</width>
+                    <height>120</height>
+                  </size>
+                </property>
+                <property name="title" >
+                  <string>Grasp Quality</string>
+                </property>
+                <layout class="QHBoxLayout" >
+                  <property name="margin" >
+                    <number>11</number>
+                  </property>
+                  <property name="spacing" >
+                    <number>6</number>
+                  </property>
+                  <item>
+                    <widget class="Q3ListBox" name="qualityListBox" >
+                      <property name="focusPolicy" >
+                        <enum>Qt::NoFocus</enum>
+                      </property>
+                      <property name="selectionMode" >
+                        <enum>Q3ListBox::NoSelection</enum>
+                      </property>
+                      <item>
+                        <property name="text" >
+                          <string>Use grasp menu to add quality measures</string>
+                        </property>
+                      </item>
+                    </widget>
+                  </item>
+                </layout>
+              </widget>
+            </item>
+            <item>
+              <widget class="Q3GroupBox" name="contactsGroupBox" >
+                <property name="sizePolicy" >
+                  <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>2</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+                <property name="minimumSize" >
+                  <size>
+                    <width>100</width>
+                    <height>120</height>
+                  </size>
+                </property>
+                <property name="title" >
+                  <string>Contacts</string>
+                </property>
+                <layout class="QHBoxLayout" >
+                  <property name="margin" >
+                    <number>11</number>
+                  </property>
+                  <property name="spacing" >
+                    <number>6</number>
+                  </property>
+                  <item>
+                    <widget class="Q3ListBox" name="contactsListBox" >
+                      <property name="focusPolicy" >
+                        <enum>Qt::NoFocus</enum>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
+              </widget>
+            </item>
+          </layout>
+        </item>
+      </layout>
+    </widget>
+    <widget class="Q3ToolBar" name="toolBar" >
+      <property name="resizeEnabled" >
+        <bool>false</bool>
+      </property>
+      <property name="label" >
+        <string>File</string>
+      </property>
+      <addaction name="fileNewAction" />
+      <addaction name="fileOpenAction" />
+      <addaction name="fileSaveAction" />
+      <addaction name="separator" />
+    </widget>
+    <widget class="Q3ToolBar" name="Toolbar_2" >
+      <property name="resizeEnabled" >
+        <bool>false</bool>
+      </property>
+      <property name="label" >
+        <string>Body Tools</string>
+      </property>
+      <widget class="QComboBox" name="materialComboBox" >
+        <property name="focusPolicy" >
+          <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="toolTip" stdset="0" >
+          <string>Material</string>
+        </property>
+      </widget>
+      <addaction name="translateToolAction" />
+      <addaction name="rotateToolAction" />
+      <addaction name="selectToolAction" />
+      <addaction name="separator" />
+      <addaction name="elementCollisionToggleAction" />
+      <addaction name="materialComboBox" />
+    </widget>
+    <widget class="Q3ToolBar" name="ToolbarDynamics" >
+      <property name="resizeEnabled" >
+        <bool>false</bool>
+      </property>
+      <property name="label" >
+        <string>Dynamics</string>
+      </property>
+      <widget class="QLCDNumber" name="timeReadout" >
+        <property name="numDigits" >
+          <number>9</number>
+        </property>
+        <property name="toolTip" stdset="0" >
+          <string>Simulation Time</string>
+        </property>
+      </widget>
+      <addaction name="dynamicsPopAction" />
+      <addaction name="dynamicsPushAction" />
+      <addaction name="dynamicsPlayAction" />
+      <addaction name="timeReadout" />
+    </widget>
+    <widget class="Q3ToolBar" name="graspToolbar" >
+      <property name="resizeEnabled" >
+        <bool>false</bool>
+      </property>
+      <property name="label" >
+        <string>Grasp</string>
+      </property>
+      <widget class="QComboBox" name="handSelectionBox" >
+        <property name="focusPolicy" >
+          <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="toolTip" stdset="0" >
+          <string>Current Hand</string>
+        </property>
+      </widget>
+      <widget class="QComboBox" name="graspedBodyBox" >
+        <property name="focusPolicy" >
+          <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="toolTip" stdset="0" >
+          <string>Body to grasp</string>
+        </property>
+      </widget>
+      <addaction name="handSelectionBox" />
+      <addaction name="graspedBodyBox" />
+    </widget>
+    <widget class="Q3ToolBar" name="tendonToolbar" >
+      <property name="resizeEnabled" >
+        <bool>false</bool>
+      </property>
+      <property name="label" >
+        <string>Tendon forces</string>
+      </property>
+      <widget class="QLabel" name="Tendon_force_label" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Tendon:</string>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QComboBox" name="tendonNamesBox" >
+        <property name="sizePolicy" >
+          <sizepolicy>
+            <hsizetype>7</hsizetype>
+            <vsizetype>0</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+          </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+          <size>
+            <width>150</width>
+            <height>0</height>
+          </size>
+        </property>
+      </widget>
+      <widget class="QLabel" name="tendonActiveForceLabel" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Active force(N):</string>
+        </property>
+        <property name="alignment" >
+          <set>Qt::AlignVCenter</set>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QSpinBox" name="TendonForceInput" >
+        <property name="toolTip" stdset="0" >
+          <string>Tendon force</string>
+        </property>
+      </widget>
+      <widget class="QLabel" name="tendonPassiveForceLabel" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Passive force (N):</string>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QLineEdit" name="tendonPassiveForceEdit" >
+        <property name="sizePolicy" >
+          <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>0</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+          </sizepolicy>
+        </property>
+        <property name="maximumSize" >
+          <size>
+            <width>40</width>
+            <height>32767</height>
+          </size>
+        </property>
+        <property name="maxLength" >
+          <number>4</number>
+        </property>
+        <property name="readOnly" >
+          <bool>true</bool>
+        </property>
+      </widget>
+      <widget class="QLabel" name="tendonExcursionLabel" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Excursion (mm):</string>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QLineEdit" name="tendonExcursionEdit" >
+        <property name="maximumSize" >
+          <size>
+            <width>40</width>
+            <height>32767</height>
+          </size>
+        </property>
+        <property name="readOnly" >
+          <bool>true</bool>
+        </property>
+      </widget>
+      <widget class="QLabel" name="tendonVisibleLabel" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Visible:</string>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QCheckBox" name="tendonVisibleCheckBox" >
+        <property name="text" >
+          <string/>
+        </property>
+      </widget>
+      <widget class="QLabel" name="forcesVisibleLabel" >
+        <property name="margin" >
+          <number>4</number>
+        </property>
+        <property name="text" >
+          <string>Show forces:</string>
+        </property>
+        <property name="wordWrap" >
+          <bool>false</bool>
+        </property>
+      </widget>
+      <widget class="QCheckBox" name="forcesVisibleCheckBox" >
+        <property name="text" >
+          <string/>
+        </property>
+      </widget>
+      <addaction name="Tendon_force_label" />
+      <addaction name="tendonNamesBox" />
+      <addaction name="tendonActiveForceLabel" />
+      <addaction name="TendonForceInput" />
+      <addaction name="tendonPassiveForceLabel" />
+      <addaction name="tendonPassiveForceEdit" />
+      <addaction name="tendonExcursionLabel" />
+      <addaction name="tendonExcursionEdit" />
+      <addaction name="tendonVisibleLabel" />
+      <addaction name="tendonVisibleCheckBox" />
+      <addaction name="forcesVisibleLabel" />
+      <addaction name="forcesVisibleCheckBox" />
+    </widget>
+    <widget class="QMenuBar" name="menubar" >
+      <widget class="QMenu" name="fileMenu" >
+        <property name="title" >
+          <string>&amp;File</string>
+        </property>
+        <addaction name="fileNewAction" />
+        <addaction name="fileOpenAction" />
+        <addaction name="fileSaveAction" />
+        <addaction name="fileSaveAsAction" />
+        <addaction name="fileSaveImageAction" />
+        <addaction name="separator" />
+        <addaction name="fileImportRobotAction" />
+        <addaction name="fileImportObjectAction" />
+        <addaction name="fileImportObstacleAction" />
+        <addaction name="separator" />
+        <addaction name="fileEditSettingsAction" />
+        <addaction name="separator" />
+        <addaction name="separator" />
+        <addaction name="fileExitAction" />
+      </widget>
+      <widget class="QMenu" name="elementMenu" >
+        <property name="title" >
+          <string>&amp;Element</string>
+        </property>
+        <addaction name="translateToolAction" />
+        <addaction name="rotateToolAction" />
+        <addaction name="selectToolAction" />
+        <addaction name="separator" />
+        <addaction name="elementCollisionToggleAction" />
+        <addaction name="elementBodyPropertiesAction" />
+        <addaction name="elementPrimitivesAction" />
+      </widget>
+      <widget class="QMenu" name="graspMenu" >
+        <property name="title" >
+          <string>&amp;Grasp</string>
+        </property>
+        <addaction name="graspAutoGraspAction" />
+        <addaction name="graspAuto_OpenAction" />
+        <addaction name="graspCreateProjectionAction" />
+        <addaction name="graspQualityMeasuresAction" />
+        <addaction name="graspPlannerAction" />
+        <addaction name="graspGFOAction" />        
+        <addaction name="separator" />
+        <addaction name="graspEigenGrasp_InterfaceAction" />
+        <addaction name="graspEigenGrasp_PlannerAction" />
+        <addaction name="graspContact_ExaminerAction" />
+      </widget>
+      <widget class="QMenu" name="dbaseMenu" >
+        <property name="title" >
+          <string>Database</string>
+        </property>
+        <addaction name="dbaseGUIAction" />
+        <addaction name="dbasePlannerAction" />
+        <addaction name="dbaseGraspCaptureAction" />
+      </widget>
+      <widget class="QMenu" name="Sensors" >
+        <property name="title" >
+          <string>Sensors</string>
+        </property>
+        <addaction name="sensorsSensor_InputAction" />
+        <addaction name="sensorsBarrett_HandAction" />
+      </widget>
+      <widget class="QMenu" name="Stereo" >
+        <property name="title" >
+          <string>Stereo</string>
+        </property>
+        <addaction name="stereoOnAction" />
+        <addaction name="stereoOffAction" />
+        <addaction name="stereoFlip_leftrightAction" />
+      </widget>
+      <widget class="QMenu" name="Misc" >
+        <property name="title" >
+          <string>Misc.</string>
+        </property>
+        <addaction name="dynamicsArch_BuilderAction" />
+        <addaction name="miscOptimizerAction" />
+        <addaction name="miscEigengridsAction" />
+        <addaction name="actionArizona_Project" />
+        <addaction name="staubliControl" />
+      </widget>
+      <widget class="QMenu" name="helpMenu" >
+        <property name="title" >
+          <string>&amp;Help</string>
+        </property>
+        <addaction name="helpManualAction" />
+        <addaction name="separator" />
+        <addaction name="helpAboutAction" />
+        <addaction name="helpAboutQTAction" />
+      </widget>
+      <addaction name="fileMenu" />
+      <addaction name="elementMenu" />
+      <addaction name="graspMenu" />
+      <addaction name="dbaseMenu" />
+      <addaction name="Sensors" />
+      <addaction name="Stereo" />
+      <addaction name="Misc" />
+      <addaction name="helpMenu" />
+    </widget>
+    <action name="fileNewAction" >
+      <property name="name" >
+        <cstring>fileNewAction</cstring>
+      </property>
+      <property name="icon" >
+        <iconset>filenew.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>New</string>
+      </property>
+      <property name="text" >
+        <string>&amp;New</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+N</string>
+      </property>
+    </action>
+    <action name="fileOpenAction" >
+      <property name="name" >
+        <cstring>fileOpenAction</cstring>
+      </property>
+      <property name="icon" >
+        <iconset>fileopen.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>Open</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Open...</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+O</string>
+      </property>
+    </action>
+    <action name="fileSaveAction" >
+      <property name="name" >
+        <cstring>fileSaveAction</cstring>
+      </property>
+      <property name="icon" >
+        <iconset>filesave.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>Save</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Save</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+S</string>
+      </property>
+    </action>
+    <action name="fileSaveAsAction" >
+      <property name="name" >
+        <cstring>fileSaveAsAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Save As</string>
+      </property>
+      <property name="text" >
+        <string>Save &amp;As...</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="fileExitAction" >
+      <property name="name" >
+        <cstring>fileExitAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Exit</string>
+      </property>
+      <property name="text" >
+        <string>E&amp;xit</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="helpManualAction" >
+      <property name="name" >
+        <cstring>helpManualAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Manual</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Manual...</string>
+      </property>
+      <property name="toolTip" >
+        <string>Manual</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="helpIndexAction" >
+      <property name="name" >
+        <cstring>helpIndexAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Index</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Index...</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="helpAboutAction" >
+      <property name="name" >
+        <cstring>helpAboutAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>About</string>
+      </property>
+      <property name="text" >
+        <string>&amp;About...</string>
+      </property>
+      <property name="shortcut" >
+        <string/>
+      </property>
+    </action>
+    <action name="fileImportRobotAction" >
+      <property name="name" >
+        <cstring>fileImportRobotAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Import Robot</string>
+      </property>
+      <property name="text" >
+        <string>Import Robot...</string>
+      </property>
+    </action>
+    <action name="fileImportObjectAction" >
+      <property name="name" >
+        <cstring>fileImportObjectAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Import Object</string>
+      </property>
+      <property name="text" >
+        <string>Import Object...</string>
+      </property>
+    </action>
+    <action name="fileImportObstacleAction" >
+      <property name="name" >
+        <cstring>fileImportObstacleAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Import Obstacle</string>
+      </property>
+      <property name="text" >
+        <string>Import Obstacle...</string>
+      </property>
+    </action>
+    <action name="fileSaveImageAction" >
+      <property name="name" >
+        <cstring>fileSaveImageAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Save Image</string>
+      </property>
+      <property name="text" >
+        <string>Save Image...</string>
+      </property>
+    </action>
+    <action name="graspCreateProjectionAction" >
+      <property name="name" >
+        <cstring>graspCreateProjectionAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Create GWS Projection</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Create GWS Projection...</string>
+      </property>
+    </action>
+    <action name="graspQualityMeasuresAction" >
+      <property name="name" >
+        <cstring>graspQualityMeasuresAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Quality Measures</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Quality Measures...</string>
+      </property>
+    </action>
+    <action name="fileEditSettingsAction" >
+      <property name="name" >
+        <cstring>fileEditSettingsAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Edit Settings</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Edit Settings...</string>
+      </property>
+    </action>
+    <action name="graspPlannerAction" >
+      <property name="name" >
+        <cstring>graspPlannerAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Planner...</string>
+      </property>
+      <property name="text" >
+        <string>&amp;Planner...</string>
+      </property>
+    </action>
+    <action name="miscOptimizerAction" >
+      <property name="name" >
+        <cstring>miscOptimizerAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Optimizer...</string>
+      </property>
+      <property name="text" >
+        <string>Optimizer...</string>
+      </property>
+    </action>
+    <action name="actionArizona_Project" >
+      <property name="name" >
+        <cstring>actionArizona_Project</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Arizona Project...</string>
+      </property>
+      <property name="text" >
+        <string>Arizona Project...</string>
+      </property>
+    </action>
+    <action name="staubliControl" >
+      <property name="name" >
+        <cstring>staubliControl</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Staubli Control Panel...</string>
+      </property>
+      <property name="text" >
+        <string>Staubli Control Panel...</string>
+      </property>
+    </action>
+    <action name="graspGFOAction" >
+      <property name="name" >
+        <cstring>graspGFOAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Grasp Force Optimization...</string>
+      </property>
+      <property name="text" >
+        <string>Grasp Force Optimization...</string>
+      </property>
+    </action>
+    <action name="graspCompliantPlannerAction" >
+      <property name="name" >
+        <cstring>graspCompliantPlannerAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Compliant Planner...</string>
+      </property>
+      <property name="text" >
+        <string>Compliant Planner...</string>
+      </property>
+    </action>
+    <action name="dynamicsPlayAction" >
+      <property name="name" >
+        <cstring>dynamicsPlayAction</cstring>
+      </property>
+      <property name="checkable" >
+        <bool>true</bool>
+      </property>
+      <property name="icon" >
+        <iconset>play.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>Start Simulation</string>
+      </property>
+      <property name="text" >
+        <string>Start Simulation</string>
+      </property>
+    </action>
+    <action name="dynamicsPopAction" >
+      <property name="name" >
+        <cstring>dynamicsPopAction</cstring>
+      </property>
+      <property name="icon" >
+        <iconset>prevMark.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>Pop State</string>
+      </property>
+      <property name="text" >
+        <string>Pop State</string>
+      </property>
+    </action>
+    <action name="dynamicsPushAction" >
+      <property name="name" >
+        <cstring>dynamicsPushAction</cstring>
+      </property>
+      <property name="icon" >
+        <iconset>mark.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>Push State</string>
+      </property>
+      <property name="text" >
+        <string>Push State</string>
+      </property>
+    </action>
+    <action name="elementCollisionToggleAction" >
+      <property name="name" >
+        <cstring>elementCollisionToggleAction</cstring>
+      </property>
+      <property name="checkable" >
+        <bool>true</bool>
+      </property>
+      <property name="icon" >
+        <iconset>collide.xpm</iconset>
+      </property>
+      <property name="iconText" >
+        <string>Collisions ON</string>
+      </property>
+      <property name="text" >
+        <string>Collisions ON</string>
+      </property>
+    </action>
+    <action name="elementBodyPropertiesAction" >
+      <property name="name" >
+        <cstring>elementBodyPropertiesAction</cstring>
+      </property>
+      <property name="enabled" >
+        <bool>false</bool>
+      </property>
+      <property name="iconText" >
+        <string>Body Properties...</string>
+      </property>
+      <property name="text" >
+        <string>Body Properties...</string>
+      </property>
+    </action>
+    <action name="graspAutoGraspAction" >
+      <property name="name" >
+        <cstring>graspAutoGraspAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Auto Grasp</string>
+      </property>
+      <property name="text" >
+        <string>Auto &amp;Grasp</string>
+      </property>
+      <property name="shortcut" >
+        <string>Ctrl+G</string>
+      </property>
+    </action>
+    <action name="helpAboutQTAction" >
+      <property name="name" >
+        <cstring>helpAboutQTAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>About QT</string>
+      </property>
+      <property name="text" >
+        <string>About &amp;QT...</string>
+      </property>
+    </action>
+    <action name="fileImport_Human_HandAction" >
+      <property name="name" >
+        <cstring>fileImport_Human_HandAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Import Human Hand...</string>
+      </property>
+      <property name="text" >
+        <string>Import Human Hand...</string>
+      </property>
+    </action>
+    <action name="dynamicsArch_BuilderAction" >
+      <property name="name" >
+        <cstring>dynamicsArch_BuilderAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Arch Builder...</string>
+      </property>
+      <property name="text" >
+        <string>Arch Builder...</string>
+      </property>
+    </action>
+    <action name="sensorsSensor_InputAction" >
+      <property name="name" >
+        <cstring>sensorsSensor_InputAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Sensor Input...</string>
+      </property>
+      <property name="text" >
+        <string>Sensor Input...</string>
+      </property>
+    </action>
+    <action name="stereoOnAction" >
+      <property name="name" >
+        <cstring>stereoOnAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>On</string>
+      </property>
+      <property name="text" >
+        <string>On</string>
+      </property>
+    </action>
+    <action name="stereoOffAction" >
+      <property name="name" >
+        <cstring>stereoOffAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Off</string>
+      </property>
+      <property name="text" >
+        <string>Off</string>
+      </property>
+    </action>
+    <action name="stereoFlip_leftrightAction" >
+      <property name="name" >
+        <cstring>stereoFlip_leftrightAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Flip Left/Right</string>
+      </property>
+      <property name="text" >
+        <string>Flip Left/Right</string>
+      </property>
+    </action>
+    <action name="dbaseGraspCaptureAction" >
+      <property name="name" >
+        <cstring>dbaseGraspCaptureAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Grasp Capture...</string>
+      </property>
+      <property name="text" >
+        <string>Grasp Capture...</string>
+      </property>
+    </action>
+    <action name="graspEigenGrasp_InterfaceAction" >
+      <property name="name" >
+        <cstring>graspEigenGrasp_InterfaceAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>EigenGrasp Interface...</string>
+      </property>
+      <property name="text" >
+        <string>EigenGrasp Interface...</string>
+      </property>
+    </action>
+    <action name="graspContact_ExaminerAction" >
+      <property name="name" >
+        <cstring>graspContact_ExaminerAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Virtual Contacts...</string>
+      </property>
+      <property name="text" >
+        <string>Virtual Contacts...</string>
+      </property>
+    </action>
+    <action name="graspEigenGrasp_PlannerAction" >
+      <property name="name" >
+        <cstring>graspEigenGrasp_PlannerAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>EigenGrasp Planner...</string>
+      </property>
+      <property name="text" >
+        <string>EigenGrasp Planner...</string>
+      </property>
+    </action>
+    <action name="sensorsBarrett_HandAction" >
+      <property name="name" >
+        <cstring>sensorsBarrett_HandAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Barrett Hand...</string>
+      </property>
+      <property name="text" >
+        <string>Barrett Hand...</string>
+      </property>
+    </action>
+    <action name="graspAuto_OpenAction" >
+      <property name="name" >
+        <cstring>graspAuto_OpenAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Auto Open</string>
+      </property>
+      <property name="text" >
+        <string>Auto Open</string>
+      </property>
+    </action>
+    <action name="elementPrimitivesAction" >
+      <property name="name" >
+        <cstring>elementPrimitivesAction</cstring>
+      </property>
+      <property name="enabled" >
+        <bool>false</bool>
+      </property>
+      <property name="iconText" >
+        <string>Primitives...</string>
+      </property>
+      <property name="text" >
+        <string>Primitives...</string>
+      </property>
+    </action>
+    <action name="miscEigengridsAction" >
+      <property name="name" >
+        <cstring>miscEigengridsAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Eigengrids...</string>
+      </property>
+      <property name="text" >
+        <string>Eigengrids...</string>
+      </property>
+    </action>
+    <action name="dbaseGUIAction" >
+      <property name="name" >
+        <cstring>dbaseGUIAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Connect and Browse...</string>
+      </property>
+      <property name="text" >
+        <string>Connect and Browse...</string>
+      </property>
+    </action>
+    <action name="dbasePlannerAction" >
+      <property name="name" >
+        <cstring>dbasePlannerAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Database Planner...</string>
+      </property>
+      <property name="text" >
+        <string>Database Planner...</string>
+      </property>
+    </action>
+    <actiongroup name="elementGroup" >
+      <action name="translateToolAction" >
+        <property name="name" >
+          <cstring>translateToolAction</cstring>
+        </property>
+        <property name="checkable" >
+          <bool>true</bool>
+        </property>
+        <property name="checked" >
+          <bool>true</bool>
+        </property>
+        <property name="icon" >
+          <iconset>translateTool.xpm</iconset>
+        </property>
+        <property name="iconText" >
+          <string>Translate</string>
+        </property>
+        <property name="text" >
+          <string>Translate</string>
+        </property>
+        <property name="toolTip" >
+          <string>Translate</string>
+        </property>
+        <property name="shortcut" >
+          <string>F2</string>
+        </property>
+      </action>
+      <action name="rotateToolAction" >
+        <property name="name" >
+          <cstring>rotateToolAction</cstring>
+        </property>
+        <property name="checkable" >
+          <bool>true</bool>
+        </property>
+        <property name="icon" >
+          <iconset>rotateTool.xpm</iconset>
+        </property>
+        <property name="iconText" >
+          <string>Rotate</string>
+        </property>
+        <property name="text" >
+          <string>Rotate</string>
+        </property>
+        <property name="toolTip" >
+          <string>Rotate</string>
+        </property>
+        <property name="shortcut" >
+          <string>F3</string>
+        </property>
+      </action>
+      <action name="selectToolAction" >
+        <property name="name" >
+          <cstring>selectToolAction</cstring>
+        </property>
+        <property name="checkable" >
+          <bool>true</bool>
+        </property>
+        <property name="icon" >
+          <iconset>selectTool.xpm</iconset>
+        </property>
+        <property name="iconText" >
+          <string>Select</string>
+        </property>
+        <property name="text" >
+          <string>Select</string>
+        </property>
+        <property name="toolTip" >
+          <string>Select</string>
+        </property>
+        <property name="shortcut" >
+          <string>F4</string>
+        </property>
+      </action>
+      <property name="name" >
+        <cstring>elementGroup</cstring>
+      </property>
+    </actiongroup>
+  </widget>
+  <layoutdefault spacing="6" margin="11" />
+  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+</ui>

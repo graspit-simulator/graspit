@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+    <material>metal</material>
+    <mass>100</mass>
+    <cog>-23.80 -1.66 0.0</cog>
+    <inertia_matrix>53.15 -6.65 0.002 -6.65 251.22 0.002 0.002 -0.002 251.29</inertia_matrix>
+    <geometryFile>pph3l.iv</geometryFile>
+</root>

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<root>
+    <mass>500.0</mass>
+    <geometryFile type="Inventor">ashtray.IV</geometryFile>
+</root>

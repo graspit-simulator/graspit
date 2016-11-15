@@ -1,0 +1,52 @@
+#Inventor V2.1 ascii
+Separator {    
+Material {
+	ambientColor	0.5 0.6 0.6
+	diffuseColor	0.4 0.1 0.1
+	emissiveColor	0.1 0.1 0.1
+    }
+
+    Texture2 {
+        filename	"textures/wood.jpg"
+    }    
+    Separator {
+        Translation {
+	    translation 275 275 425
+        }
+	Cube {
+            width	550
+	    height	550
+	    depth	50
+	}
+    }
+    Separator {
+	Translation {
+	    translation 26 26 200.5
+        }
+        DEF ctleg Separator {
+	    Cube {
+		width	50
+		height	50
+		depth	401
+	    }
+        }
+    }
+    Separator {
+	Translation {
+	    translation 26 524 200.5
+	}
+	USE ctleg
+    }
+    Separator {
+	Translation {
+	    translation 524 26 200.5
+	}
+	USE ctleg
+    }
+    Separator {
+        Translation {
+	    translation 524 524 200.5
+	}
+	USE ctleg
+    }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>500</mass>
+	<cog>0 0 0</cog>
+	<inertia_matrix>3671.5 0.0 0.0 0.0 417.10 47.542 0.0 47.542 3797.1</inertia_matrix>
+	<geometryFile type="Inventor">phone.iv</geometryFile>
+</root>

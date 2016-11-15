@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<EigenGrasps dimensions="11">
+	<EG>
+		<EigenValue value="0.51"/>
+		<Limits min="0.0" max="2.5"/>
+		<DimVals d0="1.0" d2="-1.0" d4="1.0" d6="-1.0" d8="1.0" d10="-1.0"/>
+	</EG>
+	<EG>
+		<EigenValue value="0.25"/>
+		<Limits min="-0.42" max="0.42"/>
+		<DimVals d3="1.0" d7="-1.0" />
+	</EG>
+	<ORIGIN>
+		<EigenValue value="0.0"/>
+		<DimVals />
+	  <!-- if empty, defaults to all zeros-->
+	</ORIGIN>
+</EigenGrasps>

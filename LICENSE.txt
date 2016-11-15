@@ -1,0 +1,19 @@
+GraspIt!
+Copyright (C) 2002-2009, Columbia University in the City of New York.
+All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details. A copy of the GNU General 
+Public License is included with this distribution in the file GPL.txt
+
+Several other software packages and source files have been included in 
+this distribution and are subject to their own license specifications.  
+Please see qhull/*, ply/*, include/dlfc-win32.h, src/maxdet_src.cpp 
+and tinyxml/* for information on those packages.

@@ -1,0 +1,14 @@
+#Inventor V2.1 ascii
+#material wood
+#mass 440
+#cog 0 0 0
+
+
+Separator { 
+	Material {
+		ambientColor	0.5 0.6 0.6
+		diffuseColor	0.4 0.1 0.1
+		emissiveColor	0.1 0.1 0.1
+	}
+	Cube { width 50 height 50 depth 200 }
+}

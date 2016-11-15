@@ -1,0 +1,69 @@
+#Inventor V1.0 ascii
+#metal
+#150
+
+# To change the thumb base angles change the two marked rotations below.
+# The graspit .cfg file has to be changed as well which is more tricky.
+
+Separator {
+#    File {name    "axis_arrows.iv"}	
+	File {name    "palm_main.iv"}
+	
+	Transform {
+		translation 	17.7190 0 3.5
+	}
+
+	RotationXYZ {
+		axis 	Y
+		angle	-1.570796326794897
+	}
+
+	RotationXYZ {
+		axis 	X
+		angle	3.1415927
+	}
+
+# This is one of the thumb base angles
+	RotationXYZ {
+		axis 	Z
+		angle	0.0
+#		angle	-0.65900416
+	}
+
+	File {name    "thumb_fixed_part_1.iv"}
+	
+	RotationXYZ {
+		axis 	Y
+		angle	-2.0943951
+	}
+
+
+	Transform {
+		translation 	0.0647048 0.241481 -26.8158 
+	}
+
+	RotationXYZ {
+		axis 	Z
+		angle	1.570796326794897
+	}
+
+# This is one of the thumb base angles
+	RotationXYZ {
+		axis 	Z
+		angle	-0.1
+#		angle	-0.26179939
+	}
+	File {name    "thumb_fixed_part_2.iv"}
+
+	RotationXYZ {
+		axis 	X
+		angle	-1.570796326794897
+	}
+
+	RotationXYZ {
+		axis 	Z
+		angle	1.570796326794897
+	}
+
+
+}

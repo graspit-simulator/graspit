@@ -1,0 +1,45 @@
+\subsection{GraspIt! Installation - Ubuntu Linux}
+
+\subsubsection{Qt}
+
+You will need the following libraries in order to compile GraspIt!:
+\begin{itemize}
+\item Qt 4
+\item Coin 3
+\item SoQt
+\item Blas and Lapack
+\end{itemize}
+
+On Ubuntu, you should be able to get all these from the package
+manager. It should also possible to compile them all from code, but
+since that tends to be system-specific we no longer provide
+instructions or guidelines for that.
+
+Use \texttt{sudo apt-get install} to install the following packages:
+\begin{itemize}
+\item \texttt{libqt4-dev}
+\item \texttt{libqt4-opengl-dev}
+\item \texttt{libqt4-sql-psql}
+\item \texttt{libcoin60-dev}
+\item \texttt{libsoqt4-dev}
+\item \texttt{libblas-dev}
+\item \texttt{liblapack-dev}
+\end{itemize}
+
+\subsubsection{GraspIt!}
+
+Download and unzip the GraspIt! code itself. Set the following
+environment variable:
+
+\begin{itemize}
+\item \texttt{GRASPIT} - the directory where you unzipped GraspIt!
+\end{itemize}
+
+Build QHull. Go to the \texttt{\$GRASPIT/qhull} directory and type
+\texttt{make}.
+
+Create the GraspIt! Makefile from the Qt project file. Edit
+\texttt{\$GRASPIT/graspit.pro} to suit your system and
+installation needs. Then type \texttt{qmake graspit.pro}.
+
+Build and go. From \texttt{\$GRASPIT/} type \texttt{make}.

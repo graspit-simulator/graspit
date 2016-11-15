@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>metal</material>
+    <mass>100</mass>
+    <geometryFile>pph3_5th_sim.iv</geometryFile>
+</root>

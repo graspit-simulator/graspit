@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+    <material>plastic</material>
+    <mass>10000</mass>
+    <geometryFile>joint3.iv</geometryFile>
+</root>

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>300</mass>
+	<cog>0 0 0</cog>
+	<inertia_matrix>416.64 0.0 0.0 0.0 416.64 0.0 0.0 0.0 416.64</inertia_matrix>
+	<geometryFile type="Inventor">icosahedron.iv</geometryFile>
+</root>

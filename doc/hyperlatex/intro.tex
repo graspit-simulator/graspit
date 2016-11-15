@@ -1,0 +1,145 @@
+\section{Introduction}
+
+\htmlmenu{2}
+
+\subsection{What GraspIt! is}
+
+GraspIt! was created to serve as a tool for grasping research. It is a
+simulator that can accommodate arbitrary hand and robot designs. It
+can also load objects and obstacles of arbitrary geometry to populate
+a complete simulation world. The GraspIt! engine includes a rapid
+collision detection and contact determination system that allows a
+user to interactively manipulate a robot or an object and create
+contacts between them. Once a grasp is created, one of the key
+features of the simulator is the set of grasp quality metrics. Each
+grasp is evaluated with numeric quality measures, and visualization
+methods allow the user to see the weak point of the grasp and create
+arbitrary 3D projections of the 6D grasp wrench space.
+
+In our experience, we have found that GraspIt! usually serves one of
+two purposes. First, it can be used as a development tool, to execute
+and test various robot control algorithms. In this sense, it serves as
+a replacement for the real world: in simulation, an algorithm can be
+tested on many hand designs, many objects and obstacle configurations,
+at no cost and much faster than in the real world. Second, GraspIt!
+can be used as a computational platform that backs up a robot that
+does operate in the real world. For example, a real robot can acquire a
+model of a target object, then use GraspIt! to quickly evaluate
+multiple grasping or manipulation scenarios. Often, these scenarios
+are also combined and the same GraspIt! setup used for development of
+an algorithm can also be used for computations during real life
+execution.
+
+GraspIt! has many features that help accomplish these roles; all of
+these features are documented in the second part of this manual. The
+most commonly used include the contact detection and grasp quality
+metrics mentioned above, the dynamics engine and the grasp planning
+capabilities. The dynamics engine within GraspIt! computes the motions
+of a group of connected robot elements, such as an arm and a hand,
+under the influence of controlled motor forces, joint constraint
+forces, contact forces and external forces. This allows a user to
+dynamically simulate an entire grasping task, as well as test custom
+robot control algorithms. The grasp planning algorithms rely on the
+simulated environment to quickly evaluate many hand postures, and
+find those that lead to stable grasps. There are many possible
+implementations of this concept; the planners that are included with
+GraspIt! can usually find multiple stable grasps of an object in less
+than 1 minute, taking into account obstacles and other constraints.
+
+Overall, GraspIt! is an open-source virtual environment for simulating
+robotic grasping tasks accompanied by a number of analysis and
+development tools. It has been developed in C++ using many other
+open-source libraries, and is cross-platform, tested on both Windows
+and Ubuntu Linux.
+
+\subsection{What GraspIt! is NOT}
+
+GraspIt! is not an off-the-shelf product. It is rather a large
+codebase that is the result of many years of research and development
+in the Robotics Lab at Columbia University. The tools included can
+greatly help in the development and testing of new algorithms and
+approaches. However, we have often found that most new interesting
+problems can not be completely addressed by applying these tools
+exactly as they are. It is very possible that, in the process, you
+will find yourself needing various changes or additions to the
+simulator; these might be bigger or smaller depending on your
+problem. This means that you might have to get your hands dirty and
+tinker with the code itself, which we encourage you to do. We have
+done our best to create clean, robust and well-documented
+code. However, we are not a large team of product development software
+engineers; rather, we are a small group of robotics researchers. As a
+result, do not be surprised if you find parts of the code that can be
+improved.
+
+\subsection{About this manual}
+
+This manual is divided into two parts. The first one, containing
+\textbf{Chapters 1 through 4}, is an introduction to the GraspIt!
+environment, covering the essential aspects for loading and populating
+a GraspIt!  world and interacting with it. The references to the
+source code are kept at a minimum. In the second part, containing
+\textbf{Chapters 5 through 17}, we discuss the GraspIt! advanced
+features, or the tools that it offers for solving various
+problems. Here we overlap discussions of the simulator as a final
+product with discussion of the source code itself. We also introduce a
+number of features of GraspIt!  that are not completely finished yet,
+and might not be very robust, but have been included in the
+distribution in the hope you might find them useful. Such features
+will be marked by the qualifier "Under Development" - only use them if
+you're not afraid of delving inside the code to get the most out of
+them and fix an occasional bug.
+
+Please note that, much like the code itself, this manual is under
+continuous development. There are many aspects that it does not touch
+at all, or explains too briefly. If there is a topic that you found
+particularly confusing, or you would like to see expanded, we would
+appreciate your feedback.
+
+\subsection{Troubleshooting and contact}
+
+GraspIt! includes two main resources: this manual, and a complete code
+reference. We have put a lot of work into both of them, and we
+strongly encourage you to try using them to solve your problem before
+contacting us. If that fails, we will try to provide support via
+email; write us at \texttt{graspit@lists.cs.columbia.edu}. General comments
+on the simulator, and any patches or improvements to the code are
+always appreciated.
+
+\subsection{Authors and acknowledgements}
+
+\textbf{Andrew Miller} and \textbf{Matei Ciocarlie} are the main
+authors of GraspIt!, having designed most of its features and
+implemented most of the code. GraspIt!'s current main developers and
+maintainers are Matei Ciocarlie and \textbf{Jon Weisz}. The GraspIt!
+simulator was developed in the Robotics Lab, Department of Computer
+Science, Columbia University, under the guidance of
+\textbf{Prof. Peter Allen}.
+
+Many people contributed to GraspIt!, either in the form of new ideas,
+suggestions or guidance, or by implementing new features in
+code. These include: \textbf{Prof. Jeff Trinkle}, who provided
+valuable advice on the dynamics system; \textbf{Danica Kragic} who
+developed the real time vision system allowing GraspIt! to work with
+real robots; \textbf{Prof. Henrik Christensen} and \textbf{Steffen
+  Knoop} who helped build the automatic grasp planner; \textbf{Raphael
+  Pelossof}, who implemented the first GraspIt! based machine learning
+approach; \textbf{Claire Lackner}, who helped design and implement the
+soft finger contact algorithms; \textbf{Corey Goldfeder}, who was the
+driving force behind the Columbia Grasp Database (CGDB) which is now
+integrated with GraspIt!; \textbf{Hao Dang} who wrote the GraspIt! -
+CGDB interface, and made many other valuable contributions to the
+codebase; \textbf{Norases Vesdapunt}, who wrote the XML interface for
+data files. We would like to thank all of them for their valuable
+contributions.
+
+Thanks to Prof. Gerd Hirzinger and Dr. Max Fischer, Prof. Contantinos
+Mavroidis and Katheryn DeLaurentis, Dr. Myron Diftler, Marco Reichel,
+the Shadow Robot Company, Marius Stuecheli and Dr. Tamim Asfour for
+providing us with models of their robotic hands. The M7 Robot geometry
+was provided courtesy of SRI International. The Schunk Dexterous Hand
+model was provided courtesy of SCHUNK GmbH Co. The RobotIQ hand
+model was provided courtesy of the RobotIQ Company.
+
+We would also like to thank \textbf{Willow Garage} for their support
+towards this new, GPL-licensed release, and for their commitment
+towards open-source and freely available code.

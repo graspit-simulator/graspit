@@ -1,0 +1,331 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>palm_3.xml</palm>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>59.055 8.763 49.53</translation>
+            <rotation>35 z</rotation>
+            <rotation>-40 y</rotation>
+            <rotation>-40 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>30</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>39.4335</a>
+            <alpha>-90</alpha>
+            <minValue>-30</minValue>
+            <maxValue>30</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <link dynamicJointType="Universal">tproxphal_sock.xml</link>
+        <link dynamicJointType="Revolute">tdistphal_1.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>91.059 0.0 33.02</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d4</theta>
+            <d>0</d>
+            <a>39.4335</a>
+            <alpha>-90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5</theta>
+            <d>0</d>
+            <a>38.862</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d6</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <link dynamicJointType="Universal">fproxphal_sock.xml</link>
+        <link dynamicJointType="Revolute">fmedphal_1.xml</link>
+        <link dynamicJointType="Revolute">fdistphal_1.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>91.059 0.0 11.43</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d7</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d8</theta>
+            <d>0</d>
+            <a>39.4335</a>
+            <alpha>-90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d9</theta>
+            <d>0</d>
+            <a>38.862</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d10</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <link dynamicJointType="Universal">fproxphal_sock.xml</link>
+        <link dynamicJointType="Revolute">fmedphal_1.xml</link>
+        <link dynamicJointType="Revolute">fdistphal_1.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>91.059 0.0 -10.16</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d11</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d12</theta>
+            <d>0</d>
+            <a>39.4335</a>
+            <alpha>-90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d13</theta>
+            <d>0</d>
+            <a>38.862</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d14</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <link dynamicJointType="Universal">fproxphal_sock.xml</link>
+        <link dynamicJointType="Revolute">fmedphal_1.xml</link>
+        <link dynamicJointType="Revolute">fdistphal_1.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>91.059 0.0 -29.21</translation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d15</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d16</theta>
+            <d>0</d>
+            <a>39.4335</a>
+            <alpha>-90</alpha>
+            <minValue>-10</minValue>
+            <maxValue>10</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d17</theta>
+            <d>0</d>
+            <a>38.862</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <joint type="Revolute">
+            <theta>d18</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
+        </joint>
+        <link dynamicJointType="Universal">fproxphal_sock.xml</link>
+        <link dynamicJointType="Revolute">fmedphal_1.xml</link>
+        <link dynamicJointType="Revolute">fdistphal_1.xml</link>
+    </chain>
+</robot>

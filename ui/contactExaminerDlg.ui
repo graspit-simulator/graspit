@@ -1,0 +1,386 @@
+<ui version="4.0" >
+ <class>ContactExaminerDlgUI</class>
+ <widget class="QDialog" name="ContactExaminerDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>292</width>
+    <height>321</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Virtual Grasp</string>
+  </property>
+  <widget class="Q3GroupBox" name="graspQualityAnalysisGroupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>200</y>
+     <width>270</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Virtual Grasp Quality</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Vertical</enum>
+   </property>
+   <widget class="QPushButton" name="updateQualityButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>24</y>
+      <width>71</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Compute</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="textLabel3" >
+    <property name="geometry" >
+     <rect>
+      <x>87</x>
+      <y>27</y>
+      <width>40</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Quality:</string>
+    </property>
+    <property name="wordWrap" >
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="qualityLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>131</x>
+      <y>28</y>
+      <width>50</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>0</string>
+    </property>
+    <property name="wordWrap" >
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="showGWSButton" >
+    <property name="geometry" >
+     <rect>
+      <x>200</x>
+      <y>24</y>
+      <width>61</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Show GWS</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="exitButton" >
+   <property name="geometry" >
+    <rect>
+     <x>220</x>
+     <y>280</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="contactLoadingGroupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>132</y>
+     <width>270</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Virtual Contacts</string>
+   </property>
+   <widget class="QPushButton" name="loadButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>71</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Load ...</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="clearButton" >
+    <property name="geometry" >
+     <rect>
+      <x>173</x>
+      <y>20</y>
+      <width>71</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Clear</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="saveButton" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>20</y>
+      <width>71</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Save ...</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="contactCollectionGroupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>62</y>
+     <width>270</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Contact Collection</string>
+   </property>
+   <widget class="QPushButton" name="markButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>19</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Mark Contact</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="textLabel1" >
+    <property name="geometry" >
+     <rect>
+      <x>98</x>
+      <y>26</y>
+      <width>49</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Marked:</string>
+    </property>
+    <property name="wordWrap" >
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="markedLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>142</x>
+      <y>26</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>0</string>
+    </property>
+    <property name="wordWrap" >
+     <bool>false</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>271</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Source</string>
+   </property>
+   <widget class="QRadioButton" name="objectRadioButton" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>69</x>
+      <y>16</y>
+      <width>51</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>object</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="handRadioButton" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>11</x>
+      <y>16</y>
+      <width>51</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>hand</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>Q3GroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>Qt3Support/Q3GroupBox</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="global" >vector</include>
+ </includes>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>exitButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>exitButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>updateQualityButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>updateQualityButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>saveButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>markButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>markButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>loadButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>clearButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>showGWSButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContactExaminerDlgUI</receiver>
+   <slot>showGWSButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

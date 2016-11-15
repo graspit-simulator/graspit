@@ -1,0 +1,32 @@
+#Inventor V2.1 ascii
+
+Separator {
+
+ Transform {
+	translation 0 0 0
+	rotation 1 0 0 -1.57
+  }
+	Transform {
+		translation 0 0 0
+		rotation 0 0 1 -1.57
+	} 
+ 
+	Transform {
+		#translation 0 0 0
+		rotation 0 1 0 3.14
+	} 
+        ## Kinematics 5.0 <-> armar model: 7.5
+	## Model of elbow is fixed to upperarm -> use offset, so transformations of kinematics have no effect
+#	Transform {
+#		translation 7.5 0 0 
+#		rotation 1 0 0 -0.07616814813524509
+#	} 
+	Transform {
+		translation 7.5 0 0
+		rotation 0 0 0 0 
+	} 
+#	File {name armar/hands/axis_arrows.iv }
+    	File { 
+      		name "armar/left_arm/elbow_link_l.iv"
+    	}
+}

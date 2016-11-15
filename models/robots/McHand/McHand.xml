@@ -1,0 +1,226 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>palm.xml</palm>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <dof type="r">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>5.0e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>10</draggerScale>
+    </dof>
+    <chain>
+        <transform>
+            <translation>-10 0 0</translation>
+	    <rotation>180  y</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>40</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">thumb_0.xml</link>
+        <link dynamicJointType="Revolute">thumb_1.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>10 0 -11</translation>
+            <rotation>-90 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d4+20</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>-20</minValue>
+            <maxValue>0</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d5+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d6+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d7+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Universal">finger_link_pad.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad.xml</link>
+    </chain>
+    <chain>
+        <transform>
+            <translation>10 0 11</translation>
+            <rotation>-90 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d8+-20</theta>
+            <d>0</d>
+            <a>0</a>
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>20</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d9+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d10+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d11+20</theta>
+            <d>0</d>
+            <a>20</a>
+            <alpha>0</alpha>
+            <minValue>-30</minValue>
+            <maxValue>70</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Universal">finger_link_pad.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad.xml</link>
+        <link dynamicJointType="Revolute">finger_link_pad.xml</link>
+    </chain>
+    <eigenGrasps>eigen/McHand_eigen.xml</eigenGrasps>
+    <virtualContacts>virtual/all_contacts.vgr</virtualContacts>
+</robot>

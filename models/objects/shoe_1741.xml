@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>100</mass>
+	<geometryFile type="Inventor">shoe_1741.wrl</geometryFile>
+</root>

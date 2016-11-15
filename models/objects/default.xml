@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<root>
+<!-- DO NOT REMOVE THIS FILE!-->
+<!-- This file is used as boilerplate for loading geometry files
+     that do not have an XML file. You can put any default parameters
+     you want in here (except for link to the geometry file, which 
+     gets filled in at runtime.
+     
+     Remember that for any properties for which you do not put a default
+     value here, GraspIt wil lprobably use some default value that's
+     hard-coded in the file loader.
+-->
+</root>

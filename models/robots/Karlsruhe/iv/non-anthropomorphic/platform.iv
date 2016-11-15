@@ -1,0 +1,24 @@
+#Inventor V2.1 ascii
+
+Separator { #Model
+
+ RotationXYZ {
+   axis X
+   angle 1.57
+   }
+ RotationXYZ{
+ 	axis Z
+	angle -1.57
+ }
+# Transform {
+#  rotation 0 1 0 1.57
+# }
+#  Transform {
+#  rotation 1 0 0 3.1415
+# }
+ 
+ #File {name armar/hands/axis_arrows.iv }
+ File { 
+  name "armar/platform/platform.iv"
+ }
+}

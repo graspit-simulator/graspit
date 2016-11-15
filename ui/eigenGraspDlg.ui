@@ -1,0 +1,319 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>EigenGraspDlgUI</class>
+ <widget class="QDialog" name="EigenGraspDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>278</width>
+    <height>290</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>EigenGrasps</string>
+  </property>
+  <widget class="QPushButton" name="exitButton" >
+   <property name="geometry" >
+    <rect>
+     <x>210</x>
+     <y>250</y>
+     <width>60</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="Q3GroupBox" name="groupBox3" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>261</width>
+     <height>230</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Properties and control</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Vertical</enum>
+   </property>
+   <widget class="QPushButton" name="closeHandButton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>100</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Close to Contacts</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="setOriginButton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>100</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Set Origin</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="goToOriginButton" >
+    <property name="geometry" >
+     <rect>
+      <x>130</x>
+      <y>50</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Go To Origin</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line1" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>241</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="frameShape" >
+     <enum>QFrame::HLine</enum>
+    </property>
+    <property name="frameShadow" >
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="orientation" >
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="rigidCheckBox" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>50</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Rigid</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadButton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>50</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Load...</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="fileNameLabel" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>190</y>
+      <width>230</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Filename:</string>
+    </property>
+    <property name="wordWrap" >
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="saveButton" >
+    <property name="geometry" >
+     <rect>
+      <x>80</x>
+      <y>150</y>
+      <width>50</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Save...</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="identityButton" >
+    <property name="geometry" >
+     <rect>
+      <x>140</x>
+      <y>150</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Use Identity</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>Q3GroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>Qt3Support/Q3GroupBox</header>
+   <container>1</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="global" >vector</include>
+ </includes>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>saveButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exitButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>exitButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>setOriginButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>setOriginButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rigidCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>rigidCheckBox_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>closeHandButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>closeHandButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>goToOriginButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>goToOriginButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>loadButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>identityButton</sender>
+   <signal>clicked()</signal>
+   <receiver>EigenGraspDlgUI</receiver>
+   <slot>identityButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

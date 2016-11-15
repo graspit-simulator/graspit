@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>500</mass>
+	<geometryFile type="Inventor">tapered_box.iv</geometryFile>
+</root>

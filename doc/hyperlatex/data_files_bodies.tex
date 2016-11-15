@@ -1,0 +1,160 @@
+\subsection{Bodies}
+\label{sec:bodies}
+
+There are two main types of bodies that exist in a GraspIt! simulation
+world: static bodies (also known as obstacles) and dynamic bodies
+(such as robot links and objects). Static objects do not participate
+in the dynamics, but provide collision surfaces for dynamic
+bodies. Note that this difference mainly applies when the dynamic
+engine is being used; otherwise, dynamic bodies can be used as static
+bodies as well. This document describes what makes up a basic GraspIt!
+body, and what a dynamic body adds to that definition.
+
+Every GraspIt! body has the following data associated with it:
+
+\begin{description}
+\item[Geometry:] this describes the shape of the body. It is stored as
+  an Inventor scene graph, a format similar to VRML. This structure
+  can contain pure shape nodes such as cubes, spheres, cylinders, and
+  cones, as well as sets of 2D polygons that define a
+  surface. Although GraspIt! (through the Inventor scene graph) can
+  display all of these geometry types, the collision detection system
+  only works with triangles. When any body is imported to a GraspIt!
+  world, it is faceted into triangles, and these are used for
+  detecting collisions and finding contact points. The units in these
+  files are assumed to be millimeters. Note that the origin of a
+  body's coordinate system is the origin of its geometry, as loaded
+  from a file or created by the user. This can be a tricky aspect, as
+  the origin of a body's geometry is fairly arbitrary. To counter
+  this, dynamic bodies also use the notion of center of mass,
+  explained below. However, the origin of a body's coordinate system
+  is always the origin of it's geometry.
+\item[Material:] the material affects the amount of friction possible
+  at contacts on this body. For each pair of materials we define a
+  coefficient of friction.  When the dynamic engine is not used,
+  GraspIt! uses a static coefficient of friction for all bodies. When
+  not using dynamics, this coefficient only affects grasp quality
+  computations, not the relative motion of the bodies. During the
+  dynamic simulation, the coefficient of friction affects the relative
+  motion of the bodies in contact. We also use a dynamic coefficient:
+  if the relative speed at a contact point exceeds a threshold
+  currently set at 1mm/sec, a kinetic coefficient of friction is used.
+\item[Transform:] each body keeps track of the 3D position and
+  orientation of its body frame relative to the GraspIt! world
+  coordinate system.
+\item[Name:] a body's name is currently derived from the its filename,
+  except in the case robot links, which are named using the robot's
+  name and their kinematic chain and link numbers.
+\end{description}
+
+Dynamic bodies also have the following properties:
+
+\begin{description}
+\item[Mass:] this is expressed in grams.
+\item[Center of mass:] this is a 3D position expressed relative to the
+  body coordinate system. There are two main uses for this. The first
+  one is to provide a stable point for grasp quality computations to
+  use as reference. The second one is to be used as a reference point
+  for transformation between forces and torques in dynamics. It should
+  be more stable than the origin of the body's coordinate system,
+  which is arbitrary.
+\item[Inertia tensor:] this is the standard 3x3 mass distribution
+  matrix. It is expressed relative to a coordinate frame that is
+  aligned with the coordinate system of the body, but positioned at
+  the center of mass. When stored in a file, it is scaled by 1/mass so
+  that changes to the mass can be made by changing only the mass value
+  above.
+\item[Dynamic state:] two values, q and v, store the current position
+  and velocity of the body's center of mass relative to world
+  coordinates. q is expressed as a 7x1 vector: the first three values
+  are the position, and the last four are the rotation in quaternion
+  form. v is expressed as a 6x1 vector: the first three values are the
+  linear velocity of the body, and the last three are the rotational
+  velocity. When the dynamics updates each body state, the body
+  transform is also updated. If a body is moved in the static mode,
+  the position value of the dynamic state is also updated.
+\end{description}
+
+\subsubsection{Body Files}
+
+Starting from version 2.1, GraspIt! uses an XML format for storing all
+of its data. For Bodies, there are two types of information that are
+required: the GraspIt! specific information, such as the parameters
+shown above, and the geometry itself. Each Body therefore comes with two files:
+\begin{itemize}
+\item an \texttt{.xml} file that contains all the GraspIt! specific
+  information, as well as a pointer to the file that contains the
+  actual geometry.
+\item the geometry file. Currently, there are a few options for the
+  geometry file:
+\begin{itemize}
+\item VRML format (\texttt{.wrl}), read in directly through
+  \texttt{Coin}
+\item Inventor format (\texttt{.iv}), also read in by \texttt{Coin}
+\item OFF format (\texttt{.off}), read in by our own parser. This
+  format was added mainly to be able to directly load objects from the
+  Princeton Shape Benchmark; we have not tested it extensively on
+  other files that are not part of the PSB.
+\end{itemize}
+\end{itemize}
+
+Here is an example of a typical Body file (\texttt{\$GRASPIT/models/objects/flask.xml}):
+
+\begin{verbatim}
+<?xml version="1.0" ?>
+<root>
+	<material>glass</material>
+	<mass>300</mass>
+	<cog>0 0 0</cog>
+	<inertia_matrix>4853.0 -1.1196 -6.5156 -1.1196 4853.0 47.542 -6.5156 0.0 2357.6</inertia_matrix>
+	<geometryFile type="Inventor">flask.iv</geometryFile>
+</root>
+\end{verbatim}
+
+The format is fully XML adherent, you should be able to also read it
+in with any XML parser (such as your web browser). This is the list of
+tags that GraspIt! will look for in the Body file:
+
+\begin{itemize}
+\item \texttt{<geometryFile>} - this is the only mandatory tag. It
+  contains the path to the geometry file, relative to the directory
+  where the XML file is placed. It requires an additional specifier
+  \texttt{type} which can be one of the following:
+  \begin{itemize}
+    \item \texttt{Inventor} - for VRML (\texttt{.wrl}) and Inventor
+      (\texttt{.iv}) files
+    \item \texttt{off} - for OFF (\texttt{.off}) files
+  \end{itemize}
+  \item \texttt{<material>} - can be any of the materials used in
+    GraspIt!. If it is missing, a generic material with a mid-range
+    friction coefficient is assumed. The value is a string identifying
+    the name of the material. Possible values are: frictionless,
+    plastic, metal, wood, stone, rubber.
+  \item \texttt{<youngs>} - the Young's modulus of the object, in
+    MPa. This can be used to simulate soft body contacts and compute
+    contact frictional torque. See the \link{Soft
+      Fingers}{sec:softFingers} section for details. If this is
+    missing, GraspIt! will assume the body is rigid, and use the more
+    common rigid contact model instead.
+  \item Dynamic properties:
+  \begin{itemize}
+    \item \texttt{<mass>} - the mass of the body, in grams.
+    \item \texttt{<cog>} - center of gravity. The value is composed of 3
+      entries, showing the coordinates of the center of gravity
+      relative to the origin of the geometry.
+    \item \texttt{<inertia\_matrix>} - the 3x3 inertia tensor of the
+      object, as a list of 9 doubles
+    \item{WARNING:} if any of the dynamic parameters are missing,
+      GraspIt! will attempt to compute it automatically based on the
+      geometry of the object and assuming uniform mass
+      distribution. This works reasonably well in most cases, but can
+      also produce spectacular failures. To have complete control over
+      the dynamic parameters of you Body, it is best to specify them
+      explicitly in the file.
+  \end{itemize}
+\end{itemize}
+
+For more examples, see the body files included with the distribution,
+in \texttt{\$GRASPIT/models/objects}.
+
+

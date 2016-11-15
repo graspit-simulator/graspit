@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<world>
+    <robot>
+        <filename>models/robots/M7body/M7body.xml</filename>
+        <dofValues>0 0 0 0 0 0 0 0 0 0 0 0</dofValues>
+        <transform>
+            <fullTransform>(+1 0 0 0)[0 0 0]</fullTransform>
+        </transform>
+    </robot>
+    <robot>
+        <filename>models/robots/M7tool/M7tool.xml</filename>
+        <dofValues>0 0</dofValues>
+        <transform>
+            <fullTransform>(-0.457027 +0.12751 +0.40133 +0.783455)[+414.484 +47.6725 -101.568]</fullTransform>
+        </transform>
+    </robot>
+    <robot>
+        <filename>models/robots/M7tool/M7tool.xml</filename>
+        <dofValues>0 0</dofValues>
+        <transform>
+            <fullTransform>(+0.786761 +0.387994 +0.104794 -0.468494)[+412.315 -54.495 -94.5828]</fullTransform>
+        </transform>
+    </robot>
+    <connection>
+        <parentRobot>0</parentRobot>
+        <parentChain>0</parentChain>
+        <childRobot>1</childRobot>
+        <transform>
+            <fullTransform>(-0.5 -0.5 +0.5 +0.5)[0 0 +72.644]</fullTransform>
+        </transform>
+    </connection>
+    <connection>
+        <parentRobot>0</parentRobot>
+        <parentChain>1</parentChain>
+        <childRobot>2</childRobot>
+        <transform>
+            <fullTransform>(+0.5 +0.5 +0.5 +0.5)[0 0 +72.644]</fullTransform>
+        </transform>
+    </connection>
+    <camera>
+        <position>-176.032 +2.39093 +646.44</position>
+        <orientation>+0.129152 +0.128291 -0.69507 -0.695513</orientation>
+        <focalDistance>+1123.12</focalDistance>
+    </camera>
+</world>

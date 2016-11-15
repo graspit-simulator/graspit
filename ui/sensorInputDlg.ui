@@ -1,0 +1,165 @@
+<ui version="4.0" >
+ <class>SensorsDlgUI</class>
+ <widget class="QDialog" name="SensorsDlgUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>353</width>
+    <height>241</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Sensor Input</string>
+  </property>
+  <widget class="QPushButton" name="exitButton" >
+   <property name="geometry" >
+    <rect>
+     <x>290</x>
+     <y>210</y>
+     <width>51</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>161</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Cyberglove</string>
+   </property>
+   <widget class="QPushButton" name="gloveStartButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="gloveModeBox" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>141</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Operation mode:</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2" >
+   <property name="geometry" >
+    <rect>
+     <x>180</x>
+     <y>10</y>
+     <width>161</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Flock of Birds</string>
+   </property>
+   <widget class="QPushButton" name="flockStartButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Operation mode:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="flockModeBox" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>141</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>114</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Master Flock:</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="masterFlockBox" >
+    <property name="geometry" >
+     <rect>
+      <x>80</x>
+      <y>110</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="resetFlockButton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Reset</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,17 @@
+#Inventor V2.1 ascii
+#material plastic
+#mass 440
+#cog 0 0 0
+
+Separator { # Body
+
+	Material {
+		ambientColor	0.7 0.6 0.0
+		diffuseColor	0.7 0.6 0.0
+	  }
+	Scale {
+	    scaleFactor	25.4 25.4 25.4
+	}
+
+	  Cube { width 0.8 height 6.5 depth 9.5 }
+}

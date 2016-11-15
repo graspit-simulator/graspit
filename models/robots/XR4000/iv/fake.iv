@@ -1,0 +1,21 @@
+#Inventor V2.0 ascii
+#material plastic
+#mass 0.0001
+#cog 0.003360 -3.736 -47.83
+
+#inertia_matrix
+#3540.1 0.0  0.0
+#0.0 3350.10 -42.614
+#0.0 -42.614 1056.9
+
+Separator {
+   Translation{
+	translation 1 1 1
+   }
+	Cube {
+	 width 1
+	 height 1
+	 depth 1
+	}
+}
+

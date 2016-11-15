@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<root>
+    <mass>100.0</mass>
+    <geometryFile type="Inventor">bishop.IV</geometryFile>
+</root>
