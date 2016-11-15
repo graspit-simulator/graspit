@@ -41,7 +41,6 @@
 #include <Inventor/SbBox.h>
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
 
-#include "myRegistry.h"
 #include "matvecIO.h"
 #include "world.h"
 #include "worldElement.h"
@@ -339,18 +338,19 @@ default values are used.
 void
 World::readSettings()
 {
-	QSettings settings;
-	int i,j,newNumMaterials;
-	double **newcofTable,**newkcofTable;
-	std::vector<QString> newMaterialNames;
+    QString organization = "graspit";
+    QString application = "graspit";
+    QSettings settings(organization,application);
+    
+    int i,j,newNumMaterials;
+    double **newcofTable,**newkcofTable;
+    std::vector<QString> newMaterialNames;
 
-	setDefaults();
+    setDefaults();
 
-	settings.insertSearchPath(QSettings::Windows, COMPANY_KEY);
+    dynamicsTimeStep = settings.readDoubleEntry(QString("/GraspIt/") + QString("World/dynamicsTimeStep"),dynamicsTimeStep);
 
-	dynamicsTimeStep = settings.readDoubleEntry(APP_KEY + QString("World/dynamicsTimeStep"),dynamicsTimeStep);
-
-	newNumMaterials = settings.readNumEntry(APP_KEY + QString("World/numMaterials"),numMaterials);
+    newNumMaterials = settings.readNumEntry(QString("/GraspIt/") + QString("World/numMaterials"),numMaterials);
 
 	newcofTable = (double **)malloc(newNumMaterials*sizeof(double *));
 	newkcofTable = (double **)malloc(newNumMaterials*sizeof(double *));
@@ -362,33 +362,33 @@ World::readSettings()
 	}
 
 	for (i=0;i<numMaterials;i++) {
-		newMaterialNames[i] = settings.readEntry(APP_KEY + QString("World/material%1").arg(i),materialNames[i]);
+        newMaterialNames[i] = settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i),materialNames[i]);
 
 		for (j=i;j<numMaterials;j++) {
 			newcofTable[i][j] = newcofTable[j][i] =
-				settings.readDoubleEntry(APP_KEY + QString("World/cof%1%2").arg(i).arg(j),cofTable[i][j]);
+                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j),cofTable[i][j]);
 
 			newkcofTable[i][j] = newkcofTable[j][i] =
-				settings.readDoubleEntry(APP_KEY + QString("World/kcof%1%2").arg(i).arg(j),kcofTable[i][j]);
+                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j),kcofTable[i][j]);
 		}
 
 		for (;j<newNumMaterials;j++) {
 			newcofTable[i][j] = newcofTable[j][i] =
-				settings.readDoubleEntry(APP_KEY + QString("World/cof%1%2").arg(i).arg(j));
+                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
 
 			newkcofTable[i][j] = newkcofTable[j][i] =
-				settings.readDoubleEntry(APP_KEY + QString("World/kcof%1%2").arg(i).arg(j));
+                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
 		}
 	}
 	for (;i<newNumMaterials;i++){
-		newMaterialNames.push_back(settings.readEntry(APP_KEY + QString("World/material%1").arg(i)));
+        newMaterialNames.push_back(settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i)));
 
 		for (j=i;j<newNumMaterials;j++) {
 			newcofTable[i][j] = newcofTable[j][i] =
-				settings.readDoubleEntry(APP_KEY + QString("World/cof%1%2").arg(i).arg(j));
+                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
 
 			newkcofTable[i][j] = newkcofTable[j][i] =
-				settings.readDoubleEntry(APP_KEY + QString("World/kcof%1%2").arg(i).arg(j));
+                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
 		}
 	}
 
@@ -409,16 +409,17 @@ World::readSettings()
 void
 World::saveSettings()
 {
-	int i,j;
-	QSettings settings;
-	settings.insertSearchPath(QSettings::Windows, COMPANY_KEY);
+    QString organization = "graspit";
+    QString application = "graspit";
+    QSettings settings(organization,application);
 
-	settings.writeEntry(APP_KEY + QString("World/numMaterials"),numMaterials);
+    int i,j;
+    settings.writeEntry(QString("/GraspIt/") + QString("World/numMaterials"),numMaterials);
 	for (i=0;i<numMaterials;i++) {
-		settings.writeEntry(APP_KEY + QString("World/material%1").arg(i),materialNames[i]);
+        settings.writeEntry(QString("/GraspIt/") + QString("World/material%1").arg(i),materialNames[i]);
 		for (j=i;j<numMaterials;j++) { 
-			settings.writeEntry(APP_KEY + QString("World/cof%1%2").arg(i).arg(j),cofTable[i][j]);
-			settings.writeEntry(APP_KEY + QString("World/kcof%1%2").arg(i).arg(j),kcofTable[i][j]);
+            settings.writeEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j),cofTable[i][j]);
+            settings.writeEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j),kcofTable[i][j]);
 		}
 	}
 }
