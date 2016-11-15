@@ -42,10 +42,6 @@ class SoMaterial;
 class Matrix;
 class VirtualContact;
 
-#ifdef ARIZONA_PROJECT_ENABLED
-#include <arizona/Arizona_Raw_Exp.h>
-#endif
-
 #define DISPLAY_CONE_SCALE 20.0
 #define MAX_FRICTION_EDGES 100
   
