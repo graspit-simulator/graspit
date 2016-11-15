@@ -464,7 +464,6 @@
           <string>Misc.</string>
         </property>
         <addaction name="dynamicsArch_BuilderAction" />
-        <addaction name="miscOptimizerAction" />
         <addaction name="miscEigengridsAction" />
       </widget>
       <widget class="QMenu" name="helpMenu" >
@@ -695,17 +694,6 @@
       </property>
       <property name="text" >
         <string>&amp;Planner...</string>
-      </property>
-    </action>
-    <action name="miscOptimizerAction" >
-      <property name="name" >
-        <cstring>miscOptimizerAction</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Optimizer...</string>
-      </property>
-      <property name="text" >
-        <string>Optimizer...</string>
       </property>
     </action>
     <action name="graspGFOAction" >

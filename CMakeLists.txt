@@ -77,8 +77,6 @@ set (GRASPIT_INCLUDES
     # files wouldn't compile without main window
     ${GSRC}/ui/Planner
     ${GSRC}/ui/EGPlanner
-    ${GSRC}/ui/optimizer
-    ${GSRC}/include/optimizer
 )
 
 
@@ -628,42 +626,6 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/tinyxml/tinyxmlparser.cpp
 )
 
-
-#-------------------------------------- Optimizer ---------------------
-
-set (GRASPIT_INCLUDES
-    ${GRASPIT_INCLUDES}
-    ${GSRC}/include/optimizer
-)
-set (OPTIMIZER_HEADERS 
-    ${GSRC}/ui/optimizer/optimizerDlg.h
-)
-
-set (GRASPIT_OPTIMIZER_SOURCES
-    ${GSRC}/ui/optimizer/optimizerDlg.cpp
-)
-
-set (OPTIMIZER_FORMS
-    ${GSRC}/ui/optimizer/optimizerDlg.ui)
-
-if (CGDB)  
-    set (GRASPIT_OPTIMIZER_SOURCES
-        ${GRASPIT_OPTIMIZER_SOURCES}
-        ${GSRC}/src/optimizer/eigenTorques.cpp)
-
-    set (OPTIMIZER_HEADERS 
-        ${OPTIMIZER_HEADERS} 
-        ${GSRC}/include/optimizer/eigenTorques.h
-)
-endif (CGDB)    
-
-set (MOC_HEADERS
-    ${MOC_HEADERS}
-    ${GSRC}/ui/optimizer/optimizerDlg.h
-)
-
-
-
 ##########################################
 ## Generate Qt files for the icon sets  ## 
 ##########################################
@@ -690,7 +652,6 @@ SET(GRASPIT_IMAGE_SOURCES
 set (ALL_GRASPIT_FORMS
     ${GRASPIT_FORMS}
     ${CGDB_FORMS}
-    ${OPTIMIZER_FORMS}
 )
 
 set (GRASPIT_UI_INCLUDE_DIRNAME ui)
@@ -746,7 +707,6 @@ set (GRASPIT_LIBRARY_SOURCES
     ${PLY_SOURCES}
     ${GRASPIT_COLLISION_SOURCES}
     ${GRASPIT_DYNAMICS_SOURCES}
-    ${GRASPIT_OPTIMIZER_SOURCES}
     ${GRASPIT_FORM_SOURCES}
     ${GRASPIT_IMAGE_SOURCES}
     ${UI_OUTFILES}
@@ -863,11 +823,6 @@ install(FILES
 install(FILES
     ${GRASPIT_INCLUDE_MATH_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/math
-)
-
-install(FILES
-    ${OPTIMIZER_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/optimizer
 )
 
 install(FILES

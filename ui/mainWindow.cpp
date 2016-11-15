@@ -61,7 +61,6 @@
 #include "plannerdlg.h"
 #include "eigenGraspDlg.h"
 #include "compliantPlannerDlg.h"
-#include "optimizerDlg.h"
 #include "gfoDlg.h"
 #include "contactExaminerDlg.h"
 #include "egPlannerDlg.h"
@@ -145,7 +144,6 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(mUI->stereoFlip_leftrightAction, SIGNAL(triggered()), this, SLOT(stereoFlip()));
   // -- misc menu
   QObject::connect(mUI->dynamicsArch_BuilderAction, SIGNAL(triggered()), this, SLOT(archBuilder()));
-  QObject::connect(mUI->miscOptimizerAction, SIGNAL(triggered()), this, SLOT(miscOptimizer()));
   QObject::connect(mUI->miscEigengridsAction, SIGNAL(triggered()), this, SLOT(miscEigengridsAction_activated()));
   // -- contacts
   QObject::connect(mUI->contactsListBox, SIGNAL(highlighted(int)), this, SLOT(contactSelected(int)));
@@ -919,14 +917,6 @@ void MainWindow::archBuilder()
 	}
 	bool addSupports = dlg.supportsCheckBox->isChecked();
 	create_arch(world, innerRadius, outerRadius, thickness, nBlocks, addSupports);
-}
-
-void MainWindow::miscOptimizer()
-{
-	OptimizerDlg* dlg = new OptimizerDlg(world, mWindow);
-	dlg->setAttribute(Qt::WA_ShowModal, false);
-	dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-	dlg->show();  
 }
 
 void MainWindow::miscEigengridsAction_activated()
