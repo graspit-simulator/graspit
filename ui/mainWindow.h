@@ -125,7 +125,6 @@ public Q_SLOTS:
 	void stereoFlip();
 	//-------------
 	void archBuilder();
-	void miscOptimizer();
 	void miscEigengridsAction_activated();
 	//-------------
 	void updateContactsList();
