@@ -127,7 +127,6 @@ public Q_SLOTS:
 	void archBuilder();
 	void miscOptimizer();
 	void miscEigengridsAction_activated();
-	void miscArizonaProjectDlg_activated();
 	//-------------
 	void updateContactsList();
 	void contactSelected(int newSelection);

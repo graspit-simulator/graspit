@@ -70,9 +70,6 @@
 #include "DBase/dbasePlannerDlg.h"
 #include "graspit_db_model.h"
 #endif
-#ifdef ARIZONA_PROJECT_ENABLED
-#include "arizona/arizonaProjectDlg.h"
-#endif
 #include "gloveCalibrationDlg.h"
 #include "graspCaptureDlg.h"
 #include "barrettHandDlg.h"
@@ -149,8 +146,6 @@ MainWindow::MainWindow(QWidget *parent)
   // -- misc menu
   QObject::connect(mUI->dynamicsArch_BuilderAction, SIGNAL(triggered()), this, SLOT(archBuilder()));
   QObject::connect(mUI->miscOptimizerAction, SIGNAL(triggered()), this, SLOT(miscOptimizer()));
-  QObject::connect(mUI->actionArizona_Project, SIGNAL(triggered()), 
-                   this, SLOT(miscArizonaProjectDlg_activated()));
   QObject::connect(mUI->miscEigengridsAction, SIGNAL(triggered()), this, SLOT(miscEigengridsAction_activated()));
   // -- contacts
   QObject::connect(mUI->contactsListBox, SIGNAL(highlighted(int)), this, SLOT(contactSelected(int)));
@@ -606,12 +601,6 @@ void MainWindow::updateGraspMenu()
     mUI->dbasePlannerAction->setEnabled(false);
 #endif
     
-#ifdef ARIZONA_PROJECT_ENABLED
-    mUI->actionArizona_Project->setEnabled(true);
-#else
-    mUI->actionArizona_Project->setEnabled(false);
-#endif
-    
     mUI->dbaseGraspCaptureAction->setEnabled(handFound);
     mUI->sensorsBarrett_HandAction->setEnabled(handFound);
 }
@@ -812,17 +801,6 @@ void MainWindow::dbasePlannerAction_activated()
   }
   DBasePlannerDlg *dlg = new DBasePlannerDlg(mWindow, graspitCore->getDBMgr(),
                                              world->getGB(gb)->getDBModel(), world->getCurrentHand());
-  dlg->setAttribute(Qt::WA_ShowModal, false);
-  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
-  dlg->show();
-#endif
-}
-
-
-void MainWindow::miscArizonaProjectDlg_activated()
-{
-#ifdef ARIZONA_PROJECT_ENABLED
-  ArizonaProjectDlg *dlg = new ArizonaProjectDlg(mWindow);
   dlg->setAttribute(Qt::WA_ShowModal, false);
   dlg->setAttribute(Qt::WA_DeleteOnClose, true);
   dlg->show();
