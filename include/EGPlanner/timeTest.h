@@ -30,35 +30,35 @@ class Hand;
 class Body;
 
 /*! \file
-	These classes are ment to measure the performace of the system in 
-	testing states. Mostly relevant for doing autograsp tests.
+  These classes are ment to measure the performace of the system in
+  testing states. Mostly relevant for doing autograsp tests.
 */
 
 //! Generates random states and tests them, but also keeps count of how many it has tested
 class TimeTester : public SimAnnPlanner
 {
-private:
-	void mainLoop();
-protected:
-	int mCount,mIllegalCount;
-public:
-	TimeTester(Hand *h) : SimAnnPlanner(h){}
-	virtual PlannerType getType(){return PLANNER_TIME_TEST;}
+  private:
+    void mainLoop();
+  protected:
+    int mCount, mIllegalCount;
+  public:
+    TimeTester(Hand *h) : SimAnnPlanner(h) {}
+    virtual PlannerType getType() {return PLANNER_TIME_TEST;}
 
-	void startPlanner();
-	int getCount(){return mCount;}
-	int getIllegal(){return mIllegalCount;}
+    void startPlanner();
+    int getCount() {return mCount;}
+    int getIllegal() {return mIllegalCount;}
 };
 
 //! Starts a number of children of the TimeTester type, and times each of them
 class MTTester : public TimeTester
 {
-private:
-	TimeTester *startChild();
-	std::vector<TimeTester*> mChildren;
-	void mainLoop(){}
-public:
-	MTTester(Hand *h) : TimeTester(h){}
-	void startPlanner();
-	void pausePlanner();
+  private:
+    TimeTester *startChild();
+    std::vector<TimeTester *> mChildren;
+    void mainLoop() {}
+  public:
+    MTTester(Hand *h) : TimeTester(h) {}
+    void startPlanner();
+    void pausePlanner();
 };

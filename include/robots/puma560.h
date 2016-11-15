@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: puma560.h,v 1.2 2009/03/25 22:10:23 cmatei Exp $
 //
@@ -35,24 +35,24 @@ struct Puma560Solution;
 //! Specifically for the Puma 560 Arm.  Contains analytical inverse kinematics solution
 /*! This class was created specifically for the Puma 560 Arm because we can
     override the generic inverse kinematics routine with one that solves them
-    analytically.  
+    analytically.
 */
 class Puma560 : public Robot {
-  //! There are 8 possible solutions because of the different possible arm configurations
-  static const int NUM_SOLUTIONS;
+    //! There are 8 possible solutions because of the different possible arm configurations
+    static const int NUM_SOLUTIONS;
 
-  /*! Helper routine to find which of the 8 solutions is closest to the current
-      position of the arm.
-  */
-  int findClosestSol(Puma560Solution *candidates, Puma560Solution *current);
+    /*! Helper routine to find which of the 8 solutions is closest to the current
+        position of the arm.
+    */
+    int findClosestSol(Puma560Solution *candidates, Puma560Solution *current);
 
- public:
-  /* Empty constructor */
-  Puma560(World *w,const char *name) : Robot(w,name) {}
+  public:
+    /* Empty constructor */
+    Puma560(World *w, const char *name) : Robot(w, name) {}
 
-  /* Solves the inverse kinematics of the puma arm analytically. */
-  virtual int invKinematics(const transf& endTran,double* dofVals,
-			    int chainNum=0);
+    /* Solves the inverse kinematics of the puma arm analytically. */
+    virtual int invKinematics(const transf &endTran, double *dofVals,
+                              int chainNum = 0);
 };
 
 #define PUMA560_H

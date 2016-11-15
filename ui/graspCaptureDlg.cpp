@@ -47,209 +47,209 @@
 #include "DBase/DBPlanner/sql_database_manager.h"
 #endif
 
-void 
+void
 GraspCaptureDlg::init(World *w) {
-	mWorld = w;
-	QObject::connect(mWorld, SIGNAL(graspsUpdated()), this, SLOT(updateQuality()));
-	mIndicator = new QualityIndicator(this);
-	mIndicator->setAttribute(Qt::WA_ShowModal, false);
-	mIndicator->setAttribute(Qt::WA_DeleteOnClose, false);
-	mIndicator->show();
-	mQualEpsilon = NULL;
-	mQualVolume = NULL;
-	mCurrentHand = NULL;
-	saveToDBaseButton->setEnabled(FALSE);
+  mWorld = w;
+  QObject::connect(mWorld, SIGNAL(graspsUpdated()), this, SLOT(updateQuality()));
+  mIndicator = new QualityIndicator(this);
+  mIndicator->setAttribute(Qt::WA_ShowModal, false);
+  mIndicator->setAttribute(Qt::WA_DeleteOnClose, false);
+  mIndicator->show();
+  mQualEpsilon = NULL;
+  mQualVolume = NULL;
+  mCurrentHand = NULL;
+  saveToDBaseButton->setEnabled(FALSE);
 
-    if (graspitCore->getDBMgr()) {
-		saveToDBaseButton->setEnabled(TRUE);
-	} else {
-		QTWARNING("DBase connection not found; only Save to File possible.");
-		saveToDBaseButton->setEnabled(FALSE);
-	}
+  if (graspitCore->getDBMgr()) {
+    saveToDBaseButton->setEnabled(TRUE);
+  } else {
+    QTWARNING("DBase connection not found; only Save to File possible.");
+    saveToDBaseButton->setEnabled(FALSE);
+  }
 }
 
 GraspCaptureDlg::~GraspCaptureDlg()
 {
-	mIndicator->close();
-	delete mIndicator;
-	clearListButtonClicked();
-	delete mQualEpsilon;
-	delete mQualVolume;
+  mIndicator->close();
+  delete mIndicator;
+  clearListButtonClicked();
+  delete mQualEpsilon;
+  delete mQualVolume;
 }
 
 bool
 GraspCaptureDlg::checkHandSelection()
 {
-	Hand *hand = mWorld->getCurrentHand();
-	if (!hand) return false;
-	if (mCurrentHand != hand) {
-		mCurrentHand = hand;
-		delete mQualEpsilon;
-		mQualEpsilon = new QualEpsilon(hand->getGrasp(), QString("Grasp_recorder_qm"), "L1 Norm");
-		delete mQualVolume; 
-		mQualVolume = new QualVolume(hand->getGrasp(), QString("Grasp_recorder_qm"), "L1 Norm");
-	}
-	GraspableBody *body = hand->getGrasp()->getObject();
-	if (!body) return false;
-	return true;
+  Hand *hand = mWorld->getCurrentHand();
+  if (!hand) { return false; }
+  if (mCurrentHand != hand) {
+    mCurrentHand = hand;
+    delete mQualEpsilon;
+    mQualEpsilon = new QualEpsilon(hand->getGrasp(), QString("Grasp_recorder_qm"), "L1 Norm");
+    delete mQualVolume;
+    mQualVolume = new QualVolume(hand->getGrasp(), QString("Grasp_recorder_qm"), "L1 Norm");
+  }
+  GraspableBody *body = hand->getGrasp()->getObject();
+  if (!body) { return false; }
+  return true;
 }
 
-void 
+void
 GraspCaptureDlg::captureButtonClicked()
 {
-	if (!checkHandSelection()) return;
-	if (!mWorld->noCollision()) {
-		DBGA("COLLISION");
-		return;
-	}
-	mWorld->findAllContacts();
-	mWorld->updateGrasps();
-        double quality = mQualEpsilon->evaluate();
-        if (!allowNonFCBox->isChecked() && quality < 0.0) {
-		DBGA("NON FORCE CLOSURE");
-		return;
-	}
-	GraspPlanningState *newState = new GraspPlanningState(mCurrentHand);
-	newState->setPostureType(POSE_DOF, false);
-	GraspableBody *body = mCurrentHand->getGrasp()->getObject();
-	newState->setRefTran(body->getTran());
-	newState->setObject(body);
-	newState->setEpsilonQuality( std::max(0.0, quality) );
-	newState->setVolume( std::max(0.0, quality) );
-	newState->saveCurrentHandState();
-	for (int i=0; i<mCurrentHand->getGrasp()->getNumContacts(); i++) {
-		newState->getContacts()->push_back( mCurrentHand->getGrasp()->getContact(i)->getPosition() );
-	}
-	mGrasps.push_back(newState);
-	updateNumGrasps();
+  if (!checkHandSelection()) { return; }
+  if (!mWorld->noCollision()) {
+    DBGA("COLLISION");
+    return;
+  }
+  mWorld->findAllContacts();
+  mWorld->updateGrasps();
+  double quality = mQualEpsilon->evaluate();
+  if (!allowNonFCBox->isChecked() && quality < 0.0) {
+    DBGA("NON FORCE CLOSURE");
+    return;
+  }
+  GraspPlanningState *newState = new GraspPlanningState(mCurrentHand);
+  newState->setPostureType(POSE_DOF, false);
+  GraspableBody *body = mCurrentHand->getGrasp()->getObject();
+  newState->setRefTran(body->getTran());
+  newState->setObject(body);
+  newState->setEpsilonQuality(std::max(0.0, quality));
+  newState->setVolume(std::max(0.0, quality));
+  newState->saveCurrentHandState();
+  for (int i = 0; i < mCurrentHand->getGrasp()->getNumContacts(); i++) {
+    newState->getContacts()->push_back(mCurrentHand->getGrasp()->getContact(i)->getPosition());
+  }
+  mGrasps.push_back(newState);
+  updateNumGrasps();
 
-    if (graspitCore->getDBMgr()) {
-		saveToDBaseButton->setEnabled(TRUE);
-	} else {
-		saveToDBaseButton->setEnabled(FALSE);
-	}
+  if (graspitCore->getDBMgr()) {
+    saveToDBaseButton->setEnabled(TRUE);
+  } else {
+    saveToDBaseButton->setEnabled(FALSE);
+  }
 }
 
-void 
+void
 GraspCaptureDlg::saveToFileButtonClicked()
 {
-	DBGA("Foo");
-	if (mGrasps.empty()) {
-		DBGA("No recorded grasps to save");
-		return;
-	}
-	QString fn( QFileDialog::getSaveFileName(this, QString(), 
-				QString(getenv("GRASPIT")), "Text Files (*.txt)") );
-	if ( fn.isEmpty() ) return;
-    if (fn.section('.',1).isEmpty()) fn.append(".txt");
-	FILE *fp = fopen(fn.ascii(), "a");
-	if (!fp) {
-		DBGA("Failed to open save file " << fn.ascii());
-		return;
-	}
-	std::list<GraspPlanningState*>::iterator it;
-	for (it=mGrasps.begin(); it!=mGrasps.end(); it++) {
-		(*it)->writeToFile(fp);
-	}
-	fclose(fp);
-	DBGA("Grasps saved.");
+  DBGA("Foo");
+  if (mGrasps.empty()) {
+    DBGA("No recorded grasps to save");
+    return;
+  }
+  QString fn(QFileDialog::getSaveFileName(this, QString(),
+                                          QString(getenv("GRASPIT")), "Text Files (*.txt)"));
+  if (fn.isEmpty()) { return; }
+  if (fn.section('.', 1).isEmpty()) { fn.append(".txt"); }
+  FILE *fp = fopen(fn.ascii(), "a");
+  if (!fp) {
+    DBGA("Failed to open save file " << fn.ascii());
+    return;
+  }
+  std::list<GraspPlanningState *>::iterator it;
+  for (it = mGrasps.begin(); it != mGrasps.end(); it++) {
+    (*it)->writeToFile(fp);
+  }
+  fclose(fp);
+  DBGA("Grasps saved.");
 }
 
 /*! Saves the current list of grasps in the CGDB, if an interface exists.
-	However, when we save in the CGDB, we need more information than we
-	currently store in the HandObjectState. 
+  However, when we save in the CGDB, we need more information than we
+  currently store in the HandObjectState.
 */
-void 
+void
 GraspCaptureDlg::saveToDBaseButtonClicked()
 {
 #ifndef CGDB_ENABLED
-	return;
+  return;
 #else
-    db_planner::DatabaseManager *dbMgr = graspitCore->getDBMgr();
-	if (!dbMgr) return;
-	std::list<GraspPlanningState*>::iterator it;
-	std::vector<db_planner::Grasp*> graspList;
-	for (it=mGrasps.begin(); it!=mGrasps.end(); it++) {
-		GraspitDBModel* dbModel= (*it)->getObject()->getDBModel();
-		if (!dbModel) {
-			DBGA("Model not from database!");
-			continue;
-		}
-		db_planner::Grasp* grasp = new GraspitDBGrasp(mCurrentHand);
-		grasp->SetSourceModel( *(static_cast<db_planner::Model*>(dbModel)) );
-		grasp->SetHandName(mCurrentHand->getDBName().toStdString());
-		grasp->SetEpsilonQuality((*it)->getEpsilonQuality());
-		grasp->SetVolumeQuality((*it)->getVolume());
-		grasp->SetEnergy( - 30*(*it)->getEpsilonQuality() - 100*(*it)->getVolume() );
-		//Hard-coded source: human operator
-		//should have a ComboBox here where the operator can select a source from what 
-		//options the database gives us
-		grasp->SetSource("HUMAN_REFINED");
+  db_planner::DatabaseManager *dbMgr = graspitCore->getDBMgr();
+  if (!dbMgr) { return; }
+  std::list<GraspPlanningState *>::iterator it;
+  std::vector<db_planner::Grasp *> graspList;
+  for (it = mGrasps.begin(); it != mGrasps.end(); it++) {
+    GraspitDBModel *dbModel = (*it)->getObject()->getDBModel();
+    if (!dbModel) {
+      DBGA("Model not from database!");
+      continue;
+    }
+    db_planner::Grasp *grasp = new GraspitDBGrasp(mCurrentHand);
+    grasp->SetSourceModel(*(static_cast<db_planner::Model *>(dbModel)));
+    grasp->SetHandName(mCurrentHand->getDBName().toStdString());
+    grasp->SetEpsilonQuality((*it)->getEpsilonQuality());
+    grasp->SetVolumeQuality((*it)->getVolume());
+    grasp->SetEnergy(- 30 * (*it)->getEpsilonQuality() - 100 * (*it)->getVolume());
+    //Hard-coded source: human operator
+    //should have a ComboBox here where the operator can select a source from what
+    //options the database gives us
+    grasp->SetSource("HUMAN_REFINED");
 
-		std::vector<double> tempArray;
-		//the posture
-		for(int i = 0; i < (*it)->getPosture()->getNumVariables(); ++i){
-			tempArray.push_back((*it)->getPosture()->getVariable(i)->getValue());
-		}
-		grasp->SetPregraspJoints(tempArray);
-		grasp->SetFinalgraspJoints(tempArray);
+    std::vector<double> tempArray;
+    //the posture
+    for (int i = 0; i < (*it)->getPosture()->getNumVariables(); ++i) {
+      tempArray.push_back((*it)->getPosture()->getVariable(i)->getValue());
+    }
+    grasp->SetPregraspJoints(tempArray);
+    grasp->SetFinalgraspJoints(tempArray);
 
-		//the position
-		tempArray.clear();
-		for(int i = 0; i < (*it)->getPosition()->getNumVariables(); ++i){
-			tempArray.push_back((*it)->getPosition()->getVariable(i)->getValue());
-		}
-		grasp->SetPregraspPosition(tempArray);
-		grasp->SetFinalgraspPosition(tempArray);
+    //the position
+    tempArray.clear();
+    for (int i = 0; i < (*it)->getPosition()->getNumVariables(); ++i) {
+      tempArray.push_back((*it)->getPosition()->getVariable(i)->getValue());
+    }
+    grasp->SetPregraspPosition(tempArray);
+    grasp->SetFinalgraspPosition(tempArray);
 
-		//the contacts
-		std::list<position> *contacts;
-		tempArray.clear();
-		contacts = (*it)->getContacts();
-		std::list<position>::iterator itContact;
-		for(itContact = contacts->begin(); itContact != contacts->end(); ++itContact){
-			tempArray.push_back((*itContact).x());
-			tempArray.push_back((*itContact).y());
-			tempArray.push_back((*itContact).z());
-		}
-		grasp->SetContacts(tempArray);
-		//store this
-		graspList.push_back(grasp);
-	}
-	dbMgr->SaveGrasps(graspList);
-	DBGA(graspList.size() << " grasps successfully saved to database");
-	for(size_t i = 0; i < graspList.size(); ++i){
-		delete graspList[i];
-	}
-	//just to make sure we can't click twice by mistake
-	clearListButtonClicked();
+    //the contacts
+    std::list<position> *contacts;
+    tempArray.clear();
+    contacts = (*it)->getContacts();
+    std::list<position>::iterator itContact;
+    for (itContact = contacts->begin(); itContact != contacts->end(); ++itContact) {
+      tempArray.push_back((*itContact).x());
+      tempArray.push_back((*itContact).y());
+      tempArray.push_back((*itContact).z());
+    }
+    grasp->SetContacts(tempArray);
+    //store this
+    graspList.push_back(grasp);
+  }
+  dbMgr->SaveGrasps(graspList);
+  DBGA(graspList.size() << " grasps successfully saved to database");
+  for (size_t i = 0; i < graspList.size(); ++i) {
+    delete graspList[i];
+  }
+  //just to make sure we can't click twice by mistake
+  clearListButtonClicked();
 #endif
 }
 
 void
 GraspCaptureDlg::updateNumGrasps()
 {
-	QString num;
-	num.setNum((int)mGrasps.size());
-	recordedGraspsLabel->setText("Recorded grasps: " + num);
+  QString num;
+  num.setNum((int)mGrasps.size());
+  recordedGraspsLabel->setText("Recorded grasps: " + num);
 }
 
-void 
+void
 GraspCaptureDlg::clearListButtonClicked()
 {
-	while (!mGrasps.empty()) {
-		delete mGrasps.back();
-		mGrasps.pop_back();
-	}
-	updateNumGrasps();
+  while (!mGrasps.empty()) {
+    delete mGrasps.back();
+    mGrasps.pop_back();
+  }
+  updateNumGrasps();
 }
 
 void
 GraspCaptureDlg::updateQuality()
 {
-	double quality = 0.0;
-	if (checkHandSelection()) {
-		quality = mQualEpsilon->evaluate();
-	}
-	mIndicator->setBar( std::max(0.0, quality) );
+  double quality = 0.0;
+  if (checkHandSelection()) {
+    quality = mQualEpsilon->evaluate();
+  }
+  mIndicator->setBar(std::max(0.0, quality));
 }

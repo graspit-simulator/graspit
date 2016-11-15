@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the simulation world that controls interactions between the world elements
  */
 #ifndef WORLD_HXX
@@ -69,7 +69,7 @@ typedef std::vector<CollisionData> CollisionReport;
 
 class CollisionInterface;
 class BoundingBox;
-class TiXmlElement; 
+class TiXmlElement;
 class SoGroup;
 class SoSeparator;
 class SoIdleSensor;
@@ -86,416 +86,416 @@ class SoSensor;
     later.
  */
 class World : public QObject {
-  Q_OBJECT ;
+    Q_OBJECT ;
 
-protected:
-  //! Pointer to the IVmgr who controls the simulation
-  IVmgr *myIVmgr;
+  protected:
+    //! Pointer to the IVmgr who controls the simulation
+    IVmgr *myIVmgr;
 
-  //! Keeps track of the current simulation time.
-  double worldTime;
+    //! Keeps track of the current simulation time.
+    double worldTime;
 
-  //! A vector of pointers to ALL of the bodies in the world
-  std::vector<Body *> bodyVec;
+    //! A vector of pointers to ALL of the bodies in the world
+    std::vector<Body *> bodyVec;
 
-  //! A vector of pointers to the graspable bodies in the world
-  std::vector<GraspableBody *> GBVec;
+    //! A vector of pointers to the graspable bodies in the world
+    std::vector<GraspableBody *> GBVec;
 
-  //! A vector of pointers to the robots defined within this world
-  std::vector<Robot *> robotVec;        
+    //! A vector of pointers to the robots defined within this world
+    std::vector<Robot *> robotVec;
 
-  //! A vector of pointers to the hands defined within this world
-  std::vector<Hand *> handVec;
+    //! A vector of pointers to the hands defined within this world
+    std::vector<Hand *> handVec;
 
-  //! The number of bodies currently in this world
-  int numBodies;
+    //! The number of bodies currently in this world
+    int numBodies;
 
-  //! The number of graspable bodies currently in this world
-  int numGB;
+    //! The number of graspable bodies currently in this world
+    int numGB;
 
-  //! The number of robots currently in this world
-  int numRobots;
+    //! The number of robots currently in this world
+    int numRobots;
 
-  //! The number of hands currently in this world
-  int numHands;
+    //! The number of hands currently in this world
+    int numHands;
 
-  //! The number of currently selected elements
-  int numSelectedElements;
+    //! The number of currently selected elements
+    int numSelectedElements;
 
-  //! The number of currently selected body elements
-  int numSelectedBodyElements;
+    //! The number of currently selected body elements
+    int numSelectedBodyElements;
 
-  //! The number of currently selected body elements
-  int numSelectedRobotElements;
+    //! The number of currently selected body elements
+    int numSelectedRobotElements;
 
-  //! The number of currently selected bodies
-  int numSelectedBodies;
+    //! The number of currently selected bodies
+    int numSelectedBodies;
 
-  //! Keeps track of whether the world has been modified since the last save
-  bool modified;
+    //! Keeps track of whether the world has been modified since the last save
+    bool modified;
 
-  //! Keeps track of which hand is currently the focus of menu commands
-  Hand *currentHand;
+    //! Keeps track of which hand is currently the focus of menu commands
+    Hand *currentHand;
 
-  //! A list of pointers to the currently selected worldElements
-  std::list<WorldElement *> selectedElementList;
+    //! A list of pointers to the currently selected worldElements
+    std::list<WorldElement *> selectedElementList;
 
-  //! A vector of pointers to the currently selected bodies
-  std::vector<Body *> selectedBodyVec;
-  
-  //! keeps track is a tendon is selected or not
-  bool isTendonSelected;
+    //! A vector of pointers to the currently selected bodies
+    std::vector<Body *> selectedBodyVec;
 
-  //! pointer to selected tendon
-  Tendon* selectedTendon;
+    //! keeps track is a tendon is selected or not
+    bool isTendonSelected;
 
-  //! A flag to determine if collions checking is on or off
-  bool allCollisionsOFF;
+    //! pointer to selected tendon
+    Tendon *selectedTendon;
 
-  //! Turns on or off soft contacts, needs a switch in the Iv environment
-  bool softContactsON;
+    //! A flag to determine if collions checking is on or off
+    bool allCollisionsOFF;
 
-  //! A pointer to the collision detection instance
-  CollisionInterface *mCollisionInterface;
+    //! Turns on or off soft contacts, needs a switch in the Iv environment
+    bool softContactsON;
 
-  //! A pointer to the dynamics engine
-  DynamicsEngine *mDynamicsEngine;
+    //! A pointer to the collision detection instance
+    CollisionInterface *mCollisionInterface;
 
-  //! A pointer to the root of the world's Inventor scene graph
-  SoSeparator *IVRoot;
+    //! A pointer to the dynamics engine
+    DynamicsEngine *mDynamicsEngine;
 
-  //! The number of materials defined within this world
-  int numMaterials;
-  
-  //! A vector of strings, one for each material name
-  std::vector<QString> materialNames;
+    //! A pointer to the root of the world's Inventor scene graph
+    SoSeparator *IVRoot;
 
-  //! A numMaterials x numMaterials array of static coefficient of friction values
-  double **cofTable;
+    //! The number of materials defined within this world
+    int numMaterials;
 
-  //! A numMaterials x numMaterials array of kinetic coefficient of friction values
-  double **kcofTable;
+    //! A vector of strings, one for each material name
+    std::vector<QString> materialNames;
 
-  //! A flag to determine whether dynamics is currently being used or not
-  bool dynamicsOn;
+    //! A numMaterials x numMaterials array of static coefficient of friction values
+    double **cofTable;
 
-  //! A pointer to the Inventor idle sensor that is used when dynamics is on
-  SoIdleSensor *idleSensor;
+    //! A numMaterials x numMaterials array of kinetic coefficient of friction values
+    double **kcofTable;
 
-  //! The length of the default dynamics time step
-  double dynamicsTimeStep;  
+    //! A flag to determine whether dynamics is currently being used or not
+    bool dynamicsOn;
 
-  //! Reads the user preferences for the world settings.  Under
-  void readSettings();
+    //! A pointer to the Inventor idle sensor that is used when dynamics is on
+    SoIdleSensor *idleSensor;
 
-  //! Saves the user preferences for the world settings.  
-  void saveSettings();
+    //! The length of the default dynamics time step
+    double dynamicsTimeStep;
 
-  //! Static callback routine for the dynamic operations idle sensor.
-  static void dynamicsCB(void *data,SoSensor *sensor);
-  
-  friend class Body;
-  friend class DynamicBody;
-  friend class MainWindow;
+    //! Reads the user preferences for the world settings.  Under
+    void readSettings();
 
-Q_SIGNALS:
-  //! Signal that a dynamic step has been completed
-  void dynamicStepTaken();
+    //! Saves the user preferences for the world settings.
+    void saveSettings();
 
-  //! Signal a dynamics error has occured with an error string
-  void dynamicsError(const char *errMsg);
+    //! Static callback routine for the dynamic operations idle sensor.
+    static void dynamicsCB(void *data, SoSensor *sensor);
 
-  //! Signal that selections have changed
-  void selectionsChanged();
+    friend class Body;
+    friend class DynamicBody;
+    friend class MainWindow;
 
-  //! Signal that the number of world elements has changed
-  void numElementsChanged();
+  Q_SIGNALS:
+    //! Signal that a dynamic step has been completed
+    void dynamicStepTaken();
 
-  //! Signal that a hand was removed from the world
-  void handRemoved();
+    //! Signal a dynamics error has occured with an error string
+    void dynamicsError(const char *errMsg);
 
-  //! Signal that all grasps have been updated
-  void graspsUpdated();
+    //! Signal that selections have changed
+    void selectionsChanged();
 
-  //! Signal we want have changed the currently selected hand from within the code
-  void handSelectionChanged();
+    //! Signal that the number of world elements has changed
+    void numElementsChanged();
 
-  //! Signal that a tendon has been (de)selected
-  void tendonSelectionChanged();
+    //! Signal that a hand was removed from the world
+    void handRemoved();
 
-  //! Signal that the selected tendon's status has changed
-  void tendonDetailsChanged();
+    //! Signal that all grasps have been updated
+    void graspsUpdated();
 
-public:	
-  //! public constructor
-  World(QObject *parent=0, const char *name=0);
+    //! Signal we want have changed the currently selected hand from within the code
+    void handSelectionChanged();
 
-  //! Saves the current user settings in the registry and clears the world
-  ~World();
-  
-  //! Returns the number of bodies in this world
-  int getNumBodies() const {return numBodies;}
+    //! Signal that a tendon has been (de)selected
+    void tendonSelectionChanged();
 
-  //! Returns the number of graspable bodies in this world
-  int getNumGB() const {return numGB;}
+    //! Signal that the selected tendon's status has changed
+    void tendonDetailsChanged();
 
-  //! Returns the number of robots in this world
-  int getNumRobots() const {return numRobots;}
+  public:
+    //! public constructor
+    World(QObject *parent = 0, const char *name = 0);
 
-  //! Returns the number of hands in this world
-  int getNumHands() const {return numHands;}
+    //! Saves the current user settings in the registry and clears the world
+    ~World();
 
-  //! Returns the number of materials defined in this world
-  int getNumMaterials() const {return numMaterials;}
+    //! Returns the number of bodies in this world
+    int getNumBodies() const {return numBodies;}
 
-  //! Returns the material index of the material named by matName
-  int getMaterialIdx(const QString &matName) const; 
+    //! Returns the number of graspable bodies in this world
+    int getNumGB() const {return numGB;}
 
-  //! Returns the name of the material with index i 
-  QString getMaterialName(int i) const {return materialNames[i];}
+    //! Returns the number of robots in this world
+    int getNumRobots() const {return numRobots;}
 
-  //! Returns the number of selected body elements 
-  int getNumSelectedBodyElements() const {return numSelectedBodyElements;}
-  
-  //! Returns the number of selected robot elements 
-  int getNumSelectedRobotElements() const {return numSelectedRobotElements;}
+    //! Returns the number of hands in this world
+    int getNumHands() const {return numHands;}
 
-  //! Returns the number of selected world elements 
-  int getNumSelectedElements() const {return numSelectedElements;}
+    //! Returns the number of materials defined in this world
+    int getNumMaterials() const {return numMaterials;}
 
-  //! Returns the number of selected bodies 
-  int getNumSelectedBodies() const {return numSelectedBodies;}
+    //! Returns the material index of the material named by matName
+    int getMaterialIdx(const QString &matName) const;
 
-  //! Returns a pointer to the i-th selected body in the world 
-  Body *getSelectedBody(int i) const {return selectedBodyVec[i];}
+    //! Returns the name of the material with index i
+    QString getMaterialName(int i) const {return materialNames[i];}
 
-  //! returns the number of tendons in the currently selected hand 
-  int getCurrentHandNumberTendons();
+    //! Returns the number of selected body elements
+    int getNumSelectedBodyElements() const {return numSelectedBodyElements;}
 
-  //! Returns the currently selected tendond 
-  Tendon* getSelectedTendon(){return selectedTendon;}
+    //! Returns the number of selected robot elements
+    int getNumSelectedRobotElements() const {return numSelectedRobotElements;}
 
-  //! returns the name of the i-th tendon of the currently selected hand 
-  QString getSelectedHandTendonName(int i);
+    //! Returns the number of selected world elements
+    int getNumSelectedElements() const {return numSelectedElements;}
 
-  //! returns a pointer to the dynamics engine
-  DynamicsEngine * getDynamicsEngine();
+    //! Returns the number of selected bodies
+    int getNumSelectedBodies() const {return numSelectedBodies;}
 
-  //! query whether a tendon is selected or not 
-  bool queryTendonSelected(){return isTendonSelected;}
+    //! Returns a pointer to the i-th selected body in the world
+    Body *getSelectedBody(int i) const {return selectedBodyVec[i];}
 
-  //! Set selected tendon 
-  void selectTendon(Tendon *t);
+    //! returns the number of tendons in the currently selected hand
+    int getCurrentHandNumberTendons();
 
-  //! Sets the selected tendon, receives an index into the selected hand's list of tendons 
-  void selectTendon(int i);
+    //! Returns the currently selected tendond
+    Tendon *getSelectedTendon() {return selectedTendon;}
 
-  //!deselect tendon 
-  void deselectTendon();
+    //! returns the name of the i-th tendon of the currently selected hand
+    QString getSelectedHandTendonName(int i);
 
-  //! Q_SIGNALS that a tendon has changed status, we need to update the tendon status bar 
-  void tendonChange(){Q_EMIT tendonDetailsChanged();}
+    //! returns a pointer to the dynamics engine
+    DynamicsEngine *getDynamicsEngine();
 
-  //! Returns the static coefficient of friction between two materials
-  double getCOF(int mat1,int mat2) {return cofTable[mat1][mat2];}
+    //! query whether a tendon is selected or not
+    bool queryTendonSelected() {return isTendonSelected;}
 
-  //! Returns the kinetic coefficient of friction between two materials
-  double getKCOF(int mat1,int mat2) {return kcofTable[mat1][mat2];}
+    //! Set selected tendon
+    void selectTendon(Tendon *t);
 
-  //! Returns the current simulation time for this world 
-  double getWorldTime() const {return worldTime;}
+    //! Sets the selected tendon, receives an index into the selected hand's list of tendons
+    void selectTendon(int i);
 
-  //! Returns the current simulation time reference for this world
-  double& getWorldTimeRef() {return worldTime;}
+    //!deselect tendon
+    void deselectTendon();
 
-  //! Returns the default timestep for this world 
-  double getTimeStep() const {return dynamicsTimeStep;}
-  
-  //! Returns whether this world has been modified since the last save. 
-  bool wasModified() const {return modified;}
+    //! Q_SIGNALS that a tendon has changed status, we need to update the tendon status bar
+    void tendonChange() {Q_EMIT tendonDetailsChanged();}
 
-  //! Returns the root of the Inventor scene graph for this world 
-  SoSeparator *getIVRoot() const {return IVRoot;}
+    //! Returns the static coefficient of friction between two materials
+    double getCOF(int mat1, int mat2) {return cofTable[mat1][mat2];}
 
-  //! Returns axis-aligned bounding box min and max points of the world
-  void getBoundingBox(vec3& minPoint, vec3& maxPoint);
+    //! Returns the kinetic coefficient of friction between two materials
+    double getKCOF(int mat1, int mat2) {return kcofTable[mat1][mat2];}
 
-  //! Returns a pointer to the i-th body defined in this world 
-  Body *getBody(int i) const {return bodyVec[i];}
+    //! Returns the current simulation time for this world
+    double getWorldTime() const {return worldTime;}
 
-  //! Returns a pointer to the i-th graspable body defined in this world 
-  GraspableBody *getGB(int i) const {return GBVec[i];}
+    //! Returns the current simulation time reference for this world
+    double &getWorldTimeRef() {return worldTime;}
 
-  //! Returns a pointer to the i-th hand defined in this world 
-  Hand *getHand(int i) const {return handVec[i];}
+    //! Returns the default timestep for this world
+    double getTimeStep() const {return dynamicsTimeStep;}
 
-  //! Returns a pointer to the i-th robot defined in this world 
-  Robot *getRobot(int i) const {return robotVec[i];}
+    //! Returns whether this world has been modified since the last save.
+    bool wasModified() const {return modified;}
 
-  //! Returns whether the world element pointed to by e is currently selected or not
-  bool isSelected(WorldElement *e) const;
+    //! Returns the root of the Inventor scene graph for this world
+    SoSeparator *getIVRoot() const {return IVRoot;}
 
-  //! Returns a list of pointers to the currently selected world elements 
-  const std::list<WorldElement *>& getSelectedElementList() const {return selectedElementList;}
+    //! Returns axis-aligned bounding box min and max points of the world
+    void getBoundingBox(vec3 &minPoint, vec3 &maxPoint);
 
-  //! Returns a pointer to the hand that is the focus of menu commands etc. 
-  Hand *getCurrentHand() const { return currentHand;}
+    //! Returns a pointer to the i-th body defined in this world
+    Body *getBody(int i) const {return bodyVec[i];}
 
-  //! Returns whether dynamics are currently running or not. 
-  bool dynamicsAreOn() const {return dynamicsOn;}
+    //! Returns a pointer to the i-th graspable body defined in this world
+    GraspableBody *getGB(int i) const {return GBVec[i];}
 
-  //! Returns whether  soft contacts are on 
-  bool softContactsAreOn() { return softContactsON; }
+    //! Returns a pointer to the i-th hand defined in this world
+    Hand *getHand(int i) const {return handVec[i];}
 
-  //! Sets all world settings to their original default values. 
-  void setDefaults();
+    //! Returns a pointer to the i-th robot defined in this world
+    Robot *getRobot(int i) const {return robotVec[i];}
 
-  //! Sets the ivmgr for the world.
-  void setIVMgr(IVmgr *ivmgr){myIVmgr = ivmgr;}
+    //! Returns whether the world element pointed to by e is currently selected or not
+    bool isSelected(WorldElement *e) const;
 
-  //! Sets the world modified flag.  Should be done when a change has since the last save. 
-  void setModified() {modified = true;}
+    //! Returns a list of pointers to the currently selected world elements
+    const std::list<WorldElement *> &getSelectedElementList() const {return selectedElementList;}
 
-  //! Loads the saved world from the file in filename. 
-  int load(const QString &filename);
+    //! Returns a pointer to the hand that is the focus of menu commands etc.
+    Hand *getCurrentHand() const { return currentHand;}
 
-  //! Loads the saved world from the XML file in filename.
-  int loadFromXml(const TiXmlElement* root,QString rootPath);
+    //! Returns whether dynamics are currently running or not.
+    bool dynamicsAreOn() const {return dynamicsOn;}
 
-  //! Save the current state of the world to a file.
-  int save(const QString &filename);
-  
-  //! Creates a new body of type \a bodyType, then calls the load routine of that body
-  Body *importBody(QString bodyType,QString filename);
+    //! Returns whether  soft contacts are on
+    bool softContactsAreOn() { return softContactsON; }
 
-  //! Creates a new body of type \a bodyType, then calls the loadFromXml routine of that body
-  Body *importBodyFromXml(QString bodyType, const TiXmlElement* child, QString rootPath);
+    //! Sets all world settings to their original default values.
+    void setDefaults();
 
-  //! Adds an already populated body to the world, but not to collision detection system
-  void addBody(Body *body);
+    //! Sets the ivmgr for the world.
+    void setIVMgr(IVmgr *ivmgr) {myIVmgr = ivmgr;}
 
-  //! Links are loaded in during the robot load method, but are added to the world with this routine
-  void addLink(Link *newLink);
+    //! Sets the world modified flag.  Should be done when a change has since the last save.
+    void setModified() {modified = true;}
 
-  //! Called when the user selects a new hand from the drop down menu.
-  void setCurrentHand(Hand *hand) {currentHand = hand; Q_EMIT handSelectionChanged();}
+    //! Loads the saved world from the file in filename.
+    int load(const QString &filename);
 
-  //! Creates a robot, loads it from a file and adds it to the world
-  Robot *importRobot(QString filename);
-	
-  //! Adds an already populated robot to the world,and possibly to the scene graph
-  void addRobot(Robot *robot, bool addToScene = true);
+    //! Loads the saved world from the XML file in filename.
+    int loadFromXml(const TiXmlElement *root, QString rootPath);
 
-  //! Removes the robot pointed to by robot from the world, then deletes it.
-  void removeRobot(Robot *robot);
+    //! Save the current state of the world to a file.
+    int save(const QString &filename);
 
-  //! Creates a new dynamic body from the data in the body pointed to by b.
-  DynamicBody *makeBodyDynamic(Body *b, double mass);
+    //! Creates a new body of type \a bodyType, then calls the load routine of that body
+    Body *importBody(QString bodyType, QString filename);
 
-  //! Deselects all currently selected world elements.
-  void deselectAll();
+    //! Creates a new body of type \a bodyType, then calls the loadFromXml routine of that body
+    Body *importBodyFromXml(QString bodyType, const TiXmlElement *child, QString rootPath);
 
-  //! Adds the worldElement pointed to by e to the list of selected elements.
-  void selectElement(WorldElement *e);
+    //! Adds an already populated body to the world, but not to collision detection system
+    void addBody(Body *body);
 
-  //! Removes the worldElement pointed to by e from the list of selected elements.
-  void deselectElement(WorldElement *e);
+    //! Links are loaded in during the robot load method, but are added to the world with this routine
+    void addLink(Link *newLink);
 
-  //! Removes the element pointed to by e from the world 
-  void destroyElement(WorldElement *e, bool deleteElement = true);
-  
-  //! Turns the collision detection system on or off
-  void toggleAllCollisions(bool on);
+    //! Called when the user selects a new hand from the drop down menu.
+    void setCurrentHand(Hand *hand) {currentHand = hand; Q_EMIT handSelectionChanged();}
 
-  //! Toggle collisions for a world element (robot or body)
-  void toggleCollisions(bool on, WorldElement *e1,WorldElement *e2=NULL);
+    //! Creates a robot, loads it from a file and adds it to the world
+    Robot *importRobot(QString filename);
 
-  //! Check if collisions are enabled for a world element (robot or body)
-  bool collisionsAreOff(WorldElement *e1=NULL, WorldElement *e2=NULL);
+    //! Adds an already populated robot to the world,and possibly to the scene graph
+    void addRobot(Robot *robot, bool addToScene = true);
 
-  //! Checks if collision between an entire robot and another element are on
-  bool robotCollisionsAreOff(Robot *r, WorldElement *e);
+    //! Removes the robot pointed to by robot from the world, then deletes it.
+    void removeRobot(Robot *robot);
 
-  //! Answers true if there are no collisions in the world, potentially involving a specified element.
-  bool noCollision(WorldElement *e=NULL);
+    //! Creates a new dynamic body from the data in the body pointed to by b.
+    DynamicBody *makeBodyDynamic(Body *b, double mass);
 
-  //! Queries the collision detection system for a report of which pairs of bodies are colliding.
-  int getCollisionReport(CollisionReport *colReport, const std::vector<Body*> *interestList = NULL);
+    //! Deselects all currently selected world elements.
+    void deselectAll();
 
-  //! Returns the minimum distance in mm between the two bodies; deprecated, use version on world elements
-  // double getDist(Body *b1,Body *b2);
+    //! Adds the worldElement pointed to by e to the list of selected elements.
+    void selectElement(WorldElement *e);
 
-  //! Returns the minimum distance in mm between the two world elements
-  double getDist(WorldElement *e1, WorldElement *e2);
+    //! Removes the worldElement pointed to by e from the list of selected elements.
+    void deselectElement(WorldElement *e);
 
-  //! Returns the minimum distance in mm between the two bodies as well as the points on the bodies that are closest.
-  double getDist(Body *b1,Body *b2, position &p1, position &p2);
+    //! Removes the element pointed to by e from the world
+    void destroyElement(WorldElement *e, bool deleteElement = true);
 
-  //! Finds every contact occurring between the pairs of bodies listed in the colReport.
-  void findContacts(CollisionReport &colReport);
+    //! Turns the collision detection system on or off
+    void toggleAllCollisions(bool on);
 
-  //! Finds all contacts occurring on body b.  
-  void findContacts(Body *b);
+    //! Toggle collisions for a world element (robot or body)
+    void toggleCollisions(bool on, WorldElement *e1, WorldElement *e2 = NULL);
 
-  //! Finds all the contacts occuring in the world.
-  void findAllContacts();
+    //! Check if collisions are enabled for a world element (robot or body)
+    bool collisionsAreOff(WorldElement *e1 = NULL, WorldElement *e2 = NULL);
 
-  //! Sets up virtual contacts on all links at the closest points to a given body.
-  void findVirtualContacts(Hand *hand, Body *object);
+    //! Checks if collision between an entire robot and another element are on
+    bool robotCollisionsAreOff(Robot *r, WorldElement *e);
 
-  //! Helper function that finds the closest point on a link to an object
-  ContactData findVirtualContact(Link *link, Body* object);
+    //! Answers true if there are no collisions in the world, potentially involving a specified element.
+    bool noCollision(WorldElement *e = NULL);
 
-  //! Returns the bounding boxes from the collision detection bounding box hierarchy of a body.
-  void getBvs(Body *b, int depth, std::vector<BoundingBox> *bvs);
+    //! Queries the collision detection system for a report of which pairs of bodies are colliding.
+    int getCollisionReport(CollisionReport *colReport, const std::vector<Body *> *interestList = NULL);
 
-  //! Updates the grasp for any hand that has had contacts change since its grasp was last updated.
-  void updateGrasps();
+    //! Returns the minimum distance in mm between the two bodies; deprecated, use version on world elements
+    // double getDist(Body *b1,Body *b2);
 
-  //! Resets the external wrench accumulator for all the dynamic bodies.
-  void resetDynamicWrenches();
+    //! Returns the minimum distance in mm between the two world elements
+    double getDist(WorldElement *e1, WorldElement *e2);
 
-  //! Starts the dynamic simulation for this world.
-  void turnOnDynamics();
+    //! Returns the minimum distance in mm between the two bodies as well as the points on the bodies that are closest.
+    double getDist(Body *b1, Body *b2, position &p1, position &p2);
 
-  //! Stops the dynamic simulation process.
-  void turnOffDynamics();
+    //! Finds every contact occurring between the pairs of bodies listed in the colReport.
+    void findContacts(CollisionReport &colReport);
 
-  //! Resets dynamic simulation. Clears the dynamic stack, fixes all robot bases
-  void resetDynamics();
+    //! Finds all contacts occurring on body b.
+    void findContacts(Body *b);
 
-  //! One complete step of the dynamics simulation. 
-  void stepDynamics();
+    //! Finds all the contacts occuring in the world.
+    void findAllContacts();
 
-  //! Calls upon each dynamic body to save its current dynamic state to the top of its stack of states.
-  void pushDynamicState();
+    //! Sets up virtual contacts on all links at the closest points to a given body.
+    void findVirtualContacts(Hand *hand, Body *object);
 
-  //! Restores the most recent dynamic state of each dynamic body by popping the state of each body's local stack.
-  void popDynamicState();
+    //! Helper function that finds the closest point on a link to an object
+    ContactData findVirtualContact(Link *link, Body *object);
 
-  //! Finds a region around a given point on a body through the collision detection system
-  void FindRegion( const Body *body, position point, vec3 normal, double radius,
-	  			   Neighborhood *neighborhood);
+    //! Returns the bounding boxes from the collision detection bounding box hierarchy of a body.
+    void getBvs(Body *b, int depth, std::vector<BoundingBox> *bvs);
 
-  //! Returns the collision interface being used
-  CollisionInterface *getCollisionInterface() {return mCollisionInterface;}
+    //! Updates the grasp for any hand that has had contacts change since its grasp was last updated.
+    void updateGrasps();
 
-  //! Computes the distance between a point and a body
-  vec3 pointDistanceToBody(position p, Body *b, vec3* normal = NULL);
+    //! Resets the external wrench accumulator for all the dynamic bodies.
+    void resetDynamicWrenches();
 
-  //! Adds back to the scene graph an element that has been removed
-  void addElementToSceneGraph(WorldElement *e);
-  //! Removes from the scene graph an element that is already part of this world
-  void removeElementFromSceneGraph(WorldElement *e);
+    //! Starts the dynamic simulation for this world.
+    void turnOnDynamics();
 
-  //! Emits the signal that informs that grasps have been updated
-  void emitGraspsUpdated(){Q_EMIT graspsUpdated();}
+    //! Stops the dynamic simulation process.
+    void turnOffDynamics();
 
-  //! Emits the signal that dynamics error has occured with an error string
-  void emitdynamicsError(const char *errMsg){Q_EMIT dynamicsError(errMsg);}
+    //! Resets dynamic simulation. Clears the dynamic stack, fixes all robot bases
+    void resetDynamics();
 
-  //! Emits the Signal that a dynamic step has been completed
-  void emitDynamicStepTaken(){Q_EMIT dynamicStepTaken();}
+    //! One complete step of the dynamics simulation.
+    void stepDynamics();
+
+    //! Calls upon each dynamic body to save its current dynamic state to the top of its stack of states.
+    void pushDynamicState();
+
+    //! Restores the most recent dynamic state of each dynamic body by popping the state of each body's local stack.
+    void popDynamicState();
+
+    //! Finds a region around a given point on a body through the collision detection system
+    void FindRegion(const Body *body, position point, vec3 normal, double radius,
+                    Neighborhood *neighborhood);
+
+    //! Returns the collision interface being used
+    CollisionInterface *getCollisionInterface() {return mCollisionInterface;}
+
+    //! Computes the distance between a point and a body
+    vec3 pointDistanceToBody(position p, Body *b, vec3 *normal = NULL);
+
+    //! Adds back to the scene graph an element that has been removed
+    void addElementToSceneGraph(WorldElement *e);
+    //! Removes from the scene graph an element that is already part of this world
+    void removeElementFromSceneGraph(WorldElement *e);
+
+    //! Emits the signal that informs that grasps have been updated
+    void emitGraspsUpdated() {Q_EMIT graspsUpdated();}
+
+    //! Emits the signal that dynamics error has occured with an error string
+    void emitdynamicsError(const char *errMsg) {Q_EMIT dynamicsError(errMsg);}
+
+    //! Emits the Signal that a dynamic step has been completed
+    void emitDynamicStepTaken() {Q_EMIT dynamicStepTaken();}
 };
 
 #define WORLD_HXX

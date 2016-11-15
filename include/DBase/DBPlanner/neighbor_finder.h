@@ -22,7 +22,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the %NeighborFinder class
  */
 
@@ -40,18 +40,18 @@ namespace db_planner {
 //! A class to find Models that are neighbors of some input.
 template <class Query>
 class NeighborFinder {
- public:
-  //! This virtual function finds neighboring models to a given Model. This
-  //! base version always fails regardless of input.
-  //! WARNING: "num_neighbors" is decieving - implementations should returns from 
-  //! num_neighbors to 2 x num_neighbors results, because whenever possible
-  //! neighbors should be duplicated at the scale above and below the given Model.           
-  virtual bool Find(const Query& /*query*/, 
-                    const int /*num_neighbors*/,
-                    vector<pair<Model*, double> >* /*neighbors*/) const {
-    return false;
-  }; 
-  virtual ~NeighborFinder() {}
+  public:
+    //! This virtual function finds neighboring models to a given Model. This
+    //! base version always fails regardless of input.
+    //! WARNING: "num_neighbors" is decieving - implementations should returns from
+    //! num_neighbors to 2 x num_neighbors results, because whenever possible
+    //! neighbors should be duplicated at the scale above and below the given Model.
+    virtual bool Find(const Query & /*query*/,
+                      const int /*num_neighbors*/,
+                      vector<pair<Model *, double> > * /*neighbors*/) const {
+      return false;
+    };
+    virtual ~NeighborFinder() {}
 };
 
 

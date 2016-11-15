@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
 \brief Implements the simulation world....
 */
 
@@ -85,7 +85,7 @@
 #include "dmalloc.h"
 #endif
 
-FILE *errFP=NULL;
+FILE *errFP = NULL;
 
 #include "debug.h"
 
@@ -107,30 +107,30 @@ char graspitVersionStr[] = "GraspIt! version 2.1";
 
 /*! Prepares an empty world. \a mgr is the instance of the inventor manager
 that will handle all user interaction. Also initialized collision detection
-system and reads in global settings such as friction coefficients 
+system and reads in global settings such as friction coefficients
 */
 World::World(QObject *parent, const char *name) :
-    QObject(parent,name),
-    myIVmgr(NULL)
+  QObject(parent, name),
+  myIVmgr(NULL)
 {
-	numBodies = numGB = numRobots = numHands = 0;
-	numSelectedBodyElements = numSelectedRobotElements = 0;
-	numSelectedElements = 0;
-	numSelectedBodies = 0;
-	currentHand = NULL;
+  numBodies = numGB = numRobots = numHands = 0;
+  numSelectedBodyElements = numSelectedRobotElements = 0;
+  numSelectedElements = 0;
+  numSelectedBodies = 0;
+  currentHand = NULL;
 
-	isTendonSelected = false;
-	selectedTendon = NULL;
+  isTendonSelected = false;
+  selectedTendon = NULL;
 
-	worldTime = 0.0;
-	modified = false;
+  worldTime = 0.0;
+  modified = false;
 
-	allCollisionsOFF = false;
-	softContactsON = true;
+  allCollisionsOFF = false;
+  softContactsON = true;
 
-	cofTable=kcofTable=NULL;
-	// set up the world parameters 
-	readSettings();  
+  cofTable = kcofTable = NULL;
+  // set up the world parameters
+  readSettings();
 
 #ifdef PQP_COLLISION
   mCollisionInterface = new PQPCollision();
@@ -139,15 +139,15 @@ World::World(QObject *parent, const char *name) :
   mCollisionInterface = new GraspitCollision();
 #endif
 
-	IVRoot = new SoSeparator;
-	IVRoot->ref();
+  IVRoot = new SoSeparator;
+  IVRoot->ref();
 
-	idleSensor = NULL;
-	dynamicsOn = false;
+  idleSensor = NULL;
+  dynamicsOn = false;
 
-        // This has to happen at runtime, so it's placed here
-        // maybe we can find a better solution at some point.
-        WorldElementFactory::registerBuiltinCreators();
+  // This has to happen at runtime, so it's placed here
+  // maybe we can find a better solution at some point.
+  WorldElementFactory::registerBuiltinCreators();
 
 #ifdef GRASPIT_DYNAMICS
   mDynamicsEngine = new GraspitDynamics(this);
@@ -162,74 +162,75 @@ along with all the objects that populate it.
 */
 World::~World()
 {
-	int i;
-	DBGP("Deleting world");
+  int i;
+  DBGP("Deleting world");
 
-	saveSettings();
+  saveSettings();
 
-	for (i=0;i<numMaterials;i++) {
-		free(cofTable[i]);
-		free(kcofTable[i]);
-	}
-	free(cofTable);
-	free(kcofTable);
+  for (i = 0; i < numMaterials; i++) {
+    free(cofTable[i]);
+    free(kcofTable[i]);
+  }
+  free(cofTable);
+  free(kcofTable);
 
-	for (i=numRobots-1;i>=0;i--)
-		destroyElement(robotVec[i]);
+  for (i = numRobots - 1; i >= 0; i--) {
+    destroyElement(robotVec[i]);
+  }
 
-	for (i=numBodies-1;i>=0;i--) {
-		DBGP("Deleting body: " << i <<" "<<bodyVec[i]->getName().latin1());
-		destroyElement(bodyVec[i]);
-	}
+  for (i = numBodies - 1; i >= 0; i--) {
+    DBGP("Deleting body: " << i << " " << bodyVec[i]->getName().latin1());
+    destroyElement(bodyVec[i]);
+  }
 
-	if (idleSensor) delete idleSensor;
-	delete mCollisionInterface;
-    delete mDynamicsEngine;
-	IVRoot->unref();
+  if (idleSensor) { delete idleSensor; }
+  delete mCollisionInterface;
+  delete mDynamicsEngine;
+  IVRoot->unref();
 }
 
 
 /*! Returns axis-aligned bounding box min and max points of the world
  */
-void World::getBoundingBox(vec3& minPoint, vec3& maxPoint)
+void World::getBoundingBox(vec3 &minPoint, vec3 &maxPoint)
 {
-    minPoint.set(0,0,0);
-    maxPoint.set(0,0,0);
+  minPoint.set(0, 0, 0);
+  maxPoint.set(0, 0, 0);
 
-    // viewport required for any viewport-dependent 
-    // nodes (eg text), but not required for others
-    SbViewportRegion anyVP(0,0);  
-    SoGetBoundingBoxAction bbAction( anyVP );
-    bbAction.apply( IVRoot );
-    SbBox3f bbox = bbAction.getBoundingBox();
-    const SbVec3f& minIV = bbox.getMin();
-    const SbVec3f& maxIV = bbox.getMax();
-    minPoint.set(minIV[0], minIV[1], minIV[2]);
-    maxPoint.set(maxIV[0], maxIV[1], maxIV[2]);
+  // viewport required for any viewport-dependent
+  // nodes (eg text), but not required for others
+  SbViewportRegion anyVP(0, 0);
+  SoGetBoundingBoxAction bbAction(anyVP);
+  bbAction.apply(IVRoot);
+  SbBox3f bbox = bbAction.getBoundingBox();
+  const SbVec3f &minIV = bbox.getMin();
+  const SbVec3f &maxIV = bbox.getMax();
+  minPoint.set(minIV[0], minIV[1], minIV[2]);
+  maxPoint.set(maxIV[0], maxIV[1], maxIV[2]);
 }
 
-/*! Returns the material id of a material with name \a matName 
+/*! Returns the material id of a material with name \a matName
 */
 int
 World::getMaterialIdx(const QString &matName) const
 {
-	for (int i=0; i<numMaterials; i++) {
-		if (materialNames[i] == matName) return i;
-	}
-	return -1;
+  for (int i = 0; i < numMaterials; i++) {
+    if (materialNames[i] == matName) { return i; }
+  }
+  return -1;
 }
 
 
-/*! Returns the material name of a material with id \a matIdx 
+/*! Returns the material name of a material with id \a matIdx
 */
 /**
 int
 World::getMaterialName(int matIdx, QString &matName) const
 {
-	if(i<0||i>=numMaterials)
-		return FAILURE;
-	matName = materialNames[i];
-	return SUCCESS;
+  if(i<0||i>=numMaterials)
+    return FAILURE;
+  matName = materialNames[i];
+  return SUCCESS;
 }
 */
 
@@ -240,696 +241,701 @@ later, when the application is started again.
 void
 World::setDefaults()
 {
-	int i;
-	dynamicsTimeStep = 0.0025;
+  int i;
+  dynamicsTimeStep = 0.0025;
 
-	if (cofTable) {
-		for (i=0;i<numMaterials;i++) {
-			free(cofTable[i]);
-			free(kcofTable[i]);
-		}
-		free(cofTable);
-		free(kcofTable);
-	}
+  if (cofTable) {
+    for (i = 0; i < numMaterials; i++) {
+      free(cofTable[i]);
+      free(kcofTable[i]);
+    }
+    free(cofTable);
+    free(kcofTable);
+  }
 
-	numMaterials = 7;
-	cofTable = (double **)malloc(numMaterials*sizeof(double *));
-	kcofTable = (double **)malloc(numMaterials*sizeof(double *));
-	for (i=0;i<numMaterials;i++) {
-		cofTable[i] = (double *)malloc(numMaterials*sizeof(double));
-		kcofTable[i] = (double *)malloc(numMaterials*sizeof(double));
-	}
+  numMaterials = 7;
+  cofTable = (double **)malloc(numMaterials * sizeof(double *));
+  kcofTable = (double **)malloc(numMaterials * sizeof(double *));
+  for (i = 0; i < numMaterials; i++) {
+    cofTable[i] = (double *)malloc(numMaterials * sizeof(double));
+    kcofTable[i] = (double *)malloc(numMaterials * sizeof(double));
+  }
 
-	materialNames.clear();
-	materialNames.push_back("frictionless");
-	materialNames.push_back("glass");
-	materialNames.push_back("metal");
-	materialNames.push_back("plastic");
-	materialNames.push_back("wood");
-	materialNames.push_back("rubber");
-	materialNames.push_back("stone");
+  materialNames.clear();
+  materialNames.push_back("frictionless");
+  materialNames.push_back("glass");
+  materialNames.push_back("metal");
+  materialNames.push_back("plastic");
+  materialNames.push_back("wood");
+  materialNames.push_back("rubber");
+  materialNames.push_back("stone");
 
-	//frictionless
-	for (i=0;i<7;i++) {
-		cofTable[0][i] = cofTable[i][0] = 0.0;
-		kcofTable[0][i] = kcofTable[i][0] = 0.0;
-	}
+  //frictionless
+  for (i = 0; i < 7; i++) {
+    cofTable[0][i] = cofTable[i][0] = 0.0;
+    kcofTable[0][i] = kcofTable[i][0] = 0.0;
+  }
 
-	//stone
-	cofTable[6][6] = 0.7;
-	cofTable[6][1] = cofTable[1][6] = 0.3;
-	cofTable[6][2] = cofTable[2][6] = 0.4;
-	cofTable[6][3] = cofTable[3][6] = 0.4;
-	cofTable[6][4] = cofTable[4][6] = 0.6;
-	cofTable[6][5] = cofTable[5][6] = 1.5;
-	kcofTable[6][6] = 0.6;
-	kcofTable[6][1] = kcofTable[1][6] = 0.2;
-	kcofTable[6][2] = kcofTable[2][6] = 0.3;
-	kcofTable[6][3] = kcofTable[3][6] = 0.3;
-	kcofTable[6][4] = kcofTable[4][6] = 0.5;
-	kcofTable[6][5] = kcofTable[5][6] = 1.4;
+  //stone
+  cofTable[6][6] = 0.7;
+  cofTable[6][1] = cofTable[1][6] = 0.3;
+  cofTable[6][2] = cofTable[2][6] = 0.4;
+  cofTable[6][3] = cofTable[3][6] = 0.4;
+  cofTable[6][4] = cofTable[4][6] = 0.6;
+  cofTable[6][5] = cofTable[5][6] = 1.5;
+  kcofTable[6][6] = 0.6;
+  kcofTable[6][1] = kcofTable[1][6] = 0.2;
+  kcofTable[6][2] = kcofTable[2][6] = 0.3;
+  kcofTable[6][3] = kcofTable[3][6] = 0.3;
+  kcofTable[6][4] = kcofTable[4][6] = 0.5;
+  kcofTable[6][5] = kcofTable[5][6] = 1.4;
 
-	//glass
-	cofTable[1][1] = 0.2;
-	cofTable[1][2] = cofTable[2][1] = 0.2;
-	cofTable[1][3] = cofTable[3][1] = 0.2;
-	cofTable[1][4] = cofTable[4][1] = 0.3;
-	cofTable[1][5] = cofTable[5][1] = 1.0;
-	kcofTable[1][1] = 0.1;
-	kcofTable[1][2] = kcofTable[2][1] = 0.1;
-	kcofTable[1][3] = kcofTable[3][1] = 0.1;
-	kcofTable[1][4] = kcofTable[4][1] = 0.2;
-	kcofTable[1][5] = kcofTable[5][1] = 0.9;
+  //glass
+  cofTable[1][1] = 0.2;
+  cofTable[1][2] = cofTable[2][1] = 0.2;
+  cofTable[1][3] = cofTable[3][1] = 0.2;
+  cofTable[1][4] = cofTable[4][1] = 0.3;
+  cofTable[1][5] = cofTable[5][1] = 1.0;
+  kcofTable[1][1] = 0.1;
+  kcofTable[1][2] = kcofTable[2][1] = 0.1;
+  kcofTable[1][3] = kcofTable[3][1] = 0.1;
+  kcofTable[1][4] = kcofTable[4][1] = 0.2;
+  kcofTable[1][5] = kcofTable[5][1] = 0.9;
 
-	//metal
-	cofTable[2][2] = 0.2;
-	cofTable[2][3] = cofTable[3][2] = 0.2;
-	cofTable[2][4] = cofTable[4][2] = 0.3;
-	cofTable[2][5] = cofTable[5][2] = 1.0;
-	kcofTable[2][2] = 0.1;
-	kcofTable[2][3] = kcofTable[3][2] = 0.1;
-	kcofTable[2][4] = kcofTable[4][2] = 0.2;
-	kcofTable[2][5] = kcofTable[5][2] = 0.9;
+  //metal
+  cofTable[2][2] = 0.2;
+  cofTable[2][3] = cofTable[3][2] = 0.2;
+  cofTable[2][4] = cofTable[4][2] = 0.3;
+  cofTable[2][5] = cofTable[5][2] = 1.0;
+  kcofTable[2][2] = 0.1;
+  kcofTable[2][3] = kcofTable[3][2] = 0.1;
+  kcofTable[2][4] = kcofTable[4][2] = 0.2;
+  kcofTable[2][5] = kcofTable[5][2] = 0.9;
 
-	//plastic
-	cofTable[3][3] = 0.3;
-	cofTable[3][4] = cofTable[4][3] = 0.4;
-	cofTable[3][5] = cofTable[5][3] = 1.0;
-	kcofTable[3][3] = 0.2;
-	kcofTable[3][4] = kcofTable[4][3] = 0.3;
-	kcofTable[3][5] = kcofTable[5][3] = 0.9;
+  //plastic
+  cofTable[3][3] = 0.3;
+  cofTable[3][4] = cofTable[4][3] = 0.4;
+  cofTable[3][5] = cofTable[5][3] = 1.0;
+  kcofTable[3][3] = 0.2;
+  kcofTable[3][4] = kcofTable[4][3] = 0.3;
+  kcofTable[3][5] = kcofTable[5][3] = 0.9;
 
-	//wood
-	cofTable[4][4] = 0.4;
-	cofTable[4][5] = cofTable[5][4] = 1.0;
-	kcofTable[4][4] = 0.3;
-	kcofTable[4][5] = kcofTable[5][4] = 0.9;
+  //wood
+  cofTable[4][4] = 0.4;
+  cofTable[4][5] = cofTable[5][4] = 1.0;
+  kcofTable[4][4] = 0.3;
+  kcofTable[4][5] = kcofTable[5][4] = 0.9;
 
-	//rubber
-	cofTable[5][5] = 2.0;
-	kcofTable[5][5] = 1.9;
+  //rubber
+  cofTable[5][5] = 2.0;
+  kcofTable[5][5] = 1.9;
 }
 
 /*! Reads in previously saved coefficients and parameters, if they exist. In Windows,
-they are read from the registry, in Linux they should be read from a file. It seems 
-that currently only the Window implementation is here. If they don't exist, the 
+they are read from the registry, in Linux they should be read from a file. It seems
+that currently only the Window implementation is here. If they don't exist, the
 default values are used.
 */
 void
 World::readSettings()
 {
-    QString organization = "graspit";
-    QString application = "graspit";
-    QSettings settings(organization,application);
-    
-    int i,j,newNumMaterials;
-    double **newcofTable,**newkcofTable;
-    std::vector<QString> newMaterialNames;
+  QString organization = "graspit";
+  QString application = "graspit";
+  QSettings settings(organization, application);
 
-    setDefaults();
+  int i, j, newNumMaterials;
+  double **newcofTable, **newkcofTable;
+  std::vector<QString> newMaterialNames;
 
-    dynamicsTimeStep = settings.readDoubleEntry(QString("/GraspIt/") + QString("World/dynamicsTimeStep"),dynamicsTimeStep);
+  setDefaults();
 
-    newNumMaterials = settings.readNumEntry(QString("/GraspIt/") + QString("World/numMaterials"),numMaterials);
+  dynamicsTimeStep = settings.readDoubleEntry(QString("/GraspIt/") + QString("World/dynamicsTimeStep"), dynamicsTimeStep);
 
-	newcofTable = (double **)malloc(newNumMaterials*sizeof(double *));
-	newkcofTable = (double **)malloc(newNumMaterials*sizeof(double *));
-	newMaterialNames.resize(newNumMaterials, QString::null);
+  newNumMaterials = settings.readNumEntry(QString("/GraspIt/") + QString("World/numMaterials"), numMaterials);
 
-	for (i=0;i<newNumMaterials;i++) {
-		newcofTable[i] = (double *)malloc(newNumMaterials*sizeof(double));
-		newkcofTable[i] = (double *)malloc(newNumMaterials*sizeof(double));
-	}
+  newcofTable = (double **)malloc(newNumMaterials * sizeof(double *));
+  newkcofTable = (double **)malloc(newNumMaterials * sizeof(double *));
+  newMaterialNames.resize(newNumMaterials, QString::null);
 
-	for (i=0;i<numMaterials;i++) {
-        newMaterialNames[i] = settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i),materialNames[i]);
+  for (i = 0; i < newNumMaterials; i++) {
+    newcofTable[i] = (double *)malloc(newNumMaterials * sizeof(double));
+    newkcofTable[i] = (double *)malloc(newNumMaterials * sizeof(double));
+  }
 
-		for (j=i;j<numMaterials;j++) {
-			newcofTable[i][j] = newcofTable[j][i] =
-                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j),cofTable[i][j]);
+  for (i = 0; i < numMaterials; i++) {
+    newMaterialNames[i] = settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i), materialNames[i]);
 
-			newkcofTable[i][j] = newkcofTable[j][i] =
-                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j),kcofTable[i][j]);
-		}
+    for (j = i; j < numMaterials; j++) {
+      newcofTable[i][j] = newcofTable[j][i] =
+                            settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j), cofTable[i][j]);
 
-		for (;j<newNumMaterials;j++) {
-			newcofTable[i][j] = newcofTable[j][i] =
-                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
+      newkcofTable[i][j] = newkcofTable[j][i] =
+                             settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j), kcofTable[i][j]);
+    }
 
-			newkcofTable[i][j] = newkcofTable[j][i] =
-                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
-		}
-	}
-	for (;i<newNumMaterials;i++){
-        newMaterialNames.push_back(settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i)));
+    for (; j < newNumMaterials; j++) {
+      newcofTable[i][j] = newcofTable[j][i] =
+                            settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
 
-		for (j=i;j<newNumMaterials;j++) {
-			newcofTable[i][j] = newcofTable[j][i] =
-                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
+      newkcofTable[i][j] = newkcofTable[j][i] =
+                             settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
+    }
+  }
+  for (; i < newNumMaterials; i++) {
+    newMaterialNames.push_back(settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i)));
 
-			newkcofTable[i][j] = newkcofTable[j][i] =
-                settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
-		}
-	}
+    for (j = i; j < newNumMaterials; j++) {
+      newcofTable[i][j] = newcofTable[j][i] =
+                            settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
 
-	for (i=0;i<numMaterials;i++) {
-		free(cofTable[i]);
-		free(kcofTable[i]);
-	}
+      newkcofTable[i][j] = newkcofTable[j][i] =
+                             settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
+    }
+  }
 
-	free(cofTable);
-	free(kcofTable);
-	materialNames = newMaterialNames;
-	numMaterials = newNumMaterials;
-	cofTable = newcofTable;
-	kcofTable = newkcofTable;
+  for (i = 0; i < numMaterials; i++) {
+    free(cofTable[i]);
+    free(kcofTable[i]);
+  }
+
+  free(cofTable);
+  free(kcofTable);
+  materialNames = newMaterialNames;
+  numMaterials = newNumMaterials;
+  cofTable = newcofTable;
+  kcofTable = newkcofTable;
 }
 
 /*! Saves current global settings to the registry */
 void
 World::saveSettings()
 {
-    QString organization = "graspit";
-    QString application = "graspit";
-    QSettings settings(organization,application);
+  QString organization = "graspit";
+  QString application = "graspit";
+  QSettings settings(organization, application);
 
-    int i,j;
-    settings.writeEntry(QString("/GraspIt/") + QString("World/numMaterials"),numMaterials);
-	for (i=0;i<numMaterials;i++) {
-        settings.writeEntry(QString("/GraspIt/") + QString("World/material%1").arg(i),materialNames[i]);
-		for (j=i;j<numMaterials;j++) { 
-            settings.writeEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j),cofTable[i][j]);
-            settings.writeEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j),kcofTable[i][j]);
-		}
-	}
+  int i, j;
+  settings.writeEntry(QString("/GraspIt/") + QString("World/numMaterials"), numMaterials);
+  for (i = 0; i < numMaterials; i++) {
+    settings.writeEntry(QString("/GraspIt/") + QString("World/material%1").arg(i), materialNames[i]);
+    for (j = i; j < numMaterials; j++) {
+      settings.writeEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j), cofTable[i][j]);
+      settings.writeEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j), kcofTable[i][j]);
+    }
+  }
 }
 
 /*! Removes a world element (a robot or any kind of body) from the World.
 Also removes it from the scene graph and the collision detection system.
-If \a deleteElement is true, it also deletes it at the end. If it is a 
-graspable body and there is a grasp that references it, it associates 
+If \a deleteElement is true, it also deletes it at the end. If it is a
+graspable body and there is a grasp that references it, it associates
 the grasp with the first GB or NULL if none are left.
 */
 void
 World::destroyElement(WorldElement *e, bool deleteElement)
 {
-	std::vector<Body *>::iterator bp;
-	std::vector<GraspableBody *>::iterator gp;
-	std::vector<Robot *>::iterator rp;
-	std::vector<Hand *>::iterator hp;
-	DBGP("In remove element: " << e->className());
+  std::vector<Body *>::iterator bp;
+  std::vector<GraspableBody *>::iterator gp;
+  std::vector<Robot *>::iterator rp;
+  std::vector<Hand *>::iterator hp;
+  DBGP("In remove element: " << e->className());
 
-	if (e->inherits("Body")) {
-		DBGP("found a body");
-		mCollisionInterface->removeBody( (Body*) e);
-		for (bp=bodyVec.begin();bp!=bodyVec.end();bp++) {
-			if (*bp == e) {
-				bodyVec.erase(bp); numBodies--;
-				DBGP("removed body "<<((Body *)e)->getName().toStdString().c_str() <<" from world");
-				break;
-			}
-		}
-		for (gp=GBVec.begin();gp!=GBVec.end();gp++)  {
-			if (*gp == e) {
-				GBVec.erase(gp); numGB--;
-				for (hp=handVec.begin();hp!=handVec.end();hp++) {
-					if ((*hp)->getGrasp()->getObject() == e) {
-						if (numGB > 0)
-							(*hp)->getGrasp()->setObject(GBVec[0]);
-						else
-							(*hp)->getGrasp()->setObject(NULL);
-					}
-				}
-				DBGP("removed GB " << ((Body *)e)->getName().toStdString().c_str()<<" from world");
-				break;
-			}
-		}
-	}
+  if (e->inherits("Body")) {
+    DBGP("found a body");
+    mCollisionInterface->removeBody((Body *) e);
+    for (bp = bodyVec.begin(); bp != bodyVec.end(); bp++) {
+      if (*bp == e) {
+        bodyVec.erase(bp); numBodies--;
+        DBGP("removed body " << ((Body *)e)->getName().toStdString().c_str() << " from world");
+        break;
+      }
+    }
+    for (gp = GBVec.begin(); gp != GBVec.end(); gp++)  {
+      if (*gp == e) {
+        GBVec.erase(gp); numGB--;
+        for (hp = handVec.begin(); hp != handVec.end(); hp++) {
+          if ((*hp)->getGrasp()->getObject() == e) {
+            if (numGB > 0) {
+              (*hp)->getGrasp()->setObject(GBVec[0]);
+            }
+            else {
+              (*hp)->getGrasp()->setObject(NULL);
+            }
+          }
+        }
+        DBGP("removed GB " << ((Body *)e)->getName().toStdString().c_str() << " from world");
+        break;
+      }
+    }
+  }
 
-	if (e->inherits("Robot")) {
-		DBGP(" found a robot");
-		for (hp=handVec.begin();hp!=handVec.end();hp++)  {
-			if (*hp == e) {
-				handVec.erase(hp); numHands--;
-				if (currentHand == e) {
-					if (numHands > 0) currentHand = handVec[0];
-					else currentHand = NULL;
-				}
-				DBGP("removed hand " << ((Robot *)e)->getName().toStdString().c_str() << " from world");
-				Q_EMIT handRemoved();
-				break;
-			}
-		}
-		for (rp=robotVec.begin();rp!=robotVec.end();rp++) {
-			if (*rp == e) {
-				robotVec.erase(rp); numRobots--;
-				DBGP("removed robot " << ((Robot *)e)->getName().toStdString().c_str() << " from world");
-				break;
-			}
-		}
-	}
+  if (e->inherits("Robot")) {
+    DBGP(" found a robot");
+    for (hp = handVec.begin(); hp != handVec.end(); hp++)  {
+      if (*hp == e) {
+        handVec.erase(hp); numHands--;
+        if (currentHand == e) {
+          if (numHands > 0) { currentHand = handVec[0]; }
+          else { currentHand = NULL; }
+        }
+        DBGP("removed hand " << ((Robot *)e)->getName().toStdString().c_str() << " from world");
+        Q_EMIT handRemoved();
+        break;
+      }
+    }
+    for (rp = robotVec.begin(); rp != robotVec.end(); rp++) {
+      if (*rp == e) {
+        robotVec.erase(rp); numRobots--;
+        DBGP("removed robot " << ((Robot *)e)->getName().toStdString().c_str() << " from world");
+        break;
+      }
+    }
+  }
 
-	int idx = IVRoot->findChild(e->getIVRoot());
-	if (deleteElement) delete e;
-	else e->getIVRoot()->ref();
-	if (idx > -1)
-		IVRoot->removeChild(idx);
-	if (!deleteElement) e->getIVRoot()->unrefNoDelete();
+  int idx = IVRoot->findChild(e->getIVRoot());
+  if (deleteElement) { delete e; }
+  else { e->getIVRoot()->ref(); }
+  if (idx > -1) {
+    IVRoot->removeChild(idx);
+  }
+  if (!deleteElement) { e->getIVRoot()->unrefNoDelete(); }
 
-	Q_EMIT numElementsChanged();
-	modified = true;
+  Q_EMIT numElementsChanged();
+  modified = true;
 }
 
 /*! Loads a simulation world file. These usually consists of one or more robots,
-	graspable bodies and obstacles, each with its own transform. Optionally, 
-	a camera position might also be specified. Also restores any connections
-	between robots.
+  graspable bodies and obstacles, each with its own transform. Optionally,
+  a camera position might also be specified. Also restores any connections
+  between robots.
 */
 int
 World::load(const QString &filename)
 {
-	QString graspitRoot = getenv("GRASPIT");
-	graspitRoot.replace("\\","/");
-	if (graspitRoot.at(graspitRoot.size()-1)!='/') {
-		graspitRoot += "/";
-	}
-	//load the graspit specific information in XML format
-	TiXmlDocument doc(filename);
-	if(doc.LoadFile()==false){
-		QTWARNING("Could not open file " + filename);
-		return FAILURE;
-	}
-	const TiXmlElement*  root = doc.RootElement();
-	if(root==NULL){
-		QTWARNING("Empty XML");
-		return FAILURE;	
-	}
-	if (loadFromXml(root,graspitRoot) == FAILURE) {
-		return FAILURE;
-	}
-	return SUCCESS;
+  QString graspitRoot = getenv("GRASPIT");
+  graspitRoot.replace("\\", "/");
+  if (graspitRoot.at(graspitRoot.size() - 1) != '/') {
+    graspitRoot += "/";
+  }
+  //load the graspit specific information in XML format
+  TiXmlDocument doc(filename);
+  if (doc.LoadFile() == false) {
+    QTWARNING("Could not open file " + filename);
+    return FAILURE;
+  }
+  const TiXmlElement  *root = doc.RootElement();
+  if (root == NULL) {
+    QTWARNING("Empty XML");
+    return FAILURE;
+  }
+  if (loadFromXml(root, graspitRoot) == FAILURE) {
+    return FAILURE;
+  }
+  return SUCCESS;
 }
 
 int
-World::loadFromXml(const TiXmlElement* root,QString rootPath)
+World::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-	const TiXmlElement* child = root->FirstChildElement();
-	const TiXmlElement* xmlElement;
-	QString buf, elementType, matStr, elementPath, elementName,mountFilename;
-	Link *mountPiece;
-	QString line;
-	WorldElement *element=NULL;
-	transf tr;
-	int prevRobNum,chainNum,nextRobNum;
-	bool cameraFound;
-	while(child!=NULL){
-		elementType = child->Value();
-		if(elementType.isNull()){
-			QTWARNING("Empty Element Type");
-		}
-		if (elementType == "obstacle") {
-			xmlElement = findXmlElement(child, "filename");
-			bool loadFromFile=false;
-			if(xmlElement){
-				elementName = xmlElement->GetText();
-				elementPath = rootPath + elementName;
-				elementPath = elementPath.stripWhiteSpace();
-				DBGP("importing " << elementPath.latin1());
-				element = importBody("Body",elementPath);
-				if (!element) {
-					QTWARNING("Could not open " + elementPath);
-					return FAILURE;
-				}
-				loadFromFile = true;
-			}
-			xmlElement = findXmlElement(child, "body");
-			if(loadFromFile){
-				if(xmlElement) {
-					QTWARNING("Contains both filename and body info: Load From File");
-				}
-			} else{//load from body info
-				if(!xmlElement){
-					QTWARNING("Neither filename nor body info found");
-					return FAILURE;
-				}
-				DBGP("importing obstacle from body info");
-				element = importBodyFromXml("Body", xmlElement,rootPath);
-				if (!element) {
-					QTWARNING("Could not open file " + elementPath);
-					return FAILURE;
-				}
-			}
-			xmlElement = findXmlElement(child,"transform");
-			if(xmlElement){
-				if (getTransform(xmlElement,tr)==false) {
-					QTWARNING("Obstacle transformation Error");
-					return FAILURE;
-				}
-				element->setTran(tr);
-			}
-		}
-		else if (elementType == "graspableBody") {
-			xmlElement = findXmlElement(child, "filename");
-			bool loadFromFile = false;
-			if(xmlElement){
-				elementName = xmlElement->GetText();
-				elementPath = rootPath + elementName;
-				elementPath = elementPath.stripWhiteSpace();
-				DBGP("importing " << elementPath.latin1());
-				element = importBody("GraspableBody",elementPath);
-				if (!element) {
-					QTWARNING("Could not open " + elementPath);
-					return FAILURE;
-				}
-				loadFromFile = true;
-			}
-			xmlElement = findXmlElement(child, "body");
-			if(loadFromFile){
-				if(xmlElement) {
-					QTWARNING("Contains both filename and body info: Load From File");
-				}
-			}
-			else{//load from body info
-				if(!xmlElement){
-					QTWARNING("Neither filename nor body info found");
-					return FAILURE;
-				}
-				DBGP("importing graspable body from body info");
-				element = importBodyFromXml("GraspableBody", xmlElement,rootPath);
-				if (!element) {
-					QTWARNING("Could not open " + elementPath);
-					return FAILURE;
-				}
-			}
-			xmlElement = findXmlElement(child,"transform");
-			if(xmlElement){
-				if (getTransform(xmlElement,tr)==false) {
-					QTWARNING("GraspableBody transformation Error");
-					return FAILURE;
-				}
-				element->setTran(tr);
-			}			
-		}
-		else if (elementType == "robot") {
-			Robot *robot;
-			xmlElement = findXmlElement(child, "filename");
-			if(!xmlElement){
-				QTWARNING("Robot filename not found");
-				return FAILURE;
-			}
-			elementName = xmlElement->GetText();	
-			elementPath = rootPath + elementName;
-			DBGP("importing " << elementPath.latin1());
-			if ((robot = importRobot(elementPath))==NULL){
-				QTWARNING("Could not open " + elementPath);
-				return FAILURE;
-			}
-			element = robot;
-			xmlElement = findXmlElement(child,"dofValues");
-			if(xmlElement){
-				QString dofValues =  xmlElement->GetText();
-				dofValues = dofValues.stripWhiteSpace().simplifyWhiteSpace();
-				QTextStream lineStream(&dofValues,QIODevice::ReadOnly);
-				robot->readDOFVals(lineStream);
-			}
-			xmlElement = findXmlElement(child,"transform");
-			if(xmlElement){
-				if (getTransform(xmlElement,tr)==false) {
-					QTWARNING("Robot transformation Error");
-					return FAILURE;
-				}
-				element->setTran(tr);
-			}	
-		}
-		else if (elementType == "connection") {
-			if(!getInt(child, "parentRobot", prevRobNum)){
-				QTWARNING("Failed to load Parent Robot Number");
-				return FAILURE;
-			}
-			if(!getInt(child, "parentChain", chainNum)){
-				QTWARNING("Failed to load Parent Robot's Chain Number");
-				return FAILURE;
-			}
-			if(!getInt(child, "childRobot", nextRobNum)){
-				QTWARNING("Failed to load Child Robot Number");
-				return FAILURE;
-			}
-			if (prevRobNum < 0 || prevRobNum >= numRobots || nextRobNum < 0 ||
-				nextRobNum >= numRobots || chainNum < 0 || 
-				chainNum >= robotVec[prevRobNum]->getNumChains()) {
-                    QTWARNING("Error reading connection transform"); break;
-			}
-			xmlElement = findXmlElement( child, "transform");
-			if(xmlElement){
-				if (!getTransform(xmlElement,tr)) {
-					QTWARNING("Error reading connection transform"); break;
-				}
-			}
-			DBGP("offset tran " << tr);
-			xmlElement = findXmlElement(child, "mountFilename");
-			if(xmlElement){
-				mountFilename = xmlElement->GetText();
-				if (!mountFilename.isEmpty()) {
-					mountFilename = mountFilename.stripWhiteSpace();
-					KinematicChain *prevChain= robotVec[prevRobNum]->getChain(chainNum);
-					mountFilename = rootPath + mountFilename;
-					DBGA("Mount filename: " << mountFilename.latin1());
-					if ((mountPiece = robotVec[nextRobNum]->importMountPiece(mountFilename))) {
-						addLink(mountPiece);
-						toggleCollisions(false, prevChain->getLink(prevChain->getNumLinks()-1), mountPiece);
-						toggleCollisions(false, mountPiece,robotVec[nextRobNum]->getBase());
-					}
-					mountFilename=(char *)NULL;
-				}
-			}
-			robotVec[prevRobNum]->attachRobot(robotVec[nextRobNum],chainNum,tr);
-		}
-		else if (elementType == "camera" ) {
-			double px, py, pz, q1, q2, q3, q4, fd;
-			QStringList l;
-			xmlElement = findXmlElement(child,"position");
-			if(!xmlElement){
-				QTWARNING("Camera Position not found");
-				return FAILURE;
-			}
-			QString position = xmlElement->GetText();
-			position = position.simplifyWhiteSpace().stripWhiteSpace();
-			l = QStringList::split(' ', position);
-			if(l.count()!=3){
-				QTWARNING("Invalid camera position input");
-				return FAILURE;
-			}
-			bool ok1,ok2,ok3, ok4;
-			px = l[0].toDouble(&ok1);
-			py = l[1].toDouble(&ok2);
-			pz = l[2].toDouble(&ok3);
-			if(!ok1 || !ok2 || !ok3){
-				QTWARNING("Invalid camera position input");
-				return FAILURE;
-			}
-			xmlElement = findXmlElement(child,"orientation");
-			if(!xmlElement){
-				QTWARNING("Camera orientation not found");
-				return FAILURE;
-			}
-			QString orientation = xmlElement->GetText();
-			position = orientation.simplifyWhiteSpace().stripWhiteSpace();
-			l = QStringList::split(' ', orientation);
-			if(l.count()!=4){
-				QTWARNING("Invalid camera orientation input");
-				return FAILURE;
-			}
-			q1 = l[0].toDouble(&ok1);
-			q2 = l[1].toDouble(&ok2);
-			q3 = l[2].toDouble(&ok3);
-			q4 = l[3].toDouble(&ok4);
-			if(!ok1 || !ok2 || !ok3 || !ok4){
-				QTWARNING("Invalid camera position input");
-				return FAILURE;
-			}
-			if(!getDouble(child, "focalDistance", fd)){
-				QTWARNING("Failed to load focal distance");
-				return FAILURE;				
-			}
-            if (myIVmgr) {
-                myIVmgr->setCamera(px, py, pz, q1, q2, q3, q4, fd);
-            }else{
-                DBGA("Could not set camera");
-            }
-			cameraFound = true;
-		}
-		else {
-			QTWARNING(elementType + " is not a valid WorldElement type");
-			return FAILURE;
-		}
-		child = child->NextSiblingElement();
-	}
-
-	if (!cameraFound) {
-        if (myIVmgr) {
-            myIVmgr->getViewer()->viewAll();
+  const TiXmlElement *child = root->FirstChildElement();
+  const TiXmlElement *xmlElement;
+  QString buf, elementType, matStr, elementPath, elementName, mountFilename;
+  Link *mountPiece;
+  QString line;
+  WorldElement *element = NULL;
+  transf tr;
+  int prevRobNum, chainNum, nextRobNum;
+  bool cameraFound;
+  while (child != NULL) {
+    elementType = child->Value();
+    if (elementType.isNull()) {
+      QTWARNING("Empty Element Type");
+    }
+    if (elementType == "obstacle") {
+      xmlElement = findXmlElement(child, "filename");
+      bool loadFromFile = false;
+      if (xmlElement) {
+        elementName = xmlElement->GetText();
+        elementPath = rootPath + elementName;
+        elementPath = elementPath.stripWhiteSpace();
+        DBGP("importing " << elementPath.latin1());
+        element = importBody("Body", elementPath);
+        if (!element) {
+          QTWARNING("Could not open " + elementPath);
+          return FAILURE;
         }
-	}
-	findAllContacts();
-	modified = false;
-	resetDynamics();
-	return SUCCESS;
+        loadFromFile = true;
+      }
+      xmlElement = findXmlElement(child, "body");
+      if (loadFromFile) {
+        if (xmlElement) {
+          QTWARNING("Contains both filename and body info: Load From File");
+        }
+      } else { //load from body info
+        if (!xmlElement) {
+          QTWARNING("Neither filename nor body info found");
+          return FAILURE;
+        }
+        DBGP("importing obstacle from body info");
+        element = importBodyFromXml("Body", xmlElement, rootPath);
+        if (!element) {
+          QTWARNING("Could not open file " + elementPath);
+          return FAILURE;
+        }
+      }
+      xmlElement = findXmlElement(child, "transform");
+      if (xmlElement) {
+        if (getTransform(xmlElement, tr) == false) {
+          QTWARNING("Obstacle transformation Error");
+          return FAILURE;
+        }
+        element->setTran(tr);
+      }
+    }
+    else if (elementType == "graspableBody") {
+      xmlElement = findXmlElement(child, "filename");
+      bool loadFromFile = false;
+      if (xmlElement) {
+        elementName = xmlElement->GetText();
+        elementPath = rootPath + elementName;
+        elementPath = elementPath.stripWhiteSpace();
+        DBGP("importing " << elementPath.latin1());
+        element = importBody("GraspableBody", elementPath);
+        if (!element) {
+          QTWARNING("Could not open " + elementPath);
+          return FAILURE;
+        }
+        loadFromFile = true;
+      }
+      xmlElement = findXmlElement(child, "body");
+      if (loadFromFile) {
+        if (xmlElement) {
+          QTWARNING("Contains both filename and body info: Load From File");
+        }
+      }
+      else { //load from body info
+        if (!xmlElement) {
+          QTWARNING("Neither filename nor body info found");
+          return FAILURE;
+        }
+        DBGP("importing graspable body from body info");
+        element = importBodyFromXml("GraspableBody", xmlElement, rootPath);
+        if (!element) {
+          QTWARNING("Could not open " + elementPath);
+          return FAILURE;
+        }
+      }
+      xmlElement = findXmlElement(child, "transform");
+      if (xmlElement) {
+        if (getTransform(xmlElement, tr) == false) {
+          QTWARNING("GraspableBody transformation Error");
+          return FAILURE;
+        }
+        element->setTran(tr);
+      }
+    }
+    else if (elementType == "robot") {
+      Robot *robot;
+      xmlElement = findXmlElement(child, "filename");
+      if (!xmlElement) {
+        QTWARNING("Robot filename not found");
+        return FAILURE;
+      }
+      elementName = xmlElement->GetText();
+      elementPath = rootPath + elementName;
+      DBGP("importing " << elementPath.latin1());
+      if ((robot = importRobot(elementPath)) == NULL) {
+        QTWARNING("Could not open " + elementPath);
+        return FAILURE;
+      }
+      element = robot;
+      xmlElement = findXmlElement(child, "dofValues");
+      if (xmlElement) {
+        QString dofValues =  xmlElement->GetText();
+        dofValues = dofValues.stripWhiteSpace().simplifyWhiteSpace();
+        QTextStream lineStream(&dofValues, QIODevice::ReadOnly);
+        robot->readDOFVals(lineStream);
+      }
+      xmlElement = findXmlElement(child, "transform");
+      if (xmlElement) {
+        if (getTransform(xmlElement, tr) == false) {
+          QTWARNING("Robot transformation Error");
+          return FAILURE;
+        }
+        element->setTran(tr);
+      }
+    }
+    else if (elementType == "connection") {
+      if (!getInt(child, "parentRobot", prevRobNum)) {
+        QTWARNING("Failed to load Parent Robot Number");
+        return FAILURE;
+      }
+      if (!getInt(child, "parentChain", chainNum)) {
+        QTWARNING("Failed to load Parent Robot's Chain Number");
+        return FAILURE;
+      }
+      if (!getInt(child, "childRobot", nextRobNum)) {
+        QTWARNING("Failed to load Child Robot Number");
+        return FAILURE;
+      }
+      if (prevRobNum < 0 || prevRobNum >= numRobots || nextRobNum < 0 ||
+          nextRobNum >= numRobots || chainNum < 0 ||
+          chainNum >= robotVec[prevRobNum]->getNumChains()) {
+        QTWARNING("Error reading connection transform"); break;
+      }
+      xmlElement = findXmlElement(child, "transform");
+      if (xmlElement) {
+        if (!getTransform(xmlElement, tr)) {
+          QTWARNING("Error reading connection transform"); break;
+        }
+      }
+      DBGP("offset tran " << tr);
+      xmlElement = findXmlElement(child, "mountFilename");
+      if (xmlElement) {
+        mountFilename = xmlElement->GetText();
+        if (!mountFilename.isEmpty()) {
+          mountFilename = mountFilename.stripWhiteSpace();
+          KinematicChain *prevChain = robotVec[prevRobNum]->getChain(chainNum);
+          mountFilename = rootPath + mountFilename;
+          DBGA("Mount filename: " << mountFilename.latin1());
+          if ((mountPiece = robotVec[nextRobNum]->importMountPiece(mountFilename))) {
+            addLink(mountPiece);
+            toggleCollisions(false, prevChain->getLink(prevChain->getNumLinks() - 1), mountPiece);
+            toggleCollisions(false, mountPiece, robotVec[nextRobNum]->getBase());
+          }
+          mountFilename = (char *)NULL;
+        }
+      }
+      robotVec[prevRobNum]->attachRobot(robotVec[nextRobNum], chainNum, tr);
+    }
+    else if (elementType == "camera") {
+      double px, py, pz, q1, q2, q3, q4, fd;
+      QStringList l;
+      xmlElement = findXmlElement(child, "position");
+      if (!xmlElement) {
+        QTWARNING("Camera Position not found");
+        return FAILURE;
+      }
+      QString position = xmlElement->GetText();
+      position = position.simplifyWhiteSpace().stripWhiteSpace();
+      l = QStringList::split(' ', position);
+      if (l.count() != 3) {
+        QTWARNING("Invalid camera position input");
+        return FAILURE;
+      }
+      bool ok1, ok2, ok3, ok4;
+      px = l[0].toDouble(&ok1);
+      py = l[1].toDouble(&ok2);
+      pz = l[2].toDouble(&ok3);
+      if (!ok1 || !ok2 || !ok3) {
+        QTWARNING("Invalid camera position input");
+        return FAILURE;
+      }
+      xmlElement = findXmlElement(child, "orientation");
+      if (!xmlElement) {
+        QTWARNING("Camera orientation not found");
+        return FAILURE;
+      }
+      QString orientation = xmlElement->GetText();
+      position = orientation.simplifyWhiteSpace().stripWhiteSpace();
+      l = QStringList::split(' ', orientation);
+      if (l.count() != 4) {
+        QTWARNING("Invalid camera orientation input");
+        return FAILURE;
+      }
+      q1 = l[0].toDouble(&ok1);
+      q2 = l[1].toDouble(&ok2);
+      q3 = l[2].toDouble(&ok3);
+      q4 = l[3].toDouble(&ok4);
+      if (!ok1 || !ok2 || !ok3 || !ok4) {
+        QTWARNING("Invalid camera position input");
+        return FAILURE;
+      }
+      if (!getDouble(child, "focalDistance", fd)) {
+        QTWARNING("Failed to load focal distance");
+        return FAILURE;
+      }
+      if (myIVmgr) {
+        myIVmgr->setCamera(px, py, pz, q1, q2, q3, q4, fd);
+      } else {
+        DBGA("Could not set camera");
+      }
+      cameraFound = true;
+    }
+    else {
+      QTWARNING(elementType + " is not a valid WorldElement type");
+      return FAILURE;
+    }
+    child = child->NextSiblingElement();
+  }
+
+  if (!cameraFound) {
+    if (myIVmgr) {
+      myIVmgr->getViewer()->viewAll();
+    }
+  }
+  findAllContacts();
+  modified = false;
+  resetDynamics();
+  return SUCCESS;
 }
 
-/*! Saves this world to a file. This includes all the world elements as well as 
+/*! Saves this world to a file. This includes all the world elements as well as
 positions in the world, and the positions and orientation of the camera. It
 does not save the dynamic state of the bodies.
 */
 int
 World::save(const QString &filename)
 {
-	QFile file(filename);
-	int i,j,k,l;
+  QFile file(filename);
+  int i, j, k, l;
 
-	if (!file.open(QIODevice::WriteOnly)) {
-		QTWARNING("could not open " + filename + "for writing");
-		return FAILURE;
-	}
-	QTextStream stream( &file );
-	stream << "<?xml version=\"1.0\" ?>" <<endl;
-	stream << "<world>" << endl;
-	for (i=0;i<numBodies;i++) {
-		if (bodyVec[i]->isA("Body")) {
-			stream<<"\t<obstacle>"<<endl;
-			if(bodyVec[i]->getFilename()=="unspecified"){
-				stream<<"\t\t<body>"<<endl;
-				if(bodyVec[i]->saveToXml(stream)==FAILURE){
-					QTWARNING("Failed to save body info");
-					return FAILURE;
-				}
-				stream<<"\t\t</body>"<<endl;
-			}
-			else
-				stream<<"\t\t<filename>"<<bodyVec[i]->getFilename().latin1()<<"</filename>"<<endl;
-			stream<<"\t\t<transform>" <<endl;
-			stream<< "\t\t\t<fullTransform>"<< bodyVec[i]->getTran() << "</fullTransform>" << endl;
-			stream<<"\t\t</transform>" <<endl;
-			stream<<"\t</obstacle>"<<endl;
-		}
-		else if (bodyVec[i]->inherits("GraspableBody")) {
-			stream<<"\t<graspableBody>"<<endl;
-			if(bodyVec[i]->getFilename()=="unspecified"){
-				stream<<"\t\t<body>"<<endl;
-				if(bodyVec[i]->saveToXml(stream)==FAILURE){
-					QTWARNING("Failed to save body info");
-					return FAILURE;
-				}
-				stream<<"\t\t</body>"<<endl;
-			}
-			else
-				stream<<"\t\t<filename>"<<bodyVec[i]->getFilename().latin1()<<"</filename>"<<endl;
-			stream<<"\t\t<transform>" <<endl;
-			stream<< "\t\t\t<fullTransform>"<< bodyVec[i]->getTran() << "</fullTransform>" << endl;
-			stream<<"\t\t</transform>" <<endl;
-			stream<<"\t</graspableBody>"<<endl;
-		}
-	}
-
-	for (i=0;i<numRobots;i++) {
-		stream<<"\t<robot>"<<endl;
-		stream<<"\t\t<filename>"<<robotVec[i]->getFilename().latin1()<<"</filename>"<<endl;
-		stream<<"\t\t<dofValues>";
-		robotVec[i]->writeDOFVals(stream);
-		stream << "</dofValues>" << endl;
-		stream<<"\t\t<transform>" <<endl;
-		stream<< "\t\t\t<fullTransform>"<< robotVec[i]->getTran() << "</fullTransform>" << endl;
-		stream<<"\t\t</transform>" <<endl;
-		stream<<"\t</robot>"<<endl;
-	}
-
-	for(i=0;i<numRobots;i++) {
-		for (j=0;j<robotVec[i]->getNumChains();j++) {
-			KinematicChain *chain = robotVec[i]->getChain(j);
-			for (k=0;k<chain->getNumAttachedRobots();k++) {	
-				stream<<"\t<connection>"<<endl;
-				stream<< "\t\t<parentRobot>" << i << "</parentRobot>" << endl; 
-				stream<< "\t\t<parentChain>" << j << "</parentChain>" << endl;
-				for (l=0;l<numRobots;l++)
-					if (chain->getAttachedRobot(k) == robotVec[l]) break;
-				stream<< "\t\t<childRobot>" << l << "</childRobot>" << endl;	
-				if (chain->getAttachedRobot(k)->getMountPiece()) {
-					stream<< "\t\t<mountFilename>" << chain->getAttachedRobot(k)->getMountPiece()->getFilename() << "</mountFilename>" << endl;
-				}
-				stream<<"\t\t<transform>" <<endl;
-				stream<< "\t\t\t<fullTransform>"<< chain->getAttachedRobotOffset(k) << "</fullTransform>" << endl;
-				stream<<"\t\t</transform>" <<endl;
-				stream<<"\t</connection>"<<endl;
-			}
-		}
-	}
-
-    stream<<"\t<camera>"<<endl;
-	if (myIVmgr) {
-        float px, py, pz, q1, q2, q3, q4, fd;
-		myIVmgr->getCamera(px, py, pz, q1, q2, q3, q4, fd);
-		stream<<"\t\t<position>"<<px<<" "<<py<<" "<<pz<<"</position>"<<endl;
-		stream<<"\t\t<orientation>"<<q1<<" "<<q2<<" "<<q3<<" "<<q4<<"</orientation>"<<endl;
-		stream<<"\t\t<focalDistance>"<<fd<<"</focalDistance>"<<endl;
-	} else {
-        // the object will be viewed along the negative z-axis from a distance
-        // determined by a target angle between the view point and the
-        // x-coordinate corners of the world bounding box.
-        static float angle = 60;  // angle (degrees) between rays cast to two corners of the bounding box
-        if (fabs(angle)<1e-05) {
-            DBGA("Cannot choose zero angle, forcing to 10 as minimum");
-            angle = 10;
+  if (!file.open(QIODevice::WriteOnly)) {
+    QTWARNING("could not open " + filename + "for writing");
+    return FAILURE;
+  }
+  QTextStream stream(&file);
+  stream << "<?xml version=\"1.0\" ?>" << endl;
+  stream << "<world>" << endl;
+  for (i = 0; i < numBodies; i++) {
+    if (bodyVec[i]->isA("Body")) {
+      stream << "\t<obstacle>" << endl;
+      if (bodyVec[i]->getFilename() == "unspecified") {
+        stream << "\t\t<body>" << endl;
+        if (bodyVec[i]->saveToXml(stream) == FAILURE) {
+          QTWARNING("Failed to save body info");
+          return FAILURE;
         }
-        vec3 minPoint, maxPoint, center;  // min/max points of AABB
-        getBoundingBox(minPoint, maxPoint);
-        center = (minPoint + maxPoint) * 0.5;
-        float xLen = fabs(maxPoint.x()-minPoint.x());  // lenght of BB along x
-        float zLen = fabs(maxPoint.z()-minPoint.z());  // lenght of BB along z
-        float dist = fabs(xLen*0.5 / tan (angle * 0.5 * M_PI/180));  // distance along z
-        // std::cout<<"xLen: "<<xLen<<", zLen: "<<zLen<<", dist = "<<dist<<std::endl;
-
-        // write results to stream
-        vec3 pos(center.x(), center.y(), center.z() + zLen*0.5 + dist);
-		stream<<"\t\t<position>"<<pos.x()<<" "<<pos.y()<<" "<<pos.z()<<"</position>"<<endl;
-        // orientation along negative z (with y as up vector) is default in Inventor, so
-        // keep identity quaternion
-		stream<<"\t\t<orientation>"<<0<<" "<<0<<" "<<0<<" "<<1<<"</orientation>"<<endl;
-		stream<<"\t\t<focalDistance>"<<dist<<"</focalDistance>"<<endl;
+        stream << "\t\t</body>" << endl;
+      }
+      else {
+        stream << "\t\t<filename>" << bodyVec[i]->getFilename().latin1() << "</filename>" << endl;
+      }
+      stream << "\t\t<transform>" << endl;
+      stream << "\t\t\t<fullTransform>" << bodyVec[i]->getTran() << "</fullTransform>" << endl;
+      stream << "\t\t</transform>" << endl;
+      stream << "\t</obstacle>" << endl;
     }
-	stream<<"\t</camera>"<<endl;
-	stream<<"</world>"<<endl;
-	file.close();
-	modified = false;
-	return SUCCESS;
+    else if (bodyVec[i]->inherits("GraspableBody")) {
+      stream << "\t<graspableBody>" << endl;
+      if (bodyVec[i]->getFilename() == "unspecified") {
+        stream << "\t\t<body>" << endl;
+        if (bodyVec[i]->saveToXml(stream) == FAILURE) {
+          QTWARNING("Failed to save body info");
+          return FAILURE;
+        }
+        stream << "\t\t</body>" << endl;
+      }
+      else {
+        stream << "\t\t<filename>" << bodyVec[i]->getFilename().latin1() << "</filename>" << endl;
+      }
+      stream << "\t\t<transform>" << endl;
+      stream << "\t\t\t<fullTransform>" << bodyVec[i]->getTran() << "</fullTransform>" << endl;
+      stream << "\t\t</transform>" << endl;
+      stream << "\t</graspableBody>" << endl;
+    }
+  }
+
+  for (i = 0; i < numRobots; i++) {
+    stream << "\t<robot>" << endl;
+    stream << "\t\t<filename>" << robotVec[i]->getFilename().latin1() << "</filename>" << endl;
+    stream << "\t\t<dofValues>";
+    robotVec[i]->writeDOFVals(stream);
+    stream << "</dofValues>" << endl;
+    stream << "\t\t<transform>" << endl;
+    stream << "\t\t\t<fullTransform>" << robotVec[i]->getTran() << "</fullTransform>" << endl;
+    stream << "\t\t</transform>" << endl;
+    stream << "\t</robot>" << endl;
+  }
+
+  for (i = 0; i < numRobots; i++) {
+    for (j = 0; j < robotVec[i]->getNumChains(); j++) {
+      KinematicChain *chain = robotVec[i]->getChain(j);
+      for (k = 0; k < chain->getNumAttachedRobots(); k++) {
+        stream << "\t<connection>" << endl;
+        stream << "\t\t<parentRobot>" << i << "</parentRobot>" << endl;
+        stream << "\t\t<parentChain>" << j << "</parentChain>" << endl;
+        for (l = 0; l < numRobots; l++)
+          if (chain->getAttachedRobot(k) == robotVec[l]) { break; }
+        stream << "\t\t<childRobot>" << l << "</childRobot>" << endl;
+        if (chain->getAttachedRobot(k)->getMountPiece()) {
+          stream << "\t\t<mountFilename>" << chain->getAttachedRobot(k)->getMountPiece()->getFilename() << "</mountFilename>" << endl;
+        }
+        stream << "\t\t<transform>" << endl;
+        stream << "\t\t\t<fullTransform>" << chain->getAttachedRobotOffset(k) << "</fullTransform>" << endl;
+        stream << "\t\t</transform>" << endl;
+        stream << "\t</connection>" << endl;
+      }
+    }
+  }
+
+  stream << "\t<camera>" << endl;
+  if (myIVmgr) {
+    float px, py, pz, q1, q2, q3, q4, fd;
+    myIVmgr->getCamera(px, py, pz, q1, q2, q3, q4, fd);
+    stream << "\t\t<position>" << px << " " << py << " " << pz << "</position>" << endl;
+    stream << "\t\t<orientation>" << q1 << " " << q2 << " " << q3 << " " << q4 << "</orientation>" << endl;
+    stream << "\t\t<focalDistance>" << fd << "</focalDistance>" << endl;
+  } else {
+    // the object will be viewed along the negative z-axis from a distance
+    // determined by a target angle between the view point and the
+    // x-coordinate corners of the world bounding box.
+    static float angle = 60;  // angle (degrees) between rays cast to two corners of the bounding box
+    if (fabs(angle) < 1e-05) {
+      DBGA("Cannot choose zero angle, forcing to 10 as minimum");
+      angle = 10;
+    }
+    vec3 minPoint, maxPoint, center;  // min/max points of AABB
+    getBoundingBox(minPoint, maxPoint);
+    center = (minPoint + maxPoint) * 0.5;
+    float xLen = fabs(maxPoint.x() - minPoint.x()); // lenght of BB along x
+    float zLen = fabs(maxPoint.z() - minPoint.z()); // lenght of BB along z
+    float dist = fabs(xLen * 0.5 / tan(angle * 0.5 * M_PI / 180)); // distance along z
+    // std::cout<<"xLen: "<<xLen<<", zLen: "<<zLen<<", dist = "<<dist<<std::endl;
+
+    // write results to stream
+    vec3 pos(center.x(), center.y(), center.z() + zLen * 0.5 + dist);
+    stream << "\t\t<position>" << pos.x() << " " << pos.y() << " " << pos.z() << "</position>" << endl;
+    // orientation along negative z (with y as up vector) is default in Inventor, so
+    // keep identity quaternion
+    stream << "\t\t<orientation>" << 0 << " " << 0 << " " << 0 << " " << 1 << "</orientation>" << endl;
+    stream << "\t\t<focalDistance>" << dist << "</focalDistance>" << endl;
+  }
+  stream << "\t</camera>" << endl;
+  stream << "</world>" << endl;
+  file.close();
+  modified = false;
+  return SUCCESS;
 }
 
-/*! Imports a body which is loaded from a file. \bodyType must be a class name 
+/*! Imports a body which is loaded from a file. \bodyType must be a class name
 from the Body hierarchy (e.g. "Body", "DynamicBody", etc). \a filename is
 the complete path to the file containing the body. The new body is created,
-loaded from the file, initialized, and added to the collision detection and 
+loaded from the file, initialized, and added to the collision detection and
 scene graph.
 */
 Body *
-World::importBody(QString bodyType,QString filename)
-{ 
+World::importBody(QString bodyType, QString filename)
+{
   Body *newBody = (Body *) getWorldElementFactory().createElement(bodyType.toStdString(), this, NULL);
-  if (!newBody) return NULL;
-  if (newBody->load(filename)==FAILURE) return NULL;
+  if (!newBody) { return NULL; }
+  if (newBody->load(filename) == FAILURE) { return NULL; }
   newBody->addToIvc();
   addBody(newBody);
   return newBody;
 }
 
-/*! Imports a body which is loaded from a xml file. \bodyType must be a class name 
-from the Body hierarchy (e.g. "Body", "DynamicBody", etc). \a rootPath and \a  
-child are parsed to loadFromXml. The new body is created, loaded from the 
+/*! Imports a body which is loaded from a xml file. \bodyType must be a class name
+from the Body hierarchy (e.g. "Body", "DynamicBody", etc). \a rootPath and \a
+child are parsed to loadFromXml. The new body is created, loaded from the
 XML element, initialized, and added to the collision detection and scene graph.
 */
 Body *
-World::importBodyFromXml(QString bodyType, const TiXmlElement* child, QString rootPath)
-{ 
+World::importBodyFromXml(QString bodyType, const TiXmlElement *child, QString rootPath)
+{
   Body *newBody = (Body *) getWorldElementFactory().createElement(bodyType.toStdString(), this, NULL);
-  if (!newBody) return NULL;
-  if (newBody->loadFromXml(child, rootPath)==FAILURE) return NULL;
+  if (!newBody) { return NULL; }
+  if (newBody->loadFromXml(child, rootPath) == FAILURE) { return NULL; }
   newBody->addIVMat();
   newBody->addToIvc();
   addBody(newBody);
@@ -937,85 +943,85 @@ World::importBodyFromXml(QString bodyType, const TiXmlElement* child, QString ro
 }
 
 /*! Adds to this world a body that is already created, initialized and somehow
-populated. This usually means a body obtained by loading from a file or 
-cloning another body. It does NOT add the new body to the collision detection 
-system, it is the caller's responsability to do that. Also does not initialize 
+populated. This usually means a body obtained by loading from a file or
+cloning another body. It does NOT add the new body to the collision detection
+system, it is the caller's responsability to do that. Also does not initialize
 dynamics.
 */
 void
 World::addBody(Body *newBody)
 {
-	newBody->setDefaultViewingParameters();
-	bodyVec.push_back(newBody);
-	numBodies++;
-	if (newBody->inherits("GraspableBody")) {
-		GBVec.push_back((GraspableBody *)newBody);
-		if (numGB == 0) {
-			for (int i=0;i<numHands;i++) {
-				handVec[i]->getGrasp()->setObject((GraspableBody *)newBody);
-			}
-		}
-		numGB++;
-	}
-	IVRoot->addChild(newBody->getIVRoot());
-	modified = true;
-	Q_EMIT numElementsChanged();
-    mDynamicsEngine->addBody(newBody);
+  newBody->setDefaultViewingParameters();
+  bodyVec.push_back(newBody);
+  numBodies++;
+  if (newBody->inherits("GraspableBody")) {
+    GBVec.push_back((GraspableBody *)newBody);
+    if (numGB == 0) {
+      for (int i = 0; i < numHands; i++) {
+        handVec[i]->getGrasp()->setObject((GraspableBody *)newBody);
+      }
+    }
+    numGB++;
+  }
+  IVRoot->addChild(newBody->getIVRoot());
+  modified = true;
+  Q_EMIT numElementsChanged();
+  mDynamicsEngine->addBody(newBody);
 }
 
-/*! Adds a robot link. No need to add it to scene graph, since the robot 
+/*! Adds a robot link. No need to add it to scene graph, since the robot
 will add it to its own tree. The robot will also init dynamics and
 add the link to collision detection.
 */
 void
 World::addLink(Link *newLink)
 {
-	bodyVec.push_back(newLink);
-	numBodies++;
-    mDynamicsEngine->addBody(newLink);
+  bodyVec.push_back(newLink);
+  numBodies++;
+  mDynamicsEngine->addBody(newLink);
 }
 
 /*! Loads a robot from a file and adds it to the world. \a filename must
-	contain the full path to the robot. The file is expected to be in XML
-	format. This function will open the file and read the robot file so
-	that it initializes an instance of the correct class. It will then
-	pass the XML root of the robot structure to the robot who will load
-	its own information from the file.
+  contain the full path to the robot. The file is expected to be in XML
+  format. This function will open the file and read the robot file so
+  that it initializes an instance of the correct class. It will then
+  pass the XML root of the robot structure to the robot who will load
+  its own information from the file.
 */
 Robot *
 World::importRobot(QString filename)
 {
   TiXmlDocument doc(filename);
-  if(doc.LoadFile()==false){
+  if (doc.LoadFile() == false) {
     QTWARNING("Could not open " + filename);
     return NULL;
   }
-  
-  const TiXmlElement* root = doc.RootElement();
-  if(root==NULL){
+
+  const TiXmlElement *root = doc.RootElement();
+  if (root == NULL) {
     QTWARNING("Empty XML");
-    return NULL;	
+    return NULL;
   }
-  
+
   QString line = root->Attribute("type");
-  if(line.isNull()){
+  if (line.isNull()) {
     QTWARNING("Class Type not found");
     return NULL;
   }
   line = line.stripWhiteSpace();
-  
+
   Robot *robot = (Robot *) getWorldElementFactory().createElement(line.toStdString(), this, NULL);
-  
+
   if (!robot) {
     QTWARNING("Unable to create robot of class " + line);
     return NULL;
   }
-  
-  QString rootPath = filename.section('/',0,-2,QString::SectionIncludeTrailingSep);
-  robot->setName(filename.section('/',-1).section('.',0,0));
-  QString myFilename = relativePath(filename,getenv("GRASPIT"));
+
+  QString rootPath = filename.section('/', 0, -2, QString::SectionIncludeTrailingSep);
+  robot->setName(filename.section('/', -1).section('.', 0, 0));
+  QString myFilename = relativePath(filename, getenv("GRASPIT"));
   robot->setFilename(myFilename);
-  if (robot->loadFromXml(root,rootPath) == FAILURE) {
+  if (robot->loadFromXml(root, rootPath) == FAILURE) {
     QTWARNING("Failed to load robot from file");
     delete robot;
     return NULL;
@@ -1025,7 +1031,7 @@ World::importRobot(QString filename)
 }
 
 /*! Adds to this world a robot that is already created, initialized and somehow
-populated. This usually means a robot obtained by loading from a file or 
+populated. This usually means a robot obtained by loading from a file or
 cloning another body. It only adds the new robot to the scene graph of
 \a addToScene is true. Can be used when robots are clones and clones are set
 to work, but we don't necessarily want to see them.
@@ -1037,45 +1043,45 @@ other at the joints, which would make the robot unusable.
 void
 World::addRobot(Robot *robot, bool addToScene)
 {
-	robotVec.push_back(robot);
-	numRobots++;
+  robotVec.push_back(robot);
+  numRobots++;
 
-	if (robot->getBase()) {
-		addLink(robot->getBase());
-	}
+  if (robot->getBase()) {
+    addLink(robot->getBase());
+  }
 
-	for (int f=0; f<robot->getNumChains(); f++) {
-		for (int l=0; l<robot->getChain(f)->getNumLinks(); l++) {
-			addLink(robot->getChain(f)->getLink(l));
-		}
-	}
-	for (int f=0; f<robot->getNumChains(); f++) {
-		mCollisionInterface->activatePair(robot->getChain(f)->getLink(0), robot->getBase(), false);   
-		for (int l=0; l<robot->getChain(f)->getNumLinks(); l++) {
-			for(int l2 = 0; l2<robot->getChain(f)->getNumLinks();l2++) {
-				if (l==l2) continue;
-				mCollisionInterface->activatePair(robot->getChain(f)->getLink(l), 
-					robot->getChain(f)->getLink(l2), false);
-			}
-		}
-	}
-	if (robot->inherits("Hand")) {    
-		handVec.push_back((Hand *)robot);
-		if (numGB > 0) ((Hand *)robot)->getGrasp()->setObject(GBVec[0]);
-		numHands++;
-		if (numHands==1) setCurrentHand((Hand *)robot);
-	}
-	for (int d=0;d<robot->getNumDOF();d++) {
-		robot->getDOF(d)->setDesiredPos(robot->getDOF(d)->getVal());
-	}
+  for (int f = 0; f < robot->getNumChains(); f++) {
+    for (int l = 0; l < robot->getChain(f)->getNumLinks(); l++) {
+      addLink(robot->getChain(f)->getLink(l));
+    }
+  }
+  for (int f = 0; f < robot->getNumChains(); f++) {
+    mCollisionInterface->activatePair(robot->getChain(f)->getLink(0), robot->getBase(), false);
+    for (int l = 0; l < robot->getChain(f)->getNumLinks(); l++) {
+      for (int l2 = 0; l2 < robot->getChain(f)->getNumLinks(); l2++) {
+        if (l == l2) { continue; }
+        mCollisionInterface->activatePair(robot->getChain(f)->getLink(l),
+                                          robot->getChain(f)->getLink(l2), false);
+      }
+    }
+  }
+  if (robot->inherits("Hand")) {
+    handVec.push_back((Hand *)robot);
+    if (numGB > 0) { ((Hand *)robot)->getGrasp()->setObject(GBVec[0]); }
+    numHands++;
+    if (numHands == 1) { setCurrentHand((Hand *)robot); }
+  }
+  for (int d = 0; d < robot->getNumDOF(); d++) {
+    robot->getDOF(d)->setDesiredPos(robot->getDOF(d)->getVal());
+  }
 
-	if (addToScene) {
-		addElementToSceneGraph(robot);
-	}
+  if (addToScene) {
+    addElementToSceneGraph(robot);
+  }
 
-	modified = true;
-	Q_EMIT numElementsChanged();
-    mDynamicsEngine->addRobot(robot);
+  modified = true;
+  Q_EMIT numElementsChanged();
+  mDynamicsEngine->addRobot(robot);
 }
 
 
@@ -1083,26 +1089,26 @@ World::addRobot(Robot *robot, bool addToScene)
 void
 World::removeRobot(Robot *robot)
 {
-	removeElementFromSceneGraph(robot);
-	std::vector<Robot *>::iterator rp;
-	std::vector<Hand *>::iterator hp;
-	for (rp=robotVec.begin();rp!=robotVec.end();rp++) {
-		if (*rp == robot) {
-			robotVec.erase(rp);
-			numRobots--;
-			break;
-		}
-	}
-	if (robot->inherits("Hand")) {
-		for (hp=handVec.begin();hp!=handVec.end();hp++) {
-			if (*hp == robot) {
-				handVec.erase(hp);
-				numHands--;
-				break;
-			}
-		}
-	}
-	delete robot;
+  removeElementFromSceneGraph(robot);
+  std::vector<Robot *>::iterator rp;
+  std::vector<Hand *>::iterator hp;
+  for (rp = robotVec.begin(); rp != robotVec.end(); rp++) {
+    if (*rp == robot) {
+      robotVec.erase(rp);
+      numRobots--;
+      break;
+    }
+  }
+  if (robot->inherits("Hand")) {
+    for (hp = handVec.begin(); hp != handVec.end(); hp++) {
+      if (*hp == robot) {
+        handVec.erase(hp);
+        numHands--;
+        break;
+      }
+    }
+  }
+  delete robot;
 }
 
 /*! Adds an element to the Scene Graph; the element must already be part of the
@@ -1112,61 +1118,61 @@ this element.
 void
 World::addElementToSceneGraph(WorldElement *e)
 {
-	if (IVRoot->findChild( e->getIVRoot() ) >= 0) {
-		DBGA("Element is already in scene graph");
-		return;
-	}
-	unsigned int i;
-	if (e->inherits("Robot")) {
-		for (i=0; i< robotVec.size(); i++) {
-			if (robotVec[i] == e) break;
-		}
-		if ( i==robotVec.size() ) {
-			DBGA("Robot not a part of the world");
-			return;
-		}
-	} else if (e->inherits("Body")) {
-		for (i=0; i< bodyVec.size(); i++) {
-			if (GBVec[i] == e) break;
-		}	
-		if ( i==GBVec.size() ) {
-			DBGA("Body not a part of the world");
-			return;
-		}
-	}
-	IVRoot->addChild( e->getIVRoot() );
+  if (IVRoot->findChild(e->getIVRoot()) >= 0) {
+    DBGA("Element is already in scene graph");
+    return;
+  }
+  unsigned int i;
+  if (e->inherits("Robot")) {
+    for (i = 0; i < robotVec.size(); i++) {
+      if (robotVec[i] == e) { break; }
+    }
+    if (i == robotVec.size()) {
+      DBGA("Robot not a part of the world");
+      return;
+    }
+  } else if (e->inherits("Body")) {
+    for (i = 0; i < bodyVec.size(); i++) {
+      if (GBVec[i] == e) { break; }
+    }
+    if (i == GBVec.size()) {
+      DBGA("Body not a part of the world");
+      return;
+    }
+  }
+  IVRoot->addChild(e->getIVRoot());
 }
 
-/*! Remove an element that is part of this world from the Scene Graph; 
-the element remains a part of the world and can be used in simulations; 
+/*! Remove an element that is part of this world from the Scene Graph;
+the element remains a part of the world and can be used in simulations;
 it is just not rendered anymore.
 */
 void
 World::removeElementFromSceneGraph(WorldElement *e)
 {
-	int c = IVRoot->findChild( e->getIVRoot() );
-	if (c<0) {
-		DBGA("Element not part of the scene graph");
-		return;
-	}
-	e->getIVRoot()->ref();
-	IVRoot->removeChild(c);
-	e->getIVRoot()->unrefNoDelete();
+  int c = IVRoot->findChild(e->getIVRoot());
+  if (c < 0) {
+    DBGA("Element not part of the scene graph");
+    return;
+  }
+  e->getIVRoot()->ref();
+  IVRoot->removeChild(c);
+  e->getIVRoot()->unrefNoDelete();
 }
 
 /*! Makes a static element into a dynamic body by creating a DynamicBody
-from it and initializing default dynamic properties. The geometry is 
+from it and initializing default dynamic properties. The geometry is
 not loaded again, but it is added to the collision detection again.
 */
 DynamicBody *
 World::makeBodyDynamic(Body *b, double mass)
-{ 
-	DynamicBody *dynBod = new DynamicBody(*b,mass);
-	dynBod->addToIvc();
-	addBody(dynBod);
-	destroyElement(b, true);
-	findContacts(dynBod);
-	return dynBod;
+{
+  DynamicBody *dynBod = new DynamicBody(*b, mass);
+  dynBod->addToIvc();
+  addBody(dynBod);
+  destroyElement(b, true);
+  findContacts(dynBod);
+  return dynBod;
 }
 
 /*! Selects a world element. If the element is a Robot, also selects all of its
@@ -1176,94 +1182,95 @@ selectedBodies.
 void
 World::selectElement(WorldElement *e)
 {
-	std::list<WorldElement *>::iterator ep;
-	int c,l;
+  std::list<WorldElement *>::iterator ep;
+  int c, l;
 
-	DBGP("selecting element "<<e->getName().toStdString().c_str());
-	if (e->inherits("Body")) {DBGP(" with collision id " << ((Body*)e)->getName().toStdString().c_str());}
+  DBGP("selecting element " << e->getName().toStdString().c_str());
+  if (e->inherits("Body")) {DBGP(" with collision id " << ((Body *)e)->getName().toStdString().c_str());}
 
-	if (e->inherits("Body")) numSelectedBodyElements++;
-	else if (e->inherits("Robot")) numSelectedRobotElements++;
-	numSelectedElements++;
+  if (e->inherits("Body")) { numSelectedBodyElements++; }
+  else if (e->inherits("Robot")) { numSelectedRobotElements++; }
+  numSelectedElements++;
 
-	selectedElementList.push_back(e);
+  selectedElementList.push_back(e);
 
-	selectedBodyVec.clear();
-	for (ep=selectedElementList.begin();ep!=selectedElementList.end();ep++) {
-		if ((*ep)->inherits("Body")) selectedBodyVec.push_back((Body *)(*ep));
-		else if ((*ep)->inherits("Robot")) {
-			Robot *r = (Robot *)(*ep);
-			selectedBodyVec.push_back(r->getBase());
-			for (c=0;c<r->getNumChains();c++){
-				for (l=0;l<r->getChain(c)->getNumLinks();l++) {
-					selectedBodyVec.push_back(r->getChain(c)->getLink(l));
-				}
-			}
-		}
-	}
-	numSelectedBodies = selectedBodyVec.size();
+  selectedBodyVec.clear();
+  for (ep = selectedElementList.begin(); ep != selectedElementList.end(); ep++) {
+    if ((*ep)->inherits("Body")) { selectedBodyVec.push_back((Body *)(*ep)); }
+    else if ((*ep)->inherits("Robot")) {
+      Robot *r = (Robot *)(*ep);
+      selectedBodyVec.push_back(r->getBase());
+      for (c = 0; c < r->getNumChains(); c++) {
+        for (l = 0; l < r->getChain(c)->getNumLinks(); l++) {
+          selectedBodyVec.push_back(r->getChain(c)->getLink(l));
+        }
+      }
+    }
+  }
+  numSelectedBodies = selectedBodyVec.size();
 
-	DBGP("selected elements "<<numSelectedElements);
-	DBGP("selected bodies "<<numSelectedBodies);
+  DBGP("selected elements " << numSelectedElements);
+  DBGP("selected bodies " << numSelectedBodies);
 
-	Q_EMIT selectionsChanged();
+  Q_EMIT selectionsChanged();
 }
 
-/*! Deselects a world element. If the element is a Robot, also deselects all of 
+/*! Deselects a world element. If the element is a Robot, also deselects all of
 its links, plus the base.
 */
 void
 World::deselectElement(WorldElement *e)
 {
-	std::list<WorldElement *>::iterator ep;
-	int c,l;
+  std::list<WorldElement *>::iterator ep;
+  int c, l;
 
-	DBGP("deselecting element "<<e->getName().toStdString().c_str());
-	if (e->inherits("Body")) numSelectedBodyElements--;
-	else if (e->inherits("Robot")) numSelectedRobotElements--;
-	numSelectedElements--;
+  DBGP("deselecting element " << e->getName().toStdString().c_str());
+  if (e->inherits("Body")) { numSelectedBodyElements--; }
+  else if (e->inherits("Robot")) { numSelectedRobotElements--; }
+  numSelectedElements--;
 
-	selectedElementList.remove(e);
+  selectedElementList.remove(e);
 
-	selectedBodyVec.clear();
-	for (ep=selectedElementList.begin();ep!=selectedElementList.end();ep++) {
-		if ((*ep)->inherits("Body")) selectedBodyVec.push_back((Body *)(*ep));
-		else if ((*ep)->inherits("Robot")) {
-			Robot *r = (Robot *)(*ep);
-			selectedBodyVec.push_back(r->getBase());
-			for (c=0;c<r->getNumChains();c++)
-				for (l=0;l<r->getChain(c)->getNumLinks();l++)
-					selectedBodyVec.push_back(r->getChain(c)->getLink(l));
-		}
-	}
-	numSelectedBodies = selectedBodyVec.size();
-	DBGP("selected elements "<<numSelectedElements);
-	DBGP("selected bodies "<<numSelectedBodies);
-	Q_EMIT selectionsChanged();
+  selectedBodyVec.clear();
+  for (ep = selectedElementList.begin(); ep != selectedElementList.end(); ep++) {
+    if ((*ep)->inherits("Body")) { selectedBodyVec.push_back((Body *)(*ep)); }
+    else if ((*ep)->inherits("Robot")) {
+      Robot *r = (Robot *)(*ep);
+      selectedBodyVec.push_back(r->getBase());
+      for (c = 0; c < r->getNumChains(); c++)
+        for (l = 0; l < r->getChain(c)->getNumLinks(); l++) {
+          selectedBodyVec.push_back(r->getChain(c)->getLink(l));
+        }
+    }
+  }
+  numSelectedBodies = selectedBodyVec.size();
+  DBGP("selected elements " << numSelectedElements);
+  DBGP("selected bodies " << numSelectedBodies);
+  Q_EMIT selectionsChanged();
 }
 
 /*! Clears the list of selected element and deselects all */
 void
 World::deselectAll()
 {
-	selectedElementList.clear();
-	selectedBodyVec.clear();
+  selectedElementList.clear();
+  selectedBodyVec.clear();
 
-	numSelectedElements = numSelectedBodyElements = numSelectedRobotElements = 0;
-	numSelectedBodies = 0;
-	Q_EMIT selectionsChanged();
+  numSelectedElements = numSelectedBodyElements = numSelectedRobotElements = 0;
+  numSelectedBodies = 0;
+  Q_EMIT selectionsChanged();
 }
 
-/*! Checks whether an element is currently selected by looking in the 
+/*! Checks whether an element is currently selected by looking in the
 selectedElementList
 */
 bool
 World::isSelected(WorldElement *e) const
 {
-	std::list<WorldElement *>::const_iterator ep;
-	for (ep=selectedElementList.begin();ep!=selectedElementList.end();ep++)
-		if (*ep == e) return true;
-	return false;
+  std::list<WorldElement *>::const_iterator ep;
+  for (ep = selectedElementList.begin(); ep != selectedElementList.end(); ep++)
+    if (*ep == e) { return true; }
+  return false;
 }
 
 /*! Toggles all collisions. If \a on is false, all collisions in the world are
@@ -1272,102 +1279,108 @@ disabled. If \a on is true, they are re-enabled.
 void
 World::toggleAllCollisions(bool on)
 {
-	DBGA("TOGGLING COLLISIONS");
-	bool off = !on;
-	if (numSelectedElements == 0) {
-		allCollisionsOFF = off;
-	} else if (numSelectedElements == 2) {
-		if (off) toggleCollisions(false, selectedElementList.front(), selectedElementList.back());
-		else toggleCollisions(true, selectedElementList.front(),  selectedElementList.back());
-	} else {
-		std::list<WorldElement *>::iterator ep;
-		for (ep=selectedElementList.begin();ep!=selectedElementList.end();ep++) {
-			if (off) toggleCollisions(false, *ep);
-			else toggleCollisions(true, *ep);
-		}
-	}
-	findAllContacts();
+  DBGA("TOGGLING COLLISIONS");
+  bool off = !on;
+  if (numSelectedElements == 0) {
+    allCollisionsOFF = off;
+  } else if (numSelectedElements == 2) {
+    if (off) { toggleCollisions(false, selectedElementList.front(), selectedElementList.back()); }
+    else { toggleCollisions(true, selectedElementList.front(),  selectedElementList.back()); }
+  } else {
+    std::list<WorldElement *>::iterator ep;
+    for (ep = selectedElementList.begin(); ep != selectedElementList.end(); ep++) {
+      if (off) { toggleCollisions(false, *ep); }
+      else { toggleCollisions(true, *ep); }
+    }
+  }
+  findAllContacts();
 }
 
 bool
 World::robotCollisionsAreOff(Robot *r1, WorldElement *e)
 {
-	if (e->inherits("Body")) {
-		Body *b1 = (Body*) e;
-		if (mCollisionInterface->isActive( b1, r1->getBase() ) ) {
-			return false;
-		}
-		for (int f=0; f<r1->getNumChains(); f++) {
-			for (int l=0; l<r1->getChain(f)->getNumLinks(); l++) {
-				if ( mCollisionInterface->isActive(b1, r1->getChain(f)->getLink(l)) )
-					return false;
-			}
-		}
-		return true;
-	} else if (e->inherits("Robot")) {
-		Robot *r2 = (Robot*) e;
-		if ( mCollisionInterface->isActive(r1->getBase(), r2->getBase()) )
-			return false;
+  if (e->inherits("Body")) {
+    Body *b1 = (Body *) e;
+    if (mCollisionInterface->isActive(b1, r1->getBase())) {
+      return false;
+    }
+    for (int f = 0; f < r1->getNumChains(); f++) {
+      for (int l = 0; l < r1->getChain(f)->getNumLinks(); l++) {
+        if (mCollisionInterface->isActive(b1, r1->getChain(f)->getLink(l))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  } else if (e->inherits("Robot")) {
+    Robot *r2 = (Robot *) e;
+    if (mCollisionInterface->isActive(r1->getBase(), r2->getBase())) {
+      return false;
+    }
 
-		for (int f2=0; f2<r2->getNumChains(); f2++) 
-			for (int l2=0; l2<r2->getChain(f2)->getNumLinks(); l2++)
-				if ( mCollisionInterface->isActive(r1->getBase(), r2->getChain(f2)->getLink(l2) ) )
-					return false;
+    for (int f2 = 0; f2 < r2->getNumChains(); f2++)
+      for (int l2 = 0; l2 < r2->getChain(f2)->getNumLinks(); l2++)
+        if (mCollisionInterface->isActive(r1->getBase(), r2->getChain(f2)->getLink(l2))) {
+          return false;
+        }
 
-		for (int f=0; f<r1->getNumChains(); f++) 
-			for (int l=0; l<r1->getChain(f)->getNumLinks(); l++) { 
-				if ( mCollisionInterface->isActive(r1->getChain(f)->getLink(l),r2->getBase() ) )
-					return false;
-				for (int f2=0; f2<r2->getNumChains(); f2++) 
-					for (int l2=0; l2<r2->getChain(f2)->getNumLinks(); l2++)
-						if ( mCollisionInterface->isActive(r1->getChain(f)->getLink(l), r2->getChain(f2)->getLink(l2) ) )
-							return false;
-			}
-			return true;
-	}
-	return true;
+    for (int f = 0; f < r1->getNumChains(); f++)
+      for (int l = 0; l < r1->getChain(f)->getNumLinks(); l++) {
+        if (mCollisionInterface->isActive(r1->getChain(f)->getLink(l), r2->getBase())) {
+          return false;
+        }
+        for (int f2 = 0; f2 < r2->getNumChains(); f2++)
+          for (int l2 = 0; l2 < r2->getChain(f2)->getNumLinks(); l2++)
+            if (mCollisionInterface->isActive(r1->getChain(f)->getLink(l), r2->getChain(f2)->getLink(l2))) {
+              return false;
+            }
+      }
+    return true;
+  }
+  return true;
 }
 
 /*! Checks whether collisions are off. Options for passing arguments are the same
 as for toggleCollisions.
 */
 bool
-World::collisionsAreOff(WorldElement *e1,WorldElement *e2)
+World::collisionsAreOff(WorldElement *e1, WorldElement *e2)
 {
-	int f,l;
-	Body *b1,*b2;
-	Robot *r1,*r2;
+  int f, l;
+  Body *b1, *b2;
+  Robot *r1, *r2;
 
-	if (e1 == NULL) {
-		assert(e2 == NULL);
-		return allCollisionsOFF;
-	}
-	if (e1->inherits("Body")) {
-		b1 = (Body *)e1;
-		if (e2) {
-			if (e2->inherits("Body")) {
-				b2 = (Body *)e2;  
-				return !mCollisionInterface->isActive(b1, b2);
-			} else if (e2->inherits("Robot")) {
-				r2 = (Robot*)e2;
-				return robotCollisionsAreOff(r2,e1);
-			} else {
-				return false;
-			}
-		} else return !mCollisionInterface->isActive(b1);
-	} else if (e1->inherits("Robot")) {
-		r1 = (Robot *)e1;
-		if (e2) {
-			return robotCollisionsAreOff(r1,e2);
-		} else {
-			if ( mCollisionInterface->isActive(r1->getBase()) ) return false;
-			for (f=0;f<r1->getNumChains();f++) 
-				for (l=0;l<r1->getChain(f)->getNumLinks();l++)
-					if ( mCollisionInterface->isActive(r1->getChain(f)->getLink(l)) )
-						return false;
-		}
-	}
-	return true;	
+  if (e1 == NULL) {
+    assert(e2 == NULL);
+    return allCollisionsOFF;
+  }
+  if (e1->inherits("Body")) {
+    b1 = (Body *)e1;
+    if (e2) {
+      if (e2->inherits("Body")) {
+        b2 = (Body *)e2;
+        return !mCollisionInterface->isActive(b1, b2);
+      } else if (e2->inherits("Robot")) {
+        r2 = (Robot *)e2;
+        return robotCollisionsAreOff(r2, e1);
+      } else {
+        return false;
+      }
+    } else { return !mCollisionInterface->isActive(b1); }
+  } else if (e1->inherits("Robot")) {
+    r1 = (Robot *)e1;
+    if (e2) {
+      return robotCollisionsAreOff(r1, e2);
+    } else {
+      if (mCollisionInterface->isActive(r1->getBase())) { return false; }
+      for (f = 0; f < r1->getNumChains(); f++)
+        for (l = 0; l < r1->getChain(f)->getNumLinks(); l++)
+          if (mCollisionInterface->isActive(r1->getChain(f)->getLink(l))) {
+            return false;
+          }
+    }
+  }
+  return true;
 }
 
 /*! If \a e2 is NULL, is toggles collisions for \a e1 in general. Otherwise, it
@@ -1375,98 +1388,103 @@ toggles collisions between \a e1 and \a e2. Remember that toggling collisions
 for a robot means applying the change to all of its links and the base
 */
 void
-World::toggleCollisions(bool on, WorldElement *e1,WorldElement *e2)
+World::toggleCollisions(bool on, WorldElement *e1, WorldElement *e2)
 {
-	int f,l,f2,l2;
-	Body *b1,*b2;
-	Robot *r1,*r2;
+  int f, l, f2, l2;
+  Body *b1, *b2;
+  Robot *r1, *r2;
 
-	assert(e1);
-	if (e1->inherits("Body")) {
-		b1 = (Body *)e1;
-		if (e2) {
-			if (e2->inherits("Body")) {
-				b2 = (Body *)e2;
-				mCollisionInterface->activatePair(b1,b2,on);
-			} else if (e2->inherits("Robot")) {
-				r2 = (Robot *)e2;
-				mCollisionInterface->activatePair(b1,r2->getBase(),on);
-				for (f=0;f<r2->getNumChains();f++) 
-					for (l=0;l<r2->getChain(f)->getNumLinks();l++)
-						mCollisionInterface->activatePair(b1, r2->getChain(f)->getLink(l), on);
-			}	    
-		}
-		else mCollisionInterface->activateBody(b1,on);
-	} else if (e1->inherits("Robot")) {
-		r1 = (Robot *)e1;
-		if (e2) {
-			if (e2->inherits("Body")) {
-				b2 = (Body *)e2;
-				mCollisionInterface->activatePair(r1->getBase(), b2, on);
-				for (f=0;f<r1->getNumChains();f++) 
-					for (l=0;l<r1->getChain(f)->getNumLinks();l++)
-						mCollisionInterface->activatePair(r1->getChain(f)->getLink(l), b2, on);
-			}
-			else if (e2->inherits("Robot")) {
-				r2 = (Robot *)e2;
-				mCollisionInterface->activatePair(r1->getBase(), r2->getBase(), on);
+  assert(e1);
+  if (e1->inherits("Body")) {
+    b1 = (Body *)e1;
+    if (e2) {
+      if (e2->inherits("Body")) {
+        b2 = (Body *)e2;
+        mCollisionInterface->activatePair(b1, b2, on);
+      } else if (e2->inherits("Robot")) {
+        r2 = (Robot *)e2;
+        mCollisionInterface->activatePair(b1, r2->getBase(), on);
+        for (f = 0; f < r2->getNumChains(); f++)
+          for (l = 0; l < r2->getChain(f)->getNumLinks(); l++) {
+            mCollisionInterface->activatePair(b1, r2->getChain(f)->getLink(l), on);
+          }
+      }
+    }
+    else { mCollisionInterface->activateBody(b1, on); }
+  } else if (e1->inherits("Robot")) {
+    r1 = (Robot *)e1;
+    if (e2) {
+      if (e2->inherits("Body")) {
+        b2 = (Body *)e2;
+        mCollisionInterface->activatePair(r1->getBase(), b2, on);
+        for (f = 0; f < r1->getNumChains(); f++)
+          for (l = 0; l < r1->getChain(f)->getNumLinks(); l++) {
+            mCollisionInterface->activatePair(r1->getChain(f)->getLink(l), b2, on);
+          }
+      }
+      else if (e2->inherits("Robot")) {
+        r2 = (Robot *)e2;
+        mCollisionInterface->activatePair(r1->getBase(), r2->getBase(), on);
 
-				for (f2=0;f2<r2->getNumChains();f2++) 
-					for (l2=0;l2<r2->getChain(f2)->getNumLinks();l2++)
-						mCollisionInterface->activatePair(r1->getBase(), r2->getChain(f2)->getLink(l2),on);
+        for (f2 = 0; f2 < r2->getNumChains(); f2++)
+          for (l2 = 0; l2 < r2->getChain(f2)->getNumLinks(); l2++) {
+            mCollisionInterface->activatePair(r1->getBase(), r2->getChain(f2)->getLink(l2), on);
+          }
 
-				for (f=0;f<r1->getNumChains();f++) 
-					for (l=0;l<r1->getChain(f)->getNumLinks();l++) {
-						mCollisionInterface->activatePair(r1->getChain(f)->getLink(l), r2->getBase(), on);
+        for (f = 0; f < r1->getNumChains(); f++)
+          for (l = 0; l < r1->getChain(f)->getNumLinks(); l++) {
+            mCollisionInterface->activatePair(r1->getChain(f)->getLink(l), r2->getBase(), on);
 
-						for (f2=0;f2<r2->getNumChains();f2++) 
-							for (l2=0;l2<r2->getChain(f2)->getNumLinks();l2++)
-								mCollisionInterface->activatePair(r1->getChain(f)->getLink(l), r2->getChain(f2)->getLink(l2), on);
-					}
-			}
-		}else {
-			mCollisionInterface->activateBody(r1->getBase(),on);
-			for (f=0;f<r1->getNumChains();f++) 
-				for (l=0;l<r1->getChain(f)->getNumLinks();l++)
-					mCollisionInterface->activateBody(r1->getChain(f)->getLink(l),on);	
-		}
-	}
+            for (f2 = 0; f2 < r2->getNumChains(); f2++)
+              for (l2 = 0; l2 < r2->getChain(f2)->getNumLinks(); l2++) {
+                mCollisionInterface->activatePair(r1->getChain(f)->getLink(l), r2->getChain(f2)->getLink(l2), on);
+              }
+          }
+      }
+    } else {
+      mCollisionInterface->activateBody(r1->getBase(), on);
+      for (f = 0; f < r1->getNumChains(); f++)
+        for (l = 0; l < r1->getChain(f)->getNumLinks(); l++) {
+          mCollisionInterface->activateBody(r1->getChain(f)->getLink(l), on);
+        }
+    }
+  }
 }
 
-/*! Returns true if the element \a e is not colliding with anything else. 
-Attempts to do it fast by returning as soon as any collision is found, 
+/*! Returns true if the element \a e is not colliding with anything else.
+Attempts to do it fast by returning as soon as any collision is found,
 and only looking at potential collisions that involve \a e.
 */
 bool
 World::noCollision(WorldElement *e)
 {
-	PROF_TIMER_FUNC(WORLD_NO_COLLISION);
-	if (allCollisionsOFF) return true;
+  PROF_TIMER_FUNC(WORLD_NO_COLLISION);
+  if (allCollisionsOFF) { return true; }
 
-	if (!e) {
-		if (mCollisionInterface->allCollisions(CollisionInterface::FAST_COLLISION,NULL,NULL)) return false;
-		return true;
-	}
+  if (!e) {
+    if (mCollisionInterface->allCollisions(CollisionInterface::FAST_COLLISION, NULL, NULL)) { return false; }
+    return true;
+  }
 
-	std::vector<Body*> interestList;
-	if (e->inherits("Body")) {
-		interestList.push_back( (Body*)e );
-	} else if (e->inherits("Robot")) {
-		Robot *r = (Robot*)e;
-		for (int c=0; c < r->getNumChains(); c++) {
-			for (int l=0; l < r->getChain(c)->getNumLinks(); l++) {
-				interestList.push_back( r->getChain(c)->getLink(l) );
-			}
-		}
-		interestList.push_back( r->getBase() );
-		if (r->getMountPiece()) interestList.push_back(r->getMountPiece());
-	} else {
-		DBGA("Unknown case in World::noCollision");
-	}
+  std::vector<Body *> interestList;
+  if (e->inherits("Body")) {
+    interestList.push_back((Body *)e);
+  } else if (e->inherits("Robot")) {
+    Robot *r = (Robot *)e;
+    for (int c = 0; c < r->getNumChains(); c++) {
+      for (int l = 0; l < r->getChain(c)->getNumLinks(); l++) {
+        interestList.push_back(r->getChain(c)->getLink(l));
+      }
+    }
+    interestList.push_back(r->getBase());
+    if (r->getMountPiece()) { interestList.push_back(r->getMountPiece()); }
+  } else {
+    DBGA("Unknown case in World::noCollision");
+  }
 
-	int col = mCollisionInterface->allCollisions(CollisionInterface::FAST_COLLISION, NULL, &interestList);
-	if (col) return false;
-	return true;
+  int col = mCollisionInterface->allCollisions(CollisionInterface::FAST_COLLISION, NULL, &interestList);
+  if (col) { return false; }
+  return true;
 }
 
 /*! Returns a full collision report for the bodies in the \a interestList.
@@ -1475,51 +1493,51 @@ contains. If \a interestList is NULL, is returns a collision report
 for all the bodies in the world.
 */
 int
-World::getCollisionReport(CollisionReport *colReport, const std::vector<Body*> *interestList)
+World::getCollisionReport(CollisionReport *colReport, const std::vector<Body *> *interestList)
 {
-	PROF_TIMER_FUNC(WORLD_COLLISION_REPORT);
-	DBGP("Get COLLISION REPORT")
-		colReport->clear();
-	if (allCollisionsOFF) return 0;
+  PROF_TIMER_FUNC(WORLD_COLLISION_REPORT);
+  DBGP("Get COLLISION REPORT")
+  colReport->clear();
+  if (allCollisionsOFF) { return 0; }
 
-	int numCols;
-	numCols = mCollisionInterface->allCollisions(CollisionInterface::ALL_COLLISIONS, colReport, interestList);
-	return numCols;
+  int numCols;
+  numCols = mCollisionInterface->allCollisions(CollisionInterface::ALL_COLLISIONS, colReport, interestList);
+  return numCols;
 }
 
-void 
+void
 World::getBvs(Body *b, int depth, std::vector<BoundingBox> *bvs)
 {
-	mCollisionInterface->getBoundingVolumes(b, depth, bvs);
+  mCollisionInterface->getBoundingVolumes(b, depth, bvs);
 }
 
-/*! Returns a vector that is the shortest distance from the point \a p 
+/*! Returns a vector that is the shortest distance from the point \a p
 to the body \a b. If \a normal is not NULL, it is set to the surface
-normal of body \a b at the point closest to \a p. Everything is 
+normal of body \a b at the point closest to \a p. Everything is
 expressed in world coordinates.
 */
 vec3
 World::pointDistanceToBody(position p, Body *b, vec3 *normal)
 {
-	PROF_TIMER_FUNC(WORLD_POINT_TO_BODY_DISTANCE);
-	position cp; vec3 cn;
-	mCollisionInterface->pointToBodyDistance(b, p, cp, cn);
-	if (normal) {
-		*normal = cn;
-	}
-	return cp - p;
+  PROF_TIMER_FUNC(WORLD_POINT_TO_BODY_DISTANCE);
+  position cp; vec3 cn;
+  mCollisionInterface->pointToBodyDistance(b, p, cp, cn);
+  if (normal) {
+    *normal = cn;
+  }
+  return cp - p;
 }
 
-/*! Returns the distance between two bodies \a b1 and \a b2 
+/*! Returns the distance between two bodies \a b1 and \a b2
   Deprecated by version below which runs of more general world elements
 */
 /*
 double
 World::getDist(Body *b1,Body *b2)
 {
-	PROF_TIMER_FUNC(WORLD_GET_DIST);
-	position p1,p2;
-	return mCollisionInterface->bodyToBodyDistance(b1,b2,p1,p2);
+  PROF_TIMER_FUNC(WORLD_GET_DIST);
+  position p1,p2;
+  return mCollisionInterface->bodyToBodyDistance(b1,b2,p1,p2);
 }
 */
 
@@ -1534,12 +1552,12 @@ World::getDist(WorldElement *e1, WorldElement *e2)
   if (e1->inherits("Robot")) {
     //Robot <-> Something distance
     //break it down into multiple Something <-> Robot Part distance
-    Robot *r = static_cast<Robot*>(e1);
+    Robot *r = static_cast<Robot *>(e1);
     dist = getDist(e2, r->getBase());
-    for (int c=0; c<r->getNumChains(); c++) {
-      for (int l=0; l<r->getChain(c)->getNumLinks(); l++) {
-	//careful to swap order here!
-	dist = std::min(dist, getDist(e2, r->getChain(c)->getLink(l)));
+    for (int c = 0; c < r->getNumChains(); c++) {
+      for (int l = 0; l < r->getChain(c)->getNumLinks(); l++) {
+        //careful to swap order here!
+        dist = std::min(dist, getDist(e2, r->getChain(c)->getLink(l)));
       }
     }
   } else if (e1->inherits("Body")) {
@@ -1547,14 +1565,14 @@ World::getDist(WorldElement *e1, WorldElement *e2)
       // Body <-> Robot distance
       // turn it around as Robot <-> Body and let previous case take care of it
       return getDist(e2, e1);
-    } else if (e2->inherits("Body")){
+    } else if (e2->inherits("Body")) {
       // Body <-> Body distance
       // only case actually computed here
       position p1, p2;
-      Body *b1 = static_cast<Body*>(e1);
-      Body *b2 = static_cast<Body*>(e2);
+      Body *b1 = static_cast<Body *>(e1);
+      Body *b2 = static_cast<Body *>(e2);
       PROF_TIMER_FUNC(WORLD_GET_DIST);
-      return mCollisionInterface->bodyToBodyDistance(b1,b2,p1,p2);
+      return mCollisionInterface->bodyToBodyDistance(b1, b2, p1, p2);
     } else {
       DBGA("Non-robot and non-body world element in getDist");
       return -1;
@@ -1571,45 +1589,45 @@ World::getDist(WorldElement *e1, WorldElement *e2)
 body, that are closest to each other
 */
 double
-World::getDist(Body *b1,Body *b2, position &p1, position &p2)
+World::getDist(Body *b1, Body *b2, position &p1, position &p2)
 {
-	PROF_TIMER_FUNC(WORLD_GET_DIST);
-	return mCollisionInterface->bodyToBodyDistance(b1,b2,p1,p2);
+  PROF_TIMER_FUNC(WORLD_GET_DIST);
+  return mCollisionInterface->bodyToBodyDistance(b1, b2, p1, p2);
 }
 
 void
 World::findVirtualContacts(Hand *hand, Body *object)
 {
-	PROF_TIMER_FUNC(WORLD_FIND_VIRTUAL_CONTACTS);
-	ContactReport contactSet;
-	for (int f=0; f<hand->getNumFingers(); f++) {
-		for (int l=0; l<hand->getFinger(f)->getNumLinks(); l++) {
-			Link *link = hand->getFinger(f)->getLink(l);
-			link->breakVirtualContacts();
-			ContactData pc = findVirtualContact(link, object);
-			contactSet.clear();
-			contactSet.insert( contactSet.begin(), pc);
-			addVirtualContacts(link, f, l, object, contactSet, false);
-		}
-	}
+  PROF_TIMER_FUNC(WORLD_FIND_VIRTUAL_CONTACTS);
+  ContactReport contactSet;
+  for (int f = 0; f < hand->getNumFingers(); f++) {
+    for (int l = 0; l < hand->getFinger(f)->getNumLinks(); l++) {
+      Link *link = hand->getFinger(f)->getLink(l);
+      link->breakVirtualContacts();
+      ContactData pc = findVirtualContact(link, object);
+      contactSet.clear();
+      contactSet.insert(contactSet.begin(), pc);
+      addVirtualContacts(link, f, l, object, contactSet, false);
+    }
+  }
 
-	hand->getPalm()->breakVirtualContacts();
-	ContactData pc = findVirtualContact(hand->getPalm(), object);
-	contactSet.clear();
-	contactSet.insert( contactSet.begin(), pc);
-	addVirtualContacts(hand->getPalm(), -1, 0, object, contactSet, false);
+  hand->getPalm()->breakVirtualContacts();
+  ContactData pc = findVirtualContact(hand->getPalm(), object);
+  contactSet.clear();
+  contactSet.insert(contactSet.begin(), pc);
+  addVirtualContacts(hand->getPalm(), -1, 0, object, contactSet, false);
 }
 
 ContactData
 World::findVirtualContact(Link *link, Body *object)
 {
-	position p1, p2;
-	getDist(link, object, p1, p2);
-	vec3 n = p1 * link->getTran() - p2 * object->getTran();
-	n = normalise(n);
-	n = n * link->getTran().inverse();
+  position p1, p2;
+  getDist(link, object, p1, p2);
+  vec3 n = p1 * link->getTran() - p2 * object->getTran();
+  n = normalise(n);
+  n = n * link->getTran().inverse();
 
-	return ContactData(p1, p2, n, -n) ;
+  return ContactData(p1, p2, n, -n) ;
 }
 
 /*! Asks each grasp to update itself (i.e. recompute its wrench spaces),
@@ -1618,119 +1636,119 @@ presumably due to some change in  contact geometry.
 void
 World::updateGrasps()
 {
-	bool graspChanged = false;
-	for (int i=0;i<numHands;i++) {
-		if (handVec[i]->contactsChanged()) {
-			handVec[i]->getGrasp()->update();
-			graspChanged = true;
-		}
-	}
-	if (graspChanged) {
-		Q_EMIT graspsUpdated();
-	}
+  bool graspChanged = false;
+  for (int i = 0; i < numHands; i++) {
+    if (handVec[i]->contactsChanged()) {
+      handVec[i]->getGrasp()->update();
+      graspChanged = true;
+    }
+  }
+  if (graspChanged) {
+    Q_EMIT graspsUpdated();
+  }
 }
 
-/*! Finds all the contacts between the bodies listed in the \a colReport. 
+/*! Finds all the contacts between the bodies listed in the \a colReport.
 Usually, the \a colReport is populated by the caller, based on a set
 of bodies that were in collision before, but now are assumed to be out
 of collision and potentially just touching.
 
-A contact occurs when bodies are separated by a distance less than the 
-contact threshold.  This routine uses the collision detection system to 
-find the points of contact between each body and at each one creates a 
+A contact occurs when bodies are separated by a distance less than the
+contact threshold.  This routine uses the collision detection system to
+find the points of contact between each body and at each one creates a
 pair of contact objects which are added to the individual bodies.
 */
 void
 World::findContacts(CollisionReport &colReport)
 {
-	PROF_TIMER_FUNC(WORLD_FIND_CONTACTS);
-	CollisionReport::iterator it = colReport.begin();
-	while(it!=colReport.end()) {
-		CollisionReport::iterator it2;
-		bool duplicate = false;
-		for (it2 = colReport.begin(); it2<it; it2++) {
-			if ( (*it).first == (*it2).first && (*it).second == (*it2).second) {
-				duplicate = true;
-				break;
-			}
-		}
-		if (duplicate) {
-            DBGP("duplicate: " << (*it).first->getName().toStdString().c_str() << "--" <<  (*it).second->getName().toStdString().c_str());
-			it = colReport.erase(it);
-			continue;
-		}
+  PROF_TIMER_FUNC(WORLD_FIND_CONTACTS);
+  CollisionReport::iterator it = colReport.begin();
+  while (it != colReport.end()) {
+    CollisionReport::iterator it2;
+    bool duplicate = false;
+    for (it2 = colReport.begin(); it2 < it; it2++) {
+      if ((*it).first == (*it2).first && (*it).second == (*it2).second) {
+        duplicate = true;
+        break;
+      }
+    }
+    if (duplicate) {
+      DBGP("duplicate: " << (*it).first->getName().toStdString().c_str() << "--" << (*it).second->getName().toStdString().c_str());
+      it = colReport.erase(it);
+      continue;
+    }
 
-		if ( getDist( (*it).first, (*it).second ) > Contact::THRESHOLD ) {
-            DBGP("no contact: " << (*it).first->getName().toStdString().c_str()<< "--" << (*it).second->getName().toStdString().c_str());
-			it = colReport.erase(it);
-			continue;
-		}
-		it++;
-	}
+    if (getDist((*it).first, (*it).second) > Contact::THRESHOLD) {
+      DBGP("no contact: " << (*it).first->getName().toStdString().c_str() << "--" << (*it).second->getName().toStdString().c_str());
+      it = colReport.erase(it);
+      continue;
+    }
+    it++;
+  }
 
-	ContactReport cres;
-	for (int i=0; i<(int)colReport.size(); i++) {
-		std::list<Contact*> contacts = colReport[i].first->getContacts();
-		std::list<Contact*>::iterator it;
-		for (it = contacts.begin(); it!=contacts.end(); it++) {
-			if ( (*it)->getBody1() == colReport[i].first && (*it)->getBody2() == colReport[i].second) {
-				colReport[i].first->removeContact(*it);
-			}
-		}
-		cres.clear();
-		mCollisionInterface->contact(&cres, Contact::THRESHOLD, colReport[i].first, colReport[i].second);
-		addContacts(colReport[i].first, colReport[i].second, cres, softContactsAreOn());
-	}
+  ContactReport cres;
+  for (int i = 0; i < (int)colReport.size(); i++) {
+    std::list<Contact *> contacts = colReport[i].first->getContacts();
+    std::list<Contact *>::iterator it;
+    for (it = contacts.begin(); it != contacts.end(); it++) {
+      if ((*it)->getBody1() == colReport[i].first && (*it)->getBody2() == colReport[i].second) {
+        colReport[i].first->removeContact(*it);
+      }
+    }
+    cres.clear();
+    mCollisionInterface->contact(&cres, Contact::THRESHOLD, colReport[i].first, colReport[i].second);
+    addContacts(colReport[i].first, colReport[i].second, cres, softContactsAreOn());
+  }
 }
 
-/*! Finds all the contact on body \a b. A pair of contact objects is created 
+/*! Finds all the contact on body \a b. A pair of contact objects is created
 for each contact and are added to the individual bodies that are in contact.
 */
 void
 World::findContacts(Body *b)
 {
-	PROF_TIMER_FUNC(WORLD_FIND_CONTACTS);
-	ContactReport contactReport;
-	for (int i=0;i<numBodies;i++) {
-		if (bodyVec[i] != b) {
-			mCollisionInterface->contact(&contactReport, Contact::THRESHOLD, b, bodyVec[i]);
-			addContacts(b, bodyVec[i], contactReport, softContactsAreOn());
-		}
-	}
+  PROF_TIMER_FUNC(WORLD_FIND_CONTACTS);
+  ContactReport contactReport;
+  for (int i = 0; i < numBodies; i++) {
+    if (bodyVec[i] != b) {
+      mCollisionInterface->contact(&contactReport, Contact::THRESHOLD, b, bodyVec[i]);
+      addContacts(b, bodyVec[i], contactReport, softContactsAreOn());
+    }
+  }
 }
 
-/*! Finds and adds all the contacts between any two bodies in the world. 
-A pair of contact objects is created for each contact and are added 
+/*! Finds and adds all the contacts between any two bodies in the world.
+A pair of contact objects is created for each contact and are added
 to the individual bodies that are in contact.
 */
 void
 World::findAllContacts()
 {
-	PROF_TIMER_FUNC(WORLD_FIND_CONTACTS);
-	for (int i=0;i<numBodies;i++) {
-		bodyVec[i]->resetContactList();
-	}
-	if (allCollisionsOFF) return;
-	CollisionReport report;
-	int numContacts;
-	numContacts = mCollisionInterface->allContacts(&report, Contact::THRESHOLD, NULL);
-	DBGP("found " << numContacts << " contacts. Adding...");
-	for (int i=0;i<numContacts;i++) {
-		addContacts( report[i].first, report[i].second, report[i].contacts, softContactsAreOn());
-		DBGP( report[i].first->getName().toStdString().c_str() << " - " << report[i].second->getName().toStdString().c_str() );
-	}
+  PROF_TIMER_FUNC(WORLD_FIND_CONTACTS);
+  for (int i = 0; i < numBodies; i++) {
+    bodyVec[i]->resetContactList();
+  }
+  if (allCollisionsOFF) { return; }
+  CollisionReport report;
+  int numContacts;
+  numContacts = mCollisionInterface->allContacts(&report, Contact::THRESHOLD, NULL);
+  DBGP("found " << numContacts << " contacts. Adding...");
+  for (int i = 0; i < numContacts; i++) {
+    addContacts(report[i].first, report[i].second, report[i].contacts, softContactsAreOn());
+    DBGP(report[i].first->getName().toStdString().c_str() << " - " << report[i].second->getName().toStdString().c_str());
+  }
 }
 
 
-/*! Takes a point and sends it to the collision detection system to find 
+/*! Takes a point and sends it to the collision detection system to find
 the neighborhood of that point on a body, used in soft contacts for the
 input for the paraboloid fitter.
 */
-void World::FindRegion( const Body *body, position point, vec3 normal, double radius,
-					   Neighborhood *neighborhood)
+void World::FindRegion(const Body *body, position point, vec3 normal, double radius,
+                       Neighborhood *neighborhood)
 {
-	PROF_TIMER_FUNC(WORLD_FIND_REGION);
-	mCollisionInterface->bodyRegion(body, point, normal, radius, neighborhood);
+  PROF_TIMER_FUNC(WORLD_FIND_REGION);
+  mCollisionInterface->bodyRegion(body, point, normal, radius, neighborhood);
 }
 
 /*! Starts dynamic simulation. This is all the user has to do; from now
@@ -1739,8 +1757,8 @@ The only way to determine the motion of the bodies is to set desired
 values for the robot dofs and let the world time step computations and
 the robot dof controllers do the rest.
 
-Use the resetDynamics routine to fix the base robot of every collection 
-of robots so that it does not fall under gravity and to set the desired 
+Use the resetDynamics routine to fix the base robot of every collection
+of robots so that it does not fall under gravity and to set the desired
 pose of each robot to be it's current state so that the controllers try
 to maintain the current positions until the user requests something
 different.
@@ -1748,69 +1766,69 @@ different.
 void
 World::turnOnDynamics()
 {
-	//PROF_RESET_ALL;
-	//PROF_START_TIMER(DYNAMICS);
-	dynamicsOn = true;
-    mDynamicsEngine->turnOnDynamics();
-	if (idleSensor) delete idleSensor;
-	idleSensor = new SoIdleSensor(dynamicsCB,this);
-	idleSensor->schedule();
+  //PROF_RESET_ALL;
+  //PROF_START_TIMER(DYNAMICS);
+  dynamicsOn = true;
+  mDynamicsEngine->turnOnDynamics();
+  if (idleSensor) { delete idleSensor; }
+  idleSensor = new SoIdleSensor(dynamicsCB, this);
+  idleSensor->schedule();
 }
 
 /*! Pauses dynamic simulation; no more time steps are computed*/
 void
 World::turnOffDynamics()
 {
-	//PROF_STOP_TIMER(DYNAMICS);
-	//PROF_PRINT_ALL;
-	if (idleSensor) delete idleSensor;
-	idleSensor = NULL;
-	dynamicsOn = false;
-    mDynamicsEngine->turnOffDynamics();
-	for (int i=0; i<numRobots; i++) {
-		//actually set joint values
-		robotVec[i]->updateJointValuesFromDynamics();
-		//try to approximate robot dof values based on where the joints ended up
-		robotVec[i]->updateDOFFromJoints(NULL);
-	}
-	updateGrasps();
+  //PROF_STOP_TIMER(DYNAMICS);
+  //PROF_PRINT_ALL;
+  if (idleSensor) { delete idleSensor; }
+  idleSensor = NULL;
+  dynamicsOn = false;
+  mDynamicsEngine->turnOffDynamics();
+  for (int i = 0; i < numRobots; i++) {
+    //actually set joint values
+    robotVec[i]->updateJointValuesFromDynamics();
+    //try to approximate robot dof values based on where the joints ended up
+    robotVec[i]->updateDOFFromJoints(NULL);
+  }
+  updateGrasps();
 }
 
-/*! Resets the velocities and accelerations of all bodies; fixes the base 
-robot of every collection of robots so that it is not affected by gravity 
-and sets the desired pose of each robot to be it's current state so that 
-the controllers try to maintain the current positions until the user 
+/*! Resets the velocities and accelerations of all bodies; fixes the base
+robot of every collection of robots so that it is not affected by gravity
+and sets the desired pose of each robot to be it's current state so that
+the controllers try to maintain the current positions until the user
 requests something different.
 */
 void World::resetDynamics()
 {
-	int i,d;
-	std::vector<double> zeroes(6,0.0);
-	//clear the dynamic stack of all objects
-	for (i=0;i<numBodies;i++) {
-		if (bodyVec[i]->isDynamic()) {
-			((DynamicBody *)bodyVec[i])->clearState();
-			((DynamicBody *)bodyVec[i])->setAccel(&zeroes[0]);
-			((DynamicBody *)bodyVec[i])->setVelocity(&zeroes[0]);
-		}
-	}
+  int i, d;
+  std::vector<double> zeroes(6, 0.0);
+  //clear the dynamic stack of all objects
+  for (i = 0; i < numBodies; i++) {
+    if (bodyVec[i]->isDynamic()) {
+      ((DynamicBody *)bodyVec[i])->clearState();
+      ((DynamicBody *)bodyVec[i])->setAccel(&zeroes[0]);
+      ((DynamicBody *)bodyVec[i])->setVelocity(&zeroes[0]);
+    }
+  }
 
-	//push the initial dynamic state
-	pushDynamicState();
+  //push the initial dynamic state
+  pushDynamicState();
 
-	for (i=0;i<numRobots;i++) {
-		//set robot desired position to current position
-		for (d=0;d<robotVec[i]->getNumDOF();d++) {
-			robotVec[i]->getDOF(d)->setDesiredPos(robotVec[i]->getDOF(d)->getVal());
-		}
-	}   
+  for (i = 0; i < numRobots; i++) {
+    //set robot desired position to current position
+    for (d = 0; d < robotVec[i]->getNumDOF(); d++) {
+      robotVec[i]->getDOF(d)->setDesiredPos(robotVec[i]->getDOF(d)->getVal());
+    }
+  }
 }
 
 void
-World::dynamicsCB(void *data,SoSensor *)
+World::dynamicsCB(void *data, SoSensor *)
 {
-	World *myWorld = (World *)data;
-	myWorld->stepDynamics();
+  World *myWorld = (World *)data;
+  myWorld->stepDynamics();
 }
 
 /*! Saves the current dynamic state (velocities and accelerations of
@@ -1819,41 +1837,42 @@ all bodies) onto a stack.
 void
 World::pushDynamicState()
 {
-	for (int i=0;i<numBodies;i++)
-		if (bodyVec[i]->isDynamic())
-			((DynamicBody *)bodyVec[i])->pushState();
+  for (int i = 0; i < numBodies; i++)
+    if (bodyVec[i]->isDynamic()) {
+      ((DynamicBody *)bodyVec[i])->pushState();
+    }
 }
 
 /*! Restores the dynamic state currently at the top of the stack */
 void
 World::popDynamicState()
 {
-	bool stackEmpty = false;
-	for (int i=0;i<numBodies;i++) {
-		if (bodyVec[i]->isDynamic()) {
-			if (!((DynamicBody *)bodyVec[i])->popState()) stackEmpty = true;
-		}
-	}
-	if (stackEmpty) {
-		DBGA("Resetting dynamics");
-		resetDynamics();
-	}
+  bool stackEmpty = false;
+  for (int i = 0; i < numBodies; i++) {
+    if (bodyVec[i]->isDynamic()) {
+      if (!((DynamicBody *)bodyVec[i])->popState()) { stackEmpty = true; }
+    }
+  }
+  if (stackEmpty) {
+    DBGA("Resetting dynamics");
+    resetDynamics();
+  }
 }
 
 void
 World::resetDynamicWrenches()
 {
-	for (int i=0; i<numBodies; i++) {
-		if (bodyVec[i]->isDynamic()) {
-			((DynamicBody*)bodyVec[i])->resetExtWrenchAcc();
-		}
-	}
+  for (int i = 0; i < numBodies; i++) {
+    if (bodyVec[i]->isDynamic()) {
+      ((DynamicBody *)bodyVec[i])->resetExtWrenchAcc();
+    }
+  }
 }
 
 DynamicsEngine *
 World::getDynamicsEngine()
 {
-    return mDynamicsEngine;
+  return mDynamicsEngine;
 }
 
 /*! A complete dynamics step:
@@ -1868,86 +1887,93 @@ joint constraints, for the next time step.
 void
 World::stepDynamics()
 {
-    int ret;
-    ret=mDynamicsEngine->stepDynamics();
-    if(ret==-1){
-      return;
-    }
-	if (idleSensor) idleSensor->schedule();
+  int ret;
+  ret = mDynamicsEngine->stepDynamics();
+  if (ret == -1) {
+    return;
+  }
+  if (idleSensor) { idleSensor->schedule(); }
 }
 
 void World::selectTendon(Tendon *t)
 {
-	if (isTendonSelected)
-		selectedTendon->deselect();
+  if (isTendonSelected) {
+    selectedTendon->deselect();
+  }
 
-	isTendonSelected = true;
-	selectedTendon = t;
-	selectedTendon->select();
+  isTendonSelected = true;
+  selectedTendon = t;
+  selectedTendon->select();
 
-	//we need to change selected hand to the hand that owns currently selected tendon
-	//so we can populate the drop-down tendon list in the GUI
-	if ( getCurrentHand() != (Hand*)selectedTendon->getRobot() ) setCurrentHand( (Hand*)t->getRobot() );
+  //we need to change selected hand to the hand that owns currently selected tendon
+  //so we can populate the drop-down tendon list in the GUI
+  if (getCurrentHand() != (Hand *)selectedTendon->getRobot()) { setCurrentHand((Hand *)t->getRobot()); }
 
-	Q_EMIT tendonSelectionChanged();
+  Q_EMIT tendonSelectionChanged();
 }
 
 void World::selectTendon(int i)
 {
-	if (isTendonSelected)
-		selectedTendon->deselect();
+  if (isTendonSelected) {
+    selectedTendon->deselect();
+  }
 
-	// i is supposed to be an index into the currently selected hand's list of tendons
-	if (!currentHand)
-	{
-		printf("ERROR: no hand selected\n");
-		return;
-	}
-	if (! currentHand->inherits("HumanHand") )
-	{
-		printf("ERROR: selected hand is not tendon-actuated\n");
-		return;
-	}
+  // i is supposed to be an index into the currently selected hand's list of tendons
+  if (!currentHand)
+  {
+    printf("ERROR: no hand selected\n");
+    return;
+  }
+  if (! currentHand->inherits("HumanHand"))
+  {
+    printf("ERROR: selected hand is not tendon-actuated\n");
+    return;
+  }
 
-	if ( ((HumanHand*)currentHand)->getNumTendons() <= i)
-	{
-		printf("ERROR: selected hand has fewer tendons than passed parameter\n");
-		return;
-	}
+  if (((HumanHand *)currentHand)->getNumTendons() <= i)
+  {
+    printf("ERROR: selected hand has fewer tendons than passed parameter\n");
+    return;
+  }
 
-	if (isTendonSelected)
-		selectedTendon->deselect();
+  if (isTendonSelected) {
+    selectedTendon->deselect();
+  }
 
-	isTendonSelected = true;
-	selectedTendon = ((HumanHand*)currentHand)->getTendon(i);
-	selectedTendon->select();
-	Q_EMIT tendonSelectionChanged();
+  isTendonSelected = true;
+  selectedTendon = ((HumanHand *)currentHand)->getTendon(i);
+  selectedTendon->select();
+  Q_EMIT tendonSelectionChanged();
 }
 
 void World::deselectTendon()
 {
-	isTendonSelected = false;
-	if (selectedTendon)
-		selectedTendon->deselect();
-	selectedTendon = NULL;
-	Q_EMIT tendonSelectionChanged();
+  isTendonSelected = false;
+  if (selectedTendon) {
+    selectedTendon->deselect();
+  }
+  selectedTendon = NULL;
+  Q_EMIT tendonSelectionChanged();
 }
 
 int World::getCurrentHandNumberTendons()
 {
-	if (!currentHand)
-		return 0;
-	if (! currentHand->inherits("HumanHand") )
-		return 0;
+  if (!currentHand) {
+    return 0;
+  }
+  if (! currentHand->inherits("HumanHand")) {
+    return 0;
+  }
 
-	return ((HumanHand*)currentHand)->getNumTendons();
+  return ((HumanHand *)currentHand)->getNumTendons();
 }
 
 QString World::getSelectedHandTendonName(int i)
 {
-	/*return the name of the i-th tendon of the currently selected hand*/
-	if (i>=getCurrentHandNumberTendons())
-		return QString("Error reading name");
+  /*return the name of the i-th tendon of the currently selected hand*/
+  if (i >= getCurrentHandNumberTendons()) {
+    return QString("Error reading name");
+  }
 
-	return ((HumanHand*)currentHand)->getTendon(i)->getName();
+  return ((HumanHand *)currentHand)->getTendon(i)->getName();
 }

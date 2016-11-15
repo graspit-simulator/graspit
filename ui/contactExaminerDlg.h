@@ -42,63 +42,63 @@ class Grasp;
 
 //! Dialog for creating, saving, loading and inspecting virtual contacts
 /*! This dialog enables a user to create virtual contacts on a hand, save
-	them to a file, load virtual contacts from the file and inspect them.
-	It needs a hand and an actual object; the user must create traditional
-	contacts between the hand and the object, then use this dialog to mark
-	them as virtual. The contacts then continue to exist as virtual contacts
-	even after the object has been moved away. The newly created virtual
-	contacts can then be saved to a file, or previously saved virtual contacts
-	can be loaded from a file.
-	
-	This dialog can also be used to compute a "virtual" grasp quality of
-	all the virtual contacts on the hand, without need for an object. However,
-	this functionality has not been tested recently. Overall, this dialog
-	is in need of a re-design.
+  them to a file, load virtual contacts from the file and inspect them.
+  It needs a hand and an actual object; the user must create traditional
+  contacts between the hand and the object, then use this dialog to mark
+  them as virtual. The contacts then continue to exist as virtual contacts
+  even after the object has been moved away. The newly created virtual
+  contacts can then be saved to a file, or previously saved virtual contacts
+  can be loaded from a file.
 
-	The same functionality can be applied to objects: you can load an object,
-	mark contacts as virtual ot just load pre-saved virtual contacts from
-	a file, and then compute grasp quality without needing a hand at all.
+  This dialog can also be used to compute a "virtual" grasp quality of
+  all the virtual contacts on the hand, without need for an object. However,
+  this functionality has not been tested recently. Overall, this dialog
+  is in need of a re-design.
 
-	WARNING: this is code under construction, not very robust.
+  The same functionality can be applied to objects: you can load an object,
+  mark contacts as virtual ot just load pre-saved virtual contacts from
+  a file, and then compute grasp quality without needing a hand at all.
+
+  WARNING: this is code under construction, not very robust.
 */
 class ContactExaminerDlg : public QDialog, public Ui::ContactExaminerDlgUI
 {
-	Q_OBJECT
-private:
-	World *mWorld;
-	Hand *mHand;
-	GraspableBody * mObject;
-	Grasp* mGrasp;
-	std::vector<Contact*> mMarkedContacts;
-	QualityMeasure *mQual;
+    Q_OBJECT
+  private:
+    World *mWorld;
+    Hand *mHand;
+    GraspableBody *mObject;
+    Grasp *mGrasp;
+    std::vector<Contact *> mMarkedContacts;
+    QualityMeasure *mQual;
 
-	void init();
-	void destroy();
-	void updateButtons();
-	void showQuality();
-	void collectHandContacts();
-	void collectObjectContacts();
+    void init();
+    void destroy();
+    void updateButtons();
+    void showQuality();
+    void collectHandContacts();
+    void collectObjectContacts();
 
-public:
-	ContactExaminerDlg(QWidget *parent = 0) : QDialog(parent), 
-	  mWorld(NULL), mHand(NULL), mObject(NULL), mGrasp(NULL),mQual(NULL)
-	{
-		setupUi(this);
-		init();
-		QObject::connect(handRadioButton, SIGNAL(clicked()), this, SLOT(modeSelected()));
-		QObject::connect(objectRadioButton, SIGNAL(clicked()), this, SLOT(modeSelected()));
-	}
-	~ContactExaminerDlg(){destroy();}
+  public:
+    ContactExaminerDlg(QWidget *parent = 0) : QDialog(parent),
+      mWorld(NULL), mHand(NULL), mObject(NULL), mGrasp(NULL), mQual(NULL)
+    {
+      setupUi(this);
+      init();
+      QObject::connect(handRadioButton, SIGNAL(clicked()), this, SLOT(modeSelected()));
+      QObject::connect(objectRadioButton, SIGNAL(clicked()), this, SLOT(modeSelected()));
+    }
+    ~ContactExaminerDlg() {destroy();}
 
-public Q_SLOTS:
+  public Q_SLOTS:
 
-	void markButton_clicked();
-	void loadButton_clicked();
-	void saveButton_clicked();
-	void exitButton_clicked();
-	void updateQualityButton_clicked();
-	void clearButton_clicked();
-	void showGWSButton_clicked();
-	void modeSelected();
+    void markButton_clicked();
+    void loadButton_clicked();
+    void saveButton_clicked();
+    void exitButton_clicked();
+    void updateQualityButton_clicked();
+    void clearButton_clicked();
+    void showGWSButton_clicked();
+    void modeSelected();
 };
 #endif

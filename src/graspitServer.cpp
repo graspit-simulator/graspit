@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: graspitServer.cpp,v 1.7 2009/03/25 22:10:04 cmatei Exp $
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Implements the application's TCP server.
  */
 
@@ -44,7 +44,7 @@
 ClientSocket::~ClientSocket()
 {
 #ifdef GRASPITDBG
-  std::cout << "client socket destroyed"<<std::endl;
+  std::cout << "client socket destroyed" << std::endl;
 #endif
 }
 
@@ -61,44 +61,45 @@ int
 ClientSocket::readBodyIndList(std::vector<Body *> &bodyVec)
 {
   QTextStream os(this);
-  int i,numBodies,bodNum;
+  int i, numBodies, bodNum;
   bool ok;
   World *world = graspitCore->getWorld();
-  std::cout << "ReadBodyIndList Line:"<<line.latin1() << std::endl;
+  std::cout << "ReadBodyIndList Line:" << line.latin1() << std::endl;
 
   /* if the index list is empty, use every body and send
      back the count
   */
 
-  if (strPtr == lineStrList.end()) return FAILURE;
+  if (strPtr == lineStrList.end()) { return FAILURE; }
 
   if ((*strPtr).startsWith("ALL")) {
     strPtr++;
-    for (i=0;i<world->getNumBodies();i++)
+    for (i = 0; i < world->getNumBodies(); i++) {
       bodyVec.push_back(world->getBody(i));
-    std::cout << "Sending num bodies: "<<world->getNumBodies()<<std::endl;
+    }
+    std::cout << "Sending num bodies: " << world->getNumBodies() << std::endl;
     os << world->getNumBodies() << endl;
     return SUCCESS;
   }
-  
+
   numBodies = (*strPtr).toInt(&ok);
-  if (!ok) return FAILURE;
+  if (!ok) { return FAILURE; }
   strPtr++;
-  
-  for (i=0;i<numBodies;i++) {
-    if (strPtr == lineStrList.end()) return FAILURE;
+
+  for (i = 0; i < numBodies; i++) {
+    if (strPtr == lineStrList.end()) { return FAILURE; }
     bodNum = (*strPtr).toInt(&ok);
-    if (!ok) return FAILURE;
-    
-    if (bodNum>=0 && bodNum<world->getNumBodies()) {
+    if (!ok) { return FAILURE; }
+
+    if (bodNum >= 0 && bodNum < world->getNumBodies()) {
       bodyVec.push_back(world->getBody(bodNum));
-      if (world->getBody(bodNum)==NULL) {
-	os << "Error: Cannot find body " << bodNum <<"\n";
+      if (world->getBody(bodNum) == NULL) {
+        os << "Error: Cannot find body " << bodNum << "\n";
         return FAILURE;
       }
     }
     else {
-      os << "Error: Cannot find body " << bodNum <<"\n";
+      os << "Error: Cannot find body " << bodNum << "\n";
       return FAILURE;
     }
     strPtr++;
@@ -120,43 +121,44 @@ int
 ClientSocket::readRobotIndList(std::vector<Robot *> &robVec)
 {
   QTextStream os(this);
-  int i,robNum,numRobots;
+  int i, robNum, numRobots;
   bool ok;
   World *world = graspitCore->getWorld();
-  std::cout << "ReadRobotIndList Line:"<<line.latin1() << std::endl;
+  std::cout << "ReadRobotIndList Line:" << line.latin1() << std::endl;
 
   /* if the index list is empty, use every robot and send
      back the count
   */
-  if (strPtr == lineStrList.end()) return FAILURE;
+  if (strPtr == lineStrList.end()) { return FAILURE; }
 
   if ((*strPtr).startsWith("ALL")) {
     strPtr++;
-    for (i=0;i<world->getNumRobots();i++)
+    for (i = 0; i < world->getNumRobots(); i++) {
       robVec.push_back(world->getRobot(i));
-    std::cout << "Sending num robots: "<<world->getNumRobots()<<std::endl;
+    }
+    std::cout << "Sending num robots: " << world->getNumRobots() << std::endl;
     os << world->getNumRobots() << endl;
     return SUCCESS;
   }
-  
+
   numRobots = (*strPtr).toInt(&ok);
-  if (!ok) return FAILURE;
+  if (!ok) { return FAILURE; }
   strPtr++;
-  
-  for (i=0;i<numRobots;i++) {
-    if (strPtr == lineStrList.end()) return FAILURE;
+
+  for (i = 0; i < numRobots; i++) {
+    if (strPtr == lineStrList.end()) { return FAILURE; }
     robNum = (*strPtr).toInt(&ok);
-    if (!ok) return FAILURE;
-    
-    if (robNum>=0 && robNum<world->getNumRobots()) {
+    if (!ok) { return FAILURE; }
+
+    if (robNum >= 0 && robNum < world->getNumRobots()) {
       robVec.push_back(world->getRobot(robNum));
-      if (world->getRobot(robNum)==NULL) {
-	os << "Error: Cannot find robot " << robNum <<"\n";
+      if (world->getRobot(robNum) == NULL) {
+        os << "Error: Cannot find robot " << robNum << "\n";
         return FAILURE;
       }
     }
     else {
-      os << "Error: Cannot find robot " << robNum <<"\n";
+      os << "Error: Cannot find robot " << robNum << "\n";
       return FAILURE;
     }
     strPtr++;
@@ -176,117 +178,126 @@ ClientSocket::readRobotIndList(std::vector<Robot *> &robVec)
 void
 ClientSocket::readClient()
 {
-  int i,numData,numBodies,numRobots;
+  int i, numData, numBodies, numRobots;
   double time;
   std::vector<Body *> bodyVec;
   std::vector<Robot *> robVec;
 
   bool ok;
 
-  while ( canReadLine() ) {
+  while (canReadLine()) {
     line = readLine();
-    line.truncate(line.length()-1); //strip newline character
+    line.truncate(line.length() - 1); //strip newline character
     lineStrList =
-      QStringList::split(' ',line);
+      QStringList::split(' ', line);
     strPtr = lineStrList.begin();
 
 #ifdef GRASPITDBG
-    std::cout <<"Command parser line: "<< line.toStdString().c_str() << std::endl;
+    std::cout << "Command parser line: " << line.toStdString().c_str() << std::endl;
 #endif
-    
+
     if (*strPtr == "getContacts") {
-      strPtr++; if (strPtr == lineStrList.end()) continue;
+      strPtr++; if (strPtr == lineStrList.end()) { continue; }
       numData = (*strPtr).toInt(&ok); strPtr++;
-      if (!ok) continue;
+      if (!ok) { continue; }
 
 #ifdef GRASPITDBG
-      std::cout << "Num data: "<< numData <<std::endl;
+      std::cout << "Num data: " << numData << std::endl;
 #endif
 
-      if (readBodyIndList(bodyVec)) continue;
+      if (readBodyIndList(bodyVec)) { continue; }
       numBodies = bodyVec.size();
-      for (i=0;i<numBodies;i++)
-        sendContacts(bodyVec[i],numData);
+      for (i = 0; i < numBodies; i++) {
+        sendContacts(bodyVec[i], numData);
+      }
     }
-    
+
     else if (*strPtr == "getAverageContacts") {
       strPtr++;
-      if (readBodyIndList(bodyVec)) continue;
+      if (readBodyIndList(bodyVec)) { continue; }
       numBodies = bodyVec.size();
-      for (i=0;i<numBodies;i++)
-	sendAverageContacts(bodyVec[i]);
+      for (i = 0; i < numBodies; i++) {
+        sendAverageContacts(bodyVec[i]);
+      }
     }
-    
+
     else if (*strPtr == "getBodyName") {
       strPtr++;
-      if (readBodyIndList(bodyVec)) continue;
+      if (readBodyIndList(bodyVec)) { continue; }
       numBodies = bodyVec.size();
-      for (i=0;i<numBodies;i++)
-	sendBodyName(bodyVec[i]);
+      for (i = 0; i < numBodies; i++) {
+        sendBodyName(bodyVec[i]);
+      }
     }
-    
+
     else if (*strPtr == "getRobotName") {
       strPtr++;
-      if (readRobotIndList(robVec)) continue;
+      if (readRobotIndList(robVec)) { continue; }
       numRobots = robVec.size();
-      for (i=0;i<numRobots;i++)
-	sendRobotName(robVec[i]);
+      for (i = 0; i < numRobots; i++) {
+        sendRobotName(robVec[i]);
+      }
     }
-    
+
     else if (*strPtr == "getDOFVals") {
       strPtr++;
-      if (readRobotIndList(robVec)) continue;
+      if (readRobotIndList(robVec)) { continue; }
       numRobots = robVec.size();
-      for (i=0;i<numRobots;i++)
-	sendDOFVals(robVec[i]);
+      for (i = 0; i < numRobots; i++) {
+        sendDOFVals(robVec[i]);
+      }
     }
-    
+
     else if (*strPtr == "moveDOFs") {
       strPtr++;
       readDOFVals();
     }
-    
-    else if (*strPtr == "render")
+
+    else if (*strPtr == "render") {
       graspitCore->getIVmgr()->getViewer()->render();
-    
+    }
+
     else if (*strPtr == "setDOFForces") {
       strPtr++;
-      if (readRobotIndList(robVec)) continue;
+      if (readRobotIndList(robVec)) { continue; }
       numRobots = robVec.size();
-      for (i=0;i<numRobots;i++)
-	if (readDOFForces(robVec[i])==FAILURE) continue;
+      for (i = 0; i < numRobots; i++)
+        if (readDOFForces(robVec[i]) == FAILURE) { continue; }
     }
-    else if (*strPtr == "moveToContacts")
+    else if (*strPtr == "moveToContacts") {
       graspitCore->getWorld()->getCurrentHand()->approachToContact(30, true);
- 
+    }
+
     else if ((*strPtr) == "moveDynamicBodies") {
       strPtr++;
-      if (strPtr == lineStrList.end()) ok = FALSE;
+      if (strPtr == lineStrList.end()) { ok = FALSE; }
       else {
-	time = (*strPtr).toDouble(&ok); strPtr++;
+        time = (*strPtr).toDouble(&ok); strPtr++;
       }
-      if (!ok)
-	moveDynamicBodies(-1);
-      else
-	moveDynamicBodies(time);
+      if (!ok) {
+        moveDynamicBodies(-1);
+      }
+      else {
+        moveDynamicBodies(time);
+      }
     }
-    
+
     else if (*strPtr == "computeNewVelocities") {
 
 #ifdef GRASPITDBG
       std::cout << "cnv" << std::endl;
 #endif
 
-      strPtr++; if (strPtr == lineStrList.end()) continue;
+      strPtr++; if (strPtr == lineStrList.end()) { continue; }
       time = (*strPtr).toDouble(&ok); strPtr++;
-      if (!ok) continue;
+      if (!ok) { continue; }
 
 #ifdef GRASPITDBG
-      std::cout << time <<std::endl;
+      std::cout << time << std::endl;
 #endif
       computeNewVelocities(time);
     }
-    
+
   }
 }
 
@@ -297,32 +308,32 @@ ClientSocket::readClient()
   socket on 2 separate lines.
 */
 void
-ClientSocket::sendAverageContacts(Body* bod)
+ClientSocket::sendAverageContacts(Body *bod)
 {
   QTextStream os(this);
   std::list<Contact *> contactList;
   std::list<Contact *>::iterator cp;
-  int i,numContacts;
-  double totalWrench[6]={0.0,0.0,0.0,0.0,0.0,0.0};
+  int i, numContacts;
+  double totalWrench[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double *wrench;
   vec3 totalLoc = vec3::ZERO;
 
   numContacts = bod->getNumContacts();
   contactList = bod->getContacts();
-  for (cp=contactList.begin();cp!=contactList.end();cp++) {
+  for (cp = contactList.begin(); cp != contactList.end(); cp++) {
     wrench = (*cp)->getDynamicContactWrench();
-    for (i=0;i<6;i++) totalWrench[i] += wrench[i];
+    for (i = 0; i < 6; i++) { totalWrench[i] += wrench[i]; }
     totalLoc += (*cp)->getContactFrame().translation();
   }
 
-  if (numContacts>1) {
-    for (i=0;i<6;i++) totalWrench[i] /= numContacts;
+  if (numContacts > 1) {
+    for (i = 0; i < 6; i++) { totalWrench[i] /= numContacts; }
     totalLoc = totalLoc / numContacts;
   }
 
-  os << totalWrench[0]<<" "<<totalWrench[1]<<" "<<totalWrench[2]<<
-    " "<<totalWrench[3]<<" "<<totalWrench[4]<<" "<<totalWrench[5]<<"\n";
-  os << totalLoc[0] << " "<<totalLoc[1] << " " <<totalLoc[2]<<"\n";
+  os << totalWrench[0] << " " << totalWrench[1] << " " << totalWrench[2] <<
+     " " << totalWrench[3] << " " << totalWrench[4] << " " << totalWrench[5] << "\n";
+  os << totalLoc[0] << " " << totalLoc[1] << " " << totalLoc[2] << "\n";
 
 }
 
@@ -331,7 +342,7 @@ ClientSocket::sendAverageContacts(Body* bod)
   to the socket.
 */
 void
-ClientSocket::sendBodyName(Body* bod)
+ClientSocket::sendBodyName(Body *bod)
 {
   QTextStream os(this);
   std::cout << "sending " << bod->getName().latin1() << "\n";
@@ -343,7 +354,7 @@ ClientSocket::sendBodyName(Body* bod)
   to the socket.
 */
 void
-ClientSocket::sendRobotName(Robot* rob)
+ClientSocket::sendRobotName(Robot *rob)
 {
   QTextStream os(this);
   std::cout << "sending " << rob->getName().latin1() << "\n";
@@ -359,7 +370,7 @@ ClientSocket::sendRobotName(Robot* rob)
   constraint error for that contact.
 */
 void
-ClientSocket::sendContacts(Body *bod,int numData)
+ClientSocket::sendContacts(Body *bod, int numData)
 {
   QTextStream os(this);
   std::list<Contact *> contactList;
@@ -369,23 +380,25 @@ ClientSocket::sendContacts(Body *bod,int numData)
   double *wrench;
 
 #ifdef GRASPITDBG
-  std::cout << "sending numContacts: "<<bod->getNumContacts()<<std::endl;
+  std::cout << "sending numContacts: " << bod->getNumContacts() << std::endl;
 #endif
 
-  os << bod->getNumContacts()<<"\n";
+  os << bod->getNumContacts() << "\n";
 
   contactList = bod->getContacts();
-  for (cp=contactList.begin();cp!=contactList.end();cp++) {
-	wrench = (*cp)->getDynamicContactWrench();
-	loc = (*cp)->getContactFrame().translation();
-	err = (*cp)->getConstraintError();
+  for (cp = contactList.begin(); cp != contactList.end(); cp++) {
+    wrench = (*cp)->getDynamicContactWrench();
+    loc = (*cp)->getContactFrame().translation();
+    err = (*cp)->getConstraintError();
 
-    os << wrench[0]<<" "<<wrench[1]<<" "<<wrench[2]<<" "<<wrench[3]<<" "<<
-      wrench[4]<<" "<<wrench[5]<<"\n";
-	if (numData > 1) 
-	  os << loc[0] << " "<< loc[1] << " " << loc[2]<<"\n";
-	if (numData > 2)
-	  os << err << "\n";
+    os << wrench[0] << " " << wrench[1] << " " << wrench[2] << " " << wrench[3] << " " <<
+       wrench[4] << " " << wrench[5] << "\n";
+    if (numData > 1) {
+      os << loc[0] << " " << loc[1] << " " << loc[2] << "\n";
+    }
+    if (numData > 2) {
+      os << err << "\n";
+    }
   }
 }
 
@@ -401,8 +414,9 @@ ClientSocket::sendDOFVals(Robot *rob)
   int i;
 
   os << rob->getNumDOF() << "\n";
-  for (i=0;i<rob->getNumDOF();i++)
+  for (i = 0; i < rob->getNumDOF(); i++) {
     os << rob->getDOF(i)->getVal() << "\n";
+  }
 }
 
 /*!
@@ -417,87 +431,87 @@ int
 ClientSocket::readDOFVals()
 {
   Robot *rob;
-  double *val,*stepby;
+  double *val, *stepby;
   QTextStream os(this);
-  int numDOF,i,robNum;
-  bool ok=TRUE;
+  int numDOF, i, robNum;
+  bool ok = TRUE;
 
 #ifdef GRASPITDBG
-  std::cout << "in read dof vals"<<std::endl;
+  std::cout << "in read dof vals" << std::endl;
 #endif
 
-  if (strPtr == lineStrList.end()) ok=FALSE;
-  if (ok) robNum = (*strPtr).toInt(&ok);
+  if (strPtr == lineStrList.end()) { ok = FALSE; }
+  if (ok) { robNum = (*strPtr).toInt(&ok); }
 
   if (!ok || robNum < 0 ||
-    robNum >= graspitCore->getWorld()->getNumRobots()) {
-	os <<"Error: Robot does not exist.\n";
+      robNum >= graspitCore->getWorld()->getNumRobots()) {
+    os << "Error: Robot does not exist.\n";
     return FAILURE;
   }
   rob = graspitCore->getWorld()->getRobot(robNum);
 
 #ifdef GRASPITDBG
-  std::cout << "robnum: "<<robNum<<std::endl;
+  std::cout << "robnum: " << robNum << std::endl;
 #endif
 
   strPtr++;
-  if (strPtr == lineStrList.end()) return FAILURE;
+  if (strPtr == lineStrList.end()) { return FAILURE; }
 
-  numDOF=(*strPtr).toInt(&ok);
-  if (!ok) return FAILURE;
+  numDOF = (*strPtr).toInt(&ok);
+  if (!ok) { return FAILURE; }
   strPtr++;
 
 #ifdef GRASPITDBG
-  std::cout << "read robot has: "<< numDOF << " DOF?"<<std::endl;
+  std::cout << "read robot has: " << numDOF << " DOF?" << std::endl;
 #endif
 
   if (numDOF < 1) {
 
 #ifdef GRASPITDBG
-	std::cout << "numDOF was zero."<<std::endl;
+    std::cout << "numDOF was zero." << std::endl;
 #endif
-	return FAILURE;
+    return FAILURE;
   }
   if (numDOF != rob->getNumDOF()) {
-    os <<"Error: robot has " << rob->getNumDOF() <<" DOF."<<endl;
-	return FAILURE;
+    os << "Error: robot has " << rob->getNumDOF() << " DOF." << endl;
+    return FAILURE;
   }
 
   val = new double[numDOF];
   stepby = new double[numDOF];
 
-  for (i=0;i<rob->getNumDOF();i++) {
-	if (strPtr == lineStrList.end()) return FAILURE;
-	val[i] = (*strPtr).toDouble(&ok);
-	if (!ok) return FAILURE;
-	strPtr++;
+  for (i = 0; i < rob->getNumDOF(); i++) {
+    if (strPtr == lineStrList.end()) { return FAILURE; }
+    val[i] = (*strPtr).toDouble(&ok);
+    if (!ok) { return FAILURE; }
+    strPtr++;
 #ifdef GRASPITDBG
-	std::cout<<val[i]<<" ";
+    std::cout << val[i] << " ";
 #endif
   }
 
 #ifdef GRASPITDBG
-  std::cout<<std::endl;
+  std::cout << std::endl;
 #endif
 
-  for (i=0;i<rob->getNumDOF();i++) {
-    if (strPtr == lineStrList.end()) return FAILURE;
-	stepby[i] = (*strPtr).toDouble(&ok);
-	if (!ok) return FAILURE;
-	strPtr++;
+  for (i = 0; i < rob->getNumDOF(); i++) {
+    if (strPtr == lineStrList.end()) { return FAILURE; }
+    stepby[i] = (*strPtr).toDouble(&ok);
+    if (!ok) { return FAILURE; }
+    strPtr++;
   }
 
-  rob->moveDOFToContacts(val,stepby,true);
+  rob->moveDOFToContacts(val, stepby, true);
 
   // these should be separate commands
   graspitCore->getWorld()->findAllContacts();
   graspitCore->getWorld()->updateGrasps();
 
-  for (i=0;i<rob->getNumDOF();i++) {
+  for (i = 0; i < rob->getNumDOF(); i++) {
     os << rob->getDOF(i)->getVal() << "\n";
 
 #ifdef GRASPITDBG
-    std::cout << "Sending: "<< rob->getDOF(i)->getVal() << "\n";
+    std::cout << "Sending: " << rob->getDOF(i)->getVal() << "\n";
 #endif
   }
   delete [] val;
@@ -516,53 +530,53 @@ ClientSocket::readDOFForces(Robot *rob)
 {
   double val;
   bool ok;
- // QTextStream is(this);
+  // QTextStream is(this);
   QTextStream os(this);
-  int numDOF,i;
+  int numDOF, i;
 
-  if (strPtr == lineStrList.end()) return FAILURE;
- 
-  numDOF=(*strPtr).toInt(&ok);
-  if (!ok) return FAILURE;
+  if (strPtr == lineStrList.end()) { return FAILURE; }
+
+  numDOF = (*strPtr).toInt(&ok);
+  if (!ok) { return FAILURE; }
   strPtr++;
 
 #ifdef GRASPITDBG
-  std::cout << "read robot has: "<< numDOF << " DOF?"<<std::endl;
+  std::cout << "read robot has: " << numDOF << " DOF?" << std::endl;
 #endif
 
   if (numDOF < 1) {
 #ifdef GRASPITDBG
-    std::cout << "numDOF was zero."<<std::endl;
+    std::cout << "numDOF was zero." << std::endl;
 #endif
     return FAILURE;
   }
-  
+
   if (numDOF != rob->getNumDOF()) {
-    os <<"Error: robot has " << rob->getNumDOF() <<" DOF."<<endl;
+    os << "Error: robot has " << rob->getNumDOF() << " DOF." << endl;
     return FAILURE;
   }
-  
-  for (i=0;i<rob->getNumDOF();i++) {
-    if (strPtr == lineStrList.end()) return FAILURE;
+
+  for (i = 0; i < rob->getNumDOF(); i++) {
+    if (strPtr == lineStrList.end()) { return FAILURE; }
     val = (*strPtr).toDouble(&ok);
-    if (!ok) return FAILURE;
+    if (!ok) { return FAILURE; }
     strPtr++;
     rob->getDOF(i)->setForce(val);
-    
+
 #ifdef GRASPITDBG
-    std::cout<<val<<" ";
+    std::cout << val << " ";
 #endif
   }
-  
+
 #ifdef GRASPITDBG
-  std::cout<<std::endl;
+  std::cout << std::endl;
 #endif
-  
-  for (i=0;i<rob->getNumDOF();i++) {
+
+  for (i = 0; i < rob->getNumDOF(); i++) {
     os << rob->getDOF(i)->getForce() << "\n";
-    
+
 #ifdef GRASPITDBG
-    std::cout << "Sending: "<< rob->getDOF(i)->getForce() << "\n";
+    std::cout << "Sending: " << rob->getDOF(i)->getForce() << "\n";
 #endif
   }
   return SUCCESS;
@@ -590,15 +604,18 @@ void
 ClientSocket::moveDynamicBodies(double timeStep)
 {
   QTextStream os(this);
-  if (timeStep<0)
+  if (timeStep < 0) {
     timeStep = graspitCore->getWorld()->getTimeStep();
+  }
 
   double actualTimeStep =
     graspitCore->getWorld()->getDynamicsEngine()->moveDynamicBodies(timeStep);
-  if (actualTimeStep < 0)
+  if (actualTimeStep < 0) {
     os << "Error: Timestep failsafe reached.\n";
-  else 
+  }
+  else {
     os << actualTimeStep << "\n";
+  }
 }
 
 /*!
@@ -623,7 +640,7 @@ ClientSocket::readTorques()
   QString line;
   line = readLine();
   int numDOF = line.toInt();
-  
+
   if (numDOF < 0) {} //unused parameter warning
 }
 */
@@ -633,15 +650,15 @@ ClientSocket::readTorques()
   the number of pending connections the server can have.
 */
 GraspItServer::GraspItServer(Q_UINT16 port, int backlog,
-			     QObject *parent,const char *name) : 
-  Q3ServerSocket(port,backlog,parent,name)
+                             QObject *parent, const char *name) :
+  Q3ServerSocket(port, backlog, parent, name)
 {
   if (!ok()) {
     qWarning("Failed to bind to port");
   }
 }
 
-/*! 
+/*!
   Creates a new ClientSocket to handle communication with this client.
 */
 void

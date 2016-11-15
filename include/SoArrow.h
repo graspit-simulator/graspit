@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: SoArrow.h,v 1.2 2009/03/25 22:10:23 cmatei Exp $
 //
@@ -42,51 +42,51 @@
 */
 class SoArrow : public SoComplexShape {
 
-   SO_NODE_HEADER(SoArrow);
+    SO_NODE_HEADER(SoArrow);
 
- public:
+  public:
 
-   //! Bitflags controlling which arrowheads are visible (NONE, BEGIN, END, or BOTH)
-   enum Part {
-     NONE   = 0x00, 
-     BEGIN  = 0x01,             // Arrow at the beginning of the cylinder
-     END    = 0x02,             // at the end
-     BOTH   = 0x03              // at both ends
-   };
+    //! Bitflags controlling which arrowheads are visible (NONE, BEGIN, END, or BOTH)
+    enum Part {
+      NONE   = 0x00,
+      BEGIN  = 0x01,             // Arrow at the beginning of the cylinder
+      END    = 0x02,             // at the end
+      BOTH   = 0x03              // at both ends
+    };
 
-   // Fields
-   //! Defines which arrow heads should be shown.
-   SoSFBitMask   arrowHeads;
+    // Fields
+    //! Defines which arrow heads should be shown.
+    SoSFBitMask   arrowHeads;
 
-   //! Width of arrow shaft
-   SoSFFloat     cylRadius;     
+    //! Width of arrow shaft
+    SoSFFloat     cylRadius;
 
-   //! Height of the entire arrow
-   SoSFFloat     height;
+    //! Height of the entire arrow
+    SoSFFloat     height;
 
-   //! Height of the arrow head
-   SoSFFloat     coneHeight;
-    
-   //! Radius of the arrow head
-   SoSFFloat     coneRadius;    
+    //! Height of the arrow head
+    SoSFFloat     coneHeight;
 
-   static void   initClass();
-   SoArrow();
+    //! Radius of the arrow head
+    SoSFFloat     coneRadius;
 
-   void          addPart(Part part);
-   void          removePart(Part part);
-   SbBool        hasPart(Part part) const;
+    static void   initClass();
+    SoArrow();
 
- private:
+    void          addPart(Part part);
+    void          removePart(Part part);
+    SbBool        hasPart(Part part) const;
 
-   //! A pointer to the calculator engine that computes the cylinder height
-   SoCalculator *calEngine;
+  private:
 
-   //! Pointer to switch node that controls the visibility of an arrowhead
-   SoSwitch     *beginSw,*endSw;
+    //! A pointer to the calculator engine that computes the cylinder height
+    SoCalculator *calEngine;
 
-   virtual ~SoArrow();
+    //! Pointer to switch node that controls the visibility of an arrowhead
+    SoSwitch     *beginSw, *endSw;
 
-   void generateChildren();
+    virtual ~SoArrow();
+
+    void generateChildren();
 
 };

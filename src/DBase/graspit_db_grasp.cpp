@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the special %GraspitDBGrasp class
  */
 
@@ -40,140 +40,140 @@
 #include "debug.h"
 
 //! Create a HandObjectState from data
-bool initializeHandObjectState(const std::vector<double>& joints, const std::vector<double>& position, 
-						   GraspPlanningState *state)
+bool initializeHandObjectState(const std::vector<double> &joints, const std::vector<double> &position,
+                               GraspPlanningState *state)
 {
-	if(joints.size() == 0) return false;
-	state->setPostureType(POSE_DOF);
-	state->getPosture()->readFromArray(const_cast<std::vector<double>&>(joints));
-	state->setPositionType(SPACE_COMPLETE);
-	state->getPosition()->readFromArray(const_cast<std::vector<double>&>(position));
-	return true;
+  if (joints.size() == 0) { return false; }
+  state->setPostureType(POSE_DOF);
+  state->getPosture()->readFromArray(const_cast<std::vector<double>&>(joints));
+  state->setPositionType(SPACE_COMPLETE);
+  state->getPosition()->readFromArray(const_cast<std::vector<double>&>(position));
+  return true;
 }
 
-GraspitDBGrasp::~GraspitDBGrasp(){
-	delete mPreGrasp;
-	delete mFinalGrasp;
+GraspitDBGrasp::~GraspitDBGrasp() {
+  delete mPreGrasp;
+  delete mFinalGrasp;
 }
 
 //! copy another grasp
-GraspitDBGrasp::GraspitDBGrasp(const GraspitDBGrasp& grasp2) : db_planner::Grasp(grasp2), mHand(grasp2.mHand) {
-	mPreGrasp = new GraspPlanningState(grasp2.mPreGrasp->getHand());
-	mPreGrasp->copyFrom(grasp2.mPreGrasp);
-	mFinalGrasp = new GraspPlanningState(grasp2.mFinalGrasp->getHand());
-	mFinalGrasp->copyFrom(grasp2.mFinalGrasp);
-	mTestScores = grasp2.mTestScores;
+GraspitDBGrasp::GraspitDBGrasp(const GraspitDBGrasp &grasp2) : db_planner::Grasp(grasp2), mHand(grasp2.mHand) {
+  mPreGrasp = new GraspPlanningState(grasp2.mPreGrasp->getHand());
+  mPreGrasp->copyFrom(grasp2.mPreGrasp);
+  mFinalGrasp = new GraspPlanningState(grasp2.mFinalGrasp->getHand());
+  mFinalGrasp->copyFrom(grasp2.mFinalGrasp);
+  mTestScores = grasp2.mTestScores;
 }
 
 //! give the required data, fill in the necessary information of a grasp
-bool GraspitDBGrasp::SetGraspParameters(const std::vector<double>& prejoint,
-										const std::vector<double>& prepos,
-										const std::vector<double>& finjoint,
-										const std::vector<double>& finpos){
+bool GraspitDBGrasp::SetGraspParameters(const std::vector<double> &prejoint,
+                                        const std::vector<double> &prepos,
+                                        const std::vector<double> &finjoint,
+                                        const std::vector<double> &finpos) {
 
-	mPreGrasp = new GraspPlanningState(mHand);
-	initializeHandObjectState(prejoint, prepos, mPreGrasp);
+  mPreGrasp = new GraspPlanningState(mHand);
+  initializeHandObjectState(prejoint, prepos, mPreGrasp);
 
-	mFinalGrasp = new GraspPlanningState(mHand);
-	initializeHandObjectState(finjoint, finpos, mFinalGrasp);
-	return true;
+  mFinalGrasp = new GraspPlanningState(mHand);
+  initializeHandObjectState(finjoint, finpos, mFinalGrasp);
+  return true;
 }
 
 //! transform this grasp by the transformation defined by array
-bool GraspitDBGrasp::Transform(const float array[16]){
-	// synthesize the transformation matrix
-	mat3 m;
-	m[0] = array[0];
-	m[1] = array[1];
-	m[2] = array[2];
-	m[3] = array[4];
-	m[4] = array[5];
-	m[5] = array[6];
-	m[6] = array[8];
-	m[7] = array[9];
-	m[8] = array[10];
-	vec3 v;
-	v[0] = array[3];
-	v[1] = array[7];
-	v[2] = array[11];
-	transf transform;
-	transform.set(m,v);
+bool GraspitDBGrasp::Transform(const float array[16]) {
+  // synthesize the transformation matrix
+  mat3 m;
+  m[0] = array[0];
+  m[1] = array[1];
+  m[2] = array[2];
+  m[3] = array[4];
+  m[4] = array[5];
+  m[5] = array[6];
+  m[6] = array[8];
+  m[7] = array[9];
+  m[8] = array[10];
+  vec3 v;
+  v[0] = array[3];
+  v[1] = array[7];
+  v[2] = array[11];
+  transf transform;
+  transform.set(m, v);
 
-	std::vector<double> position;
+  std::vector<double> position;
 
-	PositionState* ps = mPreGrasp->getPosition();
-	ps->setTran(ps->getCoreTran() * transform);
-	for(int i = 0; i < ps->getNumVariables(); ++i){
-		position.push_back(ps->getVariable(i)->getValue());
-	}
-	SetPregraspPosition(position);
+  PositionState *ps = mPreGrasp->getPosition();
+  ps->setTran(ps->getCoreTran() * transform);
+  for (int i = 0; i < ps->getNumVariables(); ++i) {
+    position.push_back(ps->getVariable(i)->getValue());
+  }
+  SetPregraspPosition(position);
 
-	position.clear();
-	ps = mFinalGrasp->getPosition();
-	ps->setTran(ps->getCoreTran() * transform);
-	for(int i = 0; i < ps->getNumVariables(); ++i){
-		position.push_back(ps->getVariable(i)->getValue());
-	}
-	SetFinalgraspPosition(position);
+  position.clear();
+  ps = mFinalGrasp->getPosition();
+  ps->setTran(ps->getCoreTran() * transform);
+  for (int i = 0; i < ps->getNumVariables(); ++i) {
+    position.push_back(ps->getVariable(i)->getValue());
+  }
+  SetFinalgraspPosition(position);
 
-	return true;
+  return true;
 }
 
 //! get the average test scores stored in this grasp
-double GraspitDBGrasp::getTestAverageScore(){
-	double sum = 0;
-	for(int i = 0; i < (int)mTestScores.size(); i ++){
-		sum += mTestScores[i];
-	}
-	if((int)mTestScores.size()>0){
-		return sum/(double)mTestScores.size();
-	}
-	else{
-		return 0;
-	}
+double GraspitDBGrasp::getTestAverageScore() {
+  double sum = 0;
+  for (int i = 0; i < (int)mTestScores.size(); i ++) {
+    sum += mTestScores[i];
+  }
+  if ((int)mTestScores.size() > 0) {
+    return sum / (double)mTestScores.size();
+  }
+  else {
+    return 0;
+  }
 }
 
-void GraspitDBGrasp::setPreGraspPlanningState(GraspPlanningState* p){
-	delete mPreGrasp;
-	mPreGrasp = p;
+void GraspitDBGrasp::setPreGraspPlanningState(GraspPlanningState *p) {
+  delete mPreGrasp;
+  mPreGrasp = p;
 
-	const PositionState *positionS = p->readPosition();
-	const PostureState *postureS = p->readPosture();
+  const PositionState *positionS = p->readPosition();
+  const PostureState *postureS = p->readPosture();
 
-	std::vector<double> position, joints;
-	for(int i = 0; i < positionS->getNumVariables(); ++i){
-		position.push_back(positionS->getVariable(i)->getValue());
-	}
-	for(int i = 0; i < postureS->getNumVariables(); ++i){
-		joints.push_back(postureS->getVariable(i)->getValue());
-	}
-	this->SetPregraspJoints(joints);
-	this->SetPregraspPosition(position);
+  std::vector<double> position, joints;
+  for (int i = 0; i < positionS->getNumVariables(); ++i) {
+    position.push_back(positionS->getVariable(i)->getValue());
+  }
+  for (int i = 0; i < postureS->getNumVariables(); ++i) {
+    joints.push_back(postureS->getVariable(i)->getValue());
+  }
+  this->SetPregraspJoints(joints);
+  this->SetPregraspPosition(position);
 }
 
-void GraspitDBGrasp::setFinalGraspPlanningState(GraspPlanningState* p){
-	delete mFinalGrasp;
-	mFinalGrasp = p;
+void GraspitDBGrasp::setFinalGraspPlanningState(GraspPlanningState *p) {
+  delete mFinalGrasp;
+  mFinalGrasp = p;
 
-	const PositionState *positionS = p->readPosition();
-	const PostureState *postureS = p->readPosture();
+  const PositionState *positionS = p->readPosition();
+  const PostureState *postureS = p->readPosture();
 
-	std::vector<double> pos, joints, contacts;
-	for(int i = 0; i < positionS->getNumVariables(); ++i){
-		pos.push_back(positionS->getVariable(i)->getValue());
-	}
-	for(int i = 0; i < postureS->getNumVariables(); ++i){
-		joints.push_back(postureS->getVariable(i)->getValue());
-	}
-	std::list<position>* tmpContacts;
-	tmpContacts = p->getContacts();
-	for(std::list<position>::iterator it = tmpContacts->begin(); it!= tmpContacts->end(); ++it){
-		contacts.push_back((*it).x());
-		contacts.push_back((*it).y());
-		contacts.push_back((*it).z());
-	}
-	this->SetFinalgraspJoints(joints);
-	this->SetFinalgraspPosition(pos);
-	this->SetContacts(contacts);
+  std::vector<double> pos, joints, contacts;
+  for (int i = 0; i < positionS->getNumVariables(); ++i) {
+    pos.push_back(positionS->getVariable(i)->getValue());
+  }
+  for (int i = 0; i < postureS->getNumVariables(); ++i) {
+    joints.push_back(postureS->getVariable(i)->getValue());
+  }
+  std::list<position> *tmpContacts;
+  tmpContacts = p->getContacts();
+  for (std::list<position>::iterator it = tmpContacts->begin(); it != tmpContacts->end(); ++it) {
+    contacts.push_back((*it).x());
+    contacts.push_back((*it).y());
+    contacts.push_back((*it).z());
+  }
+  this->SetFinalgraspJoints(joints);
+  this->SetFinalgraspPosition(pos);
+  this->SetContacts(contacts);
 }
 

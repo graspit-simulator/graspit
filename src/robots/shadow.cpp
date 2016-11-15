@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: shadow.cpp,v 1.5 2009/06/17 21:06:53 saint Exp $
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Implements the special %Shadow robot class
  */
 
@@ -32,12 +32,12 @@
 
 
 int
-Shadow::loadFromXml(const TiXmlElement* root,QString rootPath)
+Shadow::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
   int result = Robot::loadFromXml(root, rootPath);
-  if (result != SUCCESS) return result;
-  myWorld->toggleCollisions(false, base,chainVec[4]->getLink(1));
-  myWorld->toggleCollisions(false, chainVec[1]->getLink(0),chainVec[0]->getLink(0));
+  if (result != SUCCESS) { return result; }
+  myWorld->toggleCollisions(false, base, chainVec[4]->getLink(1));
+  myWorld->toggleCollisions(false, chainVec[1]->getLink(0), chainVec[0]->getLink(0));
 
   return result;
 }

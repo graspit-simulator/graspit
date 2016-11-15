@@ -5,10 +5,10 @@
 
 class GuidedPotentialQualityEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
 
-protected:
+  protected:
     double potentialQualityEnergy() const;
     double contactEnergy() const;
     double potentialQualityScalingFunction(double dist, double cosTheta)const ;

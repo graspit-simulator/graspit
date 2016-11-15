@@ -35,77 +35,77 @@
 void
 TimeTester::startPlanner()
 {
-	mCount = 0;
-	mIllegalCount = 0;
-	SimAnnPlanner::startPlanner();
+  mCount = 0;
+  mIllegalCount = 0;
+  SimAnnPlanner::startPlanner();
 }
 
 void
 TimeTester::mainLoop()
 {
-	GraspPlanningState *sn = new GraspPlanningState(mCurrentState);
-	SearchVariable *var;
-	double v;
-	double r = ((float)rand()) / RAND_MAX - 0.5;
-	for (int i=0; i<sn->getNumVariables(); i++) {
-		var = sn->getVariable(i);
-		if ( var->isFixed() ) continue;
-		v = var->getValue() + r * ( var->mMaxJump ) * 0.1;
-		var->setValue(v);
-	}
-	bool legal; double energy;
-	mEnergyCalculator->analyzeState(legal, energy, sn);
-	if (legal) mCount++;
-	else mIllegalCount++;
-	delete sn;
+  GraspPlanningState *sn = new GraspPlanningState(mCurrentState);
+  SearchVariable *var;
+  double v;
+  double r = ((float)rand()) / RAND_MAX - 0.5;
+  for (int i = 0; i < sn->getNumVariables(); i++) {
+    var = sn->getVariable(i);
+    if (var->isFixed()) { continue; }
+    v = var->getValue() + r * (var->mMaxJump) * 0.1;
+    var->setValue(v);
+  }
+  bool legal; double energy;
+  mEnergyCalculator->analyzeState(legal, energy, sn);
+  if (legal) { mCount++; }
+  else { mIllegalCount++; }
+  delete sn;
 }
 
 TimeTester *MTTester::startChild()
 {
-	TimeTester *child = new TimeTester(mHand);
-	child->startThread();
-	child->setEnergyType(ENERGY_AUTOGRASP_QUALITY);
-	child->setModelState(mCurrentState);
-	child->resetPlanner();
-	return child;
+  TimeTester *child = new TimeTester(mHand);
+  child->startThread();
+  child->setEnergyType(ENERGY_AUTOGRASP_QUALITY);
+  child->setModelState(mCurrentState);
+  child->resetPlanner();
+  return child;
 }
 
 void
 MTTester::startPlanner()
 {
-	int numChildren = 3;
+  int numChildren = 3;
 
-	assert(mCurrentState);
-	mCurrentState->setRefTran(mHand->getTran(), false);
+  assert(mCurrentState);
+  mCurrentState->setRefTran(mHand->getTran(), false);
 
-	mChildren.clear();
-	for (int i=0; i<numChildren; i++) {
-		TimeTester *child = startChild();
-		mChildren.push_back( child );
-	}
-	DBGA("Children ready");
-	for (int i=0; i<(int)mChildren.size(); i++){
-		mChildren[i]->startPlanner();
-	}
-	DBGA("Children started");
-	setState(RUNNING);
+  mChildren.clear();
+  for (int i = 0; i < numChildren; i++) {
+    TimeTester *child = startChild();
+    mChildren.push_back(child);
+  }
+  DBGA("Children ready");
+  for (int i = 0; i < (int)mChildren.size(); i++) {
+    mChildren[i]->startPlanner();
+  }
+  DBGA("Children started");
+  setState(RUNNING);
 }
 
 void
 MTTester::pausePlanner()
 {
-	for (int i=0; i<(int)mChildren.size(); i++){
-		mChildren[i]->stopPlanner();
-	}
+  for (int i = 0; i < (int)mChildren.size(); i++) {
+    mChildren[i]->stopPlanner();
+  }
 
-	int count = 0, illegal = 0;
-	for (int i=0; i<(int)mChildren.size(); i++){
-		count += mChildren[i]->getCount();
-		illegal += mChildren[i]->getIllegal();
-		DBGA("Child " << i << ": " << mChildren[i]->getCount() << " grasps.")
-	}
+  int count = 0, illegal = 0;
+  for (int i = 0; i < (int)mChildren.size(); i++) {
+    count += mChildren[i]->getCount();
+    illegal += mChildren[i]->getIllegal();
+    DBGA("Child " << i << ": " << mChildren[i]->getCount() << " grasps.")
+  }
 
-	DBGA(count << " grasps.");
-	DBGA("Illegal states: " << illegal);	
-	setState(READY);
+  DBGA(count << " grasps.");
+  DBGA("Illegal states: " << illegal);
+  setState(READY);
 }

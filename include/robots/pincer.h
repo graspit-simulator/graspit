@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the special %Pincer robot class
  */
 
@@ -37,8 +37,8 @@
 */
 class Pincer : public Hand {
 
- public:
-  void DOFController(double timeStep);
+  public:
+    void DOFController(double timeStep);
 
 };
 

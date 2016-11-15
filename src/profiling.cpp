@@ -34,10 +34,10 @@ ProfileInstance::ProfileInstance()
   mName = "UNNAMED";
 }
 
-double 
+double
 ProfileInstance::getTotalTimeMicroseconds()
 {
-  if (mRunning) 
+  if (mRunning)
   {
     stopTimer();
     startTimer();
@@ -50,13 +50,13 @@ ProfileInstance::getTotalTimeMicroseconds()
 void ProfileInstance::print()
 {
   double totalTime = getTotalTimeMicroseconds();
-  if (mCount == 0 && totalTime <= 0) return;
+  if (mCount == 0 && totalTime <= 0) { return; }
   std::cerr << mName << ": ";
-  if (mCount > 0) std::cerr << "Count is "<< mCount << "; ";
-  if (totalTime > 0) 
+  if (mCount > 0) { std::cerr << "Count is " << mCount << "; "; }
+  if (totalTime > 0)
   {
-    std::cerr << "Time is " << ((float)totalTime)/1000 << "ms";
-    if (mRunning) std::cerr << " (still running)";
+    std::cerr << "Time is " << ((float)totalTime) / 1000 << "ms";
+    if (mRunning) { std::cerr << " (still running)"; }
     std::cerr << "; ";
   }
   std::cerr << std::endl;
@@ -71,7 +71,7 @@ Profiler::Profiler()
   LARGE_INTEGER tmp;
   QueryPerformanceFrequency(&tmp);
   COUNTS_PER_SEC = tmp.QuadPart;
-  if (COUNTS_PER_SEC==0) 
+  if (COUNTS_PER_SEC == 0)
   {
     std::cerr << "High performance timer not availabled! PROFILER NOT OPERATIONAL.\n";
     COUNTS_PER_SEC = 1;
@@ -83,18 +83,18 @@ Profiler::~Profiler()
 {
 }
 
-void Profiler::resize(int size) 
+void Profiler::resize(int size)
 {
-  if (size <= mSize) return;
+  if (size <= mSize) { return; }
   mSize = size;
-  mPI.resize(mSize,ProfileInstance());
+  mPI.resize(mSize, ProfileInstance());
 }
 
 int Profiler::getNewIndex(const char *name)
 {
-  if (mNextIndex >= mSize) 
+  if (mNextIndex >= mSize)
   {
-    resize(2*mSize);
+    resize(2 * mSize);
   }
   mPI[mNextIndex].setName(name);
   mPI[mNextIndex].reset();
@@ -103,7 +103,7 @@ int Profiler::getNewIndex(const char *name)
 
 void Profiler::resetAll()
 {
-  for (int i=0; i<mNextIndex; i++) 
+  for (int i = 0; i < mNextIndex; i++)
   {
     mPI[i].reset();
   }
@@ -111,10 +111,10 @@ void Profiler::resetAll()
 
 void Profiler::printAll()
 {
-  for (int i=0; i<mNextIndex; i++) 
+  for (int i = 0; i < mNextIndex; i++)
   {
     mPI[i].print();
   }
 }
-  
+
 }

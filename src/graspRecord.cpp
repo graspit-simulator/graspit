@@ -29,106 +29,106 @@
 
 GraspRecord::GraspRecord(int size)
 {
-	mSize = size;
-	mPose = new CalibrationPose(mSize);
+  mSize = size;
+  mPose = new CalibrationPose(mSize);
 
-	mTran = transf::IDENTITY;
-	mObjectName = mRobotName = QString("not_set");
+  mTran = transf::IDENTITY;
+  mObjectName = mRobotName = QString("not_set");
 }
 
 GraspRecord::~GraspRecord()
 {
-	delete mPose;
+  delete mPose;
 }
 
 void GraspRecord::writeToFile(FILE *fp)
 {
-	//write names
-	fprintf(fp,"%s\n",mObjectName.latin1());
-	fprintf(fp,"%s\n",mRobotName.latin1());
-	//write transform
-	Quaternion q = mTran.rotation();
-	fprintf(fp,"%f %f %f %f ",q.x, q.y, q.z, q.w);
-	vec3 t = mTran.translation();
-	fprintf(fp,"%f %f %f\n",t.x(), t.y(), t.z());
-	//write pose
-	mPose->writeToFile(fp);
+  //write names
+  fprintf(fp, "%s\n", mObjectName.latin1());
+  fprintf(fp, "%s\n", mRobotName.latin1());
+  //write transform
+  Quaternion q = mTran.rotation();
+  fprintf(fp, "%f %f %f %f ", q.x, q.y, q.z, q.w);
+  vec3 t = mTran.translation();
+  fprintf(fp, "%f %f %f\n", t.x(), t.y(), t.z());
+  //write pose
+  mPose->writeToFile(fp);
 }
 
 void GraspRecord::readFromFile(FILE *fp)
 {
-	float x,y,z,w;
-	//read names
-	char name[1000];
-	do {
-	  if(fgets(name, 1000, fp) == NULL) {
-	    DBGA("GraspRecord::readFromFile - failed to read record name");
-	    return;
-	  } 
-	} while (name[0]=='\n' || name[0]=='\0' || name[0]==' ');
-	mObjectName = QString(name);
-	mObjectName = mObjectName.stripWhiteSpace();
-	fprintf(stderr,"object: %s__\n",mObjectName.latin1());
-	do {
-	  if(fgets(name, 1000, fp) == NULL) {
-	    DBGA("GraspRecord::readFromFile - failed to read robot name");
-	    return;
-	  }
-	} while (name[0]=='\n' || name[0]=='\0' || name[0]==' ');
-	mRobotName = QString(name);
-	mRobotName = mRobotName.stripWhiteSpace();
-	fprintf(stderr,"robot: %s__\n",mRobotName.latin1());
-	//read transform
-	if( fscanf(fp,"%f %f %f %f",&x, &y, &z, &w) <= 0) {
-	  DBGA("GraspRecord::readFromFile - failed to read record orientation.");
-	  return;
-	}
-	Quaternion q(w, x, y, z);
-	if( fscanf(fp,"%f %f %f",&x, &y, &z) <= 0) {
-	  DBGA("GraspRecord::readFromFile - failed to read record location");
-	}
-	vec3 t(x,y,z);
-	mTran.set(q,t);
-	//read pose
-	mPose->readFromFile(fp);
-	mSize = mPose->getSize();
+  float x, y, z, w;
+  //read names
+  char name[1000];
+  do {
+    if (fgets(name, 1000, fp) == NULL) {
+      DBGA("GraspRecord::readFromFile - failed to read record name");
+      return;
+    }
+  } while (name[0] == '\n' || name[0] == '\0' || name[0] == ' ');
+  mObjectName = QString(name);
+  mObjectName = mObjectName.stripWhiteSpace();
+  fprintf(stderr, "object: %s__\n", mObjectName.latin1());
+  do {
+    if (fgets(name, 1000, fp) == NULL) {
+      DBGA("GraspRecord::readFromFile - failed to read robot name");
+      return;
+    }
+  } while (name[0] == '\n' || name[0] == '\0' || name[0] == ' ');
+  mRobotName = QString(name);
+  mRobotName = mRobotName.stripWhiteSpace();
+  fprintf(stderr, "robot: %s__\n", mRobotName.latin1());
+  //read transform
+  if (fscanf(fp, "%f %f %f %f", &x, &y, &z, &w) <= 0) {
+    DBGA("GraspRecord::readFromFile - failed to read record orientation.");
+    return;
+  }
+  Quaternion q(w, x, y, z);
+  if (fscanf(fp, "%f %f %f", &x, &y, &z) <= 0) {
+    DBGA("GraspRecord::readFromFile - failed to read record location");
+  }
+  vec3 t(x, y, z);
+  mTran.set(q, t);
+  //read pose
+  mPose->readFromFile(fp);
+  mSize = mPose->getSize();
 }
 
-void loadGraspListFromFile(std::vector<GraspRecord*> *list, const char *filename)
+void loadGraspListFromFile(std::vector<GraspRecord *> *list, const char *filename)
 {
-	FILE *fp = fopen(filename, "r");
-	if (fp==NULL) {
-		fprintf(stderr,"Unable to open file %s for reading\n",filename);
-		return;
-	}
+  FILE *fp = fopen(filename, "r");
+  if (fp == NULL) {
+    fprintf(stderr, "Unable to open file %s for reading\n", filename);
+    return;
+  }
 
-	GraspRecord *newGrasp;
-	int nGrasps;
-	if(fscanf(fp,"%d",&nGrasps)) { 
-	  DBGA("loadGraspListFromFile - failed to read number of grasps");
-	  return;
-	}
-	for(int i=0; i<nGrasps; i++) {
-		newGrasp = new GraspRecord(0);
-		newGrasp->readFromFile(fp);
-		list->push_back(newGrasp);
-	}
+  GraspRecord *newGrasp;
+  int nGrasps;
+  if (fscanf(fp, "%d", &nGrasps)) {
+    DBGA("loadGraspListFromFile - failed to read number of grasps");
+    return;
+  }
+  for (int i = 0; i < nGrasps; i++) {
+    newGrasp = new GraspRecord(0);
+    newGrasp->readFromFile(fp);
+    list->push_back(newGrasp);
+  }
 
-	fclose(fp);
+  fclose(fp);
 }
 
-void writeGraspListToFile (std::vector<GraspRecord*> *list, const char *filename)
+void writeGraspListToFile(std::vector<GraspRecord *> *list, const char *filename)
 {
-	FILE *fp = fopen(filename, "w");
-	if (fp==NULL) {
-		fprintf(stderr,"Unable to open file %s for reading\n",filename);
-		return;
-	}
+  FILE *fp = fopen(filename, "w");
+  if (fp == NULL) {
+    fprintf(stderr, "Unable to open file %s for reading\n", filename);
+    return;
+  }
 
-	fprintf(fp,"%d\n",(int)list->size());
-	for (int i=0; i<(int)list->size(); i++) {
-		(*list)[i]->writeToFile(fp);
-	}
+  fprintf(fp, "%d\n", (int)list->size());
+  for (int i = 0; i < (int)list->size(); i++) {
+    (*list)[i]->writeToFile(fp);
+  }
 
-	fclose(fp);
+  fclose(fp);
 }

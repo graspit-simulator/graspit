@@ -16,7 +16,7 @@ class SoSeparator;
 */
 class PointContact : public Contact
 {
-public:
+  public:
     //! Also sets up friction edges according to Coulomb model
     PointContact(Body *b1, Body *b2, position pos, vec3 norm);
     //! Stub destructor
@@ -24,7 +24,7 @@ public:
     //! Defines a 2D friction circle with tangential friction only.
     int setUpFrictionEdges(bool dynamicsOn = false);
     //! Returns the visual indicator which is the wrench space cone itself
-    SoSeparator* getVisualIndicator();
+    SoSeparator *getVisualIndicator();
 };
 
 #endif

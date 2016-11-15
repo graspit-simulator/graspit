@@ -107,29 +107,29 @@ double DynamicBody::defaultMass = 300.0;
   geometry pointer set to NULL.  Use \c load() to initialize the body from
   a model file.
 */
-Body::Body(World *w,const char *name) : WorldElement(w,name)
+Body::Body(World *w, const char *name) : WorldElement(w, name)
 {
-	//defaults:
-	mIsElastic = false;
-	youngMod = -1;
-	
-	material = -1;
-	numContacts=0;
-	showFC = false;
-	showVC = false;
-	IVGeomRoot = NULL; IVTran = NULL; IVMat = NULL; IVContactIndicators=NULL;
-        IVScaleTran = NULL;
-        IVOffsetTran = NULL;
-	IVBVRoot = NULL;
-#ifdef GEOMETRY_LIB
-	IVPrimitiveRoot = NULL;
-#endif
-	mUsesFlock = false;
-	mBirdNumber = 0;
-	mRenderGeometry = true;
-	mGeometryFilename = "none";
+  //defaults:
+  mIsElastic = false;
+  youngMod = -1;
 
-	initializeIV();
+  material = -1;
+  numContacts = 0;
+  showFC = false;
+  showVC = false;
+  IVGeomRoot = NULL; IVTran = NULL; IVMat = NULL; IVContactIndicators = NULL;
+  IVScaleTran = NULL;
+  IVOffsetTran = NULL;
+  IVBVRoot = NULL;
+#ifdef GEOMETRY_LIB
+  IVPrimitiveRoot = NULL;
+#endif
+  mUsesFlock = false;
+  mBirdNumber = 0;
+  mRenderGeometry = true;
+  mGeometryFilename = "none";
+
+  initializeIV();
 }
 
 /*!
@@ -159,10 +159,10 @@ Body::Body(const Body &b) : WorldElement(b)
   createAxesGeometry();
 }
 
-/*! Breaks all contacts; it is up to the world to also remove it from 
-	the collision detection system or the scene graph. In general, do 
-	not delete bodies directly, but use World::removeElement(...)instead 
-	which can also delete them.
+/*! Breaks all contacts; it is up to the world to also remove it from
+  the collision detection system or the scene graph. In general, do
+  not delete bodies directly, but use World::removeElement(...)instead
+  which can also delete them.
  */
 Body::~Body()
 {
@@ -171,180 +171,181 @@ Body::~Body()
 }
 
 /*! Clones this body from an original. This means that the two bodies have independent
-	transform, materials, properties, etc, BUT they share the scene graph geometry and
-	the collision detection geometry. They can still be used for collision detection 
-	independently as they can have different transforms.
-	
-	WARNING: cloning mechanism is incomplete. If the original is deleted, the clone 
-	becomes unpredicateble and can cause the system to crash
+  transform, materials, properties, etc, BUT they share the scene graph geometry and
+  the collision detection geometry. They can still be used for collision detection
+  independently as they can have different transforms.
+
+  WARNING: cloning mechanism is incomplete. If the original is deleted, the clone
+  becomes unpredicateble and can cause the system to crash
 */
-void 
-Body::cloneFrom(const Body* original)
+void
+Body::cloneFrom(const Body *original)
 {
-	mIsElastic = original->mIsElastic;
-	youngMod = original->youngMod;
-	material = original->material;
+  mIsElastic = original->mIsElastic;
+  youngMod = original->youngMod;
+  material = original->material;
 
-	//add virtual contacts
-	virtualContactList.clear();
-	std::list<Contact*> vc = original->getVirtualContacts();
-	std::list<Contact*>::iterator it;
-	for (it = vc.begin(); it!=vc.end(); it++) {
-		VirtualContact *newContact = new VirtualContact( (VirtualContact*)(*it) );
-		newContact->setBody(this);
-		addVirtualContact(newContact);
-	}
+  //add virtual contacts
+  virtualContactList.clear();
+  std::list<Contact *> vc = original->getVirtualContacts();
+  std::list<Contact *>::iterator it;
+  for (it = vc.begin(); it != vc.end(); it++) {
+    VirtualContact *newContact = new VirtualContact((VirtualContact *)(*it));
+    newContact->setBody(this);
+    addVirtualContact(newContact);
+  }
 
-	setRenderGeometry( original->getRenderGeometry() );
+  setRenderGeometry(original->getRenderGeometry());
 
-	int numGeomChildren = original->getIVGeomRoot()->getNumChildren();
-	//create a CLONE of all geometry 
-	for (int i=0; i<numGeomChildren; i++) {
-		IVGeomRoot->addChild( original->getIVGeomRoot()->getChild(i) );
-	}
+  int numGeomChildren = original->getIVGeomRoot()->getNumChildren();
+  //create a CLONE of all geometry
+  for (int i = 0; i < numGeomChildren; i++) {
+    IVGeomRoot->addChild(original->getIVGeomRoot()->getChild(i));
+  }
 
-	addIVMat(true);
+  addIVMat(true);
 
-	//add a CLONE to collision detection
-	cloneToIvc(original);
-	setTran(original->getTran());
+  //add a CLONE to collision detection
+  cloneToIvc(original);
+  setTran(original->getTran());
 }
 
 /*! Parses the root node of an XML structure containing information
-	for a body. It looks for all the relevant properties. Some of
-	the properties are optional and if they are not found, they will
-	be set to default values. Others will cause a failure if they
-	are not present.
+  for a body. It looks for all the relevant properties. Some of
+  the properties are optional and if they are not found, they will
+  be set to default values. Others will cause a failure if they
+  are not present.
 */
 int
 Body::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-	//material
-	const TiXmlElement* element = findXmlElement(root,"material");
-	QString valueStr;
-	if(element == NULL){
-		DBGA("No material type found; using default.");
-		material = myWorld->getMaterialIdx("wood");
-	} else {
-		valueStr = element->GetText();
-		if (!valueStr.isEmpty()) {
-			material = myWorld->getMaterialIdx(valueStr);
-			if (material==-1) {
-				QTWARNING("invalid material type in body file");
-				return FAILURE;
-			}
-		} else{
-			DBGA("No material type found; using default.");
-			material = myWorld->getMaterialIdx("wood");
-		}
-	}
+  //material
+  const TiXmlElement *element = findXmlElement(root, "material");
+  QString valueStr;
+  if (element == NULL) {
+    DBGA("No material type found; using default.");
+    material = myWorld->getMaterialIdx("wood");
+  } else {
+    valueStr = element->GetText();
+    if (!valueStr.isEmpty()) {
+      material = myWorld->getMaterialIdx(valueStr);
+      if (material == -1) {
+        QTWARNING("invalid material type in body file");
+        return FAILURE;
+      }
+    } else {
+      DBGA("No material type found; using default.");
+      material = myWorld->getMaterialIdx("wood");
+    }
+  }
 
-	//Young's modulus
-	element = findXmlElement(root,"youngs");
-	if(element) {
-		valueStr = element->GetText();
-		youngMod = valueStr.toDouble();
-		if (youngMod <= 0) {
-			QTWARNING("invalid Young's modulus in body file");
-			return FAILURE;
-		}
-		mIsElastic = true;			
-	}
+  //Young's modulus
+  element = findXmlElement(root, "youngs");
+  if (element) {
+    valueStr = element->GetText();
+    youngMod = valueStr.toDouble();
+    if (youngMod <= 0) {
+      QTWARNING("invalid Young's modulus in body file");
+      return FAILURE;
+    }
+    mIsElastic = true;
+  }
 
-	//Use Flock of Birds
-	element = findXmlElement(root,"useFlockOfBirds");
-	if(element){
-		valueStr = element->GetText();
-		mBirdNumber = valueStr.toDouble();
-		mUsesFlock = true;
-		DBGA("Object using Flock of Birds sensor " << mBirdNumber);
-	}
+  //Use Flock of Birds
+  element = findXmlElement(root, "useFlockOfBirds");
+  if (element) {
+    valueStr = element->GetText();
+    mBirdNumber = valueStr.toDouble();
+    mUsesFlock = true;
+    DBGA("Object using Flock of Birds sensor " << mBirdNumber);
+  }
 
-	//load the geometry itself
-	element = findXmlElement(root,"geometryFile");
-	if (!element) {
-		QTWARNING("Geometry file information missing");
-		return FAILURE;
-	} else {
-		//the path in the file is relative to the body xml file
-		mGeometryFilename = element->GetText();
-		valueStr = rootPath + mGeometryFilename;
-		mGeometryFileType = element->Attribute("type");
-		//inventor is default
-		if (mGeometryFileType.isNull()||mGeometryFileType.isEmpty()) mGeometryFileType="Inventor";
-		int result;
-		if (mGeometryFileType=="Inventor") {
-			result = loadGeometryIV(valueStr);
-		} else if (mGeometryFileType=="off") {
-			result = loadGeometryOFF(valueStr);
-		} else if (mGeometryFileType=="ply") {
-			result = loadGeometryPLY(valueStr);
-		} else {
-			DBGA("Unknown geometry file type: " << mGeometryFileType.latin1());
-			result = FAILURE;
-		}
-		if (result == FAILURE) {
-			QTWARNING("Failed to open geometry file: " + valueStr);
-			return FAILURE;
-		}
-	}
-	
-	//scaling of the geometry
-        IVScaleTran = new SoTransform;
-        IVScaleTran->scaleFactor.setValue(1.0, 1.0, 1.0);
-	element = findXmlElement(root,"geometryScaling");
-	if (element) {
-	  valueStr = element->GetText();
-	  double scale = valueStr.toDouble();
-	  if (scale <= 0) {
-	    DBGA("Scale geometry: negative scale found");
-	    return FAILURE;
-	  }
-	  IVScaleTran->scaleFactor.setValue(scale, scale, scale);
-	}
-        IVGeomRoot->insertChild(IVScaleTran, 0);
+  //load the geometry itself
+  element = findXmlElement(root, "geometryFile");
+  if (!element) {
+    QTWARNING("Geometry file information missing");
+    return FAILURE;
+  } else {
+    //the path in the file is relative to the body xml file
+    mGeometryFilename = element->GetText();
+    valueStr = rootPath + mGeometryFilename;
+    mGeometryFileType = element->Attribute("type");
+    //inventor is default
+    if (mGeometryFileType.isNull() || mGeometryFileType.isEmpty()) { mGeometryFileType = "Inventor"; }
+    int result;
+    if (mGeometryFileType == "Inventor") {
+      result = loadGeometryIV(valueStr);
+    } else if (mGeometryFileType == "off") {
+      result = loadGeometryOFF(valueStr);
+    } else if (mGeometryFileType == "ply") {
+      result = loadGeometryPLY(valueStr);
+    } else {
+      DBGA("Unknown geometry file type: " << mGeometryFileType.latin1());
+      result = FAILURE;
+    }
+    if (result == FAILURE) {
+      QTWARNING("Failed to open geometry file: " + valueStr);
+      return FAILURE;
+    }
+  }
 
-	//any offset to the geometry, inserted inside the geometry itself
-	//note that the offset gets added before the scale, so the offset is
-	//always expressed in graspit's units
-        IVOffsetTran = new SoTransform;
-        transf::IDENTITY.toSoTransform(IVOffsetTran);
-	element = findXmlElement(root,"geometryOffset");
-	if (element) {
-	  const TiXmlElement* transformElement = findXmlElement(element,"transform");
-	  if(!transformElement){
-	    DBGA("Geometry offset field missing transform information");
-	    return FAILURE;
-	  }
-	  transf offsetTran;
-	  if(!getTransform(transformElement, offsetTran)){
-	    DBGA("Geometry offset field: failed to parse transform");
-	    return FAILURE;
-	  }
-	  offsetTran.toSoTransform(IVOffsetTran);
-	}
-        IVGeomRoot->insertChild(IVOffsetTran, 0);
+  //scaling of the geometry
+  IVScaleTran = new SoTransform;
+  IVScaleTran->scaleFactor.setValue(1.0, 1.0, 1.0);
+  element = findXmlElement(root, "geometryScaling");
+  if (element) {
+    valueStr = element->GetText();
+    double scale = valueStr.toDouble();
+    if (scale <= 0) {
+      DBGA("Scale geometry: negative scale found");
+      return FAILURE;
+    }
+    IVScaleTran->scaleFactor.setValue(scale, scale, scale);
+  }
+  IVGeomRoot->insertChild(IVScaleTran, 0);
 
-	return SUCCESS;
+  //any offset to the geometry, inserted inside the geometry itself
+  //note that the offset gets added before the scale, so the offset is
+  //always expressed in graspit's units
+  IVOffsetTran = new SoTransform;
+  transf::IDENTITY.toSoTransform(IVOffsetTran);
+  element = findXmlElement(root, "geometryOffset");
+  if (element) {
+    const TiXmlElement *transformElement = findXmlElement(element, "transform");
+    if (!transformElement) {
+      DBGA("Geometry offset field missing transform information");
+      return FAILURE;
+    }
+    transf offsetTran;
+    if (!getTransform(transformElement, offsetTran)) {
+      DBGA("Geometry offset field: failed to parse transform");
+      return FAILURE;
+    }
+    offsetTran.toSoTransform(IVOffsetTran);
+  }
+  IVGeomRoot->insertChild(IVOffsetTran, 0);
+
+  return SUCCESS;
 }
 
 int
-Body::saveToXml(QTextStream& xml){
-	xml<<"\t\t\t<material>"<<myWorld->getMaterialName(material).latin1()<<"</material>"<<endl;
-	if(youngMod>0)
-		xml<<"\t\t\t<youngs>"<<youngMod<<"</youngs>"<<endl;
-	if(mUsesFlock){
-		xml<<"\t\t\t<useFlockOfBirds>"<<mBirdNumber<<"</useFlockOfBirds>"<<endl;
-	}
-	xml<<"\t\t\t<geometryFile type = \""<<mGeometryFileType.latin1()<<"\">"
-		<<mGeometryFilename.latin1()<<"</geometryFile>"<<endl;
-	return SUCCESS;
+Body::saveToXml(QTextStream &xml) {
+  xml << "\t\t\t<material>" << myWorld->getMaterialName(material).latin1() << "</material>" << endl;
+  if (youngMod > 0) {
+    xml << "\t\t\t<youngs>" << youngMod << "</youngs>" << endl;
+  }
+  if (mUsesFlock) {
+    xml << "\t\t\t<useFlockOfBirds>" << mBirdNumber << "</useFlockOfBirds>" << endl;
+  }
+  xml << "\t\t\t<geometryFile type = \"" << mGeometryFileType.latin1() << "\">"
+      << mGeometryFilename.latin1() << "</geometryFile>" << endl;
+  return SUCCESS;
 }
 
 
 /*! Opens and loads a body information file.  \a filename is the complete path to
-    the body file, which should be in XML format (with a .xml extension) and can 
-    contain a number of Graspit-specific properties as XML tags, as well as a 
+    the body file, which should be in XML format (with a .xml extension) and can
+    contain a number of Graspit-specific properties as XML tags, as well as a
     pointer to a different file which contains the geometry itself.
 
     Alternatively, \a filename can also point directly to the geometry file.The
@@ -352,59 +353,59 @@ Body::saveToXml(QTextStream& xml){
     in which case GraspIt will use the default values for all the properties
     that normally come from the XML tags.
 */
-int 
+int
 Body::load(const QString &filename)
 {
-	QString fileType = filename.section('.',-1,-1);
-	QString xmlFilename;
-	if (fileType == "xml"){
-		//the file itself is XML
-		xmlFilename = filename;
-	} else {
-		//file is geometry; use default XML file
-		DBGA("Loading geometry file with boilerplate XML file");
-		xmlFilename = QString(getenv("GRASPIT")) + QString("/models/objects/default.xml");
-	}
+  QString fileType = filename.section('.', -1, -1);
+  QString xmlFilename;
+  if (fileType == "xml") {
+    //the file itself is XML
+    xmlFilename = filename;
+  } else {
+    //file is geometry; use default XML file
+    DBGA("Loading geometry file with boilerplate XML file");
+    xmlFilename = QString(getenv("GRASPIT")) + QString("/models/objects/default.xml");
+  }
 
 
-	myFilename = relativePath(filename, getenv("GRASPIT"));
-	if (myName.isEmpty() || myName == "unnamed") {
-		setName(filename.section('/',-1).section('.',0,0));
-	}
+  myFilename = relativePath(filename, getenv("GRASPIT"));
+  if (myName.isEmpty() || myName == "unnamed") {
+    setName(filename.section('/', -1).section('.', 0, 0));
+  }
 
-	//load the graspit specific information in XML format
-	TiXmlDocument doc(xmlFilename);
-	if(doc.LoadFile()==false){
-		QTWARNING("Could not open " + xmlFilename);
-		return FAILURE;
-	}
-	if (fileType != "xml") {
-		//make geometry point at the right thing
-		QString relFilename = relativePath(filename, QString(getenv("GRASPIT")) + 
-						   QString("/models/objects/"));
-		TiXmlElement * element = new TiXmlElement("geometryFile");
-		if (fileType=="iv" || fileType=="wrl") {
-			element->SetAttribute("type","Inventor");
-		} else if (fileType=="off") {
-			element->SetAttribute("type","off");
-		} else if (fileType=="ply") {
-			element->SetAttribute("type","ply");
-		}
-		TiXmlText * text = new TiXmlText( relFilename );
-		element->LinkEndChild(text);
-		doc.RootElement()->LinkEndChild(element);		
-	}
-	//the root path is the directory in which the xml file is placed
-	QString root = xmlFilename.section('/',0,-2,QString::SectionIncludeTrailingSep);
-	if (loadFromXml(doc.RootElement(), root) != SUCCESS) {
-		return FAILURE;
-	}
-	//add material for controlling transparency
-	addIVMat();
-	return SUCCESS;
+  //load the graspit specific information in XML format
+  TiXmlDocument doc(xmlFilename);
+  if (doc.LoadFile() == false) {
+    QTWARNING("Could not open " + xmlFilename);
+    return FAILURE;
+  }
+  if (fileType != "xml") {
+    //make geometry point at the right thing
+    QString relFilename = relativePath(filename, QString(getenv("GRASPIT")) +
+                                       QString("/models/objects/"));
+    TiXmlElement *element = new TiXmlElement("geometryFile");
+    if (fileType == "iv" || fileType == "wrl") {
+      element->SetAttribute("type", "Inventor");
+    } else if (fileType == "off") {
+      element->SetAttribute("type", "off");
+    } else if (fileType == "ply") {
+      element->SetAttribute("type", "ply");
+    }
+    TiXmlText *text = new TiXmlText(relFilename);
+    element->LinkEndChild(text);
+    doc.RootElement()->LinkEndChild(element);
+  }
+  //the root path is the directory in which the xml file is placed
+  QString root = xmlFilename.section('/', 0, -2, QString::SectionIncludeTrailingSep);
+  if (loadFromXml(doc.RootElement(), root) != SUCCESS) {
+    return FAILURE;
+  }
+  //add material for controlling transparency
+  addIVMat();
+  return SUCCESS;
 }
 
-/*! Loads only the geometry part of this object, without any other 
+/*! Loads only the geometry part of this object, without any other
     GraspIt specific information such as mass, material etc. The file
     must be in a format that is readable by Coin, which for now means
     either Inventor (.iv) or VRML.
@@ -412,27 +413,27 @@ Body::load(const QString &filename)
 int
 Body::loadGeometryIV(const QString &filename)
 {
-	SoInput myInput;
-	if (!myInput.openFile(filename.latin1())) {
-		QTWARNING("Could not open Inventor file " + filename);
-		return FAILURE;
-	}
+  SoInput myInput;
+  if (!myInput.openFile(filename.latin1())) {
+    QTWARNING("Could not open Inventor file " + filename);
+    return FAILURE;
+  }
 
-	//we will read the geometry from the file
-	SoGroup *fileGeomRoot;
-	if (myInput.isFileVRML2()) {
-		fileGeomRoot = SoDB::readAllVRML(&myInput);
-	} else {
-		fileGeomRoot = SoDB::readAll(&myInput);
-	}
-	myInput.closeFile();
-	if (fileGeomRoot == NULL) {
-		QTWARNING("A problem occurred while reading Inventor file" + filename);
-		return FAILURE;
-	}
-	//and add it to scene graph
-	IVGeomRoot->addChild(fileGeomRoot);
-	return SUCCESS;
+  //we will read the geometry from the file
+  SoGroup *fileGeomRoot;
+  if (myInput.isFileVRML2()) {
+    fileGeomRoot = SoDB::readAllVRML(&myInput);
+  } else {
+    fileGeomRoot = SoDB::readAll(&myInput);
+  }
+  myInput.closeFile();
+  if (fileGeomRoot == NULL) {
+    QTWARNING("A problem occurred while reading Inventor file" + filename);
+    return FAILURE;
+  }
+  //and add it to scene graph
+  IVGeomRoot->addChild(fileGeomRoot);
+  return SUCCESS;
 }
 
 
@@ -447,13 +448,13 @@ using std::vector;
 
 //! Helper for loadGeometryOff
 /*! Strips off leading whitespace and comments */
-bool GetOffLine(ifstream* file, istringstream* line)
+bool GetOffLine(ifstream *file, istringstream *line)
 {
   string buffer;
-  if (!file->good()) return false;
+  if (!file->good()) { return false; }
   getline(*file, buffer);
   // remove comments and leading whitespace
-  buffer = buffer.substr(buffer.find_first_not_of(" \t\n\f\r"), 
+  buffer = buffer.substr(buffer.find_first_not_of(" \t\n\f\r"),
                          buffer.find_first_of("#"));
   if (!buffer.empty()) {
     line->clear();
@@ -470,188 +471,188 @@ int OFFReadFailure() {
 }
 
 
-/*! Loads the geometry of this object from an .off file. This was 
-	primarily created for loading models from the Princeton Shape 
-	Benchmark, allowing GraspIt to interact with the Columbia Grasp 
-	Database.
+/*! Loads the geometry of this object from an .off file. This was
+  primarily created for loading models from the Princeton Shape
+  Benchmark, allowing GraspIt to interact with the Columbia Grasp
+  Database.
 */
 int
-Body::loadGeometryOFF(const QString& filename) {
+Body::loadGeometryOFF(const QString &filename) {
   ifstream file(filename.toStdString().c_str());
   istringstream line;
 
   // Skip the first line, which is always just "OFF"
-  if (!GetOffLine(&file, &line)) return OFFReadFailure();
+  if (!GetOffLine(&file, &line)) { return OFFReadFailure(); }
 
   // The header is the first line that isn't a comment (comments start with #)
   // The header contains num_vertices and num_faces
-  if (!GetOffLine(&file, &line)) return OFFReadFailure();
+  if (!GetOffLine(&file, &line)) { return OFFReadFailure(); }
   long num_vertices, num_faces;
   line >> num_vertices >> num_faces;
-  if (line.fail()) return OFFReadFailure();
-    
-  SbVec3f* vertices = new SbVec3f[num_vertices];
+  if (line.fail()) { return OFFReadFailure(); }
+
+  SbVec3f *vertices = new SbVec3f[num_vertices];
   std::vector<int32_t> face_indices;
   // Read vertices
   for (long vertex = 0; vertex < num_vertices; ++vertex) {
-    if (!GetOffLine(&file, &line)) return OFFReadFailure();
+    if (!GetOffLine(&file, &line)) { return OFFReadFailure(); }
     float x, y, z;
     line >> x >> y >> z;
-    if (line.fail()) return OFFReadFailure();
- 	  vertices[vertex].setValue(x, y, z); 
+    if (line.fail()) { return OFFReadFailure(); }
+    vertices[vertex].setValue(x, y, z);
   }
   // Read faces into a vector
   for (long face = 0; face < num_faces; ++face) {
-    if (!GetOffLine(&file, &line)) return OFFReadFailure();
+    if (!GetOffLine(&file, &line)) { return OFFReadFailure(); }
     int num_points, vertex_index;
     line >> num_points;
     // Read the points
     for (int point = 0; point < num_points; ++point) {
       line >> vertex_index;
       face_indices.push_back(vertex_index);
-      // Triangulate the face as we go with a triangle fan and save the 
+      // Triangulate the face as we go with a triangle fan and save the
     }
-    if (line.fail()) return OFFReadFailure();
+    if (line.fail()) { return OFFReadFailure(); }
     face_indices.push_back(SO_END_FACE_INDEX);
   }
 
-	// Put everything into Coin geometry
-	SoCoordinate3* coords = new SoCoordinate3;
-	coords->point.setValues(0, num_vertices, vertices);
-	SoIndexedFaceSet* ifs = new SoIndexedFaceSet;
-	ifs->coordIndex.setValues(0, face_indices.size(), &(face_indices[0]));
-	this->IVGeomRoot->addChild(coords);
-	this->IVGeomRoot->addChild(ifs);
+  // Put everything into Coin geometry
+  SoCoordinate3 *coords = new SoCoordinate3;
+  coords->point.setValues(0, num_vertices, vertices);
+  SoIndexedFaceSet *ifs = new SoIndexedFaceSet;
+  ifs->coordIndex.setValues(0, face_indices.size(), &(face_indices[0]));
+  this->IVGeomRoot->addChild(coords);
+  this->IVGeomRoot->addChild(ifs);
 
-	DBGA("OFF reader success");
-	return SUCCESS;
+  DBGA("OFF reader success");
+  return SUCCESS;
 }
 
 /*! Loads the geometry of this body from a .ply file.
     Uses ply loading code from ROS by Willow Garage, which in turn
     uses code from Greg Turk, Georgia Institute of Technology. PLY
-    loading seems to be fairly complex, as the ply format is very 
+    loading seems to be fairly complex, as the ply format is very
     extensible. Right now, this will only load vertices and triangles
     and nothing else, not even other types of faces. Could be extended
     in the future.
  */
 int
-Body::loadGeometryPLY(const QString& filename)
+Body::loadGeometryPLY(const QString &filename)
 {
 #ifndef PLY_READER
-	DBGA("PLY Reader not installed; can not read file");
-	return FAILURE;
+  DBGA("PLY Reader not installed; can not read file");
+  return FAILURE;
 #else
-	PLYModelLoader loader;
-	std::vector<position> vertices;
-	std::vector<int> triangles;
-	if (loader.readFromFile(filename.toStdString(), vertices, triangles)) {
-		DBGA("PLY loader error");
-		return FAILURE;
-	}
-        return loadGeometryMemory(vertices, triangles);
+  PLYModelLoader loader;
+  std::vector<position> vertices;
+  std::vector<int> triangles;
+  if (loader.readFromFile(filename.toStdString(), vertices, triangles)) {
+    DBGA("PLY loader error");
+    return FAILURE;
+  }
+  return loadGeometryMemory(vertices, triangles);
 #endif
 }
 
-int 
+int
 Body::loadGeometryMemory(const std::vector<position> &vertices, const std::vector<int> &triangles)
 {
-	int num_vertices = vertices.size();
-	SbVec3f* sbVertices = new SbVec3f[num_vertices];
-	for (size_t i=0; i<vertices.size(); i++) {
-		sbVertices[i].setValue(vertices[i].x(), vertices[i].y(), vertices[i].z());
-	}
-	SoCoordinate3* coords = new SoCoordinate3;
-	coords->point.setValues(0, num_vertices, sbVertices);
-	std::vector<int32_t> face_indices;
-	for (size_t i=0; i<triangles.size(); i++) {
-		face_indices.push_back(triangles[i]);
-		if (i%3==2) {
-			face_indices.push_back(SO_END_FACE_INDEX);
-		}
-	}					      
-	SoIndexedFaceSet* ifs = new SoIndexedFaceSet;
-	ifs->coordIndex.setValues(0, face_indices.size(), &(face_indices[0]));
-	this->IVGeomRoot->addChild(coords);
-	this->IVGeomRoot->addChild(ifs);
-	return SUCCESS;
+  int num_vertices = vertices.size();
+  SbVec3f *sbVertices = new SbVec3f[num_vertices];
+  for (size_t i = 0; i < vertices.size(); i++) {
+    sbVertices[i].setValue(vertices[i].x(), vertices[i].y(), vertices[i].z());
+  }
+  SoCoordinate3 *coords = new SoCoordinate3;
+  coords->point.setValues(0, num_vertices, sbVertices);
+  std::vector<int32_t> face_indices;
+  for (size_t i = 0; i < triangles.size(); i++) {
+    face_indices.push_back(triangles[i]);
+    if (i % 3 == 2) {
+      face_indices.push_back(SO_END_FACE_INDEX);
+    }
+  }
+  SoIndexedFaceSet *ifs = new SoIndexedFaceSet;
+  ifs->coordIndex.setValues(0, face_indices.size(), &(face_indices[0]));
+  this->IVGeomRoot->addChild(coords);
+  this->IVGeomRoot->addChild(ifs);
+  return SUCCESS;
 }
 
-/*! After the geometry has been set, this function adds a new Material 
-	node after any Material node already present so we can change the 
-	transparency of this object. Does not work on bodies loaded from 
-	VRML files, as they have different types of material nodes. I have
-	tried also searching for SoVRMLMaterial nodes, but the search fails
-	even if those nodes exist; I suppose that is a bug in Coin.
+/*! After the geometry has been set, this function adds a new Material
+  node after any Material node already present so we can change the
+  transparency of this object. Does not work on bodies loaded from
+  VRML files, as they have different types of material nodes. I have
+  tried also searching for SoVRMLMaterial nodes, but the search fails
+  even if those nodes exist; I suppose that is a bug in Coin.
 */
-void 
+void
 Body::addIVMat(bool clone)
 {
-	IVMat = new SoMaterial;
-	IVMat->diffuseColor.setIgnored(true);
-	IVMat->ambientColor.setIgnored(true);
-	IVMat->specularColor.setIgnored(true);
-	IVMat->emissiveColor.setIgnored(true);
-	IVMat->shininess.setIgnored(true);
+  IVMat = new SoMaterial;
+  IVMat->diffuseColor.setIgnored(true);
+  IVMat->ambientColor.setIgnored(true);
+  IVMat->specularColor.setIgnored(true);
+  IVMat->emissiveColor.setIgnored(true);
+  IVMat->shininess.setIgnored(true);
 
-	if (clone) {
-		//clone's IVMat really does nothing except die with the clone
-		IVGeomRoot->addChild(IVMat);		
-	} else {
-		SoSearchAction *sa = new SoSearchAction;
-		sa->setInterest(SoSearchAction::ALL);
-		sa->setType(SoMaterial::getClassTypeId());
-		sa->apply(IVGeomRoot);
-		
-		if (sa->getPaths().getLength() == 0) {
-			IVGeomRoot->insertChild(IVMat,0);
-		} else {
-			for (int i=0; i<sa->getPaths().getLength(); i++) {
-				SoGroup *g = (SoGroup *)sa->getPaths()[i]->getNodeFromTail(1);
-				if (((SoMaterial *)sa->getPaths()[i]->getTail())->transparency[0] == 0.0f) {
-					g->insertChild(IVMat,sa->getPaths()[i]->getIndexFromTail(0)+1);	
-				}
-			}
-		}
-		delete sa;
-	}
-	/*
-	FILE *fp = fopen("foo.txt","w");
-	SoOutput *so  = new SoOutput;
-	so->setFilePointer(fp);
-	SoWriteAction *swa = new SoWriteAction(so);
-	swa->apply(IVGeomRoot);
-	delete swa;
-	delete so;
-	fclose(fp);
-	*/
+  if (clone) {
+    //clone's IVMat really does nothing except die with the clone
+    IVGeomRoot->addChild(IVMat);
+  } else {
+    SoSearchAction *sa = new SoSearchAction;
+    sa->setInterest(SoSearchAction::ALL);
+    sa->setType(SoMaterial::getClassTypeId());
+    sa->apply(IVGeomRoot);
+
+    if (sa->getPaths().getLength() == 0) {
+      IVGeomRoot->insertChild(IVMat, 0);
+    } else {
+      for (int i = 0; i < sa->getPaths().getLength(); i++) {
+        SoGroup *g = (SoGroup *)sa->getPaths()[i]->getNodeFromTail(1);
+        if (((SoMaterial *)sa->getPaths()[i]->getTail())->transparency[0] == 0.0f) {
+          g->insertChild(IVMat, sa->getPaths()[i]->getIndexFromTail(0) + 1);
+        }
+      }
+    }
+    delete sa;
+  }
+  /*
+  FILE *fp = fopen("foo.txt","w");
+  SoOutput *so  = new SoOutput;
+  so->setFilePointer(fp);
+  SoWriteAction *swa = new SoWriteAction(so);
+  swa->apply(IVGeomRoot);
+  delete swa;
+  delete so;
+  fclose(fp);
+  */
 }
 
 /*! Adds the body to the world's collision detection system
 */
-void 
+void
 Body::addToIvc(bool ExpectEmpty)
 {
-	myWorld->getCollisionInterface()->addBody(this, ExpectEmpty);
-	myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
+  myWorld->getCollisionInterface()->addBody(this, ExpectEmpty);
+  myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
 }
 
-/*!	Clones the original's body geometry for the world
-	collision detection system. The new body only gets 
-	its own IVC transform.
+/*! Clones the original's body geometry for the world
+  collision detection system. The new body only gets
+  its own IVC transform.
 */
-void 
+void
 Body::cloneToIvc(const Body *original)
 {
-	myWorld->getCollisionInterface()->cloneBody(this, original);
-	myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
+  myWorld->getCollisionInterface()->cloneBody(this, original);
+  myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
 }
 
 /*! Collision geometry gets updated which could be slow.
 */
 void Body::setGeometryScaling(double x, double y, double z)
 {
-  if (x<=0 || y<=0 || z<=0)
+  if (x <= 0 || y <= 0 || z <= 0)
   {
     DBGA("Scale geometry: negative or zero scale found");
     return;
@@ -668,106 +669,106 @@ void Body::setGeometryOffset(transf tr)
   myWorld->getCollisionInterface()->updateBodyGeometry(this);
 }
 
-void 
+void
 Body::setDefaultViewingParameters()
 {
-	showFC = false;
-	showVC = false;
-	setTransparency(0.0);	
+  showFC = false;
+  showVC = false;
+  setTransparency(0.0);
 }
 
 /*! Initialized the empty scene graph structure that we will use
-	in the future to render this body
+  in the future to render this body
 */
-void 
+void
 Body::initializeIV()
 {
-	IVRoot = new SoSeparator;
-	IVTran = new SoTransform;
-	IVRoot->insertChild(IVTran,0);
+  IVRoot = new SoSeparator;
+  IVTran = new SoTransform;
+  IVRoot->insertChild(IVTran, 0);
 
-	//axes get added at the beginning, so they are not affected
-	//by what goes on in the other groups
-	createAxesGeometry();
+  //axes get added at the beginning, so they are not affected
+  //by what goes on in the other groups
+  createAxesGeometry();
 
-	IVContactIndicators = new SoSeparator;
-	IVRoot->addChild(IVContactIndicators);
+  IVContactIndicators = new SoSeparator;
+  IVRoot->addChild(IVContactIndicators);
 
 #ifdef GEOMETRY_LIB
-	IVPrimitiveRoot = new SoSeparator;
-	IVRoot->addChild(IVPrimitiveRoot);
+  IVPrimitiveRoot = new SoSeparator;
+  IVRoot->addChild(IVPrimitiveRoot);
 #endif
 
-	IVBVRoot = new SoSeparator;
-	IVRoot->addChild(IVBVRoot);
+  IVBVRoot = new SoSeparator;
+  IVRoot->addChild(IVBVRoot);
 
-	IVGeomRoot = new SoSeparator;
-	IVRoot->addChild(IVGeomRoot);
+  IVGeomRoot = new SoSeparator;
+  IVRoot->addChild(IVGeomRoot);
 }
 
-/*! Shows a bounding box hierarchy for this body. Used for 
-	debug purposes.
+/*! Shows a bounding box hierarchy for this body. Used for
+  debug purposes.
 */
 void
 Body::setBVGeometry(const std::vector<BoundingBox> &bvs)
 {
-	IVBVRoot->removeAllChildren();
-	int mark = 0;
-	for (int i=0; i<(int)bvs.size(); i++) {
-		SoSeparator *bvSep = new SoSeparator;
+  IVBVRoot->removeAllChildren();
+  int mark = 0;
+  for (int i = 0; i < (int)bvs.size(); i++) {
+    SoSeparator *bvSep = new SoSeparator;
 
-		SoMaterial *bvMat = new SoMaterial;
-		bvSep->addChild(bvMat);
-		float r,g,b;
-		//random colors
-		r = ((float)rand()) / RAND_MAX;
-		g = ((float)rand()) / RAND_MAX;
-		b = ((float)rand()) / RAND_MAX;
+    SoMaterial *bvMat = new SoMaterial;
+    bvSep->addChild(bvMat);
+    float r, g, b;
+    //random colors
+    r = ((float)rand()) / RAND_MAX;
+    g = ((float)rand()) / RAND_MAX;
+    b = ((float)rand()) / RAND_MAX;
 
-		//mark collisions	
-		if (bvs[i].mMark) {
-			mark++;
-			r = 0.8f; g=0.0f; b=0.0f;
-		} else {
-			r = g = b = 0.5f;
-		}
-		
-		bvMat->diffuseColor = SbColor(r,g,b);
-		bvMat->ambientColor = SbColor(r,g,b);
-		bvMat->transparency = 0.5;
+    //mark collisions
+    if (bvs[i].mMark) {
+      mark++;
+      r = 0.8f; g = 0.0f; b = 0.0f;
+    } else {
+      r = g = b = 0.5f;
+    }
 
-		SoTransform* bvTran = new SoTransform;
-		bvs[i].getTran().toSoTransform(bvTran);
-		bvSep->addChild(bvTran);
+    bvMat->diffuseColor = SbColor(r, g, b);
+    bvMat->ambientColor = SbColor(r, g, b);
+    bvMat->transparency = 0.5;
 
-		
-		//a single cube for the entire box
-		SoCube *bvBox = new SoCube;
-		bvBox->width = 2 * bvs[i].halfSize.x();
-		bvBox->height = 2 * bvs[i].halfSize.y();
-		bvBox->depth = 2 * bvs[i].halfSize.z();
-		bvSep->addChild(bvBox);
-		
+    SoTransform *bvTran = new SoTransform;
+    bvs[i].getTran().toSoTransform(bvTran);
+    bvSep->addChild(bvTran);
 
-		//2 cubes so we also see separarion plane
-		/*
-		SoCube *bvBox = new SoCube;
-		bvBox->width =		bvs[i].halfSize.x();
-		bvBox->height = 2 * bvs[i].halfSize.y();
-		bvBox->depth = 2 * bvs[i].halfSize.z();
-		SoTransform *halfCubeTran = new SoTransform;
-		halfCubeTran->translation.setValue(bvs[i].halfSize.x()/2.0, 0.0, 0.0);
-		bvSep->addChild(halfCubeTran);
-		bvSep->addChild(bvBox);
-		halfCubeTran = new SoTransform;
-		halfCubeTran->translation.setValue(-bvs[i].halfSize.x(), 0.0, 0.0);
-		bvSep->addChild(halfCubeTran);
-		bvSep->addChild(bvBox);
-		*/
 
-		IVBVRoot->addChild(bvSep);
-	}
-	DBGA("Setting bv geom: " << bvs.size() << " boxes. Marked: " << mark);
+    //a single cube for the entire box
+    SoCube *bvBox = new SoCube;
+    bvBox->width = 2 * bvs[i].halfSize.x();
+    bvBox->height = 2 * bvs[i].halfSize.y();
+    bvBox->depth = 2 * bvs[i].halfSize.z();
+    bvSep->addChild(bvBox);
+
+
+    //2 cubes so we also see separarion plane
+    /*
+    SoCube *bvBox = new SoCube;
+    bvBox->width =    bvs[i].halfSize.x();
+    bvBox->height = 2 * bvs[i].halfSize.y();
+    bvBox->depth = 2 * bvs[i].halfSize.z();
+    SoTransform *halfCubeTran = new SoTransform;
+    halfCubeTran->translation.setValue(bvs[i].halfSize.x()/2.0, 0.0, 0.0);
+    bvSep->addChild(halfCubeTran);
+    bvSep->addChild(bvBox);
+    halfCubeTran = new SoTransform;
+    halfCubeTran->translation.setValue(-bvs[i].halfSize.x(), 0.0, 0.0);
+    bvSep->addChild(halfCubeTran);
+    bvSep->addChild(bvBox);
+    */
+
+    IVBVRoot->addChild(bvSep);
+  }
+  DBGA("Setting bv geom: " << bvs.size() << " boxes. Marked: " << mark);
 }
 
 /*!
@@ -778,8 +779,8 @@ float
 Body::getTransparency() const
 {
   return IVMat->transparency[0];
-}  
-  
+}
+
 
 /*!
   Set the current transparency value for the body.
@@ -792,7 +793,7 @@ Body::setTransparency(float t)
   IVMat->transparency = t;
 }
 
-  
+
 /*!
   Set the current material of the body to mat
   \sa getMaterial()
@@ -803,9 +804,9 @@ Body::setMaterial(int mat)
   std::list<Contact *>::iterator cp;
 
   material = mat;
-  if (showFC || showVC) IVContactIndicators->removeAllChildren();
+  if (showFC || showVC) { IVContactIndicators->removeAllChildren(); }
 
-  for (cp=contactList.begin();cp!=contactList.end();cp++) {
+  for (cp = contactList.begin(); cp != contactList.end(); cp++) {
     (*cp)->updateCof();
     (*cp)->getMate()->updateCof();
     (*cp)->getBody2()->redrawFrictionCones();
@@ -821,8 +822,8 @@ void
 Body::showFrictionCones(bool on, int vc)
 {
   showFC = on;
-  if (vc==1) showVC = true;
-  else if (vc==2) showVC = false;
+  if (vc == 1) { showVC = true; }
+  else if (vc == 2) { showVC = false; }
   redrawFrictionCones();
 }
 
@@ -837,41 +838,43 @@ Body::redrawFrictionCones()
 
   IVContactIndicators->removeAllChildren();
   if (showFC) {
-    for (cp=contactList.begin();cp!=contactList.end();cp++)
-		IVContactIndicators->addChild( (*cp)->getVisualIndicator() );
+    for (cp = contactList.begin(); cp != contactList.end(); cp++) {
+      IVContactIndicators->addChild((*cp)->getVisualIndicator());
+    }
   }
   if (showVC) {
-	for (cp = virtualContactList.begin(); cp!=virtualContactList.end(); cp++)
-		IVContactIndicators->addChild( ( (VirtualContact*)(*cp) )->getVisualIndicator() );
+    for (cp = virtualContactList.begin(); cp != virtualContactList.end(); cp++) {
+      IVContactIndicators->addChild(((VirtualContact *)(*cp))->getVisualIndicator());
+    }
   }
 }
 
 /*! Sets whether a change of this body's transform should automatically
-	trigger a redraw. This seems to not always work...
+  trigger a redraw. This seems to not always work...
 */
 void
 Body::setRenderGeometry(bool s)
 {
-	assert(IVTran);
-	mRenderGeometry = s;
-	if (!s) {
-//		IVRoot->enableNotify(false);
-//		IVTran->enableNotify(false);
-//		IVMat->enableNotify(false);
-//		IVGeomRoot->enableNotify(false);
-//		IVContactIndicators->enableNotify(false);
-		IVTran->translation.enableNotify(false);
-		IVTran->rotation.enableNotify(false);
-	} else {
-//		IVRoot->enableNotify(true);
-//		IVTran->enableNotify(true);
-//		IVMat->enableNotify(true);
-//		IVGeomRoot->enableNotify(true);
-//		IVContactIndicators->enableNotify(true);
-		IVTran->translation.enableNotify(true);
-		IVTran->rotation.enableNotify(true);
-	}
-	
+  assert(IVTran);
+  mRenderGeometry = s;
+  if (!s) {
+    //    IVRoot->enableNotify(false);
+    //    IVTran->enableNotify(false);
+    //    IVMat->enableNotify(false);
+    //    IVGeomRoot->enableNotify(false);
+    //    IVContactIndicators->enableNotify(false);
+    IVTran->translation.enableNotify(false);
+    IVTran->rotation.enableNotify(false);
+  } else {
+    //    IVRoot->enableNotify(true);
+    //    IVTran->enableNotify(true);
+    //    IVMat->enableNotify(true);
+    //    IVGeomRoot->enableNotify(true);
+    //    IVContactIndicators->enableNotify(true);
+    IVTran->translation.enableNotify(true);
+    IVTran->rotation.enableNotify(true);
+  }
+
 }
 
 /*!
@@ -881,33 +884,33 @@ Body::setRenderGeometry(bool s)
 int
 Body::setTran(transf const &tr)
 {
-	if (tr == Tran) return SUCCESS;
-	breakContacts();
+  if (tr == Tran) { return SUCCESS; }
+  breakContacts();
 
-	if (!myWorld->wasModified() && tr != Tran) {
-		myWorld->setModified();
-	}
-	Tran = tr;
-	myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
-	if (IVTran) {
-		Tran.toSoTransform(IVTran);
-	}
-	return SUCCESS;
+  if (!myWorld->wasModified() && tr != Tran) {
+    myWorld->setModified();
+  }
+  Tran = tr;
+  myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
+  if (IVTran) {
+    Tran.toSoTransform(IVTran);
+  }
+  return SUCCESS;
 }
 
- 
+
 /*!
   Given a motion relative to body coordinates, this determines whether
   the current contacts allow that motion.
 */
 bool
-Body::contactsPreventMotion(const transf& motion) const
+Body::contactsPreventMotion(const transf &motion) const
 {
   std::list<Contact *>::iterator cp;
   std::list<Contact *> contactList;
 
   contactList = getContacts();
-  for (cp=contactList.begin();cp!=contactList.end();cp++) {
+  for (cp = contactList.begin(); cp != contactList.end(); cp++) {
     if ((*cp)->preventsMotion(motion)) {
       return true;
     }
@@ -923,79 +926,80 @@ Body::contactsPreventMotion(const transf& motion) const
 void
 Body::breakContacts()
 {
-	std::list<Contact *>::iterator cp;
+  std::list<Contact *>::iterator cp;
 
-	if (!contactList.empty()) {
-		for (cp=contactList.begin();cp!=contactList.end();cp++) {
-			delete *cp; *cp = NULL;
-		}
-		contactList.clear();
-	}
-	numContacts = 0;
+  if (!contactList.empty()) {
+    for (cp = contactList.begin(); cp != contactList.end(); cp++) {
+      delete *cp; *cp = NULL;
+    }
+    contactList.clear();
+  }
+  numContacts = 0;
 
-	for (cp = prevContactList.begin(); cp!=prevContactList.end(); cp++) {
-		if ( (*cp)->getMate() != NULL ) {
-			(*cp)->getMate()->setMate(NULL);
-		}
-		(*cp)->setMate(NULL);
-		delete *cp; *cp = NULL;
-	}
-	prevContactList.clear();
+  for (cp = prevContactList.begin(); cp != prevContactList.end(); cp++) {
+    if ((*cp)->getMate() != NULL) {
+      (*cp)->getMate()->setMate(NULL);
+    }
+    (*cp)->setMate(NULL);
+    delete *cp; *cp = NULL;
+  }
+  prevContactList.clear();
 
-	if (showFC)
-		IVContactIndicators->removeAllChildren();
+  if (showFC) {
+    IVContactIndicators->removeAllChildren();
+  }
 
-        setContactsChanged();
+  setContactsChanged();
 }
 
 /*! Load in all virtual contacts from file fn*/
 int
 Body::loadContactData(QString fn)
 {
-    std::ifstream inFile(fn.latin1(), std::ios::in);
-    if (!inFile.is_open())
-    {
-		fprintf(stderr,"Could not open filename %s\n",fn.latin1());
-		return FAILURE;
-    }
+  std::ifstream inFile(fn.latin1(), std::ios::in);
+  if (!inFile.is_open())
+  {
+    fprintf(stderr, "Could not open filename %s\n", fn.latin1());
+    return FAILURE;
+  }
 
-	int numContacts;
-	VirtualContactOnObject *newContact;
-    inFile >> numContacts;
-    {
-		fprintf(stderr,"Failed to read contacts from %s\n",fn.latin1());
-		return FAILURE;
-    }
+  int numContacts;
+  VirtualContactOnObject *newContact;
+  inFile >> numContacts;
+  {
+    fprintf(stderr, "Failed to read contacts from %s\n", fn.latin1());
+    return FAILURE;
+  }
 
-	breakVirtualContacts();
-	for (int i=0; i<numContacts; i++) {
-		newContact = new VirtualContactOnObject();
-		if (!newContact->readFromFile(inFile))
-        {
-		    fprintf(stderr,"Failed to a contacts from %s\n",fn.latin1());
-		    return FAILURE;
-        }
-		newContact->setBody( this );
-		((Contact*)newContact)->computeWrenches();
-		addVirtualContact( newContact );//visualize the contact just read in
-	}
-    inFile.close();
-	return SUCCESS;
+  breakVirtualContacts();
+  for (int i = 0; i < numContacts; i++) {
+    newContact = new VirtualContactOnObject();
+    if (!newContact->readFromFile(inFile))
+    {
+      fprintf(stderr, "Failed to a contacts from %s\n", fn.latin1());
+      return FAILURE;
+    }
+    newContact->setBody(this);
+    ((Contact *)newContact)->computeWrenches();
+    addVirtualContact(newContact);  //visualize the contact just read in
+  }
+  inFile.close();
+  return SUCCESS;
 }
 /*! Removes all virtual contacts. This only removes the virtual contacts.
 */
 void
 Body::breakVirtualContacts()
 {
-	std::list<Contact *>::iterator cp;
-	for (cp = virtualContactList.begin(); cp!= virtualContactList.end(); cp++) {
-		delete *cp;
-	}
-	//this deletes all contact indicators, should be fixed..
-	if (showVC) {
-		IVContactIndicators->removeAllChildren();
-	}
-	virtualContactList.clear();
+  std::list<Contact *>::iterator cp;
+  for (cp = virtualContactList.begin(); cp != virtualContactList.end(); cp++) {
+    delete *cp;
+  }
+  //this deletes all contact indicators, should be fixed..
+  if (showVC) {
+    IVContactIndicators->removeAllChildren();
+  }
+  virtualContactList.clear();
 }
 
 /*!
@@ -1005,29 +1009,30 @@ Body::breakVirtualContacts()
 void
 Body::resetContactList()
 {
-	std::list<Contact *>::iterator cp;
-	for (cp = prevContactList.begin(); cp!=prevContactList.end(); cp++) {
-		if ( (*cp)->getMate() != NULL ) {
-			(*cp)->getMate()->setMate(NULL);
-		}
-		(*cp)->setMate(NULL);
-		delete *cp; *cp = NULL;
-	}
-	prevContactList.clear();
-	if (!contactList.empty()) {
-		for (cp=contactList.begin();cp!=contactList.end();cp++) {
-			prevContactList.push_back(*cp);
-		}
-		contactList.clear();
-	}
-	numContacts = 0;
-	if (showFC)
-		IVContactIndicators->removeAllChildren();
+  std::list<Contact *>::iterator cp;
+  for (cp = prevContactList.begin(); cp != prevContactList.end(); cp++) {
+    if ((*cp)->getMate() != NULL) {
+      (*cp)->getMate()->setMate(NULL);
+    }
+    (*cp)->setMate(NULL);
+    delete *cp; *cp = NULL;
+  }
+  prevContactList.clear();
+  if (!contactList.empty()) {
+    for (cp = contactList.begin(); cp != contactList.end(); cp++) {
+      prevContactList.push_back(*cp);
+    }
+    contactList.clear();
+  }
+  numContacts = 0;
+  if (showFC) {
+    IVContactIndicators->removeAllChildren();
+  }
 
-    setContactsChanged();
+  setContactsChanged();
 }
 
-/*! 
+/*!
   Adds contact \a c to the body's contact list.  Assumes the contact is not
   already in the list.
   \sa removeContact()
@@ -1035,93 +1040,99 @@ Body::resetContactList()
 void
 Body::addContact(Contact *c)
 {
-	contactList.push_back(c);
-	numContacts++;
-	if (showFC) {
-		assert(IVContactIndicators->getNumChildren() > numContacts-2);
-		IVContactIndicators->insertChild( c->getVisualIndicator(), numContacts-1 );
-	}
-    setContactsChanged();
+  contactList.push_back(c);
+  numContacts++;
+  if (showFC) {
+    assert(IVContactIndicators->getNumChildren() > numContacts - 2);
+    IVContactIndicators->insertChild(c->getVisualIndicator(), numContacts - 1);
+  }
+  setContactsChanged();
 }
 
 /*! The number of contacts on this body. If \a b is not null, it only counts
-	contacts against \a b. If it is null, is returns all contacts on this body,
-	regardless of who they are against.
+  contacts against \a b. If it is null, is returns all contacts on this body,
+  regardless of who they are against.
 */
-int 
+int
 Body::getNumContacts(Body *b) const
 {
-	if (!b) return numContacts;
-	int c = 0;
-	std::list<Contact*>::const_iterator it;
-	for (it = contactList.begin(); it!=contactList.end(); it++) {
-		if ( (*it)->getBody2() == b) c++;
-	}
-	return c;
+  if (!b) { return numContacts; }
+  int c = 0;
+  std::list<Contact *>::const_iterator it;
+  for (it = contactList.begin(); it != contactList.end(); it++) {
+    if ((*it)->getBody2() == b) { c++; }
+  }
+  return c;
 }
 
 /*! Returns a list of the contacts on this body. if \a b is not NULL, it returns
-	only contacts against the body \a b. If \a b is NULL, it returns all the 
-	contacts.
+  only contacts against the body \a b. If \a b is NULL, it returns all the
+  contacts.
 */
-std::list<Contact*>
+std::list<Contact *>
 Body::getContacts(Body *b) const
 {
-	if (!b) return contactList;
-	std::list<Contact*> contacts;
-	std::list<Contact*>::const_iterator it;
-	for (it = contactList.begin(); it!=contactList.end(); it++) {
-		if ( (*it)->getBody2() == b) contacts.push_back(*it);
-	}
-	return contacts;
+  if (!b) { return contactList; }
+  std::list<Contact *> contacts;
+  std::list<Contact *>::const_iterator it;
+  for (it = contactList.begin(); it != contactList.end(); it++) {
+    if ((*it)->getBody2() == b) { contacts.push_back(*it); }
+  }
+  return contacts;
 }
 
 /*! Adds a virtual contacts to this body */
 void
 Body::addVirtualContact(Contact *c)
 {
-	virtualContactList.push_back(c);
-	if (showVC)
-		IVContactIndicators->addChild( c->getVisualIndicator() );
-    setContactsChanged();
+  virtualContactList.push_back(c);
+  if (showVC) {
+    IVContactIndicators->addChild(c->getVisualIndicator());
+  }
+  setContactsChanged();
 }
 
 /*!
   Checks if this contact inherits some other contact from the prevContactList.
-  The check looks of contact points are close, normals agree and the second 
-  body is the same. If inheritance is found, some properites of the contact 
+  The check looks of contact points are close, normals agree and the second
+  body is the same. If inheritance is found, some properites of the contact
   are passed from the previous contact to this one.
 */
-Contact*
+Contact *
 Body::checkContactInheritance(Contact *c)
 {
-	std::list<Contact *>::iterator cp;
-	bool inheritance = false;
-	for (cp = prevContactList.begin(); cp != prevContactList.end(); cp++) {
-		if ( (*cp)->getBody1() != c->getBody1() )
-			continue;
-		if ( (*cp)->getBody2() != c->getBody2() )
-			continue;
-		vec3 d = (*cp)->getPosition() - c->getPosition();
-		if (d.len() > Contact::INHERITANCE_THRESHOLD )
-			continue;
-		vec3 n1 = (*cp)->getNormal();
-		vec3 n2 = c->getNormal();
-		double theta = n1 % n2;
-		if ( theta < Contact::INHERITANCE_ANGULAR_THRESHOLD )
-			continue;
-		inheritance = true;
-		break;
-	}
-	if (!inheritance)
-		return NULL;
-	return (*cp);
+  std::list<Contact *>::iterator cp;
+  bool inheritance = false;
+  for (cp = prevContactList.begin(); cp != prevContactList.end(); cp++) {
+    if ((*cp)->getBody1() != c->getBody1()) {
+      continue;
+    }
+    if ((*cp)->getBody2() != c->getBody2()) {
+      continue;
+    }
+    vec3 d = (*cp)->getPosition() - c->getPosition();
+    if (d.len() > Contact::INHERITANCE_THRESHOLD) {
+      continue;
+    }
+    vec3 n1 = (*cp)->getNormal();
+    vec3 n2 = c->getNormal();
+    double theta = n1 % n2;
+    if (theta < Contact::INHERITANCE_ANGULAR_THRESHOLD) {
+      continue;
+    }
+    inheritance = true;
+    break;
+  }
+  if (!inheritance) {
+    return NULL;
+  }
+  return (*cp);
 }
 
 
 /*!
   Removes contact c from the body's contact list.  Assumes the contact is in the list.
-  \sa addContact() 
+  \sa addContact()
  */
 void
 Body::removeContact(Contact *c)
@@ -1130,14 +1141,14 @@ Body::removeContact(Contact *c)
   std::list<Contact *>::iterator cp;
 
   if (showFC) {
-    for (cp=contactList.begin(),i=0;cp!=contactList.end();cp++,i++)
+    for (cp = contactList.begin(), i = 0; cp != contactList.end(); cp++, i++)
       if (*cp == c) {
-	    contactList.erase(cp);
-	    break;
+        contactList.erase(cp);
+        break;
       }
     IVContactIndicators->removeChild(i);
   }
-  else contactList.remove(c);
+  else { contactList.remove(c); }
 
   delete c;
   numContacts--;
@@ -1146,19 +1157,19 @@ Body::removeContact(Contact *c)
 }
 
 /*!
-	Removes a contact c from the prevContactList
+  Removes a contact c from the prevContactList
 */
 void Body::removePrevContact(Contact *c)
 {
-	prevContactList.remove(c);
-	c->setMate(NULL);
-	delete c;
+  prevContactList.remove(c);
+  c->setMate(NULL);
+  delete c;
 }
 
 /*!
   Output method for writing body data to a text world configuration file.
 */
-QTextStream&
+QTextStream &
 operator<<(QTextStream &os, const Body &b)
 {
   os << b.myFilename << endl;
@@ -1168,109 +1179,109 @@ operator<<(QTextStream &os, const Body &b)
 
 
 /*! Helper callback for generating list of body triangles */
-void addTriangleCallBack(void* info, SoCallbackAction * action,
-						 const SoPrimitiveVertex * v1, 
-						 const SoPrimitiveVertex * v2, 
-						 const SoPrimitiveVertex * v3)
+void addTriangleCallBack(void *info, SoCallbackAction *action,
+                         const SoPrimitiveVertex *v1,
+                         const SoPrimitiveVertex *v2,
+                         const SoPrimitiveVertex *v3)
 {
-	std::vector<Triangle> *triangles = (std::vector<Triangle>*) info;
+  std::vector<Triangle> *triangles = (std::vector<Triangle> *) info;
 
-	SbVec3f p1, p2, p3;
-	SbMatrix mm = action->getModelMatrix();
+  SbVec3f p1, p2, p3;
+  SbMatrix mm = action->getModelMatrix();
 
-	// Transform vertices (remember vertices are in the object space coordinates for each triangle)
-	mm.multVecMatrix( v1->getPoint(), p1 );
-	mm.multVecMatrix( v2->getPoint(), p2 );
-	mm.multVecMatrix( v3->getPoint(), p3 );
+  // Transform vertices (remember vertices are in the object space coordinates for each triangle)
+  mm.multVecMatrix(v1->getPoint(), p1);
+  mm.multVecMatrix(v2->getPoint(), p2);
+  mm.multVecMatrix(v3->getPoint(), p3);
 
-	// Don't add degenerate triangles!
-	if ((p1 == p2) || (p2 == p3) || (p1 == p3)) return;
+  // Don't add degenerate triangles!
+  if ((p1 == p2) || (p2 == p3) || (p1 == p3)) { return; }
 
-	position nv1(p1[0], p1[1], p1[2]);
-	position nv2(p2[0], p2[1], p2[2]);
-	position nv3(p3[0], p3[1], p3[2]);
-	Triangle newTri(nv1,nv2,nv3);
-	triangles->push_back( newTri );
+  position nv1(p1[0], p1[1], p1[2]);
+  position nv2(p2[0], p2[1], p2[2]);
+  position nv3(p3[0], p3[1], p3[2]);
+  Triangle newTri(nv1, nv2, nv3);
+  triangles->push_back(newTri);
 }
 
 /*! Helper callback for generating list of body vertices */
-void addVertexCallBack(void* info, SoCallbackAction * action, const SoPrimitiveVertex * v1)
+void addVertexCallBack(void *info, SoCallbackAction *action, const SoPrimitiveVertex *v1)
 {
-	std::vector<position> *vertices = (std::vector<position>*) info;
-	SbVec3f p1;
-	SbMatrix mm = action->getModelMatrix();
-	// Transform vertex (remember vertices are in the object space coordinates for each triangle)
-	mm.multVecMatrix( v1->getPoint(), p1 );
-	position nv1(p1[0], p1[1], p1[2]);
-	vertices->push_back( nv1 );
+  std::vector<position> *vertices = (std::vector<position> *) info;
+  SbVec3f p1;
+  SbMatrix mm = action->getModelMatrix();
+  // Transform vertex (remember vertices are in the object space coordinates for each triangle)
+  mm.multVecMatrix(v1->getPoint(), p1);
+  position nv1(p1[0], p1[1], p1[2]);
+  vertices->push_back(nv1);
 }
 
 /*! Helper callback for generating list of body vertices */
-void addVerticesFromTriangleCallBack(void* info, SoCallbackAction * action,
-									 const SoPrimitiveVertex * v1, 
-									 const SoPrimitiveVertex * v2, 
-									 const SoPrimitiveVertex * v3)
+void addVerticesFromTriangleCallBack(void *info, SoCallbackAction *action,
+                                     const SoPrimitiveVertex *v1,
+                                     const SoPrimitiveVertex *v2,
+                                     const SoPrimitiveVertex *v3)
 {
-	std::vector<position> *vertices = (std::vector<position>*) info;
-	SbVec3f p1, p2, p3;
-	SbMatrix mm = action->getModelMatrix();
-	// Transform vertices (remember vertices are in the object space coordinates for each triangle)
-	mm.multVecMatrix( v1->getPoint(), p1 );
-	mm.multVecMatrix( v2->getPoint(), p2 );
-	mm.multVecMatrix( v3->getPoint(), p3 );
-	vertices->push_back(position(p1[0], p1[1], p1[2]));
-	vertices->push_back(position(p2[0], p2[1], p2[2]));
-	vertices->push_back(position(p3[0], p3[1], p3[2]));
+  std::vector<position> *vertices = (std::vector<position> *) info;
+  SbVec3f p1, p2, p3;
+  SbMatrix mm = action->getModelMatrix();
+  // Transform vertices (remember vertices are in the object space coordinates for each triangle)
+  mm.multVecMatrix(v1->getPoint(), p1);
+  mm.multVecMatrix(v2->getPoint(), p2);
+  mm.multVecMatrix(v3->getPoint(), p3);
+  vertices->push_back(position(p1[0], p1[1], p1[2]));
+  vertices->push_back(position(p2[0], p2[1], p2[2]));
+  vertices->push_back(position(p3[0], p3[1], p3[2]));
 }
 
 /*! Returns all the triangle that make up the geometry of this body */
 void
 Body::getGeometryTriangles(std::vector<Triangle> *triangles) const
 {
-	SoCallbackAction ca;
-	ca.addTriangleCallback(SoShape::getClassTypeId(), addTriangleCallBack, triangles);
-	ca.apply(getIVGeomRoot());
+  SoCallbackAction ca;
+  ca.addTriangleCallback(SoShape::getClassTypeId(), addTriangleCallBack, triangles);
+  ca.apply(getIVGeomRoot());
 }
 
-/*!	Returns all the vertices that make up the geometry of this body. 
-	This function will return duplicates, as vertices are reported once 
-	for each triangle that they are part of
+/*! Returns all the vertices that make up the geometry of this body.
+  This function will return duplicates, as vertices are reported once
+  for each triangle that they are part of
 */
 void
 Body::getGeometryVertices(std::vector<position> *vertices) const
 {
-	SoCallbackAction ca;
-	//unfortunately, this does not work as triangle vertices are not considered points by Coin
-	//ca.addPointCallback(SoShape::getClassTypeId(), addVertexCallBack, vertices);
-	//we have to use a triangle callback which leads to duplication
-	ca.addTriangleCallback(SoShape::getClassTypeId(), addVerticesFromTriangleCallBack, vertices);
-	ca.apply(getIVGeomRoot());
+  SoCallbackAction ca;
+  //unfortunately, this does not work as triangle vertices are not considered points by Coin
+  //ca.addPointCallback(SoShape::getClassTypeId(), addVertexCallBack, vertices);
+  //we have to use a triangle callback which leads to duplication
+  ca.addTriangleCallback(SoShape::getClassTypeId(), addVerticesFromTriangleCallBack, vertices);
+  ca.apply(getIVGeomRoot());
 }
 
 /*! Creates the geometry of the axes which show this body's local
-	coordinate system. The axes are usually shown centered at the c.o.m
+  coordinate system. The axes are usually shown centered at the c.o.m
 */
 void Body::createAxesGeometry()
-{  
-  IVWorstCase = new SoSeparator;  
-  IVAxes = new SoSwitch;  
+{
+  IVWorstCase = new SoSeparator;
+  IVAxes = new SoSwitch;
   if (graspitCore) {
     SoSeparator *axesSep = new SoSeparator;
     axesTranToCOG = new SoTranslation;
-    axesTranToCOG->translation.setValue(0,0,0);
+    axesTranToCOG->translation.setValue(0, 0, 0);
     axesSep->addChild(axesTranToCOG);
     axesSep->addChild(IVWorstCase);
-    
+
     axesScale = new SoScale;
-	axesScale->scaleFactor = SbVec3f(1,1,1);
+    axesScale->scaleFactor = SbVec3f(1, 1, 1);
     axesSep->addChild(axesScale);
-    if(graspitCore->getIVmgr())
+    if (graspitCore->getIVmgr())
     {
-        axesSep->addChild(graspitCore->getIVmgr()->getPointers()->getChild(2));
+      axesSep->addChild(graspitCore->getIVmgr()->getPointers()->getChild(2));
     }
     IVAxes->addChild(axesSep);
   }
-  if (!IVRoot) IVRoot = new SoSeparator;
+  if (!IVRoot) { IVRoot = new SoSeparator; }
 
   IVRoot->addChild(IVAxes);
 }
@@ -1285,7 +1296,7 @@ void Body::createAxesGeometry()
 */
 DynamicBody::~DynamicBody()
 {
-  if (dynJoint) delete dynJoint;
+  if (dynJoint) { delete dynJoint; }
 }
 
 void
@@ -1293,34 +1304,34 @@ DynamicBody::init()
 {
   maxRadius = 0.0; mass = 0.0;
   showAx = showDynCF = false;
-  fixed = false; dynJoint=NULL; dynamicsComputedFlag = false;
+  fixed = false; dynJoint = NULL; dynamicsComputedFlag = false;
   useDynamics = true;
-  bbox_min = vec3(-1e+6,-1e+6,-1e+6);
-  bbox_max = vec3(1e+6,1e+6,1e+6);
-  CoG.set(0.0,0.0,0.0);
-  for(int i=0; i<9; i++) {
-	  I[i] = 0.0;
+  bbox_min = vec3(-1e+6, -1e+6, -1e+6);
+  bbox_max = vec3(1e+6, 1e+6, 1e+6);
+  CoG.set(0.0, 0.0, 0.0);
+  for (int i = 0; i < 9; i++) {
+    I[i] = 0.0;
   }
   resetDynamics();
 }
 
 /*! Sets acceleration and velocity to 0 and the 7-dimensional
-	state vector to match the current transform (which includes
-	the position of the center of gravity.
+  state vector to match the current transform (which includes
+  the position of the center of gravity.
 */
 void
 DynamicBody::resetDynamics()
 {
   resetExtWrenchAcc();
-  for (int i=0; i<6; i++) {
+  for (int i = 0; i < 6; i++) {
     a[i] = 0.0;
     v[i] = 0.0;
   }
   Quaternion quat = Tran.rotation();
-  vec3 cogOffset = quat * (CoG-position::ORIGIN);
-  q[0] = Tran.translation().x()+cogOffset.x();
-  q[1] = Tran.translation().y()+cogOffset.y();
-  q[2] = Tran.translation().z()+cogOffset.z();
+  vec3 cogOffset = quat * (CoG - position::ORIGIN);
+  q[0] = Tran.translation().x() + cogOffset.x();
+  q[1] = Tran.translation().y() + cogOffset.y();
+  q[2] = Tran.translation().z() + cogOffset.z();
   q[3] = quat.w;
   q[4] = quat.x;
   q[5] = quat.y;
@@ -1328,15 +1339,15 @@ DynamicBody::resetDynamics()
 }
 
 /*! Constructs an empty DynamicBody.  Use load() to initialize this class
-	from a model file, or cloneFrom to initialize from a different 
-	dynamic body.
+  from a model file, or cloneFrom to initialize from a different
+  dynamic body.
 */
-DynamicBody::DynamicBody(World *w, const char *name) : Body(w,name)
+DynamicBody::DynamicBody(World *w, const char *name) : Body(w, name)
 {
-	init();
+  init();
 }
 
-/*! 
+/*!
   Creates a dynamic body from the basic body \a b.  Computes the mass
   properties automatically assuming a mass of \a m and uniform mass
   distribution.
@@ -1356,177 +1367,178 @@ DynamicBody::DynamicBody(const Body &b, double m) : Body(b)
 }
 
 /*! Clones another dynamic body; all dynamic paramters are copied
-	over.
+  over.
 */
 void
 DynamicBody::cloneFrom(const DynamicBody *original)
 {
-	Body::cloneFrom(original);
-	setMass(original->mass);
-	setCoG(original->CoG);
-	setInertiaMatrix(original->I);
-	setMaxRadius(original->maxRadius);
+  Body::cloneFrom(original);
+  setMass(original->mass);
+  setCoG(original->CoG);
+  setInertiaMatrix(original->I);
+  setMaxRadius(original->maxRadius);
 }
 
-int 
+int
 DynamicBody::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-	if (Body::loadFromXml(root, rootPath)==FAILURE) {
-		return FAILURE;
-	}
-	double loadMass;
-	bool overrideI, overrideCog;
-	QString valueStr;
+  if (Body::loadFromXml(root, rootPath) == FAILURE) {
+    return FAILURE;
+  }
+  double loadMass;
+  bool overrideI, overrideCog;
+  QString valueStr;
 
-	const TiXmlElement* element = findXmlElement(root, "mass");
-	if(element == NULL){
-		loadMass = defaultMass;
-		DBGA("Using default mass");
-	} else{
-		valueStr = element->GetText();
-		loadMass = valueStr.toDouble();
-		if (loadMass <= 0) {
-			QTWARNING("invalid mass in dynamic body file: " + myFilename);
-			return FAILURE;
-		}
-	}
-	element = findXmlElement(root, "cog");
-	position loadCog;
-	if(element == NULL){
-		overrideCog = false;
-	} else{
-		overrideCog = true;
-		valueStr = element->GetText();
-		valueStr = valueStr.simplifyWhiteSpace();
-		QStringList l;
-		l = QStringList::split(' ', valueStr.stripWhiteSpace());
-		if(l.count()!=3){
-			QTWARNING("Invalid Center of Gravity Input");
-			return FAILURE;
-		}		
-		double x,y,z;
-		x = l[0].toDouble();
-		y = l[1].toDouble();
-		z = l[2].toDouble();
-		loadCog = position(x,y,z);
-	}
-	double loadI[9];
-	element = findXmlElement(root, "inertia_matrix");
-	if(element == NULL){//set default inertia matrix
-		overrideI = false;
-	} else{
-		overrideI = true;
-		valueStr = element->GetText();
-		valueStr = valueStr.simplifyWhiteSpace();
-		QStringList l;
-		l = QStringList::split(' ', valueStr.stripWhiteSpace());
-		if(l.count()!=9){ //error
-			QTWARNING("Invalid Inertia Matrix Input");
-			return FAILURE;
-		}
-		loadI[0]=l[0].toDouble();
-		loadI[1]=l[1].toDouble();
-		loadI[2]=l[2].toDouble();
-		loadI[3]=l[3].toDouble();
-		loadI[4]=l[4].toDouble();
-		loadI[5]=l[5].toDouble();
-		loadI[6]=l[6].toDouble();
-		loadI[7]=l[7].toDouble();
-		loadI[8]=l[8].toDouble();
-	}
-	if (!overrideI || !overrideCog) {
-		position defaultCog;
-		double defaultI[9];
-		computeDefaultMassProp(defaultCog, defaultI);
-		if (!overrideI) {
-			memcpy(loadI, defaultI, 9*sizeof(double));
-			DBGA("Using default inertia matrix");
-		}
-		if (!overrideCog) {
-			loadCog = defaultCog;
-			DBGA("Using default center of gravity");
-		}
-	}
-	setMass(loadMass);
-	setCoG(loadCog);
-	setInertiaMatrix(loadI);
-	setMaxRadius(computeDefaultMaxRadius());
-	return SUCCESS;
+  const TiXmlElement *element = findXmlElement(root, "mass");
+  if (element == NULL) {
+    loadMass = defaultMass;
+    DBGA("Using default mass");
+  } else {
+    valueStr = element->GetText();
+    loadMass = valueStr.toDouble();
+    if (loadMass <= 0) {
+      QTWARNING("invalid mass in dynamic body file: " + myFilename);
+      return FAILURE;
+    }
+  }
+  element = findXmlElement(root, "cog");
+  position loadCog;
+  if (element == NULL) {
+    overrideCog = false;
+  } else {
+    overrideCog = true;
+    valueStr = element->GetText();
+    valueStr = valueStr.simplifyWhiteSpace();
+    QStringList l;
+    l = QStringList::split(' ', valueStr.stripWhiteSpace());
+    if (l.count() != 3) {
+      QTWARNING("Invalid Center of Gravity Input");
+      return FAILURE;
+    }
+    double x, y, z;
+    x = l[0].toDouble();
+    y = l[1].toDouble();
+    z = l[2].toDouble();
+    loadCog = position(x, y, z);
+  }
+  double loadI[9];
+  element = findXmlElement(root, "inertia_matrix");
+  if (element == NULL) { //set default inertia matrix
+    overrideI = false;
+  } else {
+    overrideI = true;
+    valueStr = element->GetText();
+    valueStr = valueStr.simplifyWhiteSpace();
+    QStringList l;
+    l = QStringList::split(' ', valueStr.stripWhiteSpace());
+    if (l.count() != 9) { //error
+      QTWARNING("Invalid Inertia Matrix Input");
+      return FAILURE;
+    }
+    loadI[0] = l[0].toDouble();
+    loadI[1] = l[1].toDouble();
+    loadI[2] = l[2].toDouble();
+    loadI[3] = l[3].toDouble();
+    loadI[4] = l[4].toDouble();
+    loadI[5] = l[5].toDouble();
+    loadI[6] = l[6].toDouble();
+    loadI[7] = l[7].toDouble();
+    loadI[8] = l[8].toDouble();
+  }
+  if (!overrideI || !overrideCog) {
+    position defaultCog;
+    double defaultI[9];
+    computeDefaultMassProp(defaultCog, defaultI);
+    if (!overrideI) {
+      memcpy(loadI, defaultI, 9 * sizeof(double));
+      DBGA("Using default inertia matrix");
+    }
+    if (!overrideCog) {
+      loadCog = defaultCog;
+      DBGA("Using default center of gravity");
+    }
+  }
+  setMass(loadMass);
+  setCoG(loadCog);
+  setInertiaMatrix(loadI);
+  setMaxRadius(computeDefaultMaxRadius());
+  return SUCCESS;
 }
 
 /*! Computes both the center of gravity and the inertia matrix
-	automatically, based on the geometry of the object and then
-	sets them.
+  automatically, based on the geometry of the object and then
+  sets them.
 */
 void
 DynamicBody::setDefaultDynamicParameters()
 {
-	position defaultCog;
-	double defaultI[9];
-	computeDefaultMassProp(defaultCog, defaultI);
-	setCoG(defaultCog);
-	setInertiaMatrix(defaultI);
+  position defaultCog;
+  double defaultI[9];
+  computeDefaultMassProp(defaultCog, defaultI);
+  setCoG(defaultCog);
+  setInertiaMatrix(defaultI);
 }
 
 int
-DynamicBody::saveToXml(QTextStream &xml){
-	if(Body::saveToXml(xml)!=SUCCESS)  return FAILURE;
-	xml<<"\t\t\t<mass>"<<mass<<"</mass>"<<endl;
-	xml<<"\t\t\t<cog>"<<CoG.x()<<" "<<CoG.y()<<" "<<CoG.z()<<"</cog>"<<endl;
-	xml<<"\t\t\t<inertia_matrix>";
-	for(int i=0;i<9;i++){
-		xml<<I[i];
-		if(i!=8)
-			xml<<" ";
-	}
-	xml<<"</inertia_matrix>"<<endl;
-	return SUCCESS;
+DynamicBody::saveToXml(QTextStream &xml) {
+  if (Body::saveToXml(xml) != SUCCESS) { return FAILURE; }
+  xml << "\t\t\t<mass>" << mass << "</mass>" << endl;
+  xml << "\t\t\t<cog>" << CoG.x() << " " << CoG.y() << " " << CoG.z() << "</cog>" << endl;
+  xml << "\t\t\t<inertia_matrix>";
+  for (int i = 0; i < 9; i++) {
+    xml << I[i];
+    if (i != 8) {
+      xml << " ";
+    }
+  }
+  xml << "</inertia_matrix>" << endl;
+  return SUCCESS;
 }
 /*! Also has to reset dynamics since the current state has to be changed
-	to match the new CoG.
+  to match the new CoG.
 */
 void
 DynamicBody::setCoG(const position &newCoG)
 {
-	CoG = newCoG;  
-	resetDynamics();
-	//use this to display axes at the CoG
-	//axesTranToCOG->translation.setValue(CoG.x(), CoG.y(), CoG.z());
+  CoG = newCoG;
+  resetDynamics();
+  //use this to display axes at the CoG
+  //axesTranToCOG->translation.setValue(CoG.x(), CoG.y(), CoG.z());
 
-	//use this to display axes at body origin
-	axesTranToCOG->translation.setValue(0,0,0);
+  //use this to display axes at body origin
+  axesTranToCOG->translation.setValue(0, 0, 0);
 }
 
 /*! The max radius can be thought of as the largest distance from the center
-	of gravity to the edge of the object.
+  of gravity to the edge of the object.
 */
 void
 DynamicBody::setMaxRadius(double maxRad)
 {
-	maxRadius = maxRad;
-	axesScale->scaleFactor = SbVec3f(maxRadius / AXES_SCALE, maxRadius / AXES_SCALE, maxRadius / AXES_SCALE);
+  maxRadius = maxRad;
+  axesScale->scaleFactor = SbVec3f(maxRadius / AXES_SCALE, maxRadius / AXES_SCALE, maxRadius / AXES_SCALE);
 }
 
 void
 DynamicBody::setInertiaMatrix(const double *newI)
 {
-	memcpy(I, newI, 9*sizeof(double));
+  memcpy(I, newI, 9 * sizeof(double));
 }
 
 double
 DynamicBody::computeDefaultMaxRadius()
 {
-	std::vector<position> vertices;
-	getGeometryVertices(&vertices);
-	if (vertices.empty()) {
-		DBGA("No vertices found when computing maxRadius!");
-	}
-	double maxRad = 0.0;
-	for (int i=0; i<(int)vertices.size(); i++) {
-		double tmpRadius = (CoG - vertices[i]).len();
-		if (tmpRadius > maxRad) maxRad = tmpRadius;
-	}
-	return maxRad;
+  std::vector<position> vertices;
+  getGeometryVertices(&vertices);
+  if (vertices.empty()) {
+    DBGA("No vertices found when computing maxRadius!");
+  }
+  double maxRad = 0.0;
+  for (int i = 0; i < (int)vertices.size(); i++) {
+    double tmpRadius = (CoG - vertices[i]).len();
+    if (tmpRadius > maxRad) { maxRad = tmpRadius; }
+  }
+  return maxRad;
 }
 
 /*!
@@ -1549,33 +1561,33 @@ DynamicBody::compProjectionIntegrals(FACE &f, int A, int B)
   for (i = 0; i < 3; i++) {
     a0 = f.verts[i][A];
     b0 = f.verts[i][B];
-    a1 = f.verts[(i+1) % 3][A];
-    b1 = f.verts[(i+1) % 3][B];
+    a1 = f.verts[(i + 1) % 3][A];
+    b1 = f.verts[(i + 1) % 3][B];
     da = a1 - a0;
     db = b1 - b0;
     a0_2 = a0 * a0; a0_3 = a0_2 * a0; a0_4 = a0_3 * a0;
     b0_2 = b0 * b0; b0_3 = b0_2 * b0; b0_4 = b0_3 * b0;
-    a1_2 = a1 * a1; a1_3 = a1_2 * a1; 
+    a1_2 = a1 * a1; a1_3 = a1_2 * a1;
     b1_2 = b1 * b1; b1_3 = b1_2 * b1;
 
     C1 = a1 + a0;
-    Ca = a1*C1 + a0_2; Caa = a1*Ca + a0_3; Caaa = a1*Caa + a0_4;
-    Cb = b1*(b1 + b0) + b0_2; Cbb = b1*Cb + b0_3; Cbbb = b1*Cbb + b0_4;
-    Cab = 3*a1_2 + 2*a1*a0 + a0_2; Kab = a1_2 + 2*a1*a0 + 3*a0_2;
-    Caab = a0*Cab + 4*a1_3; Kaab = a1*Kab + 4*a0_3;
-    Cabb = 4*b1_3 + 3*b1_2*b0 + 2*b1*b0_2 + b0_3;
-    Kabb = b1_3 + 2*b1_2*b0 + 3*b1*b0_2 + 4*b0_3;
+    Ca = a1 * C1 + a0_2; Caa = a1 * Ca + a0_3; Caaa = a1 * Caa + a0_4;
+    Cb = b1 * (b1 + b0) + b0_2; Cbb = b1 * Cb + b0_3; Cbbb = b1 * Cbb + b0_4;
+    Cab = 3 * a1_2 + 2 * a1 * a0 + a0_2; Kab = a1_2 + 2 * a1 * a0 + 3 * a0_2;
+    Caab = a0 * Cab + 4 * a1_3; Kaab = a1 * Kab + 4 * a0_3;
+    Cabb = 4 * b1_3 + 3 * b1_2 * b0 + 2 * b1 * b0_2 + b0_3;
+    Kabb = b1_3 + 2 * b1_2 * b0 + 3 * b1 * b0_2 + 4 * b0_3;
 
-    P1 += db*C1;
-    Pa += db*Ca;
-    Paa += db*Caa;
-    Paaa += db*Caaa;
-    Pb += da*Cb;
-    Pbb += da*Cbb;
-    Pbbb += da*Cbbb;
-    Pab += db*(b1*Cab + b0*Kab);
-    Paab += db*(b1*Caab + b0*Kaab);
-    Pabb += da*(a1*Cabb + a0*Kabb);
+    P1 += db * C1;
+    Pa += db * Ca;
+    Paa += db * Caa;
+    Paaa += db * Caaa;
+    Pb += da * Cb;
+    Pbb += da * Cbb;
+    Pbbb += da * Cbbb;
+    Pab += db * (b1 * Cab + b0 * Kab);
+    Paab += db * (b1 * Caab + b0 * Kaab);
+    Pabb += da * (a1 * Cabb + a0 * Kabb);
   }
 
   P1 /= 2.0;
@@ -1595,12 +1607,12 @@ DynamicBody::compProjectionIntegrals(FACE &f, int A, int B)
   adapted from code written by Brian Mirtich.
 */
 void
-DynamicBody::compFaceIntegrals(FACE &f,int A, int B, int C)
+DynamicBody::compFaceIntegrals(FACE &f, int A, int B, int C)
 {
   double *n, w;
   double k1, k2, k3, k4;
 
-  compProjectionIntegrals(f,A,B);
+  compProjectionIntegrals(f, A, B);
 
   w = f.w;
   n = f.norm;
@@ -1608,37 +1620,37 @@ DynamicBody::compFaceIntegrals(FACE &f,int A, int B, int C)
 
   Fa = k1 * Pa;
   Fb = k1 * Pb;
-  Fc = -k2 * (n[A]*Pa + n[B]*Pb + w*P1);
+  Fc = -k2 * (n[A] * Pa + n[B] * Pb + w * P1);
 
   Faa = k1 * Paa;
   Fbb = k1 * Pbb;
-  Fcc = k3 * (SQR(n[A])*Paa + 2*n[A]*n[B]*Pab + SQR(n[B])*Pbb
-	 + w*(2*(n[A]*Pa + n[B]*Pb) + w*P1));
+  Fcc = k3 * (SQR(n[A]) * Paa + 2 * n[A] * n[B] * Pab + SQR(n[B]) * Pbb
+              + w * (2 * (n[A] * Pa + n[B] * Pb) + w * P1));
 
   Faaa = k1 * Paaa;
   Fbbb = k1 * Pbbb;
-  Fccc = -k4 * (CUBE(n[A])*Paaa + 3*SQR(n[A])*n[B]*Paab 
-	   + 3*n[A]*SQR(n[B])*Pabb + CUBE(n[B])*Pbbb
-	   + 3*w*(SQR(n[A])*Paa + 2*n[A]*n[B]*Pab + SQR(n[B])*Pbb)
-	   + w*w*(3*(n[A]*Pa + n[B]*Pb) + w*P1));
+  Fccc = -k4 * (CUBE(n[A]) * Paaa + 3 * SQR(n[A]) * n[B] * Paab
+                + 3 * n[A] * SQR(n[B]) * Pabb + CUBE(n[B]) * Pbbb
+                + 3 * w * (SQR(n[A]) * Paa + 2 * n[A] * n[B] * Pab + SQR(n[B]) * Pbb)
+                + w * w * (3 * (n[A] * Pa + n[B] * Pb) + w * P1));
 
   Faab = k1 * Paab;
-  Fbbc = -k2 * (n[A]*Pabb + n[B]*Pbbb + w*Pbb);
-  Fcca = k3 * (SQR(n[A])*Paaa + 2*n[A]*n[B]*Paab + SQR(n[B])*Pabb
-	 + w*(2*(n[A]*Paa + n[B]*Pab) + w*Pa));
+  Fbbc = -k2 * (n[A] * Pabb + n[B] * Pbbb + w * Pbb);
+  Fcca = k3 * (SQR(n[A]) * Paaa + 2 * n[A] * n[B] * Paab + SQR(n[B]) * Pabb
+               + w * (2 * (n[A] * Paa + n[B] * Pab) + w * Pa));
 }
 
 /*! Helper function that uses code by Brian Mirtich to compute the center of
-	gravity and the inertia matrix for a list of triangles. Returns FAILURE
-	if the computation fails, and some degenerate values are returned.
+  gravity and the inertia matrix for a list of triangles. Returns FAILURE
+  if the computation fails, and some degenerate values are returned.
 */
-int 
+int
 DynamicBody::computeDefaultInertiaMatrix(std::vector<Triangle> &triangles, double *defaultI)
 {
   FACE f;
-  double dx1,dy1,dz1,dx2,dy2,dz2;
-  double nx, ny, nz,len;
-  int i,A,B,C;
+  double dx1, dy1, dz1, dx2, dy2, dz2;
+  double nx, ny, nz, len;
+  int i, A, B, C;
   double r[3], v1[3], v2[3], v3[3];
   double density;
 
@@ -1649,17 +1661,17 @@ DynamicBody::computeDefaultInertiaMatrix(std::vector<Triangle> &triangles, doubl
   // volume integrals
   double T0, T1[3], T2[3], TP[3];
 
-  T0 = T1[0] = T1[1] = T1[2] 
-     = T2[0] = T2[1] = T2[2] 
-     = TP[0] = TP[1] = TP[2] = 0;
+  T0 = T1[0] = T1[1] = T1[2]
+                       = T2[0] = T2[1] = T2[2]
+                                         = TP[0] = TP[1] = TP[2] = 0;
 
 
   for (i = 0; i < (int)triangles.size(); i++) {
-	triangles[i].v1.get(v1);
-	triangles[i].v2.get(v2);
-	triangles[i].v3.get(v3);
+    triangles[i].v1.get(v1);
+    triangles[i].v2.get(v2);
+    triangles[i].v3.get(v3);
 
-	dx1 = f.verts[1][0] - f.verts[0][0];
+    dx1 = f.verts[1][0] - f.verts[0][0];
     dy1 = f.verts[1][1] - f.verts[0][1];
     dz1 = f.verts[1][2] - f.verts[0][2];
     dx2 = f.verts[2][0] - f.verts[1][0];
@@ -1674,18 +1686,18 @@ DynamicBody::computeDefaultInertiaMatrix(std::vector<Triangle> &triangles, doubl
     f.norm[1] = ny / len;
     f.norm[2] = nz / len;
     f.w = - f.norm[0] * f.verts[0][0]
-           - f.norm[1] * f.verts[0][1]
-           - f.norm[2] * f.verts[0][2];
+          - f.norm[1] * f.verts[0][1]
+          - f.norm[2] * f.verts[0][2];
 
     nx = fabs(f.norm[0]);
     ny = fabs(f.norm[1]);
     nz = fabs(f.norm[2]);
-    if (nx > ny && nx > nz) C = 0;
-    else C = (ny > nz) ? 1 : 2;
+    if (nx > ny && nx > nz) { C = 0; }
+    else { C = (ny > nz) ? 1 : 2; }
     A = (C + 1) % 3;
     B = (A + 1) % 3;
 
-    compFaceIntegrals(f,A,B,C);
+    compFaceIntegrals(f, A, B, C);
 
     T0 += f.norm[0] * ((A == 0) ? Fa : ((B == 0) ? Fb : Fc));
 
@@ -1711,18 +1723,18 @@ DynamicBody::computeDefaultInertiaMatrix(std::vector<Triangle> &triangles, doubl
   DBGP("COM: " << r[0] << " " << r[1] << " " << r[2]);
 
   //default values in case of failure
-  for (int i=0; i<9; i++) {
-	  defaultI[i] = 0.0;
+  for (int i = 0; i < 9; i++) {
+    defaultI[i] = 0.0;
   }
   defaultI[0] = defaultI[3] = defaultI[6] = 1.0;
 
   //sanity checks
-  if (r[0] != r[0]) return FAILURE;
-  if (r[1] != r[1]) return FAILURE;
-  if (r[2] != r[2]) return FAILURE;
-  if (fabs(T0) < 1.0e-5) return FAILURE;
-  if ( fabs(r[0]) > 5.0e2 || fabs(r[1]) > 5.0e2 || fabs(r[2]) > 5.0e2 ) {
-	  return FAILURE;
+  if (r[0] != r[0]) { return FAILURE; }
+  if (r[1] != r[1]) { return FAILURE; }
+  if (r[2] != r[2]) { return FAILURE; }
+  if (fabs(T0) < 1.0e-5) { return FAILURE; }
+  if (fabs(r[0]) > 5.0e2 || fabs(r[1]) > 5.0e2 || fabs(r[2]) > 5.0e2) {
+    return FAILURE;
   }
 
   //assume unity mass
@@ -1737,63 +1749,66 @@ DynamicBody::computeDefaultInertiaMatrix(std::vector<Triangle> &triangles, doubl
   defaultI[6] = defaultI[2] = - density * TP[2];
 
   /* translate inertia tensor to center of mass */
-  defaultI[0] -= (r[1]*r[1] + r[2]*r[2]);
-  defaultI[4] -= (r[2]*r[2] + r[0]*r[0]);
-  defaultI[8] -= (r[0]*r[0] + r[1]*r[1]);
-  defaultI[1] = defaultI[3] += r[0] * r[1]; 
-  defaultI[5] = defaultI[7] += r[1] * r[2]; 
-  defaultI[6] = defaultI[2] += r[2] * r[0]; 
+  defaultI[0] -= (r[1] * r[1] + r[2] * r[2]);
+  defaultI[4] -= (r[2] * r[2] + r[0] * r[0]);
+  defaultI[8] -= (r[0] * r[0] + r[1] * r[1]);
+  defaultI[1] = defaultI[3] += r[0] * r[1];
+  defaultI[5] = defaultI[7] += r[1] * r[2];
+  defaultI[6] = defaultI[2] += r[2] * r[0];
   return SUCCESS;
 }
 
 /*! Helper function for computing cog and inertia matrix. Integrates
-	a pointwise function over the surface of a triangle using 7-point
-	Gaussian integration.
+  a pointwise function over the surface of a triangle using 7-point
+  Gaussian integration.
 */
 template <class IntegrableFunction>
-float Gaussian7Integrate(const Triangle& triangle, IntegrableFunction integrable_function) {
+float Gaussian7Integrate(const Triangle &triangle, IntegrableFunction integrable_function) {
   // Setup
   static const float terms[8] = {
-	0.333333333333333333333333333333333f,
-	0.79742698535308732239802527616971f,
-	0.10128650732345633880098736191512f,
-	0.059715871789769820459117580973143f,
-	0.47014206410511508977044120951345f,
-	0.225f,
-	0.12593918054482715259568394550018f,
-	0.13239415278850618073764938783315f};
-	  
+    0.333333333333333333333333333333333f,
+    0.79742698535308732239802527616971f,
+    0.10128650732345633880098736191512f,
+    0.059715871789769820459117580973143f,
+    0.47014206410511508977044120951345f,
+    0.225f,
+    0.12593918054482715259568394550018f,
+    0.13239415278850618073764938783315f
+  };
+
   static const float barycentric_weights[7][3] = {
-    {terms[0], terms[0], terms[0]}, 
-    {terms[1], terms[2], terms[2]}, 
-    {terms[2], terms[1], terms[2]}, 
-    {terms[2], terms[2], terms[1]}, 
-    {terms[3], terms[4], terms[4]}, 
-    {terms[4], terms[3], terms[4]}, 
-    {terms[4], terms[4], terms[3]}}; 
+    {terms[0], terms[0], terms[0]},
+    {terms[1], terms[2], terms[2]},
+    {terms[2], terms[1], terms[2]},
+    {terms[2], terms[2], terms[1]},
+    {terms[3], terms[4], terms[4]},
+    {terms[4], terms[3], terms[4]},
+    {terms[4], terms[4], terms[3]}
+  };
   static const float sample_weights[7] = {
-    terms[5], terms[6], terms[6], terms[6], 
-    terms[7], terms[7], terms[7]};
-	// Calculate the integration sample points
+    terms[5], terms[6], terms[6], terms[6],
+    terms[7], terms[7], terms[7]
+  };
+  // Calculate the integration sample points
   float integration_samples[7][3] = {{0}};
-	const position* vertices[3] = {&(triangle.v1), &(triangle.v2), &(triangle.v3)};
-	for(int sample_num = 0; sample_num < 7; ++sample_num) {
-		float* sample = integration_samples[sample_num];
-		const float* barycentric_weight = barycentric_weights[sample_num];
-		for (int vertex_num = 0; vertex_num < 3; ++vertex_num) {
-			const position& vertex = *(vertices[vertex_num]);
-			for (int coord = 0; coord < 3; ++coord) {
-				sample[coord] += vertex[coord] * barycentric_weight[vertex_num];
-			}
-		}
-	}
+  const position *vertices[3] = {&(triangle.v1), &(triangle.v2), &(triangle.v3)};
+  for (int sample_num = 0; sample_num < 7; ++sample_num) {
+    float *sample = integration_samples[sample_num];
+    const float *barycentric_weight = barycentric_weights[sample_num];
+    for (int vertex_num = 0; vertex_num < 3; ++vertex_num) {
+      const position &vertex = *(vertices[vertex_num]);
+      for (int coord = 0; coord < 3; ++coord) {
+        sample[coord] += vertex[coord] * barycentric_weight[vertex_num];
+      }
+    }
+  }
   // Integration
   float result = 0;
-  for (int sample = 0; sample < 7; ++sample){
+  for (int sample = 0; sample < 7; ++sample) {
     result += integrable_function(integration_samples[sample]) * sample_weights[sample];
-   }
+  }
   return result * triangle.area();
-} 
+}
 
 //! Integrable functor for computing triangle area
 struct GetCoord {
@@ -1805,14 +1820,14 @@ struct GetCoord {
 struct GetCovar {
   int coord_a, coord_b;
   float mean_a, mean_b;
-  template <class T> float operator()(const T vertex) const { 
-	  return (vertex[coord_a] - mean_a) * (vertex[coord_b] - mean_b); 
+  template <class T> float operator()(const T vertex) const {
+    return (vertex[coord_a] - mean_a) * (vertex[coord_b] - mean_b);
   }
 };
 
 /*! A different version for computing the cog of an object based
-	on the surface triangles. Used as a fallback when the other
-	version fails. Courtesy of Corey Goldfeder.
+  on the surface triangles. Used as a fallback when the other
+  version fails. Courtesy of Corey Goldfeder.
 */
 int
 computeDefaultCoG(std::vector<Triangle> &triangles, position &defaultCoG)
@@ -1831,35 +1846,35 @@ computeDefaultCoG(std::vector<Triangle> &triangles, position &defaultCoG)
     float means[3] = {0};
     // set up local class representing function to integrate
     GetCoord get_coord;
-    for(unsigned i = 0; i < 3; ++i) {
+    for (unsigned i = 0; i < 3; ++i) {
       get_coord.coord = i;
       for (std::vector<Triangle>::const_iterator triangle = triangles.begin();
-          triangle != triangles.end(); ++triangle) {
-         means[i] += Gaussian7Integrate(*triangle, get_coord);
+           triangle != triangles.end(); ++triangle) {
+        means[i] += Gaussian7Integrate(*triangle, get_coord);
       }
     }
-    for (int i = 0; i < 3; ++i) center_of_mass[i] = means[i] / total_area;
+    for (int i = 0; i < 3; ++i) { center_of_mass[i] = means[i] / total_area; }
 
-	// Get the covariance
+    // Get the covariance
     float covars[3][3] = {{0}};
     GetCovar get_covar;
-    for(unsigned a = 0; a < 3; ++a) {
-      for(unsigned b = a; b < 3; ++b) {
+    for (unsigned a = 0; a < 3; ++a) {
+      for (unsigned b = a; b < 3; ++b) {
         get_covar.coord_a = a;
         get_covar.coord_b = b;
-		get_covar.mean_a = center_of_mass[a];
-		get_covar.mean_b = center_of_mass[b];
+        get_covar.mean_a = center_of_mass[a];
+        get_covar.mean_b = center_of_mass[b];
         for (std::vector<Triangle>::const_iterator triangle = triangles.begin();
-            triangle != triangles.end(); ++triangle) {
+             triangle != triangles.end(); ++triangle) {
           covars[b][a] += Gaussian7Integrate(*triangle, get_covar);
         }
       }
-	}
-	defaultCoG.set(center_of_mass);
-	return SUCCESS;
+    }
+    defaultCoG.set(center_of_mass);
+    return SUCCESS;
   } else {
-	  defaultCoG.set(0,0,0);
- 	  return FAILURE;
+    defaultCoG.set(0, 0, 0);
+    return FAILURE;
   }
 }
 /*!
@@ -1873,24 +1888,24 @@ DynamicBody::computeDefaultMassProp(position &defaultCoG, double *defaultI)
   std::vector<Triangle> triangles;
   getGeometryTriangles(&triangles);
   if (triangles.empty()) {
-	 DBGA("No triangles found when computing mass properties!");
-	 defaultCoG.set(0,0,0);
-	 return;
+    DBGA("No triangles found when computing mass properties!");
+    defaultCoG.set(0, 0, 0);
+    return;
   }
   if (computeDefaultInertiaMatrix(triangles, defaultI) == FAILURE) {
-	DBGA("Failed to compute inertia matrix based on geometry; using identity");
+    DBGA("Failed to compute inertia matrix based on geometry; using identity");
   }
-  for(int i=0; i<3; i++) {
-	DBGP(defaultI[3*i] << " " << defaultI[3*i+1] << " " << defaultI[3*i+2]);
+  for (int i = 0; i < 3; i++) {
+    DBGP(defaultI[3 * i] << " " << defaultI[3 * i + 1] << " " << defaultI[3 * i + 2]);
   }
   computeDefaultCoG(triangles, defaultCoG);
 }
 
-void 
+void
 DynamicBody::setDefaultViewingParameters()
 {
-	Body::setDefaultViewingParameters();
-	showAx = false;
+  Body::setDefaultViewingParameters();
+  showAx = false;
 }
 
 /*!
@@ -1901,8 +1916,8 @@ void
 DynamicBody::showAxes(bool on)
 {
   DBGP("Show axes: " << on);
-  if (on) IVAxes->whichChild = 0;
-  else IVAxes->whichChild = -1;
+  if (on) { IVAxes->whichChild = 0; }
+  else { IVAxes->whichChild = -1; }
   showAx = on;
 }
 
@@ -1931,7 +1946,7 @@ DynamicBody::resetExtWrenchAcc()
   Adds \a extW to the external wrench accumulator.
 */
 void
-DynamicBody::addExtWrench(double *extW){
+DynamicBody::addExtWrench(double *extW) {
   extWrenchAcc[0] += extW[0];
   extWrenchAcc[1] += extW[1];
   extWrenchAcc[2] += extW[2];
@@ -1940,7 +1955,7 @@ DynamicBody::addExtWrench(double *extW){
   extWrenchAcc[5] += extW[5];
 }
 
-/*! 
+/*!
    Adds a force expressed in world coordinates, to the external force
    accumulator for this body.
 */
@@ -1963,7 +1978,7 @@ DynamicBody::addTorque(vec3 torque)
   extWrenchAcc[3] += torque[0];
   extWrenchAcc[4] += torque[1];
   extWrenchAcc[5] += torque[2];
-  DBGP("Adding torque "<< torque);
+  DBGP("Adding torque " << torque);
 }
 
 /*
@@ -1974,22 +1989,22 @@ void
 DynamicBody::addRelTorque(vec3 torque)
 {
   vec3 worldTorque;
-  DBGP("Adding rel torque "<< torque);
+  DBGP("Adding rel torque " << torque);
   worldTorque = Tran.rotation() * torque;
   extWrenchAcc[3] += worldTorque[0];
   extWrenchAcc[4] += worldTorque[1];
   extWrenchAcc[5] += worldTorque[2];
-  DBGP("     world torque "<< worldTorque);
+  DBGP("     world torque " << worldTorque);
 }
 
 
-/*! 
+/*!
    Adds a force expressed in world coordinates at a position also expressed
    world coordinates. This force and the computed torque are added to the
    external force accumulator for this body.
 */
 void
-DynamicBody::addForceAtPos(vec3 force,position pos)
+DynamicBody::addForceAtPos(vec3 force, position pos)
 {
   vec3 worldTorque;
   vec3 worldPos;
@@ -2012,7 +2027,7 @@ DynamicBody::addForceAtPos(vec3 force,position pos)
   external force accumulator for this body.
 */
 void
-DynamicBody::addForceAtRelPos(vec3 force,position pos)
+DynamicBody::addForceAtRelPos(vec3 force, position pos)
 {
   vec3 worldForce;
   vec3 worldTorque;
@@ -2026,37 +2041,37 @@ DynamicBody::addForceAtRelPos(vec3 force,position pos)
   extWrenchAcc[3] += worldTorque[0];
   extWrenchAcc[4] += worldTorque[1];
   extWrenchAcc[5] += worldTorque[2];
-  DBGP("Adding rel force "<< force << " at " << pos);
-  DBGP("    world torque "<< worldTorque << " worldForce " << worldForce);
+  DBGP("Adding rel force " << force << " at " << pos);
+  DBGP("    world torque " << worldTorque << " worldForce " << worldForce);
 }
 
 // Let the dynamics routine take care of breaking the contacts
-bool 
+bool
 DynamicBody::setPos(const double *new_q)
 {
-	double norm;
-	// is the object within its permissable area?
-	if (new_q[0] < bbox_min.x() || new_q[0] > bbox_max.x()) return false;
-	if (new_q[1] < bbox_min.y() || new_q[1] > bbox_max.y()) return false;
-	if (new_q[2] < bbox_min.z() || new_q[2] > bbox_max.z()) return false;
-  
-	memcpy(q,new_q,7*sizeof(double));
+  double norm;
+  // is the object within its permissable area?
+  if (new_q[0] < bbox_min.x() || new_q[0] > bbox_max.x()) { return false; }
+  if (new_q[1] < bbox_min.y() || new_q[1] > bbox_max.y()) { return false; }
+  if (new_q[2] < bbox_min.z() || new_q[2] > bbox_max.z()) { return false; }
 
-	// normalize the quaternion
-	norm = sqrt(q[3]*q[3]+q[4]*q[4]+q[5]*q[5]+q[6]*q[6]);
-	q[3] /= norm;
-	q[4] /= norm;
-	q[5] /= norm;
-	q[6] /= norm;
-	Quaternion rot(q[3],q[4],q[5],q[6]);
-	vec3 cogOffset = rot * (CoG-position::ORIGIN);
-	transf tr = transf(rot,vec3(q[0],q[1],q[2])-cogOffset);
+  memcpy(q, new_q, 7 * sizeof(double));
 
-	Tran = tr;
-	Tran.toSoTransform(IVTran);
-	myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
-	
-	return true;
+  // normalize the quaternion
+  norm = sqrt(q[3] * q[3] + q[4] * q[4] + q[5] * q[5] + q[6] * q[6]);
+  q[3] /= norm;
+  q[4] /= norm;
+  q[5] /= norm;
+  q[6] /= norm;
+  Quaternion rot(q[3], q[4], q[5], q[6]);
+  vec3 cogOffset = rot * (CoG - position::ORIGIN);
+  transf tr = transf(rot, vec3(q[0], q[1], q[2]) - cogOffset);
+
+  Tran = tr;
+  Tran.toSoTransform(IVTran);
+  myWorld->getCollisionInterface()->setBodyTransform(this, Tran);
+
+  return true;
 }
 
 /*!
@@ -2066,8 +2081,8 @@ DynamicBody::setPos(const double *new_q)
 void
 DynamicBody::markState()
 {
-  memcpy(markedQ,q,7*sizeof(double));
-  memcpy(markedV,v,6*sizeof(double));
+  memcpy(markedQ, q, 7 * sizeof(double));
+  memcpy(markedV, v, 6 * sizeof(double));
 }
 
 /*!
@@ -2077,23 +2092,23 @@ DynamicBody::markState()
 void
 DynamicBody::returnToMarkedState()
 {
-  memcpy(v,markedV,6*sizeof(double));
+  memcpy(v, markedV, 6 * sizeof(double));
   setPos(markedQ);
 }
 
-/*! 
+/*!
   Push the current dynamic state of the body onto a local stack.
 */
 void
 DynamicBody::pushState()
 {
   double *tmp = new double[7];
-  memcpy(tmp,q,7*sizeof(double));
+  memcpy(tmp, q, 7 * sizeof(double));
   qStack.push_back(tmp);
 
   tmp = new double[6];
-  memcpy(tmp,v,6*sizeof(double));
-  vStack.push_back(tmp);  
+  memcpy(tmp, v, 6 * sizeof(double));
+  vStack.push_back(tmp);
 }
 
 /*!
@@ -2102,62 +2117,62 @@ DynamicBody::pushState()
 bool
 DynamicBody::popState()
 {
-	if (qStack.empty()) {
-		DBGA("Pop state failed: stack empty");
-		return false;
-	}
-	memcpy(v,vStack.back(),6*sizeof(double));
-	setPos(qStack.back());
+  if (qStack.empty()) {
+    DBGA("Pop state failed: stack empty");
+    return false;
+  }
+  memcpy(v, vStack.back(), 6 * sizeof(double));
+  setPos(qStack.back());
 
-	// don't pop off the first saved state.
-	if (++qStack.begin() != qStack.end()) {
-		delete [] vStack.back();
-		delete [] qStack.back();
-		vStack.pop_back(); 
-		qStack.pop_back();
-		return true;
-	} else {
-		return false;
-    }
+  // don't pop off the first saved state.
+  if (++qStack.begin() != qStack.end()) {
+    delete [] vStack.back();
+    delete [] qStack.back();
+    vStack.pop_back();
+    qStack.pop_back();
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void
 DynamicBody::clearState()
 {
-	//we don't actually change the state of the object, just clear
-	//the stack. For some reason we leave the last state in.
-	if (qStack.empty()) return;
-	while (++qStack.begin() != qStack.end()) {
-		delete [] vStack.back();
-		delete [] qStack.back();
-		vStack.pop_back(); 
-		qStack.pop_back();
-	}
+  //we don't actually change the state of the object, just clear
+  //the stack. For some reason we leave the last state in.
+  if (qStack.empty()) { return; }
+  while (++qStack.begin() != qStack.end()) {
+    delete [] vStack.back();
+    delete [] qStack.back();
+    vStack.pop_back();
+    qStack.pop_back();
+  }
 }
 /*!
   Calls Body::setTran then updates the dynamic state of the body.
 */
 int
-DynamicBody::setTran(transf const& tr)
+DynamicBody::setTran(transf const &tr)
 {
-  if (tr == Tran) return SUCCESS;
-  if (Body::setTran(tr) == FAILURE) return FAILURE;
+  if (tr == Tran) { return SUCCESS; }
+  if (Body::setTran(tr) == FAILURE) { return FAILURE; }
   Quaternion quat = Tran.rotation();
-  vec3 cogOffset = quat * (CoG-position::ORIGIN);
-  q[0] = Tran.translation().x()+cogOffset.x();
-  q[1] = Tran.translation().y()+cogOffset.y();
-  q[2] = Tran.translation().z()+cogOffset.z();
+  vec3 cogOffset = quat * (CoG - position::ORIGIN);
+  q[0] = Tran.translation().x() + cogOffset.x();
+  q[1] = Tran.translation().y() + cogOffset.y();
+  q[2] = Tran.translation().z() + cogOffset.z();
   q[3] = quat.w;
   q[4] = quat.x;
   q[5] = quat.y;
-  q[6] = quat.z;  
+  q[6] = quat.z;
   if (fixed) {
-	  if (!dynJoint->getPrevLink()) {
-		  //if the previous link of the dynamic joint is NULL this means
-		  //the body is fixed to the current position in the world
-		  //we need to update that position
-		  fix();
-	  }
+    if (!dynJoint->getPrevLink()) {
+      //if the previous link of the dynamic joint is NULL this means
+      //the body is fixed to the current position in the world
+      //we need to update that position
+      fix();
+    }
   }
   return SUCCESS;
 }
@@ -2171,7 +2186,7 @@ void
 DynamicBody::fix()
 {
   fixed = true;
-  setDynJoint(new FixedDynJoint(NULL,this,Tran));
+  setDynJoint(new FixedDynJoint(NULL, this, Tran));
 }
 
 /*!
@@ -2191,7 +2206,7 @@ DynamicBody::unfix()
 void
 DynamicBody::setDynJoint(DynJoint *dj)
 {
-  if (dynJoint) delete dynJoint;
+  if (dynJoint) { delete dynJoint; }
   dynJoint = dj;
 }
 
@@ -2204,7 +2219,7 @@ DynamicBody::setDynJoint(DynJoint *dj)
   this link, \a c is the index of the chain this link is in, and \a l is
   the link number of this link within that chain.
 */
-Link::Link(Robot *r,int c, int l,World *w,const char *name) : DynamicBody(w,name)
+Link::Link(Robot *r, int c, int l, World *w, const char *name) : DynamicBody(w, name)
 {
   owner = r; chainNum = c; linkNum = l; showVC = false; showFC = false;
 }
@@ -2229,24 +2244,25 @@ Link::setContactsChanged()
   updateSensors();
 }
 /*!
-	This acts like contactPreventMotion, except in the case of a link belonging to a robot.
-	In this case, contact against another link of the same robot does not prevent motion,
-	as we assume the entire robot is moving.
+  This acts like contactPreventMotion, except in the case of a link belonging to a robot.
+  In this case, contact against another link of the same robot does not prevent motion,
+  as we assume the entire robot is moving.
 */
 bool
-Link::externalContactsPreventMotion(const transf& motion)
+Link::externalContactsPreventMotion(const transf &motion)
 {
-	std::list<Contact *>::iterator cp;
-	std::list<Contact *> contactList;
+  std::list<Contact *>::iterator cp;
+  std::list<Contact *> contactList;
 
-	contactList = getContacts();
-	for (cp=contactList.begin();cp!=contactList.end();cp++) {
-		if ( (*cp)->getBody2()->getOwner() == getOwner() )
-			continue;
-		if ((*cp)->preventsMotion(motion)) {
-			return true;
-		}
-	}
+  contactList = getContacts();
+  for (cp = contactList.begin(); cp != contactList.end(); cp++) {
+    if ((*cp)->getBody2()->getOwner() == getOwner()) {
+      continue;
+    }
+    if ((*cp)->preventsMotion(motion)) {
+      return true;
+    }
+  }
   return false;
 }
 
@@ -2254,52 +2270,52 @@ Link::externalContactsPreventMotion(const transf& motion)
 position
 Link::getDistalJointLocation()
 {
-	return position(0,0,0);
+  return position(0, 0, 0);
 }
 
 /*! The translation component of the previous joint transform gives me the location of that joint
-	in this joint's coordinate system */
+  in this joint's coordinate system */
 position
 Link::getProximalJointLocation()
 {
-	int jointNum = owner->getChain(chainNum)->getLastJoint(linkNum);
-	Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
-	vec3 p = j->getTran().inverse().translation();
-	return position( p.x(), p.y(), p.z() );
+  int jointNum = owner->getChain(chainNum)->getLastJoint(linkNum);
+  Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
+  vec3 p = j->getTran().inverse().translation();
+  return position(p.x(), p.y(), p.z());
 }
 
 vec3
 Link::getProximalJointAxis()
 {
-	int jointNum = owner->getChain(chainNum)->getLastJoint(linkNum);
-	Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
-	vec3 r = vec3(0,0,1) * j->getTran().inverse();
-	return r;
+  int jointNum = owner->getChain(chainNum)->getLastJoint(linkNum);
+  Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
+  vec3 r = vec3(0, 0, 1) * j->getTran().inverse();
+  return r;
 }
 
 
-void Link::getSensorReadings(std::vector<SensorReading*> &sensorReadings)
+void Link::getSensorReadings(std::vector<SensorReading *> &sensorReadings)
 {
-    std::vector<BodySensor *>::iterator bi;
-    for(bi = mSensors.begin();bi !=mSensors.end(); bi++)
-    {
-        SensorReading *so = (*bi)->getSensorOutput();
-        sensorReadings.push_back(so);
-    }
+  std::vector<BodySensor *>::iterator bi;
+  for (bi = mSensors.begin(); bi != mSensors.end(); bi++)
+  {
+    SensorReading *so = (*bi)->getSensorOutput();
+    sensorReadings.push_back(so);
+  }
 }
 
 void Link::updateSensors()
 {
-    std::vector<BodySensor *>::iterator bi;
-    for(bi = mSensors.begin();bi !=mSensors.end(); bi++)
-    {
-        (*bi)->updateSensorModel();
-    }
+  std::vector<BodySensor *>::iterator bi;
+  for (bi = mSensors.begin(); bi != mSensors.end(); bi++)
+  {
+    (*bi)->updateSensorModel();
+  }
 }
 
-void Link::addBodySensor(BodySensor * sensor)
+void Link::addBodySensor(BodySensor *sensor)
 {
-    mSensors.push_back(sensor);
+  mSensors.push_back(sensor);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2309,10 +2325,10 @@ void Link::addBodySensor(BodySensor * sensor)
 /*
   Stub constructor.
 */
-GraspableBody::GraspableBody(World *w,const char *name) : DynamicBody(w,name)
+GraspableBody::GraspableBody(World *w, const char *name) : DynamicBody(w, name)
 {
 #ifdef CGDB_ENABLED
-	mGraspitDBModel = NULL;
+  mGraspitDBModel = NULL;
 #endif
 }
 
@@ -2325,27 +2341,27 @@ GraspableBody::~GraspableBody()
 }
 
 /*! Shows friction cones and axes, and sets transparency to 0.4 */
-void 
+void
 GraspableBody::setDefaultViewingParameters()
 {
-	showFC = true;
-	showVC = true;
-	showAxes(true);
-	setTransparency(0.4f);
+  showFC = true;
+  showVC = true;
+  showAxes(true);
+  setTransparency(0.4f);
 }
 
 /*! Probably not needed, just calls super*/
 void
-GraspableBody::cloneFrom(const GraspableBody *original) 
+GraspableBody::cloneFrom(const GraspableBody *original)
 {
-	DynamicBody::cloneFrom(original);
-	setDefaultViewingParameters();
+  DynamicBody::cloneFrom(original);
+  setDefaultViewingParameters();
 }
 
 /*!
   Output method for writing body data to a text world configuration file
 */
-QTextStream&
+QTextStream &
 operator<<(QTextStream &os, const GraspableBody &gb)
 {
   os << gb.myFilename << endl;

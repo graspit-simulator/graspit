@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the special %GraspitDBModel class
  */
 
@@ -37,36 +37,36 @@ class GraspableBody;
 
 /*! This is the class to define the data entry of model in CGDB
 */
-class GraspitDBModel : public db_planner::Model{
-protected:
-	//! This is the body representation in GraspIt
-	GraspableBody* mGraspableBody;
-	//! Tells us if the scene graph geometry of this object has been loaded
-	bool mGeometryLoaded;
+class GraspitDBModel : public db_planner::Model {
+  protected:
+    //! This is the body representation in GraspIt
+    GraspableBody *mGraspableBody;
+    //! Tells us if the scene graph geometry of this object has been loaded
+    bool mGeometryLoaded;
 
-        //! Loads the geometry for this body
-        virtual int loadGeometry();
-public:
-	GraspitDBModel() : mGraspableBody(NULL), mGeometryLoaded(false){}
-	~GraspitDBModel();
-	//! Loads the geometry and initializes the corresponding GraspableBody
-	int load(World* w);
-	//! Deletes the loaded geometry; 
-	void unload();
-	//! Returns the flag that tells us if geometry has been loaded
-	bool geometryLoaded() const {return mGeometryLoaded;}
-	//! Returns the Graspable body
-	GraspableBody* getGraspableBody() const { return mGraspableBody; }
+    //! Loads the geometry for this body
+    virtual int loadGeometry();
+  public:
+    GraspitDBModel() : mGraspableBody(NULL), mGeometryLoaded(false) {}
+    ~GraspitDBModel();
+    //! Loads the geometry and initializes the corresponding GraspableBody
+    int load(World *w);
+    //! Deletes the loaded geometry;
+    void unload();
+    //! Returns the flag that tells us if geometry has been loaded
+    bool geometryLoaded() const {return mGeometryLoaded;}
+    //! Returns the Graspable body
+    GraspableBody *getGraspableBody() const { return mGraspableBody; }
 };
 
 //! An implementation of ModelAllocator that returns new GraspitDBModel objects.
 class GraspitDBModelAllocator : public db_planner::ModelAllocator
 {
-public:
-	GraspitDBModelAllocator(){}
-	db_planner::Model* Get() const {
-		return new GraspitDBModel();
-	}
+  public:
+    GraspitDBModelAllocator() {}
+    db_planner::Model *Get() const {
+      return new GraspitDBModel();
+    }
 };
 
 namespace db_planner {class DatabaseManager;}
@@ -75,30 +75,30 @@ namespace db_planner {class DatabaseManager;}
 /*! Might be integrated into the class above at some point */
 class GeomGraspitDBModel : public GraspitDBModel
 {
-private:
-  //! Pointer to the db manager which can load the geometry on demand
-  db_planner::DatabaseManager *mManager;
-  //! Gets the geometry directly form the database, in binary format
-  virtual int loadGeometry();
-public:
-  //! Emty Stub
-  GeomGraspitDBModel(db_planner::DatabaseManager* manager) : GraspitDBModel(), mManager(manager) {}
+  private:
+    //! Pointer to the db manager which can load the geometry on demand
+    db_planner::DatabaseManager *mManager;
+    //! Gets the geometry directly form the database, in binary format
+    virtual int loadGeometry();
+  public:
+    //! Emty Stub
+    GeomGraspitDBModel(db_planner::DatabaseManager *manager) : GraspitDBModel(), mManager(manager) {}
 };
 
 //! Allocator for the specialized model that loads geometry from the database
 class GeomGraspitDBModelAllocator : public db_planner::ModelAllocator
 {
-private:
-  //! Pointer to the db manager to be passed onto the models
-  db_planner::DatabaseManager *mManager;
-public:
-  //! Empty stub
-  GeomGraspitDBModelAllocator(db_planner::DatabaseManager *manager) : mManager(manager) {}
+  private:
+    //! Pointer to the db manager to be passed onto the models
+    db_planner::DatabaseManager *mManager;
+  public:
+    //! Empty stub
+    GeomGraspitDBModelAllocator(db_planner::DatabaseManager *manager) : mManager(manager) {}
 
-  //! Returns a Ros db model with the manager set correctly
-  db_planner::Model* Get() const {
-    return new GeomGraspitDBModel(mManager);
-  }
+    //! Returns a Ros db model with the manager set correctly
+    db_planner::Model *Get() const {
+      return new GeomGraspitDBModel(mManager);
+    }
 };
 
 #endif

@@ -37,8 +37,8 @@
 #include "graspit_db_grasp.h"
 #include "debug.h"
 
-CompliantGraspCopyTask::CompliantGraspCopyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-                                               db_planner::TaskRecord rec) : PreGraspCheckTask (disp, mgr, rec)
+CompliantGraspCopyTask::CompliantGraspCopyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                                               db_planner::TaskRecord rec) : PreGraspCheckTask(disp, mgr, rec)
 {
   //nothing so far
 }
@@ -53,21 +53,21 @@ void CompliantGraspCopyTask::start()
   }
 
   loadHand();
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   if (!mHand->isA("Pr2Gripper2010")) {
     DBGA("Compliant copy task only works on the PR2 gripper");
     mStatus = FAILED;
     return;
   }
-  Pr2Gripper2010* gripper = static_cast<Pr2Gripper2010*>(mHand);
+  Pr2Gripper2010 *gripper = static_cast<Pr2Gripper2010 *>(mHand);
 
   loadObject();
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   //load all the grasps
-  std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
+  std::vector<db_planner::Grasp *> graspList;
+  if (!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)) {
     DBGA("Load grasps failed");
     mStatus = FAILED;
     emptyGraspList(graspList);
@@ -75,9 +75,9 @@ void CompliantGraspCopyTask::start()
   }
 
   bool success = true;
-  std::vector<db_planner::Grasp*>::iterator it;
-  for (it=graspList.begin(); it!=graspList.end(); it++) {
-    GraspPlanningState *graspState = static_cast<GraspitDBGrasp*>(*it)->getFinalGraspPlanningState();
+  std::vector<db_planner::Grasp *>::iterator it;
+  for (it = graspList.begin(); it != graspList.end(); it++) {
+    GraspPlanningState *graspState = static_cast<GraspitDBGrasp *>(*it)->getFinalGraspPlanningState();
     gripper->setCompliance(Pr2Gripper2010::NONE);
     graspState->execute();
     DBGA("Compliant copy around finger 0");
@@ -96,20 +96,20 @@ void CompliantGraspCopyTask::start()
   gripper->setCompliance(Pr2Gripper2010::NONE);
 
   emptyGraspList(graspList);
-  if (success) mStatus = DONE;
-  else mStatus = FAILED;
+  if (success) { mStatus = DONE; }
+  else { mStatus = FAILED; }
 }
 
 bool CompliantGraspCopyTask::compliantCopy(const db_planner::Grasp *grasp, Pr2Gripper2010::ComplianceType compliance)
 {
   //open slowly (2 degrees increments)
   //also, positive change means open for the pr2 gripper
-  double OPEN_BY = 0.035; 
-  Pr2Gripper2010* gripper = static_cast<Pr2Gripper2010*>(mHand);
+  double OPEN_BY = 0.035;
+  Pr2Gripper2010 *gripper = static_cast<Pr2Gripper2010 *>(mHand);
   gripper->setCompliance(compliance);
 
-  std::vector<double> dof(mHand->getNumDOF(),0.0);
-  std::vector<double> stepSize(mHand->getNumDOF(), M_PI/36.0);
+  std::vector<double> dof(mHand->getNumDOF(), 0.0);
+  std::vector<double> stepSize(mHand->getNumDOF(), M_PI / 36.0);
   mHand->getDOFVals(&dof[0]);
   bool done = false;
   transf lastTran = mHand->getTran();
@@ -117,7 +117,7 @@ bool CompliantGraspCopyTask::compliantCopy(const db_planner::Grasp *grasp, Pr2Gr
   {
     //DBGA("Move loop");
     //open the hand a little bit
-    for (int d=0; d<mHand->getNumDOF(); d++) {
+    for (int d = 0; d < mHand->getNumDOF(); d++) {
       dof[d] += OPEN_BY;
     }
     mHand->checkSetDOFVals(&dof[0]);
@@ -137,17 +137,17 @@ bool CompliantGraspCopyTask::compliantCopy(const db_planner::Grasp *grasp, Pr2Gr
       //remember the last saved grasp
       lastTran = currentTran;
     }
-      
+
     //if we have not opened as much as we wanted to, we've hit something; we are done
-    for (int d=0; d<mHand->getNumDOF(); d++) {
-      if ( fabs(mHand->getDOF(d)->getVal() - dof[d]) > 1.0e-5 || 
-           dof[d] == mHand->getDOF(d)->getMin() || 
-           dof[d] == mHand->getDOF(d)->getMax()) {
+    for (int d = 0; d < mHand->getNumDOF(); d++) {
+      if (fabs(mHand->getDOF(d)->getVal() - dof[d]) > 1.0e-5 ||
+          dof[d] == mHand->getDOF(d)->getMin() ||
+          dof[d] == mHand->getDOF(d)->getMax()) {
         //DBGA("Done moving");
         done = true;
         break;
       }
-    }    
+    }
   }
   return true;
 }
@@ -161,7 +161,7 @@ bool CompliantGraspCopyTask::checkStoreGrasp(const db_planner::Grasp *original)
   }
   //create the new grasp as a copy of the old one
   //this should copy score and everything
-  const GraspitDBGrasp *graspit_original = static_cast<const GraspitDBGrasp*>(original);
+  const GraspitDBGrasp *graspit_original = static_cast<const GraspitDBGrasp *>(original);
   std::auto_ptr<GraspitDBGrasp> newGrasp(new GraspitDBGrasp(*graspit_original));
   //new grasp is a compliant copy of the old one
   newGrasp->SetCompliantCopy(true);
@@ -216,25 +216,25 @@ bool CompliantGraspCopyTask::checkStoreGrasp(const db_planner::Grasp *original)
 
   The angular threshold does not really play any role here as compliant copies *should* not have
   any angular differences.
-*/  
+*/
 bool CompliantGraspCopyTask::similarity(const transf &t1, const transf &t2)
 {
   //7.5mm distance threshold
   double DISTANCE_THRESHOLD = 7.5;
   //15 degrees angular threshold
   double ANGULAR_THRESHOLD = 0.26;
-  
+
   vec3 dvec = t1.translation() - t2.translation();
   double d = dvec.len();
-  if (d > DISTANCE_THRESHOLD) return false;
-  
+  if (d > DISTANCE_THRESHOLD) { return false; }
+
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle,axis);
-  if (angle >  M_PI) angle -= 2*M_PI;
-  if (angle < -M_PI) angle += 2*M_PI;
-  if (fabs(angle) > ANGULAR_THRESHOLD) return false;
-  
+  qvec.ToAngleAxis(angle, axis);
+  if (angle >  M_PI) { angle -= 2 * M_PI; }
+  if (angle < -M_PI) { angle += 2 * M_PI; }
+  if (fabs(angle) > ANGULAR_THRESHOLD) { return false; }
+
   return true;
 }
 
@@ -247,12 +247,12 @@ bool CompliantGraspCopyTask::searchSimilarity(const transf &t1, const transf &t2
   double DISTANCE_THRESHOLD = 0.01;
 
   vec3 dvec = t1.translation() - t2.translation();
-  double d = dvec.len() / mObject->getMaxRadius();  
+  double d = dvec.len() / mObject->getMaxRadius();
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle,axis);
+  qvec.ToAngleAxis(angle, axis);
   //0.5 weight out of thin air
   double q = 0.5 * fabs(angle) / M_PI;
-  if (std::max(d,q) > DISTANCE_THRESHOLD) return false;
+  if (std::max(d, q) > DISTANCE_THRESHOLD) { return false; }
   return true;
 }

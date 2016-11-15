@@ -7,10 +7,10 @@ namespace db_planner {
 
 template <class Features>
 class FeaturesExtractor {
- public:
-  virtual bool Extract(const Model& model, Features* features) const {
-    return false;
-  }
+  public:
+    virtual bool Extract(const Model &model, Features *features) const {
+      return false;
+    }
 };
 
 

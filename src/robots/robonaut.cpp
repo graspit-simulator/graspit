@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: robonaut.cpp,v 1.5 2009/06/17 21:06:53 saint Exp $
 //
 //######################################################################
 
-/*! \file 
+/*! \file
 \brief Implements the special %Robonaut robot class
 */
 
@@ -31,17 +31,17 @@
 #include "world.h"
 
 int
-Robonaut::loadFromXml(const TiXmlElement* root,QString rootPath)
+Robonaut::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-	int result = Robot::loadFromXml(root, rootPath);
-	if (result != SUCCESS) return result;
-	myWorld->toggleCollisions(false, base,chainVec[0]->getLink(1));
+  int result = Robot::loadFromXml(root, rootPath);
+  if (result != SUCCESS) { return result; }
+  myWorld->toggleCollisions(false, base, chainVec[0]->getLink(1));
 
-	return result;
+  return result;
 }
 
 void Robonaut::cloneFrom(Hand *original)
 {
-	Hand::cloneFrom(original);
-	myWorld->toggleCollisions(false, base,chainVec[0]->getLink(1));
-} 
+  Hand::cloneFrom(original);
+  myWorld->toggleCollisions(false, base, chainVec[0]->getLink(1));
+}

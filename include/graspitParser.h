@@ -5,10 +5,10 @@ class GraspitParser
 
 {
 
-public:
+  public:
     GraspitParser();
     ~GraspitParser();
-    cmdline::parser* parseArgs(int argc, char *argv[]);
+    cmdline::parser *parseArgs(int argc, char *argv[]);
 
     static const std::string usage;
     static const std::string version;
@@ -22,6 +22,6 @@ public:
     static const std::string version_help;
     static const std::string headless_help;
 
-private:
-     cmdline::parser *parser;
+  private:
+    cmdline::parser *parser;
 };

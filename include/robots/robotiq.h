@@ -24,7 +24,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the special %RobotIQ robot class
  */
 
@@ -36,26 +36,26 @@
 //! A special hand because collisions must be turned off between the palm and the second link of the thumb. This is done by overriding the load method.
 
 class RobotIQ : public HumanHand {
-	Q_OBJECT
+    Q_OBJECT
 
- public:
+  public:
 
-  /*! Empty constructor (placeholder) */
-  RobotIQ(World *w,const char *name) : HumanHand(w,name) {}
-  
-   /*! Performs the normal robot load routine from xml then turns off collisions 
-       between the palm and the second link of the thumb.
- */
-  virtual int loadFromXml(const TiXmlElement* root,QString rootPath);
+    /*! Empty constructor (placeholder) */
+    RobotIQ(World *w, const char *name) : HumanHand(w, name) {}
 
- /*! Performs the normal robot clone routine then turns off collisions between
-     the palm and the second link of the thumb.
- */
-  virtual void cloneFrom(Hand *original);
+    /*! Performs the normal robot load routine from xml then turns off collisions
+        between the palm and the second link of the thumb.
+    */
+    virtual int loadFromXml(const TiXmlElement *root, QString rootPath);
 
-  //! Performs RobotIQ-specific autograsp where distal links stay parallel unless proximal
-  //  links hit an object.
-  virtual bool autoGrasp(bool renderIt, double speedFactor = 1.0, bool stopAtContact = false);
+    /*! Performs the normal robot clone routine then turns off collisions between
+        the palm and the second link of the thumb.
+    */
+    virtual void cloneFrom(Hand *original);
+
+    //! Performs RobotIQ-specific autograsp where distal links stay parallel unless proximal
+    //  links hit an object.
+    virtual bool autoGrasp(bool renderIt, double speedFactor = 1.0, bool stopAtContact = false);
 
 };
 

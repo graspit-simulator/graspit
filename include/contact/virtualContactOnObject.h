@@ -9,11 +9,11 @@ it changes the virtual contact's location from the finger to an object imported 
 */
 class VirtualContactOnObject : public VirtualContact
 {
-public:
-    VirtualContactOnObject ();
-    ~VirtualContactOnObject ();
-    bool readFromFile(std::ifstream& infile);
-    void writeToFile(std::ofstream& outfile);
+  public:
+    VirtualContactOnObject();
+    ~VirtualContactOnObject();
+    bool readFromFile(std::ifstream &infile);
+    void writeToFile(std::ofstream &outfile);
 };
 
 #endif

@@ -17,14 +17,14 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
-// $Id: 
+// $Id:
 //
 //######################################################################
 
 /*! \file
-  \brief Implements the QMDlg, the quality measure dialog box. 
+  \brief Implements the QMDlg, the quality measure dialog box.
 */
 
 #include "ui_qmDlg.h"
@@ -48,21 +48,21 @@
 
 class QMDlg : public QDialog, public Ui::QMDlgUI
 {
-	Q_OBJECT
-private:
-	qmDlgDataT qmDlgData;
+    Q_OBJECT
+  private:
+    qmDlgDataT qmDlgData;
 
-	void init();
-public:
-	QMDlg(QWidget *parent) : QDialog(parent) {
-		setupUi(this);
-		init();
-	}
-public Q_SLOTS:
-	void selectQMType(const QString &typeStr);
-	void updateSettingsBox();
-	void addEditQM();
-	void deleteQM();
-	void selectQM( int which);
-	void gravityBox_clicked();
+    void init();
+  public:
+    QMDlg(QWidget *parent) : QDialog(parent) {
+      setupUi(this);
+      init();
+    }
+  public Q_SLOTS:
+    void selectQMType(const QString &typeStr);
+    void updateSettingsBox();
+    void addEditQM();
+    void deleteQM();
+    void selectQM(int which);
+    void gravityBox_clicked();
 };

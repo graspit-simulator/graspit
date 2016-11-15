@@ -37,65 +37,65 @@
 #endif
 
 #ifdef  GRASPIT_USE_WIN_DYNLIB
-    #include <windows.h>
-    // typedef HMODULE           PLUGIN_DYNLIB_HANDLE;
-    typedef HINSTANCE           PLUGIN_DYNLIB_HANDLE;
-    #define PLUGIN_DYNLIB_ERROR plugin_dynlib_error
+#include <windows.h>
+// typedef HMODULE           PLUGIN_DYNLIB_HANDLE;
+typedef HINSTANCE           PLUGIN_DYNLIB_HANDLE;
+#define PLUGIN_DYNLIB_ERROR plugin_dynlib_error
 
-    #define PLUGIN_API_ENTRY
-    #define PLUGIN_API_CALL     __cdecl  // __stdcall
-    #define PLUGIN_CALLBACK     __cdecl  // __stdcall
+#define PLUGIN_API_ENTRY
+#define PLUGIN_API_CALL     __cdecl  // __stdcall
+#define PLUGIN_CALLBACK     __cdecl  // __stdcall
 
 #else
-    typedef void*                PLUGIN_DYNLIB_HANDLE;
-    #define PLUGIN_API_ENTRY
-    #define PLUGIN_API_CALL
-    #define PLUGIN_CALLBACK
+typedef void                *PLUGIN_DYNLIB_HANDLE;
+#define PLUGIN_API_ENTRY
+#define PLUGIN_API_CALL
+#define PLUGIN_CALLBACK
 #endif
-    
+
 
 
 //! Defines a plugin that can can be loaded dynamically and used with GraspIt
 class Plugin
 {
-public:
-  //! Stub destructor
-  virtual ~Plugin(){}
-  //! Called once when user starts the plugin (or on startup if the plugin is automatically started)
-  virtual int init(int argc, char **argv) = 0;
-  //! Called whenever GraspIt's main loop is idle
-  virtual int mainLoop() = 0;
+  public:
+    //! Stub destructor
+    virtual ~Plugin() {}
+    //! Called once when user starts the plugin (or on startup if the plugin is automatically started)
+    virtual int init(int argc, char **argv) = 0;
+    //! Called whenever GraspIt's main loop is idle
+    virtual int mainLoop() = 0;
 };
 
 class PluginCreator
 {
-public:
-  typedef Plugin* (*CreatePluginFctn)();
-  typedef PLUGIN_API_ENTRY std::string (PLUGIN_API_CALL *GetTypeFctn)();
-private:
-  PLUGIN_DYNLIB_HANDLE mLibraryHandle;
-  CreatePluginFctn mCreatePluginFctn;
+  public:
+    typedef Plugin *(*CreatePluginFctn)();
+    typedef PLUGIN_API_ENTRY std::string(PLUGIN_API_CALL *GetTypeFctn)();
+  private:
+    PLUGIN_DYNLIB_HANDLE mLibraryHandle;
+    CreatePluginFctn mCreatePluginFctn;
 
-  bool mAutoStart;
-  std::string mType;
+    bool mAutoStart;
+    std::string mType;
 
-public:
-  PluginCreator(PLUGIN_DYNLIB_HANDLE libraryHandle, CreatePluginFctn createPluginFctn,
-                bool autoStart, std::string type) :
-    mLibraryHandle(libraryHandle),
-    mCreatePluginFctn(createPluginFctn),
-    mAutoStart(autoStart),
-    mType(type)
-  {}
-  
-  ~PluginCreator();
+  public:
+    PluginCreator(PLUGIN_DYNLIB_HANDLE libraryHandle, CreatePluginFctn createPluginFctn,
+                  bool autoStart, std::string type) :
+      mLibraryHandle(libraryHandle),
+      mCreatePluginFctn(createPluginFctn),
+      mAutoStart(autoStart),
+      mType(type)
+    {}
 
-  Plugin* createPlugin(int argc, char** argv);
-  
-  bool autoStart() const {return mAutoStart;}
-  std::string type() const {return mType;}
+    ~PluginCreator();
 
-  static PluginCreator* loadFromLibrary(std::string libName);
+    Plugin *createPlugin(int argc, char **argv);
+
+    bool autoStart() const {return mAutoStart;}
+    std::string type() const {return mType;}
+
+    static PluginCreator *loadFromLibrary(std::string libName);
 };
 
 
@@ -105,7 +105,7 @@ public:
 
 
 For both linux and windows, extern "C" are necessary.
-I.E. 
+I.E.
      namespace fooplugin{
      class fooPlugin: Plugin{
      --stuff--

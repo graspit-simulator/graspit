@@ -24,7 +24,7 @@
 //######################################################################
 
 /*! \file
-	A wrapper for using the QPOASES solver from within GraspIt!
+  A wrapper for using the QPOASES solver from within GraspIt!
 */
 
 #include "qpoases.h"
@@ -43,27 +43,27 @@
 */
 void oasesFromMatrix(std::vector<double> &O, const Matrix &M, double scale = 1.0)
 {
-  int i,j;
+  int i, j;
   double value;
   M.sequentialReset();
   O.resize(0);
-  O.resize( M.rows()*M.cols(), 0.0 );
+  O.resize(M.rows()*M.cols(), 0.0);
   while (M.nextSequentialElement(i, j, value)) {
-    O.at( i*M.cols() + j) = value / scale;
+    O.at(i * M.cols() + j) = value / scale;
   }
 }
 
 void printMatrix(const std::vector<double> &M, std::string name)
 {
   std::cerr << name << "[";
-  for(size_t i=0; i<M.size(); i++) {
-    if (i!=0) std::cerr << " ";
+  for (size_t i = 0; i < M.size(); i++) {
+    if (i != 0) { std::cerr << " "; }
     std::cerr << M[i];
   }
   std::cerr << "]\n";
 }
 
-int QPOASESSolverWrapperQP(const Matrix &Q, 
+int QPOASESSolverWrapperQP(const Matrix &Q,
                            const Matrix &Eq, const Matrix &b,
                            const Matrix &InEq, const Matrix &ib,
                            const Matrix &lowerBounds, const Matrix &upperBounds,
@@ -71,12 +71,12 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
 {
   // number of variables
   int nV = sol.rows();
-  // number of constraints 
+  // number of constraints
   int nC = Eq.rows() + InEq.rows();
   // set up QProblem object
-  qpOASES::QProblem problem( nV, nC );
+  qpOASES::QProblem problem(nV, nC);
   problem.setPrintLevel(qpOASES::PL_LOW);
-  
+
   //solvers are sensitive to numerical problems. Scale the problem down
   //we will use this value to scale down the right hand side of equality
   //and inequality constraints and lower and upper bounds
@@ -88,7 +88,7 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
   } else {
     DBGP("qpOASES solver: scaling problem down by " << scale);
   }
-  
+
   // prepare the quadratic matrix
   std::vector<double> H;
   oasesFromMatrix(H, Q);
@@ -102,20 +102,20 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
   std::vector<double> ubA;
   oasesFromMatrix(ubA, GubA, scale);
   //lower bounds; min inf for inequalities
-  SparseMatrix GlbA( Matrix::BLOCKCOLUMN<SparseMatrix>( b, Matrix::MIN_VECTOR(ib.rows()) ) );
+  SparseMatrix GlbA(Matrix::BLOCKCOLUMN<SparseMatrix>(b, Matrix::MIN_VECTOR(ib.rows())));
   std::vector<double> lbA;
   oasesFromMatrix(lbA, GlbA, scale);
-  
+
   //lower and upper bounds
   std::vector<double> lb;
   lowerBounds.getData(&lb);
   std::vector<double> ub;
   upperBounds.getData(&ub);
-  for (size_t i=0; i<lb.size(); i++) {
-    if (lb[i] != std::numeric_limits<double>::max() && lb[i] != -std::numeric_limits<double>::max() ) {
+  for (size_t i = 0; i < lb.size(); i++) {
+    if (lb[i] != std::numeric_limits<double>::max() && lb[i] != -std::numeric_limits<double>::max()) {
       lb[i] /= scale;
     }
-    if (ub[i] != std::numeric_limits<double>::max() && ub[i] != -std::numeric_limits<double>::max() ) {
+    if (ub[i] != std::numeric_limits<double>::max() && ub[i] != -std::numeric_limits<double>::max()) {
       ub[i] /= scale;
     }
   }
@@ -126,7 +126,7 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
 
   // solve QP
   int nWSR = 1000;
-  qpOASES::returnValue retVal = problem.init( &H[0], &g[0], &A[0], &lb[0], &ub[0], &lbA[0], &ubA[0], nWSR, 0 );
+  qpOASES::returnValue retVal = problem.init(&H[0], &g[0], &A[0], &lb[0], &ub[0], &lbA[0], &ubA[0], nWSR, 0);
 
   if (retVal == qpOASES::RET_MAX_NWSR_REACHED) {
     DBGA("qpOASES QP:max iterations reached");
@@ -154,8 +154,8 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
     DBGA("qpOASES QP:failed to retrieve solution");
     return -1;
   }
-  for (size_t i=0; i<xOpt.size(); i++) {
-    sol.elem(i,0) = scale * xOpt[i];
+  for (size_t i = 0; i < xOpt.size(); i++) {
+    sol.elem(i, 0) = scale * xOpt[i];
   }
   //retrieve the objective
   *objVal = problem.getObjVal();
@@ -172,16 +172,16 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
                            const Matrix &Eq, const Matrix &b,
                            const Matrix &InEq, const Matrix &ib,
                            const Matrix &lowerBounds, const Matrix &upperBounds,
-                           Matrix &sol, double* objVal)
+                           Matrix &sol, double *objVal)
 {
   // number of variables
   int nV = sol.rows();
-  // number of constraints 
+  // number of constraints
   int nC = Eq.rows() + InEq.rows();
   // set up QProblem object, inform it of 0 Hessian (since we have an LP)
-  qpOASES::QProblem problem( nV, nC, qpOASES::HST_ZERO );
+  qpOASES::QProblem problem(nV, nC, qpOASES::HST_ZERO);
   problem.setPrintLevel(qpOASES::PL_LOW);
-  
+
   //solvers are sensitive to numerical problems. Scale the problem down
   //we will use this value to scale down the right hand side of equality
   //and inequality constraints and lower and upper bounds
@@ -193,7 +193,7 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
   } else {
     DBGP("qpOASES solver: scaling problem down by " << scale);
   }
-  
+
   // prepare the objective matrix
   assert(Q.rows() == 1);
   std::vector<double> g;
@@ -208,27 +208,27 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
   std::vector<double> ubA;
   oasesFromMatrix(ubA, GubA, scale);
   //lower bounds; min inf for inequalities
-  SparseMatrix GlbA( Matrix::BLOCKCOLUMN<SparseMatrix>( b, Matrix::MIN_VECTOR(ib.rows()) ) );
+  SparseMatrix GlbA(Matrix::BLOCKCOLUMN<SparseMatrix>(b, Matrix::MIN_VECTOR(ib.rows())));
   std::vector<double> lbA;
   oasesFromMatrix(lbA, GlbA, scale);
-  
+
   //lower and upper bounds
   std::vector<double> lb;
   lowerBounds.getData(&lb);
   std::vector<double> ub;
   upperBounds.getData(&ub);
-  for (size_t i=0; i<lb.size(); i++) {
-    if (lb[i] != std::numeric_limits<double>::max() && lb[i] != -std::numeric_limits<double>::max() ) {
+  for (size_t i = 0; i < lb.size(); i++) {
+    if (lb[i] != std::numeric_limits<double>::max() && lb[i] != -std::numeric_limits<double>::max()) {
       lb[i] /= scale;
     }
-    if (ub[i] != std::numeric_limits<double>::max() && ub[i] != -std::numeric_limits<double>::max() ) {
+    if (ub[i] != std::numeric_limits<double>::max() && ub[i] != -std::numeric_limits<double>::max()) {
       ub[i] /= scale;
     }
   }
 
   // solve LP
   int nWSR = 1000;
-  qpOASES::returnValue retVal = problem.init( NULL, &g[0], &A[0], &lb[0], &ub[0], &lbA[0], &ubA[0], nWSR, 0 );
+  qpOASES::returnValue retVal = problem.init(NULL, &g[0], &A[0], &lb[0], &ub[0], &lbA[0], &ubA[0], nWSR, 0);
 
   if (retVal == qpOASES::RET_MAX_NWSR_REACHED) {
     DBGA("qpOASES LP: max iterations reached");
@@ -256,8 +256,8 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
     DBGA("qpOASES LP: failed to retrieve solution");
     return -1;
   }
-  for (size_t i=0; i<xOpt.size(); i++) {
-    sol.elem(i,0) = scale * xOpt[i];
+  for (size_t i = 0; i < xOpt.size(); i++) {
+    sol.elem(i, 0) = scale * xOpt[i];
   }
   //retrieve the objective
   *objVal = problem.getObjVal();

@@ -40,8 +40,8 @@
 #include "DBPlanner/ros_database_manager.h"
 using namespace db_planner;
 
-PreGraspCheckTask::PreGraspCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-				     db_planner::TaskRecord rec) : Task (disp, mgr, rec)
+PreGraspCheckTask::PreGraspCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                                     db_planner::TaskRecord rec) : Task(disp, mgr, rec)
 {
   //nothing so far
 }
@@ -53,10 +53,10 @@ PreGraspCheckTask::~PreGraspCheckTask()
   mObject->getWorld()->destroyElement(mObject, false);
   //clean up the loaded geometry
   //the model itself is left around. we don't have a good solution for that yet
-  static_cast<GraspitDBModel*>(mPlanningTask.model)->unload();
+  static_cast<GraspitDBModel *>(mPlanningTask.model)->unload();
 }
 
-void PreGraspCheckTask::emptyGraspList(std::vector<db_planner::Grasp*> &graspList)
+void PreGraspCheckTask::emptyGraspList(std::vector<db_planner::Grasp *> &graspList)
 {
   while (!graspList.empty()) {
     delete graspList.back();
@@ -67,7 +67,7 @@ void PreGraspCheckTask::emptyGraspList(std::vector<db_planner::Grasp*> &graspLis
 void PreGraspCheckTask::loadHand()
 {
   World *world = graspitCore->getWorld();
-  
+
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand we need
   if (world->getCurrentHand() && world->getCurrentHand()->getDBName() == QString(mPlanningTask.handName.c_str())) {
@@ -76,9 +76,9 @@ void PreGraspCheckTask::loadHand()
   } else {
     QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
-    DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());	      
-    mHand = static_cast<Hand*>(world->importRobot(handPath));
-    if ( !mHand ) {
+    DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());
+    mHand = static_cast<Hand *>(world->importRobot(handPath));
+    if (!mHand) {
       DBGA("Failed to load hand");
       mStatus = FAILED;
       return;
@@ -87,7 +87,7 @@ void PreGraspCheckTask::loadHand()
   mDBMgr->SetGraspAllocator(new GraspitDBGraspAllocator(mHand));
 
   //check for virtual contacts
-  if (mHand->getNumVirtualContacts()==0) {
+  if (mHand->getNumVirtualContacts() == 0) {
     DBGA("Specified hand does not have virtual contacts defined");
     mStatus = FAILED;
     return;
@@ -98,7 +98,7 @@ void PreGraspCheckTask::loadObject()
 {
   World *world = graspitCore->getWorld();
 
-  GraspitDBModel *model = static_cast<GraspitDBModel*>(mPlanningTask.model);
+  GraspitDBModel *model = static_cast<GraspitDBModel *>(mPlanningTask.model);
   if (model->load(world) != SUCCESS) {
     DBGA("Grasp Planning Task: failed to load model");
     mStatus = FAILED;
@@ -119,14 +119,14 @@ void PreGraspCheckTask::start()
   }
 
   loadHand();
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   loadObject();
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   //load all the grasps
-  std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
+  std::vector<db_planner::Grasp *> graspList;
+  if (!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)) {
     DBGA("Load grasps failed");
     mStatus = FAILED;
     emptyGraspList(graspList);
@@ -134,8 +134,8 @@ void PreGraspCheckTask::start()
   }
 
   bool success = true;
-  std::vector<db_planner::Grasp*>::iterator it;
-  for (it=graspList.begin(); it!=graspList.end(); it++) {
+  std::vector<db_planner::Grasp *>::iterator it;
+  for (it = graspList.begin(); it != graspList.end(); it++) {
     if (!checkSetGrasp(*it)) {
       success = false;
       break;
@@ -143,22 +143,22 @@ void PreGraspCheckTask::start()
   }
 
   emptyGraspList(graspList);
-  if (success) mStatus = DONE;
-  else mStatus = FAILED;
+  if (success) { mStatus = DONE; }
+  else { mStatus = FAILED; }
 }
 
 bool PreGraspCheckTask::checkSetGrasp(db_planner::Grasp *grasp)
 {
   if (!computePreGrasp(grasp)) {
     DBGA("Pre-grasp creation fails");
-    //delete from database    
+    //delete from database
     if (!mDBMgr->DeleteGrasp(grasp)) {
       DBGA("Failed to delete grasp with id " << grasp->GraspId() << " from database");
       return false;
     }
     return true;
   }
-  
+
   //sanity check
   if (!mHand->getWorld()->noCollision()) {
     DBGA("Collision detected for pre-grasp!");
@@ -180,14 +180,14 @@ bool PreGraspCheckTask::checkSetGrasp(db_planner::Grasp *grasp)
   newPreGrasp->setRefTran(mObject->getTran(), false);
   newPreGrasp->saveCurrentHandState();
   //set pre-grasp
-  static_cast<GraspitDBGrasp*>(grasp)->setPreGraspPlanningState(newPreGrasp);
+  static_cast<GraspitDBGrasp *>(grasp)->setPreGraspPlanningState(newPreGrasp);
 
   //save pre-grasp along with clearance in database
   //for now, we update by deleting and re-inserting
   if (!mDBMgr->DeleteGrasp(grasp)) {
     DBGA("Failed to delete grasp with id " << grasp->GraspId() << " from database");
     return false;
-  }  
+  }
 
   /*
   //move the grasp back by 42mm
@@ -209,14 +209,14 @@ bool PreGraspCheckTask::checkSetGrasp(db_planner::Grasp *grasp)
     return false;
   }
   DBGA("Pre-grasp inserted");
-  return true;				
+  return true;
 }
 
 bool PreGraspCheckTask::computePreGrasp(db_planner::Grasp *grasp)
 {
   //place the hand in position
-  GraspPlanningState *graspState = static_cast<GraspitDBGrasp*>(grasp)->getFinalGraspPlanningState();
-  graspState->execute();  
+  GraspPlanningState *graspState = static_cast<GraspitDBGrasp *>(grasp)->getFinalGraspPlanningState();
+  graspState->execute();
 
   //check the pre-grasp
   return preGraspCheck(mHand);
@@ -227,14 +227,14 @@ bool PreGraspCheckTask::preGraspCheck(Hand *hand)
   //the entire range of motion for the pr2_gripper_2010
   //also, positive change means open gripper for pr2_gripper
   double OPEN_BY = 0.323;
-  //go back 5cm 
+  //go back 5cm
   double RETREAT_BY = -100;
 
   //open fingers
-  std::vector<double> dof(hand->getNumDOF(),0.0);
+  std::vector<double> dof(hand->getNumDOF(), 0.0);
   std::vector<double> stepSize(hand->getNumDOF(), 0.0);
   hand->getDOFVals(&dof[0]);
-  for (int d=0; d<hand->getNumDOF(); d++) {
+  for (int d = 0; d < hand->getNumDOF(); d++) {
     dof[d] += OPEN_BY;
     if (dof[d] < hand->getDOF(d)->getMin()) {
       dof[d] = hand->getDOF(d)->getMin();
@@ -242,13 +242,13 @@ bool PreGraspCheckTask::preGraspCheck(Hand *hand)
     if (dof[d] > hand->getDOF(d)->getMax()) {
       dof[d] = hand->getDOF(d)->getMax();
     }
-    stepSize[d] = M_PI/36.0;
+    stepSize[d] = M_PI / 36.0;
   }
   hand->moveDOFToContacts(&dof[0], &stepSize[0], true, false);
 
   //check if move has succeeded
-  for (int d=0; d<hand->getNumDOF(); d++) {
-    if ( fabs( dof[d] - hand->getDOF(d)->getVal() ) > 1.0e-5) {
+  for (int d = 0; d < hand->getNumDOF(); d++) {
+    if (fabs(dof[d] - hand->getDOF(d)->getVal()) > 1.0e-5) {
       DBGP("  trying to open to " << dof[d] << "; only made it to " << hand->getDOF(d)->getVal());
       DBGA("  open gripper fails");
       return false;

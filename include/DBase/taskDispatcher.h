@@ -34,9 +34,9 @@ class SoSensor;
 class SoTimerSensor;
 
 namespace db_planner {
-	class DatabaseManager;
-	class Model;
-	class Grasp;
+class DatabaseManager;
+class Model;
+class Grasp;
 }
 
 class TaskDispatcher;
@@ -53,15 +53,15 @@ class TaskDispatcher;
     which do that natively.
 
     A Task must implement the following interface:
-    
-    - at the beginning, the TaskDispatcher will call the start() fctn. The 
-    Task must start its own event management from there. 
-    
-    - if the Task is one-shot, it can do all the work in start() and set its 
-    status to either DONE or FAILED at the end. The Dispatcher will see this, 
+
+    - at the beginning, the TaskDispatcher will call the start() fctn. The
+    Task must start its own event management from there.
+
+    - if the Task is one-shot, it can do all the work in start() and set its
+    status to either DONE or FAILED at the end. The Dispatcher will see this,
     clean up and go to the next Task.
 
-    - if the Task is event based, start() must set up the Task event loop, then 
+    - if the Task is event based, start() must set up the Task event loop, then
     leave mStatus = RUNNING, and then surrender control. The Dispatcher will in
     turn surrender control and let the Task event loop do its thing.
 
@@ -71,35 +71,35 @@ class TaskDispatcher;
     another task.
 */
 class Task {
- public:
-	enum Status{RUNNING, FAILED, DONE};
- protected:
-	//! The current status of this task
-	Status mStatus;
-	//! The Dispatcher that started this task
-	TaskDispatcher* mDispatcher;
-	//! A database mgr that can be used to access the dbase
-	/*! Acquired from the TaskDispatcher */
-	db_planner::DatabaseManager *mDBMgr;
-	//! The dbase record of the task being executed
-	db_planner::TaskRecord mRecord;
+  public:
+    enum Status {RUNNING, FAILED, DONE};
+  protected:
+    //! The current status of this task
+    Status mStatus;
+    //! The Dispatcher that started this task
+    TaskDispatcher *mDispatcher;
+    //! A database mgr that can be used to access the dbase
+    /*! Acquired from the TaskDispatcher */
+    db_planner::DatabaseManager *mDBMgr;
+    //! The dbase record of the task being executed
+    db_planner::TaskRecord mRecord;
 
- public:
-        Task(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, db_planner::TaskRecord rec) 
-		: mDispatcher(disp), mDBMgr(mgr), mRecord(rec) {};
-	virtual ~Task(){}
-	virtual void start() = 0;
-	//! Returns the current status of this task
-	Status getStatus(){return mStatus;}
-	//! Returns a copy of the dbase record of this task
-	db_planner::TaskRecord getRecord(){return mRecord;}
+  public:
+    Task(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, db_planner::TaskRecord rec)
+      : mDispatcher(disp), mDBMgr(mgr), mRecord(rec) {};
+    virtual ~Task() {}
+    virtual void start() = 0;
+    //! Returns the current status of this task
+    Status getStatus() {return mStatus;}
+    //! Returns a copy of the dbase record of this task
+    db_planner::TaskRecord getRecord() {return mRecord;}
 };
 
 //! Given a taskType, returns an instance of the right type of task
 class TaskFactory {
- public:
-	inline Task* getTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-			     db_planner::TaskRecord rec);
+  public:
+    inline Task *getTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                         db_planner::TaskRecord rec);
 };
 
 //! A high-level executive that dispatches tasks based on the contents of the database
@@ -108,8 +108,8 @@ class TaskFactory {
     instances of the Task class and then monitoring them.
 
     It can run either one-shot tasks (that do something and they're done) or even-based
-    tasks which have their own callback system. In the latter case, the Dispatcher uses 
-    a callback timer of its own to wake up periodically and check on the currently running 
+    tasks which have their own callback system. In the latter case, the Dispatcher uses
+    a callback timer of its own to wake up periodically and check on the currently running
     task.
 
     On exit, the Dispatcher will exit GraspIt's main loop, thus terminating the
@@ -125,46 +125,46 @@ class TaskFactory {
     Note that if a Task itself finishes with an error, the Dispacther will mark that in the
     database, then proceed to the next task.
 */
-class TaskDispatcher 
+class TaskDispatcher
 {
- public:
-        enum Status {READY, NO_TASK, FAILED, RUNNING, DONE};
- private:
-	//! A factory for instantiating the right type of task
-	TaskFactory mFactory;
-	//! The db mgr used to connect to the dbase
-	db_planner::DatabaseManager *mDBMgr;
-	//! The task currently being executed
-	Task *mCurrentTask;
+  public:
+    enum Status {READY, NO_TASK, FAILED, RUNNING, DONE};
+  private:
+    //! A factory for instantiating the right type of task
+    TaskFactory mFactory;
+    //! The db mgr used to connect to the dbase
+    db_planner::DatabaseManager *mDBMgr;
+    //! The task currently being executed
+    Task *mCurrentTask;
 
-	//! The status of the Dispatcher
-	Status mStatus;
-	//! The number of tasks completed so far
-	int mCompletedTasks;
-	//! Max number of tasks to be completed. -1 means no max limit
-	int mMaxTasks;
-	//! The timer sensor used to wake up periodically
-	SoTimerSensor *mSensor;
- public:
-	TaskDispatcher();
-	~TaskDispatcher();
+    //! The status of the Dispatcher
+    Status mStatus;
+    //! The number of tasks completed so far
+    int mCompletedTasks;
+    //! Max number of tasks to be completed. -1 means no max limit
+    int mMaxTasks;
+    //! The timer sensor used to wake up periodically
+    SoTimerSensor *mSensor;
+  public:
+    TaskDispatcher();
+    ~TaskDispatcher();
 
-	//! Connects to the database. Returns 0 on success
-	int connect(std::string host, int port, std::string username, 
-		    std::string password, std::string database);
+    //! Connects to the database. Returns 0 on success
+    int connect(std::string host, int port, std::string username,
+                std::string password, std::string database);
 
-	//! Checks the status of the current task; cleans up after it if done
-	void checkCurrentTask();
-	//! Attempts to read a task from the dbase and start it
-	void startNewTask();
-	//! Main operation loop, called periodically
-	void mainLoop();
+    //! Checks the status of the current task; cleans up after it if done
+    void checkCurrentTask();
+    //! Attempts to read a task from the dbase and start it
+    void startNewTask();
+    //! Main operation loop, called periodically
+    void mainLoop();
 
-	//! Returns the status of the Dispatcher
-	Status getStatus() const {return mStatus;}
+    //! Returns the status of the Dispatcher
+    Status getStatus() const {return mStatus;}
 
-	//! Static sensor callback, just calls mainLoop()
-	static void sensorCB(void *data, SoSensor*);
+    //! Static sensor callback, just calls mainLoop()
+    static void sensorCB(void *data, SoSensor *);
 };
 
 //! An empty task used to test and debug the dispatcher
@@ -172,15 +172,15 @@ class TaskDispatcher
 */
 class EmptyTask : public Task
 {
- private:
-	SoTimerSensor *mSensor;
-	void finish();
- public:
-        EmptyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, db_planner::TaskRecord rec) :
-	          Task(disp, mgr, rec), mSensor(NULL) {}
-	~EmptyTask();
-	void start();
-	static void sensorCB(void *data, SoSensor*);
+  private:
+    SoTimerSensor *mSensor;
+    void finish();
+  public:
+    EmptyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, db_planner::TaskRecord rec) :
+      Task(disp, mgr, rec), mSensor(NULL) {}
+    ~EmptyTask();
+    void start();
+    static void sensorCB(void *data, SoSensor *);
 };
 
 //! An empty one-shot task used to test and debug the dispatcher
@@ -188,11 +188,11 @@ class EmptyTask : public Task
 */
 class EmptyOneShotTask : public Task
 {
- public:
-        EmptyOneShotTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, db_planner::TaskRecord rec) :
-                         Task(disp, mgr, rec) {}
-	~EmptyOneShotTask();
-	void start(){mStatus = DONE;}
+  public:
+    EmptyOneShotTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, db_planner::TaskRecord rec) :
+      Task(disp, mgr, rec) {}
+    ~EmptyOneShotTask();
+    void start() {mStatus = DONE;}
 };
 
 #endif

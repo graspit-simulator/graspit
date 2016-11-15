@@ -6,7 +6,7 @@
 
 class ContactEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
 };
 

@@ -5,7 +5,7 @@
 
 class GuidedAutoGraspQualityEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
 
 };

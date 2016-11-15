@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_visualization.cpp,v 1.2 2009/03/25 22:10:05 cmatei Exp $
 //
@@ -70,96 +70,97 @@
   The rotation of the palm, z-approach, vector is specified with \a mat ,
   the rotation of the thumb vector is specified with \a thMat .  The Inventor
   sub graph containing these elements is added to the provided \a glroot node .
-*/    
-grasp_representation::grasp_representation(SbMatrix mat, SbMatrix thMat, SoSeparator* glroot){
+*/
+grasp_representation::grasp_representation(SbMatrix mat, SbMatrix thMat, SoSeparator *glroot) {
 
-    parentSep = glroot;
-    
-    top = new SoSeparator();
-    sep = new SoSeparator();
-    thSep = new SoSeparator();
+  parentSep = glroot;
 
-    material = new SoMaterial();
+  top = new SoSeparator();
+  sep = new SoSeparator();
+  thSep = new SoSeparator();
 
-    tranArrowSphere = new SoTransform();
-    arrow = new SoArrow();
-    arrow->height.setValue(50.);
-    sphere = new SoSphere();
-    sphere->radius.setValue(5.0);
-    
-    thRot = new SoTransform();
-    thArrow = new SoArrow();
-    thArrow->height.setValue(20.);
+  material = new SoMaterial();
 
-    top->addChild(sep);
-    top->addChild(thSep);
+  tranArrowSphere = new SoTransform();
+  arrow = new SoArrow();
+  arrow->height.setValue(50.);
+  sphere = new SoSphere();
+  sphere->radius.setValue(5.0);
 
-    sep->addChild(tranArrowSphere);
-    sep->addChild(material);
-    sep->addChild(arrow);
-    sep->addChild(sphere);
+  thRot = new SoTransform();
+  thArrow = new SoArrow();
+  thArrow->height.setValue(20.);
 
-    thSep->addChild(material);
-    thSep->addChild(thRot);
-    thSep->addChild(thArrow);
+  top->addChild(sep);
+  top->addChild(thSep);
 
-    tranArrowSphere->setMatrix(mat);
+  sep->addChild(tranArrowSphere);
+  sep->addChild(material);
+  sep->addChild(arrow);
+  sep->addChild(sphere);
 
-    thRot->setMatrix(thMat);
+  thSep->addChild(material);
+  thSep->addChild(thRot);
+  thSep->addChild(thArrow);
 
-    parentSep->addChild(top);
+  tranArrowSphere->setMatrix(mat);
 
-    visOn = true;
+  thRot->setMatrix(thMat);
+
+  parentSep->addChild(top);
+
+  visOn = true;
 }
 
 /*!
   Removes and deletes the Inventor elements for this represenntation.
 */
-grasp_representation::~grasp_representation(){
+grasp_representation::~grasp_representation() {
 
-    if (visOn)
-	parentSep->removeChild(top);
-    /*
-    thSep->removeChild(thArrow);
-    thSep->removeChild(thRot);
-    thSep->removeChild(material);
+  if (visOn) {
+    parentSep->removeChild(top);
+  }
+  /*
+  thSep->removeChild(thArrow);
+  thSep->removeChild(thRot);
+  thSep->removeChild(material);
 
-    sep->removeChild(sphere);
-    sep->removeChild(arrow);
-    sep->removeChild(material);
-    sep->removeChild(tranArrowSphere);
+  sep->removeChild(sphere);
+  sep->removeChild(arrow);
+  sep->removeChild(material);
+  sep->removeChild(tranArrowSphere);
 
-    top->removeChild(thSep);
-    top->removeChild(sep);
+  top->removeChild(thSep);
+  top->removeChild(sep);
 
-    thArrow->unref();
-    thRot->unref();
-    sphere->unref();
-    arrow->unref();
-    material->unref();
-    
-    thSep->unref();
-    sep->unref();
-    top->unref();
-    */
+  thArrow->unref();
+  thRot->unref();
+  sphere->unref();
+  arrow->unref();
+  material->unref();
+
+  thSep->unref();
+  sep->unref();
+  top->unref();
+  */
 }
 
 /*!
   Changes the diffuse color of the representation.
 */
-void 
-grasp_representation::changeColor(double r, double g, double b){
-    material->diffuseColor.setValue((float)r,(float)g,(float)b);
-    material->transparency.setValue(0.5);
+void
+grasp_representation::changeColor(double r, double g, double b) {
+  material->diffuseColor.setValue((float)r, (float)g, (float)b);
+  material->transparency.setValue(0.5);
 }
 
 /*!
   Resets the material properties of the representation elements to their
   original values.
 */
-void 
-grasp_representation::resetColor(){
-    material->setToDefaults();
+void
+grasp_representation::resetColor() {
+  material->setToDefaults();
 }
 
 /*!
@@ -167,8 +168,8 @@ grasp_representation::resetColor(){
   * GRASP_SPHERE_SIZE_FACTOR.
 */
 void
-grasp_representation::changeRadius(double rad){
-    sphere->radius.setValue((float)(rad * GRASP_SPHERE_SIZE_FACTOR));
+grasp_representation::changeRadius(double rad) {
+  sphere->radius.setValue((float)(rad * GRASP_SPHERE_SIZE_FACTOR));
 }
 
 

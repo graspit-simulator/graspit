@@ -46,77 +46,77 @@ class GraspableBody;
 class Hand;
 class EGPlanner;
 
-/*! The EGPlannerDialog can interface to most of the types of EGPlanners, 
-	pass them any type of HandObjectState as a starting position, accept 
-	changes to the Input provided to the Planner, etc. This is the primary 
-	way of getting familiar with the various implementations of EGPlanner.
+/*! The EGPlannerDialog can interface to most of the types of EGPlanners,
+  pass them any type of HandObjectState as a starting position, accept
+  changes to the Input provided to the Planner, etc. This is the primary
+  way of getting familiar with the various implementations of EGPlanner.
 */
 class EigenGraspPlannerDlg : public QDialog, public Ui::EigenGraspPlannerDlgUI
 {
-	Q_OBJECT
-private:
+    Q_OBJECT
+  private:
     QGridLayout *varGridLayout;
     QVBoxLayout *varMainLayout;
-    std::vector<QCheckBox*> varInput;
-    std::vector<QCheckBox*> varCheck;
-    std::vector<QLabel*> varNames;
-    std::vector<QHBoxLayout*> varLayouts;
-    std::vector<QSlider*> varConfidence;
-    std::vector<QLabel*> varTarget;
+    std::vector<QCheckBox *> varInput;
+    std::vector<QCheckBox *> varCheck;
+    std::vector<QLabel *> varNames;
+    std::vector<QHBoxLayout *> varLayouts;
+    std::vector<QSlider *> varConfidence;
+    std::vector<QLabel *> varTarget;
 
-	GraspPlanningState *mHandObjectState;
+    GraspPlanningState *mHandObjectState;
     GraspableBody *mObject;
     Hand *mHand;
     int mDisplayState;
     EGPlanner *mPlanner;
 
-	void init();
-	void destroy();
-	void setVariableLayout();
-	void updateVariableLayout();
-	void updateInputLayout();
-	void readPlannerSettings();
-	void startPlanner();
-	void stopPlanner();
+    void init();
+    void destroy();
+    void setVariableLayout();
+    void updateVariableLayout();
+    void updateInputLayout();
+    void readPlannerSettings();
+    void startPlanner();
+    void stopPlanner();
 
-public:
-	EigenGraspPlannerDlg(QWidget *parent = 0) : QDialog(parent) {
-		setupUi(this);
-		init();
-	}
-	~EigenGraspPlannerDlg(){destroy();}
+  public:
+    EigenGraspPlannerDlg(QWidget *parent = 0) : QDialog(parent) {
+      setupUi(this);
+      init();
+    }
+    ~EigenGraspPlannerDlg() {destroy();}
 
-public Q_SLOTS:
-	void exitButton_clicked();
-	void setMembers( Hand *h, GraspableBody *b );
-	void variableInputChanged();
-	void variableCheckBoxChanged();
-	void spaceSearchBox_activated( const QString &s );
-	void prevGraspButton_clicked();
-	void bestGraspButton_clicked();
-	void nextGraspButton_clicked();
-	void plannerUpdate();
-	void updateResults(bool render);
-	void updateStatus();
-	void energyBox_activated( const QString & );
-	void setContactsBox_toggled( bool checked);
-	void plannerComplete();
-	void plannerInit_clicked();
-	void plannerReset_clicked(); 
-	void plannerStart_clicked();
-	void plannerTypeBox_activated( const QString & );
-	void autoGraspBox_clicked();
-	void onlinePlannerUpdate();
-	void onlineGraspButton_clicked();
-	void onlineReleaseButton_clicked();
-	void onlinePlanButton_clicked();
-	void instantEnergyButton_clicked();
-	void showCloneBox_toggled( bool c);
-	void showSolutionBox_toggled( bool c);
-	void useVirtualHandBox_clicked();
-	void useRealBarrettBox_toggled( bool s);
-	void inputGloveBox_toggled( bool on);
-	void inputLoadButton_clicked();
+  public Q_SLOTS:
+    void exitButton_clicked();
+    void setMembers(Hand *h, GraspableBody *b);
+    void variableInputChanged();
+    void variableCheckBoxChanged();
+    void spaceSearchBox_activated(const QString &s);
+    void prevGraspButton_clicked();
+    void bestGraspButton_clicked();
+    void nextGraspButton_clicked();
+    void plannerUpdate();
+    void updateResults(bool render);
+    void updateStatus();
+    void energyBox_activated(const QString &);
+    void setContactsBox_toggled(bool checked);
+    void plannerComplete();
+    void plannerInit_clicked();
+    void plannerReset_clicked();
+    void plannerStart_clicked();
+    void plannerTypeBox_activated(const QString &);
+    void autoGraspBox_clicked();
+    void onlinePlannerUpdate();
+    void onlineGraspButton_clicked();
+    void onlineReleaseButton_clicked();
+    void onlinePlanButton_clicked();
+    void instantEnergyButton_clicked();
+    void showCloneBox_toggled(bool c);
+    void showSolutionBox_toggled(bool c);
+    void useVirtualHandBox_clicked();
+    void useRealBarrettBox_toggled(bool s);
+    void inputGloveBox_toggled(bool on);
+    void inputLoadButton_clicked();
 };
 
 #endif

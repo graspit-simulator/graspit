@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_directions.cpp,v 1.2 2009/03/25 22:10:05 cmatei Exp $
 //
@@ -51,7 +51,7 @@ GraspDirection::GraspDirection()
 {
   //    point = new coordinates;
   //    dir = new coordinates;
-    empty = false;
+  empty = false;
 }
 
 /*!
@@ -66,71 +66,72 @@ GraspDirection::~GraspDirection()
 /*!
   Returns a pointer to the palm position coordinates.
 */
-coordinates         
+coordinates
 GraspDirection::get_point()      const
 {
-    return *point;
+  return *point;
 }
 
 /*!
   Returns a pointer to the palm approach vector coordinates.
 */
-coordinates         
+coordinates
 GraspDirection::get_dir()          const
-{ 
-    return *dir;
+{
+  return *dir;
 }
 
 /*!
   Sets empty to the value of \a in .
 */
-void                
+void
 GraspDirection::set_empty(bool in)
 {
-    empty = in;
+  empty = in;
 }
 
 /*!
   Returns the value of empty.
 */
-bool                
+bool
 GraspDirection::get_empty()        const
 {
-    return empty;
+  return empty;
 }
 
 /*!
   Sets the grasp direction type to \a in .
 */
-void                
+void
 GraspDirection::set_gdType(graspDirectionType in)
 {
-    gdType = in;
+  gdType = in;
 }
 
 /*!
   Returns the grasp direction type.
 */
-graspDirectionType  
+graspDirectionType
 GraspDirection::get_gdType()       const
 {
-    return gdType;
+  return gdType;
 }
 
 /*!
   Compares this grasp direction to \a p .  If the point and direction
-  are the same and the value of empty is the same, then it returns TRUE.  
+  are the same and the value of empty is the same, then it returns TRUE.
 */
-bool            
-GraspDirection::operator==(const GraspDirection& p)
+bool
+GraspDirection::operator==(const GraspDirection &p)
 {
 
   //ATM: Hmmmm why is steffen comparing pointer values?
-    if (p.get_point() == get_point() &&
-	p.get_dir() == get_dir() &&
-	p.get_empty() == get_empty())
-	return true;
-    return false;
+  if (p.get_point() == get_point() &&
+      p.get_dir() == get_dir() &&
+      p.get_empty() == get_empty()) {
+    return true;
+  }
+  return false;
 }
 
 
@@ -145,45 +146,45 @@ CARTESIAN GraspDirection
 */
 cartesianGraspDirection::cartesianGraspDirection()
 {
-    point = new cartesian_coordinates();
-    dir = new cartesian_coordinates();
-    empty = false;
+  point = new cartesian_coordinates();
+  dir = new cartesian_coordinates();
+  empty = false;
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-cartesianGraspDirection::cartesianGraspDirection(GraspDirection* p)
+cartesianGraspDirection::cartesianGraspDirection(GraspDirection *p)
 {
-    point = new cartesian_coordinates(p->get_point());
-    dir = new cartesian_coordinates(p->get_dir());
-    empty = p->get_empty();
-    set_gdType(p->get_gdType());
+  point = new cartesian_coordinates(p->get_point());
+  dir = new cartesian_coordinates(p->get_dir());
+  empty = p->get_empty();
+  set_gdType(p->get_gdType());
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-cartesianGraspDirection::cartesianGraspDirection(cartesianGraspDirection* p)
+cartesianGraspDirection::cartesianGraspDirection(cartesianGraspDirection *p)
 {
-    point = new cartesian_coordinates(p->get_point());
-    dir = new cartesian_coordinates(p->get_dir());
-    empty = p->get_empty();
-    set_gdType(p->get_gdType());
+  point = new cartesian_coordinates(p->get_point());
+  dir = new cartesian_coordinates(p->get_dir());
+  empty = p->get_empty();
+  set_gdType(p->get_gdType());
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-cartesianGraspDirection::cartesianGraspDirection(const cartesianGraspDirection& p) : GraspDirection()
+cartesianGraspDirection::cartesianGraspDirection(const cartesianGraspDirection &p) : GraspDirection()
 {
-    point = new cartesian_coordinates(p.get_point());
-    dir = new cartesian_coordinates(p.get_dir());
-    empty = p.get_empty();
-    set_gdType(p.get_gdType());
+  point = new cartesian_coordinates(p.get_point());
+  dir = new cartesian_coordinates(p.get_dir());
+  empty = p.get_empty();
+  set_gdType(p.get_gdType());
 }
 
 /*!
@@ -191,39 +192,39 @@ cartesianGraspDirection::cartesianGraspDirection(const cartesianGraspDirection& 
 */
 cartesianGraspDirection::~cartesianGraspDirection()
 {
-    delete point;
-    delete dir;
+  delete point;
+  delete dir;
 }
 
 /*!
   Sets the point to the value of \a in .
 */
-void        
+void
 cartesianGraspDirection::set_point(coordinates in)
 {
-    *point = in;
+  *point = in;
 }
 
 /*!
   Sets the directions to the value of \a in .
 */
-void        
+void
 cartesianGraspDirection::set_dir(coordinates in)
 {
-    *dir = in;
+  *dir = in;
 }
 
 /*!
   Returns a normalized distance measure between this grasp direction and
   \a to .
 */
-double 
+double
 cartesianGraspDirection::distanceTo(cartesianGraspDirection to) const
 {
-    double dist = point->distanceTo(to.get_point());
-    dist += dir->distanceTo(to.get_dir());
-    /* max is 2.0, every dist normed to 1 */
-    return dist / 2.0;
+  double dist = point->distanceTo(to.get_point());
+  dist += dir->distanceTo(to.get_dir());
+  /* max is 2.0, every dist normed to 1 */
+  return dist / 2.0;
 }
 
 /***************
@@ -235,47 +236,47 @@ CYLINDRICAL GraspDirection
 */
 cylindricalGraspDirection::cylindricalGraspDirection()  : GraspDirection()
 {
-    point = new cylindrical_coordinates();
-    dir = new cylindrical_coordinates();
-    empty = false;
+  point = new cylindrical_coordinates();
+  dir = new cylindrical_coordinates();
+  empty = false;
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-cylindricalGraspDirection::cylindricalGraspDirection(GraspDirection* p) : GraspDirection()
+cylindricalGraspDirection::cylindricalGraspDirection(GraspDirection *p) : GraspDirection()
 {
-    point = new cylindrical_coordinates();
-    set_point(p->get_point());
-    dir = new cylindrical_coordinates();
-    set_dir(p->get_dir());
-    empty = p->get_empty();
-    set_gdType(p->get_gdType());
+  point = new cylindrical_coordinates();
+  set_point(p->get_point());
+  dir = new cylindrical_coordinates();
+  set_dir(p->get_dir());
+  empty = p->get_empty();
+  set_gdType(p->get_gdType());
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-cylindricalGraspDirection::cylindricalGraspDirection(cylindricalGraspDirection* p) : GraspDirection()
+cylindricalGraspDirection::cylindricalGraspDirection(cylindricalGraspDirection *p) : GraspDirection()
 {
-    point = new cylindrical_coordinates(p->get_point());
-    dir = new cylindrical_coordinates(p->get_dir());
-    empty = p->get_empty();
-    set_gdType(p->get_gdType());
+  point = new cylindrical_coordinates(p->get_point());
+  dir = new cylindrical_coordinates(p->get_dir());
+  empty = p->get_empty();
+  set_gdType(p->get_gdType());
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-cylindricalGraspDirection::cylindricalGraspDirection(const cylindricalGraspDirection& p) : GraspDirection()
+cylindricalGraspDirection::cylindricalGraspDirection(const cylindricalGraspDirection &p) : GraspDirection()
 {
-    point = new cylindrical_coordinates(p.get_point());
-    dir = new cylindrical_coordinates(p.get_dir());
-    empty = p.get_empty();
-    set_gdType(p.get_gdType());
+  point = new cylindrical_coordinates(p.get_point());
+  dir = new cylindrical_coordinates(p.get_dir());
+  empty = p.get_empty();
+  set_gdType(p.get_gdType());
 }
 
 /*!
@@ -283,36 +284,38 @@ cylindricalGraspDirection::cylindricalGraspDirection(const cylindricalGraspDirec
 */
 cylindricalGraspDirection::~cylindricalGraspDirection()
 {
-    delete point;
-    delete dir;
+  delete point;
+  delete dir;
 }
 
 /*!
   Sets the point to the value of \a in .
 */
-void        
+void
 cylindricalGraspDirection::set_point(coordinates in)
 {
-    (*point)[0] = in[0];
+  (*point)[0] = in[0];
 
-    while (in[1] > (2*M_PI))
-	in[1]-=(2*M_PI);
-    while (in[1] < (2*M_PI))
-	in[1]+=(2*M_PI);
-    (*point)[1] = in[1];
+  while (in[1] > (2 * M_PI)) {
+    in[1] -= (2 * M_PI);
+  }
+  while (in[1] < (2 * M_PI)) {
+    in[1] += (2 * M_PI);
+  }
+  (*point)[1] = in[1];
 
-    (*point)[2] = in[2];
+  (*point)[2] = in[2];
 }
 
 /*!
   Sets the directions to the value of \a in .
 */
-void        
+void
 cylindricalGraspDirection::set_dir(coordinates in)
 {
-    (*dir)[0] = in[0];
-    (*dir)[1] = (in[1] > (2 * M_PI)) ? (2*M_PI) : in[1];
-    (*dir)[2] = in[2];
+  (*dir)[0] = in[0];
+  (*dir)[1] = (in[1] > (2 * M_PI)) ? (2 * M_PI) : in[1];
+  (*dir)[2] = in[2];
 }
 
 
@@ -326,46 +329,46 @@ SPHERICAL PART
 */
 sphericalGraspDirection::sphericalGraspDirection() : GraspDirection()
 {
-    point = new spherical_coordinates();
-    dir = new spherical_coordinates();
+  point = new spherical_coordinates();
+  dir = new spherical_coordinates();
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-sphericalGraspDirection::sphericalGraspDirection(GraspDirection* p) : GraspDirection()
+sphericalGraspDirection::sphericalGraspDirection(GraspDirection *p) : GraspDirection()
 {
-    point = new spherical_coordinates();
-    set_point(p->get_point());
-    dir = new spherical_coordinates();
-    set_dir(p->get_dir());
-    empty = p->get_empty();
-    set_gdType(p->get_gdType());
+  point = new spherical_coordinates();
+  set_point(p->get_point());
+  dir = new spherical_coordinates();
+  set_dir(p->get_dir());
+  empty = p->get_empty();
+  set_gdType(p->get_gdType());
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-sphericalGraspDirection::sphericalGraspDirection(sphericalGraspDirection* p) : GraspDirection()
+sphericalGraspDirection::sphericalGraspDirection(sphericalGraspDirection *p) : GraspDirection()
 {
-    point = new spherical_coordinates(p->get_point());
-    dir = new spherical_coordinates(p->get_dir());
-    empty = p->get_empty();
-    set_gdType(p->get_gdType());
+  point = new spherical_coordinates(p->get_point());
+  dir = new spherical_coordinates(p->get_dir());
+  empty = p->get_empty();
+  set_gdType(p->get_gdType());
 }
 
 /*!
   Copies the point and dir pointers from \a p.  Also copies the values
   of empty and gdType .
 */
-sphericalGraspDirection::sphericalGraspDirection(const sphericalGraspDirection& p) : GraspDirection()
+sphericalGraspDirection::sphericalGraspDirection(const sphericalGraspDirection &p) : GraspDirection()
 {
-    point = new spherical_coordinates(p.get_point());
-    dir = new spherical_coordinates(p.get_dir());
-    empty = p.get_empty();
-    set_gdType(p.get_gdType());
+  point = new spherical_coordinates(p.get_point());
+  dir = new spherical_coordinates(p.get_dir());
+  empty = p.get_empty();
+  set_gdType(p.get_gdType());
 }
 
 /*!
@@ -373,40 +376,44 @@ sphericalGraspDirection::sphericalGraspDirection(const sphericalGraspDirection& 
 */
 sphericalGraspDirection::~sphericalGraspDirection()
 {
-    delete point;
-    delete dir;
+  delete point;
+  delete dir;
 }
 
 /*!
   Sets the point to the value of \a in .
 */
-void        
+void
 sphericalGraspDirection::set_point(coordinates in)
 {
-    (*point)[0] = in[0];
+  (*point)[0] = in[0];
 
-    while (in[1] > M_PI)
-	in[1]-=M_PI;
-    while (in[1] < M_PI)
-	in[1]+=M_PI;
-    (*point)[1] = in[1];
+  while (in[1] > M_PI) {
+    in[1] -= M_PI;
+  }
+  while (in[1] < M_PI) {
+    in[1] += M_PI;
+  }
+  (*point)[1] = in[1];
 
-    while (in[2] > (2*M_PI))
-	in[2]-=(2*M_PI);
-    while (in[2] < (2*M_PI))
-	in[2]+=(2*M_PI);
-    (*point)[2] = in[2];
+  while (in[2] > (2 * M_PI)) {
+    in[2] -= (2 * M_PI);
+  }
+  while (in[2] < (2 * M_PI)) {
+    in[2] += (2 * M_PI);
+  }
+  (*point)[2] = in[2];
 }
 
 /*!
   Sets the directions to the value of \a in .
 */
-void        
+void
 sphericalGraspDirection::set_dir(coordinates in)
 {
-    (*dir)[0] = in[0];
-    (*dir)[1] = (in[1] > M_PI) ? M_PI : in[1];
-    (*dir)[2] = (in[1] > (2 * M_PI)) ? (2*M_PI) : in[1];
+  (*dir)[0] = in[0];
+  (*dir)[1] = (in[1] > M_PI) ? M_PI : in[1];
+  (*dir)[2] = (in[1] > (2 * M_PI)) ? (2 * M_PI) : in[1];
 
 }
 
