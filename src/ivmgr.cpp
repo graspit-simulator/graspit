@@ -86,10 +86,17 @@
 #include <Inventor/nodes/SoTranslation.h>
 #include <Inventor/nodes/SoText2.h>
 #include <Inventor/nodes/SoFile.h>
+#include <Inventor/nodes/SoVertexShader.h>
+#include <Inventor/nodes/SoFragmentShader.h>
+#include <Inventor/nodes/SoShaderObject.h>
+#include <Inventor/nodes/SoShaderParameter.h>
+#include <Inventor/nodes/SoShaderProgram.h>
+#include <Inventor/nodes/SoDepthBuffer.h>
 #include <Inventor/sensors/SoIdleSensor.h>
 #include <Inventor/sensors/SoNodeSensor.h>
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/Qt/SoQt.h>
+
 
 #include "pointers.dat"
 #include "ivmgr.h"
@@ -1546,6 +1553,111 @@ IVmgr::saveImage(QString filename)
   
   renderRoot->unref();
   delete myRenderer;
+}
+
+/*!
+  Given a filename with an appropriate image format file extension, this
+  will render the current scene to an image file.  It currently uses a white
+  background and performs anti-aliasing by blending the images from 5 slightly
+  different camera angles.  One camera headlight is used for lighting.
+ */
+void
+IVmgr::saveDepthImage(QString filename)
+{
+    SoQtRenderArea *renderArea;
+    SoGLRenderAction *glRend;
+    SoOffscreenRenderer *myRenderer;
+    SoVertexShader *vertexShader;
+    SoFragmentShader *fragmentShader;
+    SoShaderProgram *shaderProgram;
+    SoSeparator *shaderSep;
+    SoDepthBuffer * depthBuffer;
+
+    renderArea = getViewer();
+
+    depthBuffer = new SoDepthBuffer;
+    depthBuffer->function = SoDepthBufferElement::LESS;
+    depthBuffer->test = true;
+    depthBuffer->write = true;
+
+    QString script_path = QString(getenv("GRASPIT")) + QString("/render_scripts");
+
+    vertexShader = new SoVertexShader;
+    vertexShader->sourceProgram.setValue((script_path.toStdString() + "/depth_vert.glsl").c_str());
+
+    fragmentShader = new SoFragmentShader;
+    fragmentShader->sourceProgram.setValue((script_path.toStdString() + "/depth_frag.glsl").c_str());
+
+    shaderProgram = new SoShaderProgram;
+    shaderProgram->shaderObject.set1Value(0, vertexShader);
+    shaderProgram->shaderObject.set1Value(1, fragmentShader);
+
+    shaderSep = new SoSeparator;
+    shaderSep->ref();
+    shaderSep->addChild(depthBuffer);
+    shaderSep->addChild(shaderProgram);
+    shaderSep->addChild(getViewer()->getCamera());
+    shaderSep->addChild(renderArea->getSceneGraph());
+
+    glRend = new SoGLRenderAction(renderArea->getViewportRegion());
+    glRend->setSmoothing(false);
+    glRend->setNumPasses(5);
+    glRend->setTransparencyType(SoGLRenderAction::NONE);
+
+    const SbColor black(255, 255, 255);
+    myRenderer = new SoOffscreenRenderer(glRend);
+    myRenderer->setBackgroundColor(black);
+    myRenderer->setComponents(SoOffscreenRenderer::RGB_TRANSPARENCY);
+
+
+    myRenderer->render(shaderSep);
+
+    unsigned char * data = myRenderer->getBuffer();
+
+    float scale_factor = 1000.0; // output units to meters conversion factor
+
+    int height = myRenderer->getViewportRegion().getWindowSize()[1];
+    int width = myRenderer->getViewportRegion().getWindowSize()[0];
+
+    QImage *img = new QImage(width, height, QImage::Format_RGB32);
+
+    int max_depth = 1.0;
+    int index = 0;
+    size_t i = 0;
+    for(int h = 0; h < height; ++ h)
+    {
+       for(int w = 0; w < width; ++ w)
+       {
+           index = (height-h-1)*width + w;
+
+           float val = 0;
+           for (int c =0; c < 3; c++)
+           {
+               val += data[i]*pow(255, (3-c-1)) ;
+               ++i;
+           }
+           ++i; // extra one because 4 channels...
+
+           val = (1.0 * val) / (1.0 * scale_factor);
+
+           if(val > max_depth)
+           {
+               val = max_depth;
+           }
+
+           int int_val =  255 - ((1.0 * val)/ (1.0 * max_depth ) * 255);
+
+           QRgb value = qRgb(int_val, int_val, int_val);
+           img->setPixel(w, height-h-1, value);
+       }
+    }
+
+    img->save(filename);
+
+    shaderSep->unref();
+    delete glRend;
+    delete myRenderer;
+    delete img;
 }
 
 /*!
