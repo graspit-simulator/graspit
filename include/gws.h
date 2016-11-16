@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the abstract Grasp Wrench Space class and specific GWS classes
  */
 #ifndef GWS_H
@@ -41,93 +41,93 @@ struct coordT;
   class.
 */
 class GWS {
-public:
-  //! Default option for building a GWS on all 6 dimensions
-  static const std::vector<int> ALL_DIMENSIONS;
-protected:
-	//! Consider the effects of gravity on the object
-	bool useGravity;
+  public:
+    //! Default option for building a GWS on all 6 dimensions
+    static const std::vector<int> ALL_DIMENSIONS;
+  protected:
+    //! Consider the effects of gravity on the object
+    bool useGravity;
 
-	//! The direction and magnitude of gravity along each GWS axis
-	vec3 gravDirection;
+    //! The direction and magnitude of gravity along each GWS axis
+    vec3 gravDirection;
 
-	//! Calls QHull to build from an array of pre-specified wrenches
-	int buildHyperplanesFromWrenches(void *wr, int numWrenches, 
-									 std::vector<int> useDimensions);
+    //! Calls QHull to build from an array of pre-specified wrenches
+    int buildHyperplanesFromWrenches(void *wr, int numWrenches,
+                                     std::vector<int> useDimensions);
 
-	//! After the hyperplanes are computed we can look at other metrics
-	void computeHyperplaneMetrics();
+    //! After the hyperplanes are computed we can look at other metrics
+    void computeHyperplaneMetrics();
 
-	//! Deletes the hyperplanes of the currently computed GWS
-	void clearGWS();
+    //! Deletes the hyperplanes of the currently computed GWS
+    void clearGWS();
 
- public:
+  public:
 
-  //! Tells is wether to use gravity, and if yes it's direction and magnitude
-  void setGravity(bool use, vec3 gd=vec3(0,0,0));
+    //! Tells is wether to use gravity, and if yes it's direction and magnitude
+    void setGravity(bool use, vec3 gd = vec3(0, 0, 0));
 
-  //! A pointer to the associated grasp
-  Grasp *grasp;
-  
-  //! number of 6D hyperplanes bounding this GWS
-  int numHyperPlanes;
+    //! A pointer to the associated grasp
+    Grasp *grasp;
 
-  //! 7 x numHyperPlanes matrix of plane coefficients
-  double **hyperPlanes;
+    //! number of 6D hyperplanes bounding this GWS
+    int numHyperPlanes;
 
-  //! Keeps track of the dimensions used to build this gws
-  std::vector<int> mUsedDimensions;
-  
-  //! Surface area of 6D hull (returned by qhull)
-  double hullArea;
-  
-  //! Volume of 6D hull (returned by qhull)
-  double hullVolume;
+    //! 7 x numHyperPlanes matrix of plane coefficients
+    double **hyperPlanes;
 
-  //! If GWS contains the origin, the grasp has force closure
-  bool forceClosure;
+    //! Keeps track of the dimensions used to build this gws
+    std::vector<int> mUsedDimensions;
 
-  //! Number of reference to this GWS.  When it is 0, GWS may be deleted
-  int refCount;
+    //! Surface area of 6D hull (returned by qhull)
+    double hullArea;
 
-  //! Initializes grasp to \a g.  Zeros hyperplanes and refCount.
-  GWS(Grasp *g) : useGravity(false), grasp(g),numHyperPlanes(0),hyperPlanes(NULL),refCount(0) {}
+    //! Volume of 6D hull (returned by qhull)
+    double hullVolume;
 
-  virtual ~GWS();
+    //! If GWS contains the origin, the grasp has force closure
+    bool forceClosure;
 
-  /*! Returns a pointer to the grasp associated with this GWS */
-  Grasp *getGrasp() const {return grasp;}
+    //! Number of reference to this GWS.  When it is 0, GWS may be deleted
+    int refCount;
 
-  /*! Adds one reference to this GWS */
-  void ref() {refCount++;}
+    //! Initializes grasp to \a g.  Zeros hyperplanes and refCount.
+    GWS(Grasp *g) : useGravity(false), grasp(g), numHyperPlanes(0), hyperPlanes(NULL), refCount(0) {}
 
-  /*! Removes one reference to this GWS */
-  void unref() {refCount--;}
+    virtual ~GWS();
 
-  /*! Returns the current number of references to this GWS */
-  int getRefCount() {return refCount;}
+    /*! Returns a pointer to the grasp associated with this GWS */
+    Grasp *getGrasp() const {return grasp;}
 
-  /*! Returns whether this grasp has force closure. */
-  bool isForceClosure() {return forceClosure;}
+    /*! Adds one reference to this GWS */
+    void ref() {refCount++;}
 
-  /*! Returns whether the 6D GWS has non-zero volume. */
-  bool hasPositiveVolume(){ if (hullVolume>0) return true; return false;}
+    /*! Removes one reference to this GWS */
+    void unref() {refCount--;}
 
-  /*! Returns a string that is the name of the type of GWS. */
-  virtual const char *getType() =0;
+    /*! Returns the current number of references to this GWS */
+    int getRefCount() {return refCount;}
 
-  /*! Builds the GWS from the contact wrenches. */
-  virtual int build(std::vector<int> useDimensions = ALL_DIMENSIONS) = 0;
+    /*! Returns whether this grasp has force closure. */
+    bool isForceClosure() {return forceClosure;}
 
-  //! Creates a 3D projection of the 6D wrench space
-  virtual int projectTo3D(double *projCoords,std::set<int> fixedCoordSet,
-			  std::vector<position> &hullCoords,
-			  std::vector<int> &hullIndices);
+    /*! Returns whether the 6D GWS has non-zero volume. */
+    bool hasPositiveVolume() { if (hullVolume > 0) { return true; } return false;}
 
-  //! Array of strings of possible GWS types
-  static const char *TYPE_LIST[];
+    /*! Returns a string that is the name of the type of GWS. */
+    virtual const char *getType() = 0;
 
-  static GWS *createInstance(const char *type,Grasp *g);
+    /*! Builds the GWS from the contact wrenches. */
+    virtual int build(std::vector<int> useDimensions = ALL_DIMENSIONS) = 0;
+
+    //! Creates a 3D projection of the 6D wrench space
+    virtual int projectTo3D(double *projCoords, std::set<int> fixedCoordSet,
+                            std::vector<position> &hullCoords,
+                            std::vector<int> &hullIndices);
+
+    //! Array of strings of possible GWS types
+    static const char *TYPE_LIST[];
+
+    static GWS *createInstance(const char *type, Grasp *g);
 };
 
 //! A class to build an L1 GWS
@@ -137,22 +137,22 @@ protected:
 */
 class L1GWS : public GWS {
 
-  //! Name of this type of GWS
-  static const char *type;
+    //! Name of this type of GWS
+    static const char *type;
 
- public:
+  public:
 
-  /*! Stub */
-  L1GWS(Grasp *g) : GWS(g) {}
+    /*! Stub */
+    L1GWS(Grasp *g) : GWS(g) {}
 
-  //! Build the GWS using individual contact wrenches
-  int build(std::vector<int> useDimensions = ALL_DIMENSIONS);
+    //! Build the GWS using individual contact wrenches
+    int build(std::vector<int> useDimensions = ALL_DIMENSIONS);
 
-  /*! Returns the name of this type of GWS */
-  static const char *getClassType() {return type;}
+    /*! Returns the name of this type of GWS */
+    static const char *getClassType() {return type;}
 
-  /*! Returns the name of this type of GWS */
-  virtual const char *getType() {return type;}
+    /*! Returns the name of this type of GWS */
+    virtual const char *getType() {return type;}
 };
 
 //! A class to build an L-Infinity GWS
@@ -162,23 +162,23 @@ class L1GWS : public GWS {
 */
 class LInfGWS : public GWS {
 
-  //! Name of this type of GWS
-  static const char *type;
+    //! Name of this type of GWS
+    static const char *type;
 
- public:
+  public:
 
-  /*! Stub */
-  LInfGWS(Grasp *g) : GWS(g) {}
-  //  virtual ~LInfGWS() {}
+    /*! Stub */
+    LInfGWS(Grasp *g) : GWS(g) {}
+    //  virtual ~LInfGWS() {}
 
-  //! Build the GWS using the Minkowski sum of all contact wrenches
-  int build(std::vector<int> useDimensions = ALL_DIMENSIONS);
+    //! Build the GWS using the Minkowski sum of all contact wrenches
+    int build(std::vector<int> useDimensions = ALL_DIMENSIONS);
 
-  /*! Returns the name of this type of GWS */
-  static const char *getClassType() {return type;}
+    /*! Returns the name of this type of GWS */
+    static const char *getClassType() {return type;}
 
-  /*! Returns the name of this type of GWS */
-  virtual const char *getType() {return type;}
+    /*! Returns the name of this type of GWS */
+    virtual const char *getType() {return type;}
 
 };
 

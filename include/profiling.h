@@ -27,81 +27,81 @@
 #define _profiling_h_
 
 /*! \file
-	Implements a number of tools for simple, but easy to use and efficient 
-	code profiling. It should add a tiny overhead to the caller code, so
-	it can be called lots of times.
+  Implements a number of tools for simple, but easy to use and efficient
+  code profiling. It should add a tiny overhead to the caller code, so
+  it can be called lots of times.
 
-	Usage example:
-	----------------------------
-	#define PROF_ENABLED
-	#include "profiling.h"
+  Usage example:
+  ----------------------------
+  #define PROF_ENABLED
+  #include "profiling.h"
 
-	PROF_DECLARE(TOTAL_TIMER);
-	PROF_DECLARE(FOO_TIMER);
+  PROF_DECLARE(TOTAL_TIMER);
+  PROF_DECLARE(FOO_TIMER);
 
-	void foo() {
-		PROF_TIMER_FUNC(FOO_TIMER);
-		for (int i=0; i<1000; i++) {}
-	}
+  void foo() {
+    PROF_TIMER_FUNC(FOO_TIMER);
+    for (int i=0; i<1000; i++) {}
+  }
 
-	int main(int, char**) {
+  int main(int, char**) {
 
-		PROF_START_TIMER(TOTAL_TIMER);
-		for (int i=0; i<100000; i++) {
-			for (int j=0; j<2000; j++) {}
-			foo();
-		}
-		PROF_STOP_TIMER(TOTAL_TIMER);
+    PROF_START_TIMER(TOTAL_TIMER);
+    for (int i=0; i<100000; i++) {
+      for (int j=0; j<2000; j++) {}
+      foo();
+    }
+    PROF_STOP_TIMER(TOTAL_TIMER);
 
-		//Total time in program
-		PROF_PRINT(TOTAL_TIMER);
-		//Number of calls to and time spent in foo() function
-		PROF_PRINT(FOO_TIMER);
+    //Total time in program
+    PROF_PRINT(TOTAL_TIMER);
+    //Number of calls to and time spent in foo() function
+    PROF_PRINT(FOO_TIMER);
 
-		return 0;
-	}
-	-------------------------------
+    return 0;
+  }
+  -------------------------------
 
-	Usage "manual":
+  Usage "manual":
 
-	The main concept is a "timer", of which you can define as many as you 
-	want. When you define a timer, you associate a name with it, and then 
-	you can start it, stop it, print it, or have it time a particular 
-	function. Any timer will also double as a counter, and you can reset or 
-	increment its count whenever you want.
+  The main concept is a "timer", of which you can define as many as you
+  want. When you define a timer, you associate a name with it, and then
+  you can start it, stop it, print it, or have it time a particular
+  function. Any timer will also double as a counter, and you can reset or
+  increment its count whenever you want.
 
-	<ul>
-	<li> #include "profiling.h" in any source file. 
-	<li> to enable the profiler, also #define PROF_ENABLED just before 
-	the include directive. To disable profiling, just remove the PROF_ENABLED 
-	definition and you can leave all the other profiler calls in, they will be 
-	pre-processed out.
-	<li> it is preferable to include your profiling definitions in source, not
-	header files, so that the definition PROF_ENABLED doesn't propagate to 
-	unexpected places.
-	</ul>
-	To declare a new timer, use:
+  <ul>
+  <li> #include "profiling.h" in any source file.
+  <li> to enable the profiler, also #define PROF_ENABLED just before
+  the include directive. To disable profiling, just remove the PROF_ENABLED
+  definition and you can leave all the other profiler calls in, they will be
+  pre-processed out.
+  <li> it is preferable to include your profiling definitions in source, not
+  header files, so that the definition PROF_ENABLED doesn't propagate to
+  unexpected places.
+  </ul>
+  To declare a new timer, use:
 
-	PROF_DECLARE(my_timer_name);
+  PROF_DECLARE(my_timer_name);
 
-	This can be placed in any source file in your project. Just be sure to place
-	timer declarations at the global scope (not inside of any functions). Don't
-	worry about namespace pollution, everything profiler-related ends up in its
-	own namespace behind the scenes.
+  This can be placed in any source file in your project. Just be sure to place
+  timer declarations at the global scope (not inside of any functions). Don't
+  worry about namespace pollution, everything profiler-related ends up in its
+  own namespace behind the scenes.
 
-	The name then becomes the unique identifier that you can refer to a timer
-	through. The main feature of this framework is that you can use literal 
-	names, thus making it easy to use. However, behind the scenes they are 
-	converted into static ints and add no overhead when they need to be 
-	matched against timers. On the other hand, using any undeclared timer is 
-	caught at compile-time.
+  The name then becomes the unique identifier that you can refer to a timer
+  through. The main feature of this framework is that you can use literal
+  names, thus making it easy to use. However, behind the scenes they are
+  converted into static ints and add no overhead when they need to be
+  matched against timers. On the other hand, using any undeclared timer is
+  caught at compile-time.
 
-	To use the same timer in a different file than it was declared in, place 
-	an extern declaration in the file you use it in:
+  To use the same timer in a different file than it was declared in, place
+  an extern declaration in the file you use it in:
 
-	PROF_EXTERN(my_timer_name);
+  PROF_EXTERN(my_timer_name);
 
-	See below macros for what you can do with a timer.
+  See below macros for what you can do with a timer.
 */
 
 #include <iostream>
@@ -110,14 +110,14 @@
 #include "assert.h"
 
 namespace Profiling {
-	class Profiler;
-	inline Profiler &getProfiler();
+class Profiler;
+inline Profiler &getProfiler();
 }
 
 #ifdef PROF_ENABLED
 
 //declarations
-//! Declares a new timer. 
+//! Declares a new timer.
 #define PROF_DECLARE(STR) namespace Profiling{extern const int STR = getProfiler().getNewIndex(#STR);}
 //! Allows the usage of a timer which was declared (with PROF_DECLARE) in a different file
 #define PROF_EXTERN(STR) namespace Profiling{extern const int STR;}
@@ -166,117 +166,117 @@ namespace Profiling {
 
 namespace Profiling {
 
-class ProfileInstance 
+class ProfileInstance
 {
-private:
-  int mCount;
-  bool mRunning;
-  std::string mName;
-  //! The units here might be different depending on the operating system
-  /*! use getTotalTimeMicroseconds() to get total timer time in microseconds. */
-  PROF_TIME_UNIT mStartTime;
-  PROF_DURATION_UNIT mElapsedTime;
-public:
-  ProfileInstance();
-  void setName(const char *name){mName = name;}
+  private:
+    int mCount;
+    bool mRunning;
+    std::string mName;
+    //! The units here might be different depending on the operating system
+    /*! use getTotalTimeMicroseconds() to get total timer time in microseconds. */
+    PROF_TIME_UNIT mStartTime;
+    PROF_DURATION_UNIT mElapsedTime;
+  public:
+    ProfileInstance();
+    void setName(const char *name) {mName = name;}
 
-  void count(){mCount++;}
-  int getCount(){return mCount;}
-  void reset()
-  {
-    mCount=0;
-    PROF_RESET_DURATION(mElapsedTime);
-    if (mRunning) 
+    void count() {mCount++;}
+    int getCount() {return mCount;}
+    void reset()
     {
-      PROF_GET_TIME(mStartTime);
+      mCount = 0;
+      PROF_RESET_DURATION(mElapsedTime);
+      if (mRunning)
+      {
+        PROF_GET_TIME(mStartTime);
+      }
     }
-  }
-  void startTimer()
-  {
-    if (!mRunning) 
+    void startTimer()
     {
-      PROF_GET_TIME(mStartTime);
-      mRunning = true;
-    } 
-    else 
-    {
-      std::cerr << "Timer " << mName << " already running.\n";
+      if (!mRunning)
+      {
+        PROF_GET_TIME(mStartTime);
+        mRunning = true;
+      }
+      else
+      {
+        std::cerr << "Timer " << mName << " already running.\n";
+      }
     }
-  }
-  void stopTimer()
-  {
-    if (mRunning) 
+    void stopTimer()
     {
-      PROF_TIME_UNIT currentTime;
-      PROF_GET_TIME(currentTime);
-      PROF_ADD_DURATION( mElapsedTime, mStartTime, currentTime);
-      mRunning = false;
-    } 
-    else 
-    {
-      std::cerr << "Timer " << mName << " is not running.\n";
+      if (mRunning)
+      {
+        PROF_TIME_UNIT currentTime;
+        PROF_GET_TIME(currentTime);
+        PROF_ADD_DURATION(mElapsedTime, mStartTime, currentTime);
+        mRunning = false;
+      }
+      else
+      {
+        std::cerr << "Timer " << mName << " is not running.\n";
+      }
     }
-  }
-  /*! This returns the elapsed time. It does whatever conversion is necessary,
-    depending on the OS, to convert to microseconds. If the timer is running
-    at the moment when this is called, is also adds the currently ellapsed 
-    time.
-    
-    This call is slower than start or stop timer, so don't abuse it.
-  */
-  double getTotalTimeMicroseconds();
-  void print();
+    /*! This returns the elapsed time. It does whatever conversion is necessary,
+      depending on the OS, to convert to microseconds. If the timer is running
+      at the moment when this is called, is also adds the currently ellapsed
+      time.
+
+      This call is slower than start or stop timer, so don't abuse it.
+    */
+    double getTotalTimeMicroseconds();
+    void print();
 };
 
-class Profiler 
+class Profiler
 {
-private:
-  int mNextIndex;
-  int mSize;
-  std::vector<ProfileInstance> mPI;
+  private:
+    int mNextIndex;
+    int mSize;
+    std::vector<ProfileInstance> mPI;
 #ifdef WIN32
-  UINT64 COUNTS_PER_SEC;
+    UINT64 COUNTS_PER_SEC;
 #endif
-public:
-  Profiler();
-  ~Profiler();
-  
-  void resize(int size);
-  int getNewIndex(const char *name);
+  public:
+    Profiler();
+    ~Profiler();
 
-  void count(int index){mPI[index].count();}
-  int getCount(int index){return mPI[index].getCount();}
-  void reset(int index){mPI[index].reset();}
-  void startTimer(int index){mPI[index].startTimer();}
-  void stopTimer(int index){mPI[index].stopTimer();}
-  void print(int index){mPI[index].print();}
-  
-  void resetAll();
-  void printAll();
+    void resize(int size);
+    int getNewIndex(const char *name);
+
+    void count(int index) {mPI[index].count();}
+    int getCount(int index) {return mPI[index].getCount();}
+    void reset(int index) {mPI[index].reset();}
+    void startTimer(int index) {mPI[index].startTimer();}
+    void stopTimer(int index) {mPI[index].stopTimer();}
+    void print(int index) {mPI[index].print();}
+
+    void resetAll();
+    void printAll();
 #ifdef WIN32
-  UINT64 getCountsPerSec(){return COUNTS_PER_SEC;}
+    UINT64 getCountsPerSec() {return COUNTS_PER_SEC;}
 #endif
 };
 
-Profiler& getProfiler()
+Profiler &getProfiler()
 {
   //the one and only instance of the profiler
   static Profiler profInstance;
   return profInstance;
- }
+}
 
-class FunctionTimer 
+class FunctionTimer
 {
-private:
-  Profiler &mProfiler;
-  int mIndex;
-public:
- FunctionTimer(Profiler &prof, int index) : mProfiler(prof), mIndex(index) 
- {
-   mProfiler.count(mIndex);
-   mProfiler.startTimer(mIndex);
- }
-  ~FunctionTimer(){mProfiler.stopTimer(mIndex);}
+  private:
+    Profiler &mProfiler;
+    int mIndex;
+  public:
+    FunctionTimer(Profiler &prof, int index) : mProfiler(prof), mIndex(index)
+    {
+      mProfiler.count(mIndex);
+      mProfiler.startTimer(mIndex);
+    }
+    ~FunctionTimer() {mProfiler.stopTimer(mIndex);}
 };
 
 }

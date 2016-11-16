@@ -32,59 +32,59 @@
 #include "mytools.h"
 /*! Very simple class, only holds 3 public vertices as positions */
 class Triangle {
-public:
-	position v1,v2,v3;
+  public:
+    position v1, v2, v3;
 
-	Triangle(const position &nv1, const position &nv2, const position &nv3) : v1(nv1), v2(nv2), v3(nv3) {}
-	Triangle(const Triangle &t) : v1(t.v1), v2(t.v2), v3(t.v3) {}
-	inline void applyTransform(const transf &t);
-	inline double area() const;
-	inline position centroid() const;
-	inline vec3 normal() const;
+    Triangle(const position &nv1, const position &nv2, const position &nv3) : v1(nv1), v2(nv2), v3(nv3) {}
+    Triangle(const Triangle &t) : v1(t.v1), v2(t.v2), v3(t.v3) {}
+    inline void applyTransform(const transf &t);
+    inline double area() const;
+    inline position centroid() const;
+    inline vec3 normal() const;
 
-	friend INLINE_RELEASE bool triangleIntersection(const Triangle &t1, const Triangle &t2);
+    friend INLINE_RELEASE bool triangleIntersection(const Triangle &t1, const Triangle &t2);
 };
 
-INLINE_RELEASE bool 
+INLINE_RELEASE bool
 triangleIntersection(const Triangle &t1, const Triangle &t2);
 
-INLINE_RELEASE position 
+INLINE_RELEASE position
 closestPtTriangle(const Triangle &t, const position &p);
 
 //! Returns the distance between the triangles as well as the two closest points on them
-INLINE_RELEASE double 
+INLINE_RELEASE double
 triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
- 						   position &p1, position &p2);
+                           position &p1, position &p2);
 
 //! Returns all the points on the two triangles separated by less than the threshold
 INLINE_RELEASE int
-triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq, 
-						std::vector< std::pair<position, position> >* contactPoints);
+triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
+                        std::vector< std::pair<position, position> > *contactPoints);
 
-double 
+double
 Triangle::area() const
 {
-	return  0.5 * ((v2 - v1) * (v3 - v1)).len();
+  return  0.5 * ((v2 - v1) * (v3 - v1)).len();
 }
 
-vec3 
+vec3
 Triangle::normal() const
 {
-	return normalise( (v2 - v1) * (v3 - v1) );
+  return normalise((v2 - v1) * (v3 - v1));
 }
 
-position 
+position
 Triangle::centroid() const
 {
-	return (1.0 / 3.0) * (v1 + v2 + v3);
+  return (1.0 / 3.0) * (v1 + v2 + v3);
 }
 
 void
 Triangle::applyTransform(const transf &t)
 {
-	v1 = v1*t;
-	v2 = v2*t;
-	v3 = v3*t;
+  v1 = v1 * t;
+  v2 = v2 * t;
+  v3 = v3 * t;
 }
 
 #ifdef GRASPIT_RELEASE

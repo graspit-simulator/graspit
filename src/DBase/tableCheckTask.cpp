@@ -36,8 +36,8 @@
 #include "DBPlanner/db_manager.h"
 #include "graspit_db_grasp.h"
 
-TableCheckTask::TableCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-			       db_planner::TaskRecord rec) : PreGraspCheckTask (disp, mgr, rec)
+TableCheckTask::TableCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                               db_planner::TaskRecord rec) : PreGraspCheckTask(disp, mgr, rec)
 {
   //load the table
   World *world = graspitCore->getWorld();
@@ -59,7 +59,7 @@ TableCheckTask::~TableCheckTask()
 
 void TableCheckTask::start()
 {
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   //get the details of the planning task itself
   if (!mDBMgr->GetPlanningTaskRecord(mPlanningTask.taskId, &mPlanningTask)) {
@@ -69,26 +69,26 @@ void TableCheckTask::start()
   }
 
   loadHand();
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   loadObject();
-  if (mStatus == FAILED) return;
+  if (mStatus == FAILED) { return; }
 
   //place the table in the right position
   //start way under the object
-  mTable->setTran( transf( Quaternion::IDENTITY, vec3(0.0, 0.0, -200.0) ) );
+  mTable->setTran(transf(Quaternion::IDENTITY, vec3(0.0, 0.0, -200.0)));
   //and move up until it touches the object
-  transf tr( Quaternion::IDENTITY, vec3(0.0, 0.0, 100.0) );
-  
+  transf tr(Quaternion::IDENTITY, vec3(0.0, 0.0, 100.0));
+
   World *world = graspitCore->getWorld();
   world->toggleCollisions(false, mHand, mTable);
-  mTable->moveTo( tr, 5.0, M_PI/36.0 );
+  mTable->moveTo(tr, 5.0, M_PI / 36.0);
   world->toggleCollisions(true, mHand, mTable);
   DBGA("Table z location: " << mTable->getTran().translation().z());
 
   //load all the grasps
-  std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
+  std::vector<db_planner::Grasp *> graspList;
+  if (!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)) {
     DBGA("Load grasps failed");
     mStatus = FAILED;
     emptyGraspList(graspList);
@@ -96,8 +96,8 @@ void TableCheckTask::start()
   }
 
   bool success = true;
-  std::vector<db_planner::Grasp*>::iterator it;
-  for (it=graspList.begin(); it!=graspList.end(); it++) {
+  std::vector<db_planner::Grasp *>::iterator it;
+  for (it = graspList.begin(); it != graspList.end(); it++) {
     if (!checkSetGrasp(*it)) {
       success = false;
       break;
@@ -105,8 +105,8 @@ void TableCheckTask::start()
   }
 
   emptyGraspList(graspList);
-  if (success) mStatus = DONE;
-  else mStatus = FAILED;
+  if (success) { mStatus = DONE; }
+  else { mStatus = FAILED; }
 }
 
 bool TableCheckTask::checkSetGrasp(db_planner::Grasp *grasp)
@@ -117,16 +117,16 @@ bool TableCheckTask::checkSetGrasp(db_planner::Grasp *grasp)
     DBGA("Failed to mark table clearance in database");
     return false;
   }
-  
+
   DBGA("Saved clearance: " << distance);
-  return true;				
+  return true;
 }
 
 double TableCheckTask::getTableClearance(db_planner::Grasp *grasp)
 {
   //place the hand in position
-  GraspPlanningState *graspState = static_cast<GraspitDBGrasp*>(grasp)->getFinalGraspPlanningState();
-  graspState->execute();  
+  GraspPlanningState *graspState = static_cast<GraspitDBGrasp *>(grasp)->getFinalGraspPlanningState();
+  graspState->execute();
 
   //check distance for grasp
   World *world = graspitCore->getWorld();

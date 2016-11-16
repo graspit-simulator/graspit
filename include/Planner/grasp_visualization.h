@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_visualization.h,v 1.2 2009/03/25 22:10:24 cmatei Exp $
 //
@@ -58,42 +58,42 @@
 */
 class grasp_representation
 {
-  //! Inventor root node where this representation will be added to
-  SoSeparator *parentSep;
+    //! Inventor root node where this representation will be added to
+    SoSeparator *parentSep;
 
-  //! Root node of this representation
-  SoSeparator *top;
+    //! Root node of this representation
+    SoSeparator *top;
 
-  //! Root of sub-graph containing sphere and palm arrow
-  SoSeparator *sep;
+    //! Root of sub-graph containing sphere and palm arrow
+    SoSeparator *sep;
 
-  //! Root of sub-graph containing thumb arrow
-  SoSeparator *thSep;
-  
-  //! Material for the representation
-  SoMaterial  *material;
-  
-  //! The position and orientation of the sphere and approach vecotr
-  SoTransform *tranArrowSphere;
-  
-  //! A pointer to the long approach arrow
-  SoArrow     *arrow;
+    //! Root of sub-graph containing thumb arrow
+    SoSeparator *thSep;
 
-  //! A pointer to the palm position/quality indicator sphere
-  SoSphere    *sphere;
-    
-  //! The rotation of the thumb arrow
-  SoTransform *thRot;
+    //! Material for the representation
+    SoMaterial  *material;
 
-  //! A pointer to the short thumb arrow
-  SoArrow     *thArrow;
+    //! The position and orientation of the sphere and approach vecotr
+    SoTransform *tranArrowSphere;
 
-  //! Not used right now.
-  bool visOn;
+    //! A pointer to the long approach arrow
+    SoArrow     *arrow;
 
- public:
-    
-    grasp_representation(SbMatrix, SbMatrix, SoSeparator*);
+    //! A pointer to the palm position/quality indicator sphere
+    SoSphere    *sphere;
+
+    //! The rotation of the thumb arrow
+    SoTransform *thRot;
+
+    //! A pointer to the short thumb arrow
+    SoArrow     *thArrow;
+
+    //! Not used right now.
+    bool visOn;
+
+  public:
+
+    grasp_representation(SbMatrix, SbMatrix, SoSeparator *);
     ~grasp_representation();
 
     void changeColor(double, double, double);

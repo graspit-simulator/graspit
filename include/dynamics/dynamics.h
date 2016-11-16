@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: dynamics.h,v 1.7 2009/03/30 14:59:55 cmatei Exp $
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Prototypes for moveBodies and iterateDynamics.
   This is the heart of the dynamics engine, where all computations are performed.
   The design is fairly old and had not been update to an object-oriented more
@@ -39,19 +39,19 @@ class Robot;
 #define ERP 0.05
 
 typedef struct StructDynamicParameters {
-	double timeStep;
-	bool useContactEps;
-	double gravityMultiplier;
+  double timeStep;
+  bool useContactEps;
+  double gravityMultiplier;
 } DynamicParameters;
 
 //! Moves all dynamic bodies for one time step
 int
-moveBodies(int numBodies,std::vector<DynamicBody *> bodyVec,double h);
+moveBodies(int numBodies, std::vector<DynamicBody *> bodyVec, double h);
 
 //! Computes the new velocites of all bodies, based on contact and joint constraints
 int
 iterateDynamics(std::vector<Robot *> robotVec,
-		std::vector<DynamicBody *> bodyVec,
-		DynamicParameters *dp);
+                std::vector<DynamicBody *> bodyVec,
+                DynamicParameters *dp);
 
 

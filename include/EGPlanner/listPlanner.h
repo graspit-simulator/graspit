@@ -33,56 +33,56 @@
 class GraspPlanningState;
 
 /*! The List Planner simply processes a list of grasps, computes the quality for
-	each of them and then sorts the results. The list of grasps can be either
-	passed in or computed on the spot by inherited versions of this class.
+  each of them and then sorts the results. The list of grasps can be either
+  passed in or computed on the spot by inherited versions of this class.
 
-	Depending on the EnergyFunction used, the incoming list can be of grasps or
-	pre-grasps.
+  Depending on the EnergyFunction used, the incoming list can be of grasps or
+  pre-grasps.
 
-	The original Primitive Planner can be re-cast as one of these. I am hoping to
-	do that at some point. 
+  The original Primitive Planner can be re-cast as one of these. I am hoping to
+  do that at some point.
 */
 class ListPlanner : public EGPlanner
 {
-protected:
-	/*! The list of grasps to be tried by this planner. All HandObjectStates are deleted
-		upon destruction of the planner */
-	std::list<GraspPlanningState*> mInputList;
+  protected:
+    /*! The list of grasps to be tried by this planner. All HandObjectStates are deleted
+      upon destruction of the planner */
+    std::list<GraspPlanningState *> mInputList;
 
-	//! The current position in the input list; shows the next grasp to be tried
-	std::list<GraspPlanningState*>::iterator mPlanningIterator;
+    //! The current position in the input list; shows the next grasp to be tried
+    std::list<GraspPlanningState *>::iterator mPlanningIterator;
 
-	//! Also resets the planning iterator
-	virtual void resetParameters();
+    //! Also resets the planning iterator
+    virtual void resetParameters();
 
-	//! The main planning function
-	virtual void mainLoop();
+    //! The main planning function
+    virtual void mainLoop();
 
-	//! Pulls the state at the given index from the input list
-	GraspPlanningState *getState(int index);
-public:
-	ListPlanner(Hand *h);
-	~ListPlanner();
-	virtual PlannerType getType(){return PLANNER_LIST;}
+    //! Pulls the state at the given index from the input list
+    GraspPlanningState *getState(int index);
+  public:
+    ListPlanner(Hand *h);
+    ~ListPlanner();
+    virtual PlannerType getType() {return PLANNER_LIST;}
 
-	//! True as long as there is something to test in the input list
-	virtual bool initialized(){return !mInputList.empty();}
+    //! True as long as there is something to test in the input list
+    virtual bool initialized() {return !mInputList.empty();}
 
-	/*! Sets the list of input grasps to test. This class will take ownership of the list
-		and delete all the grasps inside in its own destructor */
-	void setInput(std::list<GraspPlanningState*> input);
+    /*! Sets the list of input grasps to test. This class will take ownership of the list
+      and delete all the grasps inside in its own destructor */
+    void setInput(std::list<GraspPlanningState *> input);
 
-	//! Shows or hides visual markers of all input states
-	void showVisualMarkers(bool show);
+    //! Shows or hides visual markers of all input states
+    void showVisualMarkers(bool show);
 
-	//! Tests a the pre-grasp at the given index in the current input list
-	void testState(int index);
+    //! Tests a the pre-grasp at the given index in the current input list
+    void testState(int index);
 
-	//! Shows the unprocessed state at the given index in the input list
-	void showState(int index);
+    //! Shows the unprocessed state at the given index in the input list
+    void showState(int index);
 
-	//! A hack; shows the state and also does approachToContact as the SearchEnergy would
-	void prepareState(int index);
+    //! A hack; shows the state and also does approachToContact as the SearchEnergy would
+    void prepareState(int index);
 };
 
 #endif

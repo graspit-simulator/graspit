@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: SoArrow.cpp,v 1.2 2009/03/25 22:10:03 cmatei Exp $
 //
@@ -53,8 +53,8 @@ SO_NODE_SOURCE(SoArrow);
 void
 SoArrow::initClass()
 {
-   // Initialize type id variables
-   SO_NODE_INIT_CLASS(SoArrow, SoComplexShape, "SoComplexShape");
+  // Initialize type id variables
+  SO_NODE_INIT_CLASS(SoArrow, SoComplexShape, "SoComplexShape");
 }
 
 /*!
@@ -65,23 +65,23 @@ SoArrow::SoArrow()
 
   children = new SoChildList(this);
 
-   SO_NODE_CONSTRUCTOR(SoArrow);
-   SO_NODE_ADD_FIELD(arrowHeads,(END));
-   SO_NODE_ADD_FIELD(cylRadius, (0.5));
-   SO_NODE_ADD_FIELD(height,    (4.0));
-   SO_NODE_ADD_FIELD(coneHeight,(2.0));
-   SO_NODE_ADD_FIELD(coneRadius,(1.0));
+  SO_NODE_CONSTRUCTOR(SoArrow);
+  SO_NODE_ADD_FIELD(arrowHeads, (END));
+  SO_NODE_ADD_FIELD(cylRadius, (0.5));
+  SO_NODE_ADD_FIELD(height, (4.0));
+  SO_NODE_ADD_FIELD(coneHeight, (2.0));
+  SO_NODE_ADD_FIELD(coneRadius, (1.0));
 
-   // Set up static values and strings for the "arrowHeads"
-   // enumerated type field.
-   SO_NODE_DEFINE_ENUM_VALUE(Part, NONE);
-   SO_NODE_DEFINE_ENUM_VALUE(Part, BEGIN);
-   SO_NODE_DEFINE_ENUM_VALUE(Part, END);
-   SO_NODE_DEFINE_ENUM_VALUE(Part, BOTH);
+  // Set up static values and strings for the "arrowHeads"
+  // enumerated type field.
+  SO_NODE_DEFINE_ENUM_VALUE(Part, NONE);
+  SO_NODE_DEFINE_ENUM_VALUE(Part, BEGIN);
+  SO_NODE_DEFINE_ENUM_VALUE(Part, END);
+  SO_NODE_DEFINE_ENUM_VALUE(Part, BOTH);
 
-   // Copy static information for "arrowHeads" enumerated type field
-   // into this instance. 
-   SO_NODE_SET_SF_ENUM_TYPE(arrowHeads, Part);
+  // Copy static information for "arrowHeads" enumerated type field
+  // into this instance.
+  SO_NODE_SET_SF_ENUM_TYPE(arrowHeads, Part);
 }
 
 /*!
@@ -99,9 +99,9 @@ SoArrow::~SoArrow()
 void
 SoArrow::addPart(Part part)
 {
-   arrowHeads.setValue(arrowHeads.getValue() | part);
+  arrowHeads.setValue(arrowHeads.getValue() | part);
 
-  if (HAS_PART(arrowHeads.getValue(),SoArrow::BEGIN)) {
+  if (HAS_PART(arrowHeads.getValue(), SoArrow::BEGIN)) {
     calEngine->c.setValue(1);
     beginSw->whichChild.setValue(SO_SWITCH_ALL);
   }
@@ -110,7 +110,7 @@ SoArrow::addPart(Part part)
     beginSw->whichChild.setValue(SO_SWITCH_NONE);
   }
 
-  if (HAS_PART(arrowHeads.getValue(),SoArrow::END)) {
+  if (HAS_PART(arrowHeads.getValue(), SoArrow::END)) {
     calEngine->d.setValue(1);
     endSw->whichChild.setValue(SO_SWITCH_ALL);
   }
@@ -127,9 +127,9 @@ SoArrow::addPart(Part part)
 void
 SoArrow::removePart(Part part)
 {
-   arrowHeads.setValue(arrowHeads.getValue() & ~part);
+  arrowHeads.setValue(arrowHeads.getValue() & ~part);
 
-  if (HAS_PART(arrowHeads.getValue(),SoArrow::BEGIN)) {
+  if (HAS_PART(arrowHeads.getValue(), SoArrow::BEGIN)) {
     calEngine->c.setValue(1);
     beginSw->whichChild.setValue(SO_SWITCH_ALL);
   }
@@ -138,7 +138,7 @@ SoArrow::removePart(Part part)
     beginSw->whichChild.setValue(SO_SWITCH_NONE);
   }
 
-  if (HAS_PART(arrowHeads.getValue(),SoArrow::END)) {
+  if (HAS_PART(arrowHeads.getValue(), SoArrow::END)) {
     calEngine->d.setValue(1);
     endSw->whichChild.setValue(SO_SWITCH_ALL);
   }
@@ -155,11 +155,11 @@ SoArrow::removePart(Part part)
 SbBool
 SoArrow::hasPart(Part part) const
 {
-   return HAS_PART(arrowHeads.getValue(), part);
+  return HAS_PART(arrowHeads.getValue(), part);
 }
 
 
-/*! 
+/*!
   This is called once to generate the child nodes that make up this
   complex shape.  The child nodes consist of a cylinder, transforms, and
   cones.  A calculator node caluculates the height of the cylinder from
@@ -170,7 +170,7 @@ SoArrow::generateChildren()
 {
   // This should be called once, that means children
   // doesn not have any children yet.
-  assert (children->getLength() == 0); 
+  assert(children->getLength() == 0);
 
   // Construct the begin arrowhead
   SoCone *cne = new SoCone;
@@ -178,8 +178,8 @@ SoArrow::generateChildren()
   cne->bottomRadius.connectFrom(&coneRadius);
 
   SoTransform *beginTran = new SoTransform;
-  beginTran->rotation.setValue(SbVec3f(1,0,0),(float)M_PI);
-  
+  beginTran->rotation.setValue(SbVec3f(1, 0, 0), (float)M_PI);
+
   SoSeparator *beginSep = new SoSeparator;
   beginSep->addChild(beginTran);
   beginSep->addChild(cne);
@@ -200,7 +200,7 @@ SoArrow::generateChildren()
   calEngine->a.connectFrom(&height);
   calEngine->b.connectFrom(&coneHeight);
 
-  if (HAS_PART(arrowHeads.getValue(),SoArrow::BEGIN)) {
+  if (HAS_PART(arrowHeads.getValue(), SoArrow::BEGIN)) {
     calEngine->c.setValue(1);
     beginSw->whichChild.setValue(SO_SWITCH_ALL);
   }
@@ -209,7 +209,7 @@ SoArrow::generateChildren()
     beginSw->whichChild.setValue(SO_SWITCH_NONE);
   }
 
-  if (HAS_PART(arrowHeads.getValue(),SoArrow::END)) {
+  if (HAS_PART(arrowHeads.getValue(), SoArrow::END)) {
     calEngine->d.setValue(1);
     endSw->whichChild.setValue(SO_SWITCH_ALL);
   }
@@ -230,7 +230,7 @@ SoArrow::generateChildren()
 
   beginTran->translation.connectFrom(&calEngine->oA);
   endTran->translation.connectFrom(&calEngine->oB);
-  
+
   SoCylinder *shaft = new SoCylinder;
   shaft->radius.connectFrom(&cylRadius);
   shaft->height.connectFrom(&calEngine->oa);
@@ -247,9 +247,9 @@ SoArrow::generateChildren()
   children->append(root);
 }
 
-  
 
-   
-  
+
+
+
 
 

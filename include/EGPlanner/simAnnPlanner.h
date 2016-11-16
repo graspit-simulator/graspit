@@ -40,33 +40,33 @@ class SoSensor;
 class SearchEnergy;
 class SimAnn;
 
-/*!	This is the simplest implementation of the EGPlanner. It also has a 
-	SimAnn class for doing simulated annealing over	all variables. This 
-	is exactly what it does in the mainLoop() fctn. It buffers the best 
-	states (with lowest energy)	as it finds them.
+/*! This is the simplest implementation of the EGPlanner. It also has a
+  SimAnn class for doing simulated annealing over all variables. This
+  is exactly what it does in the mainLoop() fctn. It buffers the best
+  states (with lowest energy) as it finds them.
 */
 class SimAnnPlanner : public EGPlanner
 {
-protected:
-	//! The instance that is used to do simulated annealing
-	SimAnn *mSimAnn;
-	SimAnnPlanner(){}
-	//! Calls a simulated annealing step and buffers the best solutions
-	void mainLoop();
-	//! Also resets the simulated annealer
-	void resetParameters();
-public:
-	//! Also initializes the simulated annealer
-	SimAnnPlanner(Hand *h);
-	~SimAnnPlanner();
-	virtual PlannerType getType(){return PLANNER_SIM_ANN;}
-	void setAnnealingParameters(AnnealingType y);
+  protected:
+    //! The instance that is used to do simulated annealing
+    SimAnn *mSimAnn;
+    SimAnnPlanner() {}
+    //! Calls a simulated annealing step and buffers the best solutions
+    void mainLoop();
+    //! Also resets the simulated annealer
+    void resetParameters();
+  public:
+    //! Also initializes the simulated annealer
+    SimAnnPlanner(Hand *h);
+    ~SimAnnPlanner();
+    virtual PlannerType getType() {return PLANNER_SIM_ANN;}
+    void setAnnealingParameters(AnnealingType y);
 
-	//! Checks if a model state has been set
-	virtual bool initialized();
-	//! Has to be called BEFORE any planning can begin. 
-	/*! It tells the planner how the state it is searching on looks like (how many variables, etc). */
-	virtual void setModelState(const GraspPlanningState *modelState);
+    //! Checks if a model state has been set
+    virtual bool initialized();
+    //! Has to be called BEFORE any planning can begin.
+    /*! It tells the planner how the state it is searching on looks like (how many variables, etc). */
+    virtual void setModelState(const GraspPlanningState *modelState);
 };
 
 #endif

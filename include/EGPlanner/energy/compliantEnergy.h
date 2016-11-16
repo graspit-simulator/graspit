@@ -6,14 +6,14 @@
 
 class CompliantEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
 
-protected:
+  protected:
     mutable bool mCompUnbalanced;
     mutable vec3 mMaxUnbalancedForce;
 
-private Q_SLOTS:
+  private Q_SLOTS:
     //! Called to compute compliant force balances during autograsp
     void autoGraspStep(int numCols, bool &stopRequest) const;
 };

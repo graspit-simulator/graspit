@@ -32,36 +32,36 @@
 
 
 
-#ifdef GRASPIT_USE_WIN_DYNLIB 
-    #include <windows.h>
+#ifdef GRASPIT_USE_WIN_DYNLIB
+#include <windows.h>
 
-    #define PLUGIN_DYNLIB_OPEN    LoadLibrary
-    #define PLUGIN_DYNLIB_CLOSE   FreeLibrary
-    #define PLUGIN_DYNLIB_IMPORT  GetProcAddress
-    #define LIBRARY_SUFFIX ".dll"
+#define PLUGIN_DYNLIB_OPEN    LoadLibrary
+#define PLUGIN_DYNLIB_CLOSE   FreeLibrary
+#define PLUGIN_DYNLIB_IMPORT  GetProcAddress
+#define LIBRARY_SUFFIX ".dll"
 
-    static char* plugin_dynlib_error(void)
-    {
-        static char buf[32];
-	DWORD dw = GetLastError();
-	if (dw == 0) return NULL;
-	sprintf(buf,"error 0x%x", (unsigned int)dw);
-	return buf;
-    }
+static char *plugin_dynlib_error(void)
+{
+  static char buf[32];
+  DWORD dw = GetLastError();
+  if (dw == 0) { return NULL; }
+  sprintf(buf, "error 0x%x", (unsigned int)dw);
+  return buf;
+}
 
-    #define PLUGIN_DYNLIB_ERROR plugin_dynlib_error
+#define PLUGIN_DYNLIB_ERROR plugin_dynlib_error
 
 #else // GRASPIT_USE_WIN_DYNLIB
-    // extern "C"{  // it seems extern C is not needed (any more?)
-    #include <dlfcn.h>
-    // }
-    #define PLUGIN_DYNLIB_OPEN(path)  dlopen(path, RTLD_NOW | RTLD_GLOBAL)
-    #define PLUGIN_DYNLIB_CLOSE       dlclose
-    #define PLUGIN_DYNLIB_IMPORT      dlsym
-    
-    #define PLUGIN_DYNLIB_ERROR dlerror
+// extern "C"{  // it seems extern C is not needed (any more?)
+#include <dlfcn.h>
+// }
+#define PLUGIN_DYNLIB_OPEN(path)  dlopen(path, RTLD_NOW | RTLD_GLOBAL)
+#define PLUGIN_DYNLIB_CLOSE       dlclose
+#define PLUGIN_DYNLIB_IMPORT      dlsym
 
-    #define LIBRARY_SUFFIX ".so"
+#define PLUGIN_DYNLIB_ERROR dlerror
+
+#define LIBRARY_SUFFIX ".so"
 #endif // GRASPIT_USE_WIN_DYNLIB
 
 
@@ -77,19 +77,19 @@ PluginCreator::~PluginCreator()
 }
 
 
-Plugin* PluginCreator::createPlugin(int argc, char** argv)
+Plugin *PluginCreator::createPlugin(int argc, char **argv)
 {
-  Plugin* plugin = (*mCreatePluginFctn)();
+  Plugin *plugin = (*mCreatePluginFctn)();
   if (!plugin)
   {
-      return NULL;
+    return NULL;
   }
 
   //make copy of argv, so plugins cannot interfere with each other.
-  char ** argv_copy = new char*[argc+1];
-  for(int i=0; i < argc; i++)
+  char **argv_copy = new char*[argc + 1];
+  for (int i = 0; i < argc; i++)
   {
-      argv_copy[i] = strdup(argv[i]);
+    argv_copy[i] = strdup(argv[i]);
   }
   argv_copy[argc] = NULL;
 
@@ -102,7 +102,7 @@ Plugin* PluginCreator::createPlugin(int argc, char** argv)
   return plugin;
 }
 
-PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
+PluginCreator *PluginCreator::loadFromLibrary(std::string libName)
 {
   QString filename = QString::fromStdString(libName);
   //append library suffix if it does not already have it
@@ -117,7 +117,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
       DBGA("Could not find absolute plugin file " << filename.latin1());
       return NULL;
     }
-  } else{
+  } else {
     //filename is relative to GRASPIT_PLUGIN_DIR
     QString pluginDirs = QString(getenv("GRASPIT_PLUGIN_DIR"));
     if (pluginDirs.isNull()) {
@@ -125,9 +125,9 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
       return NULL;
     }
     bool found = false;
-    for (int i=0; i<=pluginDirs.count(","); i++) {
-      QString dir = pluginDirs.section(',',i,i);
-      if (!dir.endsWith("/")) dir.append("/");
+    for (int i = 0; i <= pluginDirs.count(","); i++) {
+      QString dir = pluginDirs.section(',', i, i);
+      if (!dir.endsWith("/")) { dir.append("/"); }
       dir.append(filename);
       QFile file(dir);
       if (file.exists()) {
@@ -147,8 +147,8 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   PLUGIN_DYNLIB_HANDLE handle = PLUGIN_DYNLIB_OPEN(filename.toAscii().constData());
   char *errstr = PLUGIN_DYNLIB_ERROR();
   if (!handle) {
-    DBGA("Failed to open dynamic library " << filename.toAscii().constData() );
-    if (errstr) DBGA("Error: " << errstr);
+    DBGA("Failed to open dynamic library " << filename.toAscii().constData());
+    if (errstr) { DBGA("Error: " << errstr); }
     return NULL;
   }
 
@@ -158,7 +158,7 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   //see also discussion here:
   // http://www.trilithium.com/johan/2004/12/problem-with-dlsym/
   //maybe in the future a better solution can be found...
-  PluginCreator::CreatePluginFctn _createPluginFctn = (CreatePluginFctn) PLUGIN_DYNLIB_IMPORT(handle,"createPlugin");
+  PluginCreator::CreatePluginFctn _createPluginFctn = (CreatePluginFctn) PLUGIN_DYNLIB_IMPORT(handle, "createPlugin");
   if (PLUGIN_DYNLIB_ERROR()) {
     DBGA("Could not load symbol createPlugin from library " << filename.toAscii().constData());
     return NULL;
@@ -166,14 +166,14 @@ PluginCreator* PluginCreator::loadFromLibrary(std::string libName)
   PluginCreator::CreatePluginFctn createPluginFctn = reinterpret_cast<PluginCreator::CreatePluginFctn>(_createPluginFctn);
 
   //read the type of plugin
-  PluginCreator::GetTypeFctn _getTypeFctn = (GetTypeFctn) PLUGIN_DYNLIB_IMPORT(handle,"getType");
+  PluginCreator::GetTypeFctn _getTypeFctn = (GetTypeFctn) PLUGIN_DYNLIB_IMPORT(handle, "getType");
   if (PLUGIN_DYNLIB_ERROR()) {
     DBGA("Could not load symbol getType from library " << filename.toAscii().constData());
     return NULL;
   }
   PluginCreator::GetTypeFctn getTypeFctn = reinterpret_cast<PluginCreator::GetTypeFctn>(_getTypeFctn);
-  
-  std::cout << "Function name " << (*getTypeFctn)() <<std::endl;
+
+  std::cout << "Function name " << (*getTypeFctn)() << std::endl;
   std::string type = (*getTypeFctn)();
   if (type.empty()) {
     DBGA("Could not get plugin type from library " << filename.toAscii().constData());

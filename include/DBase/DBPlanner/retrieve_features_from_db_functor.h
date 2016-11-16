@@ -3,8 +3,8 @@
 
 namespace db_planner {
 
-  RetrieveFeaturesFromDbFunctor {
-  }
+RetrieveFeaturesFromDbFunctor {
+}
 
 }
 

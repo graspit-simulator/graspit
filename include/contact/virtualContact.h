@@ -9,7 +9,7 @@ class SoSeparator;
 class SoMaterial;
 
 //! A contact that exists even when a hand is not perfectly touching another object
-/*!	This class is meant for studing grasp quality when there is really no grasp, as
+/*! This class is meant for studing grasp quality when there is really no grasp, as
     the hand is not exactly touching an object. The high-level purpose is to convert
     the grasp quality function to a continous function that exists in all hand
     configurations, rather then a highly discrete function that only is non-zero
@@ -40,7 +40,7 @@ class SoMaterial;
 */
 class VirtualContact : public Contact
 {
-private:
+  private:
     //! Meant to replace the object CoG when a virtual contact has no object
     position mCenter;
     //! Meant to replace the object max radius when a virtual contact has no object
@@ -58,7 +58,7 @@ private:
 
     //! Empty contact initialization shared by all constructors; sets the contact as its own mate
     void init();
-public:
+  public:
 
     //! The constructor initializes an empty virtual contact, setting it as its own mate
     VirtualContact();
@@ -70,16 +70,16 @@ public:
     ~VirtualContact();
 
     //! Sets the body that this contact is on, presumably to a robot link
-    void setBody(Body *b){body1 = b;}
+    void setBody(Body *b) {body1 = b;}
     //! Sets an object that this contact is not exactly on, but we use in calculations.
-    void setObject(Body *b){body2 = b;}
+    void setObject(Body *b) {body2 = b;}
 
     //! Writes this contact, including friction edges, to a file
     // Returns false if file cannot be opened for writing
-    void writeToFile(std::ofstream& outfile);
+    void writeToFile(std::ofstream &outfile);
     //! Loads this contact, including friction edges, from a file
     // Returns false if file cannot be opened for reading
-    bool readFromFile(std::ifstream& infile);
+    bool readFromFile(std::ifstream &infile);
 
     //! Wrench computation is done in world coordinates considers the fact that we have no object
     void computeWrenches(bool useObjectData = false, bool simply = false);
@@ -91,19 +91,19 @@ public:
     int setUpFrictionEdges(bool dynamicsOn = false);
 
     //! Updates mObjectDistance and mObjectNormal based on current world locations.
-    void updateContact(Body* object);
+    void updateContact(Body *object);
 
     //! Sets the max radius that is to be used in wrench computations
-    void setRadius(float r){mMaxRadius = r;}
+    void setRadius(float r) {mMaxRadius = r;}
     //! Sets the c.o.g that is to be used in wrench computations
-    void setCenter(position c){mCenter = c;}
+    void setCenter(position c) {mCenter = c;}
     //! Gets the max radius that is used in wrench computations
-    double getMaxRadius(){return mMaxRadius;}
+    double getMaxRadius() {return mMaxRadius;}
     //! Gets the center that is used in wrench computations
-    position getCenter(){return mCenter;}
+    position getCenter() {return mCenter;}
 
     //! The visual indicator is just a thin red cylinder
-    SoSeparator* getVisualIndicator();
+    SoSeparator *getVisualIndicator();
     //! Another indicator that can be atatched directly to the world root, for debug
     void getWorldIndicator(bool useObjectData = false);
 
@@ -118,12 +118,12 @@ public:
     void mark(bool m);
 
     //! Returns the number of the finger that this contact is on
-    int getFingerNum(){return mFingerNum;}
+    int getFingerNum() {return mFingerNum;}
     //! Returns the number of the link that this contact is on
-    int getLinkNum(){return mLinkNum;}
+    int getLinkNum() {return mLinkNum;}
 
-        //! Changes the frame (and thus also the location and normal) of this virtual contact
-        void changeFrame(transf tr);
+    //! Changes the frame (and thus also the location and normal) of this virtual contact
+    void changeFrame(transf tr);
 };
 
 #endif

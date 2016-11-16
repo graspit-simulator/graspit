@@ -36,8 +36,8 @@ class EGPlanner;
 class GraspPlanningState;
 
 //! Plans grasps for the hand and object, and stores them in the database
-/*! For now, it does its own cleanup in the sense that it will remove from 
-    the world and delete the object that was used for planning. However, it 
+/*! For now, it does its own cleanup in the sense that it will remove from
+    the world and delete the object that was used for planning. However, it
     will leave the hand in, as it might be used by subsequent tasks.
 
     On startup, it will load the hand it needs, unless that hand is already
@@ -45,41 +45,41 @@ class GraspPlanningState;
     it needs. It will not delete anything from the world ar startup.
 
     The init and cleanup so that the world is used by subsequent tasks is
-    not well-defined yet, needs more work. Exactly what initialization and 
-    cleanup in the GraspIt world such a planner should do is unclear, might 
+    not well-defined yet, needs more work. Exactly what initialization and
+    cleanup in the GraspIt world such a planner should do is unclear, might
     change in the future.
-    
+
  */
 class GraspPlanningTask : public QObject, public Task {
-  Q_OBJECT
- private:
-  //! The hand we are planning with
-  Hand *mHand;
-  //! The object we are planning on
-  GraspableBody *mObject;
-  //! The planner that we are using
-  EGPlanner *mPlanner;
-  //! The index of the last solution that was already saved in the database
-  int mLastSolution;
-  //! The record of the actual planning task
-  db_planner::PlanningTaskRecord mPlanningTask;
-  
-  //! Saves a solution grasp to the database
-  bool saveGrasp(const GraspPlanningState *gps);
-  
-public:
-  //! Just a stub for now
-  GraspPlanningTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-                    db_planner::TaskRecord rec);
-  //! Removes the object that has been used from the sim world, but not the hand
-  ~GraspPlanningTask();
-  //! Loads the hand and the object, initializes and starts a loop planner
-  virtual void start();
-public Q_SLOTS:
-  //! Connected to the loopUpdate() signal of the planner
-  void plannerLoopUpdate();
-  //! Connected to the complete() signal of the planner
-  void plannerComplete();
+    Q_OBJECT
+  private:
+    //! The hand we are planning with
+    Hand *mHand;
+    //! The object we are planning on
+    GraspableBody *mObject;
+    //! The planner that we are using
+    EGPlanner *mPlanner;
+    //! The index of the last solution that was already saved in the database
+    int mLastSolution;
+    //! The record of the actual planning task
+    db_planner::PlanningTaskRecord mPlanningTask;
+
+    //! Saves a solution grasp to the database
+    bool saveGrasp(const GraspPlanningState *gps);
+
+  public:
+    //! Just a stub for now
+    GraspPlanningTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                      db_planner::TaskRecord rec);
+    //! Removes the object that has been used from the sim world, but not the hand
+    ~GraspPlanningTask();
+    //! Loads the hand and the object, initializes and starts a loop planner
+    virtual void start();
+  public Q_SLOTS:
+    //! Connected to the loopUpdate() signal of the planner
+    void plannerLoopUpdate();
+    //! Connected to the complete() signal of the planner
+    void plannerComplete();
 };
 
 #endif

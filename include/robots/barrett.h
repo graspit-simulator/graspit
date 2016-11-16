@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the %Barrett hand class, a specialized hand subclass
  */
 #ifndef BARRETT_H
@@ -34,30 +34,30 @@ class BarrettHand;
 
 //! The Barrett hand has its own dedicated class so it can speak to a real Barrett hand
 /*! The Barrett hand class can also hold an instance of the interface to
-	a real Barrett hand. Using this interface, the real Barrett can be made
-	to mimic the behavior of the simulated Barrett, or vice versa.
+  a real Barrett hand. Using this interface, the real Barrett can be made
+  to mimic the behavior of the simulated Barrett, or vice versa.
 */
 class Barrett : public Hand {
-	Q_OBJECT
+    Q_OBJECT
 
-protected:
-	//! The interface to the real Barrett hand (or NULL if no real hand is used)
-  BarrettHand *mRealHand;
+  protected:
+    //! The interface to the real Barrett hand (or NULL if no real hand is used)
+    BarrettHand *mRealHand;
 
- public:
-  //! Just sets the interface to NULL, no real hand used by default
-  Barrett(World *w,const char *name) : Hand(w,name) {mRealHand = NULL;}
-  //! Also deletes the interface, if any
-  ~Barrett();
+  public:
+    //! Just sets the interface to NULL, no real hand used by default
+    Barrett(World *w, const char *name) : Hand(w, name) {mRealHand = NULL;}
+    //! Also deletes the interface, if any
+    ~Barrett();
 
-  //! Also sets the real hand interface to NULL
-  int loadFromXml(const TiXmlElement* root,QString rootPath);
+    //! Also sets the real hand interface to NULL
+    int loadFromXml(const TiXmlElement *root, QString rootPath);
 
-  //! Returns the interface to the real barrett hand
-  BarrettHand *getRealHand();
+    //! Returns the interface to the real barrett hand
+    BarrettHand *getRealHand();
 
-  //! Returns true if the real hand is currently executing a motor command
-  bool isBusy();
+    //! Returns true if the real hand is currently executing a motor command
+    bool isBusy();
 };
 
 #define BARRETT__H

@@ -38,60 +38,60 @@ class Robot;
 
 //! Interfaces GraspIt with a real Barrett hand
 /*! This dialog provides an interface between a simulated Barrett hand
-	in GraspIt and a real Barrett hand. The interface goes in both ways:
-	the real Barrett hand can me instructed to move like the simulated
-	one, or the simulated hand can replicate the posture of the real
-	one.
+  in GraspIt and a real Barrett hand. The interface goes in both ways:
+  the real Barrett hand can me instructed to move like the simulated
+  one, or the simulated hand can replicate the posture of the real
+  one.
 */
 class BarrettHandDlg : public QDialog, public Ui::BarrettHandDlgUI
 {
-	Q_OBJECT
-private:
-	//! Shows if the user is currently interacting with the simulated hand
+    Q_OBJECT
+  private:
+    //! Shows if the user is currently interacting with the simulated hand
     bool userInteractionOngoing;
-	//! Shows if we are currently in the process of interacting with the real hand
-	bool withinSimulationUpdate;
+    //! Shows if we are currently in the process of interacting with the real hand
+    bool withinSimulationUpdate;
 
     Robot *simulatedHandForContinuousOperation;
-	//! The interface to the real Barrett hand
+    //! The interface to the real Barrett hand
     BarrettHand *mRealBarrett;
-	//! For multi-threaded interface with a real hand. This is not complete.
+    //! For multi-threaded interface with a real hand. This is not complete.
     BarrettHandThread *mBHT;
-	//! The simulated Barrett hand in GraspIt
+    //! The simulated Barrett hand in GraspIt
     Barrett *mSimBarrett;
-	//! The world that the simulated hand belongs to 
+    //! The world that the simulated hand belongs to
     World *world;
 
-	//! Dialog initialization and button connections
-	void init();
-	//! Called when the user starts interacting with the simulated hand
-	void userInteractionStart();
-	//! Called when the user stops interacting with the simulated hand
-	void userInteractionEnd();
+    //! Dialog initialization and button connections
+    void init();
+    //! Called when the user starts interacting with the simulated hand
+    void userInteractionStart();
+    //! Called when the user stops interacting with the simulated hand
+    void userInteractionEnd();
 
-public:
-	//! Initializes the dialog
-	BarrettHandDlg(QWidget *parent = 0) : QDialog(parent) {
-		setupUi(this);
-		init();
-	}
+  public:
+    //! Initializes the dialog
+    BarrettHandDlg(QWidget *parent = 0) : QDialog(parent) {
+      setupUi(this);
+      init();
+    }
 
-	//! Sets the world and extracts from it all the members of this dialog
-	bool setWorld( World *w );
-	
-public Q_SLOTS:
-	//! Calls the initialization procedure on the real hand
-	void initializeHand();
-	//! Makes the simulated hand mimic the posture of the real hand
-	void simulationFromRealHand();
-	//! Updates the real hand based on the posture of the simulated hand
-	void realHandFromSimulation();
-	//! In continous operation, the real hand follows all motion of the simulated hand
-	void toggleContinuousOperation();
-	//! Sets motor parameters on the real hand to produce smoother motion in the spread DOF
-	void smoothButton_clicked();
-	//! Re-initializes the spread angle DOF of the real hand
-	void initSpreadButton_clicked();
+    //! Sets the world and extracts from it all the members of this dialog
+    bool setWorld(World *w);
+
+  public Q_SLOTS:
+    //! Calls the initialization procedure on the real hand
+    void initializeHand();
+    //! Makes the simulated hand mimic the posture of the real hand
+    void simulationFromRealHand();
+    //! Updates the real hand based on the posture of the simulated hand
+    void realHandFromSimulation();
+    //! In continous operation, the real hand follows all motion of the simulated hand
+    void toggleContinuousOperation();
+    //! Sets motor parameters on the real hand to produce smoother motion in the spread DOF
+    void smoothButton_clicked();
+    //! Re-initializes the spread angle DOF of the real hand
+    void initSpreadButton_clicked();
 };
 
 #endif

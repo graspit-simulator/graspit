@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Aaron Blasdel 
+// Author(s): Aaron Blasdel
 //
 // $Id: robotiq.cpp,v 1.5 2012/03/21 21:06:53 saint Exp $
 //
 //######################################################################
 
-/*! \file 
+/*! \file
 \brief Implements the special %RobotIQ robot class
 */
 
@@ -31,36 +31,36 @@
 #include "world.h"
 #include "debug.h"
 
-int RobotIQ::loadFromXml(const TiXmlElement* root,QString rootPath)
+int RobotIQ::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-	int result = Robot::loadFromXml(root, rootPath);
-	if (result != SUCCESS) return result;
-	myWorld->toggleCollisions(false, base,chainVec[0]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[1]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[2]->getLink(1));
+  int result = Robot::loadFromXml(root, rootPath);
+  if (result != SUCCESS) { return result; }
+  myWorld->toggleCollisions(false, base, chainVec[0]->getLink(1));
+  myWorld->toggleCollisions(false, base, chainVec[1]->getLink(1));
+  myWorld->toggleCollisions(false, base, chainVec[2]->getLink(1));
 
-	return result;
+  return result;
 }
 
 void RobotIQ::cloneFrom(Hand *original)
 {
-	Hand::cloneFrom(original);
-	myWorld->toggleCollisions(false, base,chainVec[0]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[1]->getLink(1));
-	myWorld->toggleCollisions(false, base,chainVec[2]->getLink(1));
-} 
+  Hand::cloneFrom(original);
+  myWorld->toggleCollisions(false, base, chainVec[0]->getLink(1));
+  myWorld->toggleCollisions(false, base, chainVec[1]->getLink(1));
+  myWorld->toggleCollisions(false, base, chainVec[2]->getLink(1));
+}
 
 bool
 RobotIQ::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
 {
   //not implemented for the RobotIQ yet
-  if (myWorld->dynamicsAreOn()) return Hand::autoGrasp(renderIt, speedFactor, stopAtContact);
+  if (myWorld->dynamicsAreOn()) { return Hand::autoGrasp(renderIt, speedFactor, stopAtContact); }
 
   if (numDOF != 11) {DBGA("Hard-coded autograsp does not match RobotIQ hand"); return false;}
 
   std::vector<double> desiredVals(11, 0.0);
 
-  if (speedFactor < 0) 
+  if (speedFactor < 0)
   {
     DBGA("Hand opening not yet implemented for RobotIQ hand; forcing it to open pose");
     desiredVals[3] = getDOF(3)->getVal();
@@ -75,43 +75,43 @@ RobotIQ::autoGrasp(bool renderIt, double speedFactor, bool stopAtContact)
   desiredVals[1] = desiredVals[5] = desiredVals[9] = dofVec[1]->getMin();
   desiredVals[2] = desiredVals[6] = desiredVals[10] = dofVec[2]->getMin();
 
-  desiredSteps[0] = desiredSteps[4] = desiredSteps[8] = speedFactor*AUTO_GRASP_TIME_STEP;
-  desiredSteps[1] = desiredSteps[5] = desiredSteps[9] = -speedFactor*AUTO_GRASP_TIME_STEP;
-  desiredSteps[2] = desiredSteps[6] = desiredSteps[10] = -speedFactor*AUTO_GRASP_TIME_STEP;
+  desiredSteps[0] = desiredSteps[4] = desiredSteps[8] = speedFactor * AUTO_GRASP_TIME_STEP;
+  desiredSteps[1] = desiredSteps[5] = desiredSteps[9] = -speedFactor * AUTO_GRASP_TIME_STEP;
+  desiredSteps[2] = desiredSteps[6] = desiredSteps[10] = -speedFactor * AUTO_GRASP_TIME_STEP;
 
-  int steps=0;
-  while(1)
+  int steps = 0;
+  while (1)
   {
     bool moved = moveDOFToContacts(&desiredVals[0], &desiredSteps[0], true, renderIt);
     std::vector<double> ref;
     ref.push_back(0); ref.push_back(4); ref.push_back(8);
     std::vector<double> links;
     links.push_back(0); links.push_back(1); links.push_back(1);
-    for(size_t i=0; i<ref.size(); i++)
+    for (size_t i = 0; i < ref.size(); i++)
     {
-      if (getChain(i)->getLink(links[i]+0)->getNumContacts() || 
-	  getChain(i)->getLink(links[i]+1)->getNumContacts() || 
-	  getDOF(ref[i]+0)->getVal() == getDOF(ref[i]+0)->getMax() )
+      if (getChain(i)->getLink(links[i] + 0)->getNumContacts() ||
+          getChain(i)->getLink(links[i] + 1)->getNumContacts() ||
+          getDOF(ref[i] + 0)->getVal() == getDOF(ref[i] + 0)->getMax())
       {
-	desiredVals[ref[i]+0] = getDOF(ref[i]+0)->getVal();
-	desiredSteps[ref[i]+0] = 0;
+        desiredVals[ref[i] + 0] = getDOF(ref[i] + 0)->getVal();
+        desiredSteps[ref[i] + 0] = 0;
 
-        desiredVals[ref[i]+1] = getDOF(ref[i]+1)->getMax();
-        desiredSteps[ref[i]+1] = speedFactor*AUTO_GRASP_TIME_STEP;
+        desiredVals[ref[i] + 1] = getDOF(ref[i] + 1)->getMax();
+        desiredSteps[ref[i] + 1] = speedFactor * AUTO_GRASP_TIME_STEP;
 
-	if (getChain(i)->getLink(links[i]+1)->getNumContacts() || 
-            getDOF(ref[i]+1)->getVal() == getDOF(ref[i]+1)->getMax() )
+        if (getChain(i)->getLink(links[i] + 1)->getNumContacts() ||
+            getDOF(ref[i] + 1)->getVal() == getDOF(ref[i] + 1)->getMax())
         {
-	  desiredVals[ref[i]+1] = getDOF(ref[i]+1)->getVal();
-	  desiredSteps[ref[i]+1] = 0;
+          desiredVals[ref[i] + 1] = getDOF(ref[i] + 1)->getVal();
+          desiredSteps[ref[i] + 1] = 0;
 
-	  desiredVals[ref[i]+2] = getDOF(ref[i]+2)->getMax();
-	  desiredSteps[ref[i]+2] = speedFactor*AUTO_GRASP_TIME_STEP;  
-	}
-    
+          desiredVals[ref[i] + 2] = getDOF(ref[i] + 2)->getMax();
+          desiredSteps[ref[i] + 2] = speedFactor * AUTO_GRASP_TIME_STEP;
+        }
+
       }
     }
-    if (!moved) break;
+    if (!moved) { break; }
     if (++steps > 1000)
     {
       DBGA("RobotIQ hard-coded autograsp seems to be looping forever; escaping...");

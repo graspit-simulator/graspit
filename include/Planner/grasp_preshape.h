@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_preshape.h,v 1.2 2009/03/25 22:10:24 cmatei Exp $
 //
@@ -65,7 +65,7 @@
   - \b PR_t_shape where the spread angle is 90 so that the 2 fingers oppose each other directly and the thumb is 90 degrees away from each of them.
   - \b PR_three_opp_palm where the spread angle is 180, so that all 3 fingers are together and oppose the palm
 */
-enum preshapeType{PR_None, PR_circle, PR_two_opp_one, PR_three_opp_palm, PR_t_shape};
+enum preshapeType {PR_None, PR_circle, PR_two_opp_one, PR_three_opp_palm, PR_t_shape};
 
 //! Holds the grasp preshape type and the DOF values for that presahpe.
 /*!
@@ -75,35 +75,35 @@ enum preshapeType{PR_None, PR_circle, PR_two_opp_one, PR_three_opp_palm, PR_t_sh
 */
 class preshape
 {
-private:
-  //! Spread angle for Barrett Hand in degrees (DOF #0)
-  double a;
+  private:
+    //! Spread angle for Barrett Hand in degrees (DOF #0)
+    double a;
 
-  //! Flexion of finger 1 of Barrett Hand in degrees (DOF #1)
-  double f1;
+    //! Flexion of finger 1 of Barrett Hand in degrees (DOF #1)
+    double f1;
 
-  //! Flexion of finger 2 of Barrett Hand in degrees (DOF #2)
-  double f2;
-  
-  //! Flexion of finger 3 of Barrett Hand in degrees (DOF #3)
-  double f3;
+    //! Flexion of finger 2 of Barrett Hand in degrees (DOF #2)
+    double f2;
 
-  //! The current preshape 
-  preshapeType pType;
+    //! Flexion of finger 3 of Barrett Hand in degrees (DOF #3)
+    double f3;
+
+    //! The current preshape
+    preshapeType pType;
 
     void updateAngles();
 
-public:
+  public:
 
     preshape();
     preshape(preshapeType);
-    preshape(const preshape&);
-    
+    preshape(const preshape &);
+
     void set_preshapeType(preshapeType);
     void set_preshape(double, double, double, double);
 
-    preshapeType get_preshapeType()   const;   
-    void get_preshape(double&, double&, double&, double&) const;
+    preshapeType get_preshapeType()   const;
+    void get_preshape(double &, double &, double &, double &) const;
 
     double distanceTo(preshape) const;
 };

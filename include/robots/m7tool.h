@@ -19,11 +19,11 @@
 //
 // Author(s):  Hao Dang (hd2181@columbia.edu)
 //
-// $Id: 
+// $Id:
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the special %M7Tool class
  */
 
@@ -32,23 +32,23 @@
 
 #include "robot.h"
 /*! A special class who loads normally but turns off collisions between
-	 all the links in it
+   all the links in it
 */
 class M7Tool : public Hand {
-	Q_OBJECT
-public:
-  /*! Empty constructor (placeholder) */
-  M7Tool(World *w,const char *name) : Hand(w,name) {}
-  
- /*! Performs the normal robot load routine then turns off collisions between
-	 all the links in the robot
- */
-  virtual int loadFromXml(const TiXmlElement* root,QString rootPath);
+    Q_OBJECT
+  public:
+    /*! Empty constructor (placeholder) */
+    M7Tool(World *w, const char *name) : Hand(w, name) {}
 
- /*! Performs the normal robot clone routine then turns off collisions between
-	 all the links in the robot
- */
-  virtual void cloneFrom(Hand *original);
+    /*! Performs the normal robot load routine then turns off collisions between
+     all the links in the robot
+    */
+    virtual int loadFromXml(const TiXmlElement *root, QString rootPath);
+
+    /*! Performs the normal robot clone routine then turns off collisions between
+     all the links in the robot
+    */
+    virtual void cloneFrom(Hand *original);
 };
 
 #endif

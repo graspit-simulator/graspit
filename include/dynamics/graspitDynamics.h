@@ -29,18 +29,18 @@
 #include "dynamicsEngine.h"
 
 class GraspitDynamics : public DynamicsEngine {
- public:
-  explicit GraspitDynamics(World *world);
-  ~GraspitDynamics();
-  void addBody(Body *newBody);
-  void addRobot(Robot *robot);
-  void turnOnDynamics();
-  void turnOffDynamics();
-  int stepDynamics();
-  double moveDynamicBodies(double timeStep);
-  int computeNewVelocities(double timeStep);
- private:
-  World *mWorld;
+  public:
+    explicit GraspitDynamics(World *world);
+    ~GraspitDynamics();
+    void addBody(Body *newBody);
+    void addRobot(Robot *robot);
+    void turnOnDynamics();
+    void turnOffDynamics();
+    int stepDynamics();
+    double moveDynamicBodies(double timeStep);
+    int computeNewVelocities(double timeStep);
+  private:
+    World *mWorld;
 };
 
 #endif

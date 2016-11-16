@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the %DBasePlannerDlg class
  */
 
@@ -41,9 +41,9 @@
 #include "DBPlanner/db_manager.h"
 
 namespace db_planner {
-	class DatabaseManager;
-	class Model;
-	class Grasp;
+class DatabaseManager;
+class Model;
+class Grasp;
 }
 
 class Hand;
@@ -54,97 +54,97 @@ class GraspPlanningState;
 
 class DBasePlannerDlg : public QDialog, public Ui::DBasePlannerDlgUI
 {
-	Q_OBJECT	
-private:
-	//! Database manager that talks with the database
-	db_planner::DatabaseManager *mDBMgr;
-	//! Instance of neighbor finder
-	db_planner::NeighborFinder<db_planner::Model> *mNeighborFinder;
-	//! Grasp ranker that ranks a bag of grasps
-	db_planner::GraspRanker *mGraspRanker;
-	//! Aligner that does alignments between two models
-	db_planner::Aligner<db_planner::Model> *mAligner;
-	//! Planner that does the kernel test for grasp planning
-	GraspitDBPlanner* mPlanner;
-	//! A simple table that records the neighbors and the distances from current model
-	std::vector<std::pair<db_planner::Model*, double> >mNeighbors;
-	//! A vector that stores the original grasps from neighbors
-	std::vector<db_planner::Grasp*>mOriginalGrasps;
-	//! A vector that stores the tested grasps after test all is called
-	std::vector<db_planner::Grasp*>mTestedGrasps;
-	//! A pointer to the model to be planned
-	db_planner::Model *mPlanningModel;
-	//! A pointer to the model shown in GraspIt world
-	db_planner::Model *mModelShown;
-	//! A pointer to the hand involved in the current grasps
-	Hand* mHand;
-	//! Index of the current grasp in mOriginalGrasps
+    Q_OBJECT
+  private:
+    //! Database manager that talks with the database
+    db_planner::DatabaseManager *mDBMgr;
+    //! Instance of neighbor finder
+    db_planner::NeighborFinder<db_planner::Model> *mNeighborFinder;
+    //! Grasp ranker that ranks a bag of grasps
+    db_planner::GraspRanker *mGraspRanker;
+    //! Aligner that does alignments between two models
+    db_planner::Aligner<db_planner::Model> *mAligner;
+    //! Planner that does the kernel test for grasp planning
+    GraspitDBPlanner *mPlanner;
+    //! A simple table that records the neighbors and the distances from current model
+    std::vector<std::pair<db_planner::Model *, double> >mNeighbors;
+    //! A vector that stores the original grasps from neighbors
+    std::vector<db_planner::Grasp *>mOriginalGrasps;
+    //! A vector that stores the tested grasps after test all is called
+    std::vector<db_planner::Grasp *>mTestedGrasps;
+    //! A pointer to the model to be planned
+    db_planner::Model *mPlanningModel;
+    //! A pointer to the model shown in GraspIt world
+    db_planner::Model *mModelShown;
+    //! A pointer to the hand involved in the current grasps
+    Hand *mHand;
+    //! Index of the current grasp in mOriginalGrasps
     unsigned int mCurrentOriginalGrasp;
-	//! Index of the current grasp in mTestedGrasps
+    //! Index of the current grasp in mTestedGrasps
     unsigned int mCurrentTestedGrasp;
-	//! Widget for displaying thumbnails
-	QGraphicsScene * mModelScene;
-	//! Helper variable that indicates whether the neighbor combo box is in reconstruction
-	bool neighborComboBoxInReconstruction;
+    //! Widget for displaying thumbnails
+    QGraphicsScene *mModelScene;
+    //! Helper variable that indicates whether the neighbor combo box is in reconstruction
+    bool neighborComboBoxInReconstruction;
 
-	void init();
-	void destroy();
-	void initializeDistanceComboBox(std::vector<string>);
-	void updateNeighborList();
-	void updateModelImage(db_planner::Model*);
-	void updateOriginalGraspInfo();
-	void updateTestedGraspInfo();
-	void show3DObject(bool isNbr = false);
+    void init();
+    void destroy();
+    void initializeDistanceComboBox(std::vector<string>);
+    void updateNeighborList();
+    void updateModelImage(db_planner::Model *);
+    void updateOriginalGraspInfo();
+    void updateTestedGraspInfo();
+    void show3DObject(bool isNbr = false);
 
-	template <class vectorType, class treatAsType>
-	void deleteVectorElements(std::vector<vectorType>& v);
+    template <class vectorType, class treatAsType>
+    void deleteVectorElements(std::vector<vectorType> &v);
 
-    void previousGrasp(unsigned int& i, std::vector<db_planner::Grasp*> graspList);
-    void nextGrasp(unsigned int& i, std::vector<db_planner::Grasp*> graspList);
-	void showGrasp(db_planner::Grasp* grasp);
-	void setGroupBoxEnabled(bool nbrGen, bool alignment, bool ranking, bool grasp, bool execute);
+    void previousGrasp(unsigned int &i, std::vector<db_planner::Grasp *> graspList);
+    void nextGrasp(unsigned int &i, std::vector<db_planner::Grasp *> graspList);
+    void showGrasp(db_planner::Grasp *grasp);
+    void setGroupBoxEnabled(bool nbrGen, bool alignment, bool ranking, bool grasp, bool execute);
 
-public:
-	DBasePlannerDlg(QWidget *parent = 0, db_planner::DatabaseManager* dbm = NULL, 
-				    db_planner::Model* m = NULL, Hand* h = NULL) :
-                    QDialog(parent), mDBMgr(dbm),mAligner(NULL), mPlanningModel(m), mModelShown(m),
-                    mHand(h), mCurrentOriginalGrasp(0), mCurrentTestedGrasp(0),
-                    mModelScene(NULL), neighborComboBoxInReconstruction(false) {
-		setupUi(this);
-		QObject::connect(exitButton, SIGNAL(clicked()), this, SLOT(exitButton_clicked()));
-		QObject::connect(getNeighborButton, SIGNAL(clicked()), this, SLOT(getNeighborButton_clicked()));
-		QObject::connect(executeButton, SIGNAL(clicked()), this, SLOT(executeButton_clicked()));
-		QObject::connect(retrieveGraspsButton, SIGNAL(clicked()), this, SLOT(retrieveGraspsButton_clicked()));
-		QObject::connect(rankGraspsButton, SIGNAL(clicked()), this, SLOT(rankGraspsButton_clicked()));
-		QObject::connect(previousGraspButton, SIGNAL(clicked()), this, SLOT(previousGraspButton_clicked()));
-		QObject::connect(nextGraspButton, SIGNAL(clicked()), this, SLOT(nextGraspButton_clicked()));
-		QObject::connect(createGWSButton, SIGNAL(clicked()), this, SLOT(createGWSButton_clicked()));
-		QObject::connect(neighborComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(modelChanged()));
-		QObject::connect(alignmentMethodComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(alignmentChanged()));
-		QObject::connect(seeNeighborCheckBox, SIGNAL(stateChanged(int)), this, SLOT(neighborCheckBoxChanged()));
-		QObject::connect(originalGraspRadioButton, SIGNAL(clicked()), this, SLOT(originalGraspRadioButton_clicked()));
-		QObject::connect(testedGraspRadioButton, SIGNAL(clicked()), this, SLOT(testedGraspRadioButton_clicked()));
-		init();
-	}
-	~DBasePlannerDlg(){destroy();}
+  public:
+    DBasePlannerDlg(QWidget *parent = 0, db_planner::DatabaseManager *dbm = NULL,
+                    db_planner::Model *m = NULL, Hand *h = NULL) :
+      QDialog(parent), mDBMgr(dbm), mAligner(NULL), mPlanningModel(m), mModelShown(m),
+      mHand(h), mCurrentOriginalGrasp(0), mCurrentTestedGrasp(0),
+      mModelScene(NULL), neighborComboBoxInReconstruction(false) {
+      setupUi(this);
+      QObject::connect(exitButton, SIGNAL(clicked()), this, SLOT(exitButton_clicked()));
+      QObject::connect(getNeighborButton, SIGNAL(clicked()), this, SLOT(getNeighborButton_clicked()));
+      QObject::connect(executeButton, SIGNAL(clicked()), this, SLOT(executeButton_clicked()));
+      QObject::connect(retrieveGraspsButton, SIGNAL(clicked()), this, SLOT(retrieveGraspsButton_clicked()));
+      QObject::connect(rankGraspsButton, SIGNAL(clicked()), this, SLOT(rankGraspsButton_clicked()));
+      QObject::connect(previousGraspButton, SIGNAL(clicked()), this, SLOT(previousGraspButton_clicked()));
+      QObject::connect(nextGraspButton, SIGNAL(clicked()), this, SLOT(nextGraspButton_clicked()));
+      QObject::connect(createGWSButton, SIGNAL(clicked()), this, SLOT(createGWSButton_clicked()));
+      QObject::connect(neighborComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(modelChanged()));
+      QObject::connect(alignmentMethodComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(alignmentChanged()));
+      QObject::connect(seeNeighborCheckBox, SIGNAL(stateChanged(int)), this, SLOT(neighborCheckBoxChanged()));
+      QObject::connect(originalGraspRadioButton, SIGNAL(clicked()), this, SLOT(originalGraspRadioButton_clicked()));
+      QObject::connect(testedGraspRadioButton, SIGNAL(clicked()), this, SLOT(testedGraspRadioButton_clicked()));
+      init();
+    }
+    ~DBasePlannerDlg() {destroy();}
 
-public Q_SLOTS:
-	//! Button events
-	void exitButton_clicked();
-	void getNeighborButton_clicked();
-	void executeButton_clicked();
-	void retrieveGraspsButton_clicked();
-	void rankGraspsButton_clicked();
-	void previousGraspButton_clicked();
-	void nextGraspButton_clicked();
-	void createGWSButton_clicked();
-	void originalGraspRadioButton_clicked();
-	void testedGraspRadioButton_clicked();
+  public Q_SLOTS:
+    //! Button events
+    void exitButton_clicked();
+    void getNeighborButton_clicked();
+    void executeButton_clicked();
+    void retrieveGraspsButton_clicked();
+    void rankGraspsButton_clicked();
+    void previousGraspButton_clicked();
+    void nextGraspButton_clicked();
+    void createGWSButton_clicked();
+    void originalGraspRadioButton_clicked();
+    void testedGraspRadioButton_clicked();
 
-	//! Trigger events
-	void modelChanged();
-	void neighborCheckBoxChanged();
-	void alignmentChanged();
+    //! Trigger events
+    void modelChanged();
+    void neighborCheckBoxChanged();
+    void alignmentChanged();
 };
 
 #endif

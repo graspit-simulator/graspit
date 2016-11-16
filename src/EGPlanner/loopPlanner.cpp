@@ -40,12 +40,12 @@ LoopPlanner::LoopPlanner(Hand *h)
   init();
 
   mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
-  mEnergyCalculator->setAvoidList( &mAvoidList );
-  
+  mEnergyCalculator->setAvoidList(&mAvoidList);
+
   mSimAnn = new SimAnn();
   mSimAnn->setParameters(ANNEAL_LOOP);
   mRepeat = true;
-  
+
   mDistanceThreshold = 0.1f;
   mEnergyCalculator->setThreshold(mDistanceThreshold);
 
@@ -55,14 +55,14 @@ LoopPlanner::LoopPlanner(Hand *h)
 void
 LoopPlanner::setEnergyType(SearchEnergyType s)
 {
-    assert (mEnergyCalculator);
-    if (!mEnergyCalculator->isType(s))
-    {
-        delete mEnergyCalculator;
-        mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
-        mEnergyCalculator->setThreshold(mDistanceThreshold);
-        mEnergyCalculator->setAvoidList( &mAvoidList );
-    }
+  assert(mEnergyCalculator);
+  if (!mEnergyCalculator->isType(s))
+  {
+    delete mEnergyCalculator;
+    mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
+    mEnergyCalculator->setThreshold(mDistanceThreshold);
+    mEnergyCalculator->setAvoidList(&mAvoidList);
+  }
 }
 
 void LoopPlanner::setDistanceThreshold(float t)
@@ -83,20 +83,20 @@ void LoopPlanner::resetParameters()
     if (s->getEnergy() > mSaveThreshold) {
       delete s;
     } else {
-      mAvoidList.push_back( s );
+      mAvoidList.push_back(s);
     }
   }
   SimAnnPlanner::resetParameters();
   Q_EMIT loopUpdate();
 }
 
-const GraspPlanningState* 
+const GraspPlanningState *
 LoopPlanner::getGrasp(int i)
 {
   DBGP("Loop get grasp");
-  assert (i>=0 && i<(int)mAvoidList.size());
-  std::list<GraspPlanningState*>::iterator it = mAvoidList.begin();
-  for (int k=0; k<i; k++) {
+  assert(i >= 0 && i < (int)mAvoidList.size());
+  std::list<GraspPlanningState *>::iterator it = mAvoidList.begin();
+  for (int k = 0; k < i; k++) {
     it++;
   }
   return (*it);
@@ -106,7 +106,7 @@ void
 LoopPlanner::clearSolutions()
 {
   SimAnnPlanner::clearSolutions();
-  while ( !mAvoidList.empty() ) {
+  while (!mAvoidList.empty()) {
     delete(mAvoidList.back());
     mAvoidList.pop_back();
   }

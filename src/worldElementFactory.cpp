@@ -45,42 +45,42 @@
 
 WorldElementFactory::~WorldElementFactory()
 {
-  for (std::map<std::string, WorldElementCreator*>::iterator it=mCreators.begin(); it!=mCreators.end(); it++)
+  for (std::map<std::string, WorldElementCreator *>::iterator it = mCreators.begin(); it != mCreators.end(); it++)
   {
     delete it->second;
   }
 }
 
-WorldElement* 
-WorldElementFactory::createElement(std::string elementType, World *parent,const char *name)
+WorldElement *
+WorldElementFactory::createElement(std::string elementType, World *parent, const char *name)
 {
-  std::map<std::string, WorldElementCreator*>::iterator it = mCreators.find(elementType);
-  if (it==mCreators.end()) return NULL;
+  std::map<std::string, WorldElementCreator *>::iterator it = mCreators.find(elementType);
+  if (it == mCreators.end()) { return NULL; }
   return (*(it->second))(parent, name);
 }
 
-void 
+void
 WorldElementFactory::registerCreator(std::string elementType, WorldElementCreator *creator)
 {
   mCreators[elementType] = creator;
 }
 
-void 
+void
 WorldElementFactory::registerBuiltinCreators()
 {
-  REGISTER_CREATOR("Body",Body);
-  REGISTER_CREATOR("GraspableBody",GraspableBody);
-  REGISTER_CREATOR("Robot",Robot);
-  REGISTER_CREATOR("Hand",Hand);
-  REGISTER_CREATOR("Puma560",Puma560);
-  REGISTER_CREATOR("Barrett",Barrett);
-  REGISTER_CREATOR("Robonaut",Robonaut);
-  REGISTER_CREATOR("Pr2Gripper",Pr2Gripper);
-  REGISTER_CREATOR("Pr2Gripper2010",Pr2Gripper2010);
-  REGISTER_CREATOR("M7",M7);
-  REGISTER_CREATOR("M7Tool",M7Tool);
-  REGISTER_CREATOR("HumanHand",HumanHand);
-  REGISTER_CREATOR("Shadow",Shadow);
-  REGISTER_CREATOR("McGrip",McGrip);
-  REGISTER_CREATOR("RobotIQ",RobotIQ);
+  REGISTER_CREATOR("Body", Body);
+  REGISTER_CREATOR("GraspableBody", GraspableBody);
+  REGISTER_CREATOR("Robot", Robot);
+  REGISTER_CREATOR("Hand", Hand);
+  REGISTER_CREATOR("Puma560", Puma560);
+  REGISTER_CREATOR("Barrett", Barrett);
+  REGISTER_CREATOR("Robonaut", Robonaut);
+  REGISTER_CREATOR("Pr2Gripper", Pr2Gripper);
+  REGISTER_CREATOR("Pr2Gripper2010", Pr2Gripper2010);
+  REGISTER_CREATOR("M7", M7);
+  REGISTER_CREATOR("M7Tool", M7Tool);
+  REGISTER_CREATOR("HumanHand", HumanHand);
+  REGISTER_CREATOR("Shadow", Shadow);
+  REGISTER_CREATOR("McGrip", McGrip);
+  REGISTER_CREATOR("RobotIQ", RobotIQ);
 }

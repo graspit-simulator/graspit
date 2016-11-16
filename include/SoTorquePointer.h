@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: SoTorquePointer.h,v 1.2 2009/03/25 22:10:23 cmatei Exp $
 //
@@ -43,25 +43,25 @@
 */
 class SoTorquePointer : public SoComplexShape {
 
-   SO_NODE_HEADER(SoTorquePointer);
+    SO_NODE_HEADER(SoTorquePointer);
 
- public:
+  public:
 
-   // Fields
-   //! Defines the width of the shaft
-   SoSFFloat     cylRadius;
+    // Fields
+    //! Defines the width of the shaft
+    SoSFFloat     cylRadius;
 
-   //! Defines the height of the shaft
-   SoSFFloat     height;
+    //! Defines the height of the shaft
+    SoSFFloat     height;
 
-   static void   initClass();
-   SoTorquePointer();
+    static void   initClass();
+    SoTorquePointer();
 
- private:
-   //! A pointer to the geometry of the curved arrow
-   static SoSeparator *curvedArrow;
-   
-   virtual ~SoTorquePointer();
+  private:
+    //! A pointer to the geometry of the curved arrow
+    static SoSeparator *curvedArrow;
 
-   void generateChildren();
+    virtual ~SoTorquePointer();
+
+    void generateChildren();
 };

@@ -31,31 +31,31 @@
 class Hand;
 class GraspableBody;
 namespace db_planner {
-  class Grasp;
+class Grasp;
 }
 
 //! Checks which two grasps of the same object can be executed concurrently
 class GraspTransferCheckTask : public Task {
- private:
-  //! The hands we are planning with
-  Hand  *mHand1, *mHand2;
-  //! The object we are planning on
-  GraspableBody *mObject;
-  //! The record of the actual planning task
-  db_planner::PlanningTaskRecord mPlanningTask;
-  
-  //! Checks if a pair of grasps is compatible and writes it to the database
-  bool checkGraspCombo(db_planner::Grasp* grasp1, db_planner::Grasp* grasp2);
-  
- public:
-  //! Just a stub for now
-  GraspTransferCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-			 db_planner::TaskRecord rec);
-  //! Removes the object that has been used from the sim world, but not the hand
-  ~GraspTransferCheckTask();
+  private:
+    //! The hands we are planning with
+    Hand  *mHand1, *mHand2;
+    //! The object we are planning on
+    GraspableBody *mObject;
+    //! The record of the actual planning task
+    db_planner::PlanningTaskRecord mPlanningTask;
 
-  //! Actually does all the work
-  virtual void start();
+    //! Checks if a pair of grasps is compatible and writes it to the database
+    bool checkGraspCombo(db_planner::Grasp *grasp1, db_planner::Grasp *grasp2);
+
+  public:
+    //! Just a stub for now
+    GraspTransferCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                           db_planner::TaskRecord rec);
+    //! Removes the object that has been used from the sim world, but not the hand
+    ~GraspTransferCheckTask();
+
+    //! Actually does all the work
+    virtual void start();
 };
 
 #endif

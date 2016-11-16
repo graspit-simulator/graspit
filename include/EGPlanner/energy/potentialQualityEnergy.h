@@ -7,10 +7,10 @@
 
 class PotentialQualityEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
 
-protected:
+  protected:
     double potentialQualityScalingFunction(double dist, double cosTheta)const ;
 
 };

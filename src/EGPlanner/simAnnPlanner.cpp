@@ -39,104 +39,104 @@
 
 SimAnnPlanner::SimAnnPlanner(Hand *h)
 {
-	mHand = h;
-	init();
-    mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
-	mSimAnn = new SimAnn();
-	//mSimAnn->writeResults(true);
+  mHand = h;
+  init();
+  mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
+  mSimAnn = new SimAnn();
+  //mSimAnn->writeResults(true);
 }
 
 SimAnnPlanner::~SimAnnPlanner()
 {
-	if (mSimAnn) delete mSimAnn;
+  if (mSimAnn) { delete mSimAnn; }
 }
 
 void
 SimAnnPlanner::setAnnealingParameters(AnnealingType y) {
-	if (isActive()) {
-		DBGA("Stop planner before setting ann parameters");
-		return;
-	}
-	mSimAnn->setParameters(y);
+  if (isActive()) {
+    DBGA("Stop planner before setting ann parameters");
+    return;
+  }
+  mSimAnn->setParameters(y);
 }
 
 void
 SimAnnPlanner::resetParameters()
 {
-	EGPlanner::resetParameters();
-	mSimAnn->reset();
-	mCurrentStep = mSimAnn->getCurrentStep();
-	mCurrentState->setEnergy(1.0e8);
+  EGPlanner::resetParameters();
+  mSimAnn->reset();
+  mCurrentStep = mSimAnn->getCurrentStep();
+  mCurrentState->setEnergy(1.0e8);
 }
 
 bool
 SimAnnPlanner::initialized()
 {
-	if (!mCurrentState) return false;
-	return true;
+  if (!mCurrentState) { return false; }
+  return true;
 }
 
 void
 SimAnnPlanner::setModelState(const GraspPlanningState *modelState)
 {
-	if (isActive()) {
-		DBGA("Can not change model state while planner is running");
-		return;
-	}
+  if (isActive()) {
+    DBGA("Can not change model state while planner is running");
+    return;
+  }
 
-	if (mCurrentState) delete mCurrentState;
-	mCurrentState = new GraspPlanningState(modelState);
-	mCurrentState->setEnergy(1.0e5);
-	//my hand might be a clone
-	mCurrentState->changeHand(mHand, true);
+  if (mCurrentState) { delete mCurrentState; }
+  mCurrentState = new GraspPlanningState(modelState);
+  mCurrentState->setEnergy(1.0e5);
+  //my hand might be a clone
+  mCurrentState->changeHand(mHand, true);
 
-	if (mTargetState && (mTargetState->readPosition()->getType() != mCurrentState->readPosition()->getType() ||
-						 mTargetState->readPosture()->getType() != mCurrentState->readPosture()->getType() ) ) {
-		delete mTargetState; mTargetState = NULL;
-    }
-	if (!mTargetState) {
-		mTargetState = new GraspPlanningState(mCurrentState);
-		mTargetState->reset();
-		mInputType = INPUT_NONE;
-	}
-	invalidateReset();
+  if (mTargetState && (mTargetState->readPosition()->getType() != mCurrentState->readPosition()->getType() ||
+                       mTargetState->readPosture()->getType() != mCurrentState->readPosture()->getType())) {
+    delete mTargetState; mTargetState = NULL;
+  }
+  if (!mTargetState) {
+    mTargetState = new GraspPlanningState(mCurrentState);
+    mTargetState->reset();
+    mInputType = INPUT_NONE;
+  }
+  invalidateReset();
 }
 
 void
 SimAnnPlanner::mainLoop()
 {
-	GraspPlanningState *input = NULL;
-	if ( processInput() ) {
-		input = mTargetState;
-	}
+  GraspPlanningState *input = NULL;
+  if (processInput()) {
+    input = mTargetState;
+  }
 
-	//call sim ann
-	SimAnn::Result result = mSimAnn->iterate(mCurrentState, mEnergyCalculator, input);
-	if ( result == SimAnn::FAIL) {
-		DBGP("Sim ann failed");
-		return;
-	}
-	DBGP("Sim Ann success");
+  //call sim ann
+  SimAnn::Result result = mSimAnn->iterate(mCurrentState, mEnergyCalculator, input);
+  if (result == SimAnn::FAIL) {
+    DBGP("Sim ann failed");
+    return;
+  }
+  DBGP("Sim Ann success");
 
-	//put result in list if there's room or it's better than the worst solution so far
-	double worstEnergy;
-	if ((int)mBestList.size() < BEST_LIST_SIZE) worstEnergy = 1.0e5;
-	else worstEnergy = mBestList.back()->getEnergy();
-	if (result == SimAnn::JUMP && mCurrentState->getEnergy() < worstEnergy) {
-		GraspPlanningState *insertState = new GraspPlanningState(mCurrentState);
-		//but check if a similar solution is already in there
-		if (!addToListOfUniqueSolutions(insertState,&mBestList,0.2)) {
-			delete insertState;
-		} else {
-			mBestList.sort(GraspPlanningState::compareStates);
-			while ((int)mBestList.size() > BEST_LIST_SIZE) {
-				delete(mBestList.back());
-				mBestList.pop_back();
-			}
-		}
-	}
-	render();
-	mCurrentStep = mSimAnn->getCurrentStep();
-	if (mCurrentStep % 100 == 0 && !mMultiThread) Q_EMIT update();
-	if (mMaxSteps == 200) {DBGP("Child at " << mCurrentStep << " steps");}
+  //put result in list if there's room or it's better than the worst solution so far
+  double worstEnergy;
+  if ((int)mBestList.size() < BEST_LIST_SIZE) { worstEnergy = 1.0e5; }
+  else { worstEnergy = mBestList.back()->getEnergy(); }
+  if (result == SimAnn::JUMP && mCurrentState->getEnergy() < worstEnergy) {
+    GraspPlanningState *insertState = new GraspPlanningState(mCurrentState);
+    //but check if a similar solution is already in there
+    if (!addToListOfUniqueSolutions(insertState, &mBestList, 0.2)) {
+      delete insertState;
+    } else {
+      mBestList.sort(GraspPlanningState::compareStates);
+      while ((int)mBestList.size() > BEST_LIST_SIZE) {
+        delete(mBestList.back());
+        mBestList.pop_back();
+      }
+    }
+  }
+  render();
+  mCurrentStep = mSimAnn->getCurrentStep();
+  if (mCurrentStep % 100 == 0 && !mMultiThread) { Q_EMIT update(); }
+  if (mMaxSteps == 200) {DBGP("Child at " << mCurrentStep << " steps");}
 }

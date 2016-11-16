@@ -38,30 +38,30 @@ class World;
 class KinematicChain;
 
 class BulletDynamics : public DynamicsEngine {
- public:
-  explicit BulletDynamics(World *world);
-  ~BulletDynamics();
-  void addBody(Body *newBody);
-  void addRobot(Robot *robot);
-  void addChain(KinematicChain *chain, btRigidBody *btbase);
-  void turnOnDynamics();
-  void turnOffDynamics();
-  int stepDynamics();
-  double moveDynamicBodies(double timeStep);
-  int computeNewVelocities(double timeStep);
-  void btApplyInternalWrench (Joint * activeJoint, double magnitude, std::map<Body*, btRigidBody*> btBodyMap);
+  public:
+    explicit BulletDynamics(World *world);
+    ~BulletDynamics();
+    void addBody(Body *newBody);
+    void addRobot(Robot *robot);
+    void addChain(KinematicChain *chain, btRigidBody *btbase);
+    void turnOnDynamics();
+    void turnOffDynamics();
+    int stepDynamics();
+    double moveDynamicBodies(double timeStep);
+    int computeNewVelocities(double timeStep);
+    void btApplyInternalWrench(Joint *activeJoint, double magnitude, std::map<Body *, btRigidBody *> btBodyMap);
 
- private:
-  World *mWorld;
+  private:
+    World *mWorld;
 
-  btDiscreteDynamicsWorld* mBtDynamicsWorld;
-  btAlignedObjectArray<btRigidBody*> mBtLinks;
-  
-  typedef std::pair<Body*, btRigidBody*> btBodyPair;
-  std::map<Body*, btRigidBody*> btBodyMap;
+    btDiscreteDynamicsWorld *mBtDynamicsWorld;
+    btAlignedObjectArray<btRigidBody *> mBtLinks;
 
-  typedef std::pair<Body*, btHingeConstraint*> btJointPair;
-  std::map<Joint*, btHingeConstraint*> btJointMap;
+    typedef std::pair<Body *, btRigidBody *> btBodyPair;
+    std::map<Body *, btRigidBody *> btBodyMap;
+
+    typedef std::pair<Body *, btHingeConstraint *> btJointPair;
+    std::map<Joint *, btHingeConstraint *> btJointMap;
 };
 
 #endif

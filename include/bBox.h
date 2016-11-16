@@ -31,43 +31,43 @@
 
 #include <iostream>
 
-/*! A bounding box. Transform holds the translation to the center of the box and 
-	the rotation to make the box axes align with coordinate axes. HalfSize is the extents
-	of half of the box along each axis.
+/*! A bounding box. Transform holds the translation to the center of the box and
+  the rotation to make the box axes align with coordinate axes. HalfSize is the extents
+  of half of the box along each axis.
 */
 class BoundingBox
 {
-private:
-	transf mTran;
-	transf mTranInv;
-public:
-	vec3 halfSize;
-	//for debugging purposes
-	mutable bool mMark;
-	BoundingBox(const transf &t, const vec3 &v) : mTran(t), mTranInv(t.inverse()), 
-												  halfSize(v), mMark(false) {}
-	BoundingBox(const BoundingBox &b) : mTran(b.getTran()), mTranInv(b.getTranInv()), 
-										halfSize(b.halfSize), mMark(b.mMark) {}
-	BoundingBox() : mTran(), mTranInv(), halfSize(), mMark(false){}
-	INLINE_RELEASE void applyTransform(const transf &t);
-	void setTran(const transf &t) {
-		mTran = t;
-		mTranInv = mTran.inverse();
-	}
-	const transf& getTran() const {return mTran;}
-	const transf& getTranInv() const {return mTranInv;}
+  private:
+    transf mTran;
+    transf mTranInv;
+  public:
+    vec3 halfSize;
+    //for debugging purposes
+    mutable bool mMark;
+    BoundingBox(const transf &t, const vec3 &v) : mTran(t), mTranInv(t.inverse()),
+      halfSize(v), mMark(false) {}
+    BoundingBox(const BoundingBox &b) : mTran(b.getTran()), mTranInv(b.getTranInv()),
+      halfSize(b.halfSize), mMark(b.mMark) {}
+    BoundingBox() : mTran(), mTranInv(), halfSize(), mMark(false) {}
+    INLINE_RELEASE void applyTransform(const transf &t);
+    void setTran(const transf &t) {
+      mTran = t;
+      mTranInv = mTran.inverse();
+    }
+    const transf &getTran() const {return mTran;}
+    const transf &getTranInv() const {return mTranInv;}
 };
 
-INLINE_RELEASE bool 
+INLINE_RELEASE bool
 bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2To1);
 
-INLINE_RELEASE double 
+INLINE_RELEASE double
 bboxDistanceSq(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2To1);
 
-INLINE_RELEASE double 
+INLINE_RELEASE double
 bboxDistanceApp(const BoundingBox &bb1, const BoundingBox &bb2);
 
-INLINE_RELEASE double 
+INLINE_RELEASE double
 pointBoxDistanceSq(const BoundingBox &bbox, const position &p);
 
 INLINE_RELEASE

@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: settingsDlg.h,v 1.3 2009/04/21 14:53:09 cmatei Exp $
 //
@@ -27,7 +27,7 @@
 #define _settingsdlg_h_
 
 /*! \file
-  \brief Implements the SettingsDlg, the user preferences dialog box. 
+  \brief Implements the SettingsDlg, the user preferences dialog box.
 */
 
 #include "ui_settingsDlg.h"
@@ -49,32 +49,32 @@
 
 class SettingsDlg : public QObject
 {
-	Q_OBJECT
-private:
-	double currCOFVal, currKCOFVal;
-	QDialog *dlgImpl;
-	void init();
+    Q_OBJECT
+  private:
+    double currCOFVal, currKCOFVal;
+    QDialog *dlgImpl;
+    void init();
 
-private Q_SLOTS:
-	void checkCOFEntry( int row, int col );
-	void saveCurrentCOF( int row, int col );
-	void saveCurrentKCOF( int row, int col );
-	void checkKCOFEntry( int row, int col );
-	void validateDlg();
+  private Q_SLOTS:
+    void checkCOFEntry(int row, int col);
+    void saveCurrentCOF(int row, int col);
+    void saveCurrentKCOF(int row, int col);
+    void checkKCOFEntry(int row, int col);
+    void validateDlg();
 
-public:
-	Ui::SettingsDlgUI *dlgUI;
-	SettingsDlg(QWidget * parent = 0, Qt::WFlags f = 0){
-		dlgImpl = new QDialog(parent, f);
-		dlgUI = new Ui::SettingsDlgUI;
-		dlgUI->setupUi(dlgImpl);
-		init();
-	}
-	~SettingsDlg();
-	int exec(){return dlgImpl->exec();}
-	void setAttribute(Qt::WidgetAttribute attribute, bool on = true) {
-		dlgImpl->setAttribute(attribute,on);
-	};
+  public:
+    Ui::SettingsDlgUI *dlgUI;
+    SettingsDlg(QWidget *parent = 0, Qt::WFlags f = 0) {
+      dlgImpl = new QDialog(parent, f);
+      dlgUI = new Ui::SettingsDlgUI;
+      dlgUI->setupUi(dlgImpl);
+      init();
+    }
+    ~SettingsDlg();
+    int exec() {return dlgImpl->exec();}
+    void setAttribute(Qt::WidgetAttribute attribute, bool on = true) {
+      dlgImpl->setAttribute(attribute, on);
+    };
 
 };
 
