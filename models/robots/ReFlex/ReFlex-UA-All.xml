@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+    <palm>palm-with-pad.xml</palm>
+
+<!-- sideways finger motion -->
+    <dof type="r">
+        <defaultVelocity>0.0</defaultVelocity>
+        <maxEffort>5.0e+10</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+    </dof>
+
+<!-- finger 1 -->
+    <dof type="b">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+
+<!-- finger 2 -->
+    <dof type="b">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+
+<!-- thumb -->
+    <dof type="b">
+        <defaultVelocity>1.0</defaultVelocity>
+        <maxEffort>2.5e+9</maxEffort>
+        <Kp>1.0e+11</Kp>
+        <Kd>1.0e+7</Kd>
+        <draggerScale>20</draggerScale>
+        <breakAwayTorque>0.5</breakAwayTorque>
+    </dof>
+
+<!-- finger 1 -->
+    <chain>
+        <transform> 
+	  <translation>50.4 -26 63</translation>
+          <rotation>180 x</rotation>
+	</transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>-18.6</d>
+            <a>10</a> 
+            <alpha>-90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1</theta>
+            <d>0</d>
+            <a>68</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <!--
+		I needed to increase this way beyond
+		the actual physical limits in order for
+		the distal to rotate by the right amount
+		after breakaway occurs
+		<maxValue>160</maxValue>-->
+            <maxValue>340</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d1*0.2+20</theta>
+            <d>0</d>
+            <a>63</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>120</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">swivel.xml</link>
+        <link dynamicJointType="Revolute">proximal-with-pad.xml</link>
+        <link dynamicJointType="Revolute">distal-with-pad.xml</link>
+    </chain>
+
+<!-- finger 2 -->
+    <chain>
+        <transform> 
+	  <translation>50.4 26 63</translation>
+	</transform>
+        <joint type="Revolute">
+            <theta>d0</theta>
+            <d>18.6</d>
+            <a>10</a> 
+            <alpha>90</alpha>
+            <minValue>0</minValue>
+            <maxValue>90</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2</theta>
+            <d>0</d>
+            <a>68</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>340</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d2*0.2+20</theta>
+            <d>0</d>
+            <a>63</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>120</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">swivel.xml</link>
+        <link dynamicJointType="Revolute">proximal-with-pad.xml</link>
+        <link dynamicJointType="Revolute">distal-with-pad.xml</link>
+    </chain>
+
+<!-- thumb -->
+    <chain>
+        <transform>
+            <translation>-30 0 81.6 </translation>
+	    <rotation>-90 x</rotation>
+        </transform>
+        <joint type="Revolute">
+            <theta>d3+180</theta>
+            <d>0</d>
+            <a>68</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>340</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <joint type="Revolute">
+            <theta>d3*0.2+20</theta>
+            <d>0</d>
+            <a>63</a>
+            <alpha>0</alpha>
+            <minValue>0</minValue>
+            <maxValue>120</maxValue>
+            <viscousFriction>5.0e+7</viscousFriction>
+        </joint>
+        <link dynamicJointType="Revolute">proximal-with-pad.xml</link>
+        <link dynamicJointType="Revolute">distal-with-pad.xml</link>
+    </chain>
+
+<!-- grasping parameters  -->
+    <approachDirection>
+        <referenceLocation>0 0 73</referenceLocation>
+        <direction>0 0 1</direction>
+    </approachDirection>
+
+    <virtualContacts>virtual/reflex_all_virtual.vgr</virtualContacts>
+<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only.vgr</virtualContacts>-->
+<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only-old.vgr</virtualContacts>-->
+<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only2.vgr</virtualContacts>-->
+
+    <eigenGrasps>eigen/reflex_ua_eigen.xml</eigenGrasps>
+
+</robot>
