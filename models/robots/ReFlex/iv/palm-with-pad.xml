@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<root>
+    <material>rubber</material>
+    <!--<geometryFile>palm-with-pad.wrl</geometryFile>-->
+    <geometryFile>palm-with-pad-scaled2.wrl</geometryFile>
+<!--
+    <mass>0</mass>
+    <cog>0 0 0</cog>
+    <inertia_matrix>0 0 0 0 0 0 0 0 0</inertia_matrix>
+-->
+</root>
