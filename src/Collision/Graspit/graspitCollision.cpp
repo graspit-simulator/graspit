@@ -472,7 +472,7 @@ GraspitCollision::bodyToBodyDistance(const Body *body1, const Body *body2,
   dc.getClosestPoints(p1, p2);
   //the legacy interface requests p1 and p2 in each body's coordinate system
   p1 = body1->getTran().inverse().applyTransform(p1);
-  p2 = body1->getTran().inverse().applyTransform(p2);
+  p2 = body2->getTran().inverse().applyTransform(p2);
   return dc.getMin();
 }
 

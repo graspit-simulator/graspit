@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <limits>
 
-//#define GRASPITDBG
+#define GRASPITDBG
 #include "debug.h"
 #ifdef MKL
 #include "mkl_wrappers.h"
@@ -114,8 +114,17 @@ void Leaf::fitBox(const mat3 &R, vec3 &center, vec3 &halfSize)
   }
   DBGP("computed halfsize: " << halfSize);
   //halfSize = 0.5 * (max - min);
+
   center = min + halfSize;
+  std::cout << std::endl << "center1: " << center << std::endl;
+  std::cout << "R: " << R << std::endl;
+  std::cout << "R02: " << R(0) << " " << R(1) << " " << R(2) << std::endl;
+  std::cout << "R35: " << R(3) << " " << R(4) << " " << R(5) << std::endl;
+  std::cout << "R68: " << R(6) << " " << R(7) << " " << R(8) << std::endl;
+  std::cout << "R.row(0): " << R.row(0);
+  std::cout << "R.inverse(): " << R.inverse() << std::endl;
   center = R.inverse() * center;
+  std::cout << "center2: " << center << std::endl;
   //sanity check
   for (int i = 0; i < 3; i++) {
     if (halfSize[i] < TOLERANCE) {
@@ -165,6 +174,7 @@ void Leaf::areaWeightedCovarianceMatrix(double covMat[3][3])
 
 void Leaf::computeBboxOO()
 {
+  std::cout << "Leaf::computeBboxOO() start " << std::endl;
   //compute the covariance matrix
   double covMat[3][3], v[3][3];
   areaWeightedCovarianceMatrix(covMat);
@@ -194,11 +204,16 @@ void Leaf::computeBboxOO()
   yAxis = zAxis.cross(xAxis.normalized());
   xAxis = yAxis.cross(zAxis);
   mat3 R;
-  R.col(0) = xAxis;
-  R.col(1) = yAxis;
-  R.col(2) = zAxis;
+  R.row(0) = xAxis;
+  R.row(1) = yAxis;
+  R.row(2) = zAxis;
+
+  std::cout << "xAxis: " << xAxis << std::endl;
+  std::cout << "yAxis: " << yAxis << std::endl;
+  std::cout << "zAxis: " << zAxis << std::endl;
 
   DBGP("Matrix: " << R);
+
 
   //compute bbox extents
   vec3 halfSize, center;
@@ -225,6 +240,9 @@ void Leaf::computeBboxOO()
 
   mBbox.halfSize = halfSize;
   mBbox.setTran(transf(R, center));
+
+  std::cout << "Leaf::computeBboxOO() end " << std::endl;
+  sleep(10);
 }
 
 void Leaf::computeBboxAA()
@@ -233,7 +251,9 @@ void Leaf::computeBboxAA()
   vec3 halfSize, center;
   fitBox(R, center, halfSize);
   mBbox.halfSize = halfSize;
+  std::cout << "computeBboxAA R: " << R << std::endl;
   mBbox.setTran(transf(R, center));
+  sleep(10);
 }
 
 /*! The split process goes through the followins stages:
@@ -430,6 +450,7 @@ Leaf::optimalSplit(const vec3 &x, const vec3 &y, const vec3 &z, Leaf *child1, Le
 
 void Node::getBVRecurse(int currentDepth, int desiredDepth, std::vector<BoundingBox> *bvs)
 {
+  std::cout << "Node::getBVRecurse: " << currentDepth << std::endl;
   if (currentDepth == desiredDepth || isLeaf()) {
     bvs->push_back(BoundingBox(mBbox));
     DBGP("BBox tran: " << mBbox.getTran());
@@ -440,6 +461,7 @@ void Node::getBVRecurse(int currentDepth, int desiredDepth, std::vector<Bounding
 
 void Branch::getBVRecurse(int currentDepth, int desiredDepth, std::vector<BoundingBox> *bvs)
 {
+  std::cout << "Branch::getBVRecurse: " << currentDepth << std::endl;
   Node::getBVRecurse(currentDepth, desiredDepth, bvs);
   if (currentDepth < desiredDepth) {
     mChild1->getBVRecurse(currentDepth + 1, desiredDepth, bvs);

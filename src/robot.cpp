@@ -289,9 +289,9 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
     xdir = ydir.cross(zdir);
 
     mat3 r;
-    r.col(0) = xdir;
-    r.col(1) = ydir;
-    r.col(2) = zdir;
+    r.row(0) = xdir;
+    r.row(1) = ydir;
+    r.row(2) = zdir;
     approachTran.set(r, aPt);
   }
   addApproachGeometry();
@@ -1801,9 +1801,9 @@ along the approach direction.
 double
 Robot::getApproachDistance(Body *object, double maxDist)
 {
-  position p0 = getTran().applyTransform(getApproachTran().applyTransform(position(0, 0, 0)));
+  position p0 = (getTran() % getApproachTran()).applyTransform(position(0, 0, 0));
   position p = p0;
-  vec3 app = getTran().applyRotation(getApproachTran().applyRotation(vec3(0, 0, 1)));
+  vec3 app = (getTran() % getApproachTran()).applyRotation(vec3(0, 0, 1));
   bool done = false;
   double totalDist = 0;
   vec3 direction;

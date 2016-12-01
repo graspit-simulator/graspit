@@ -63,9 +63,9 @@ void ScanSimulator::setPosition(position p, vec3 optical_axis, vec3 up_axis, Axe
   switch (convention) {
     case STEREO_CAMERA:
       mat3 m;
-      m.col(0) = -1.0 * mHorizDirection;
-      m.col(1) = -1.0 * mUp;
-      m.col(2) = mDirection;
+      m.row(0) = -1.0 * mHorizDirection;
+      m.row(1) = -1.0 * mUp;
+      m.row(2) = mDirection;
       mTran = transf(m, vec3(mPosition.x(), mPosition.y(), mPosition.z()));
       mTranInv = mTran.inverse();
       break;

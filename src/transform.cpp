@@ -40,9 +40,9 @@ transf::COORDINATE(const position &o, const vec3 &xaxis, const vec3 &yaxis)
   vec3 newzaxis = (newxaxis.cross(yaxis)).normalized();
   vec3 newyaxis = (newzaxis.cross(newxaxis)).normalized();
   mat3 m;
-  m.col(0) = newxaxis;
-  m.col(1) = newyaxis;
-  m.col(2) = newzaxis;
+  m.row(0) = newxaxis;
+  m.row(1) = newyaxis;
+  m.row(2) = newzaxis;
   return transf(m, o);
 }
 

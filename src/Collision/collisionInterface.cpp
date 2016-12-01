@@ -98,7 +98,7 @@ CollisionInterface::compactContactSet(ContactReport *contacts)
       ContactReport::iterator it;
       for (it = sp->begin(); it != sp->end(); it++) {
         vec3 dist = it->b1_pos - cp->b1_pos;
-        if (dist.norm()*dist.norm() < DISTANCE_TOLERANCE) { break; }
+        if (dist.squaredNorm() < DISTANCE_TOLERANCE) { break; }
       }
       if (it == sp->end()) { sp->push_back(*cp); }
     }

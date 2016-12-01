@@ -634,7 +634,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         if ((*cp)->getBody1() == bodyVec[bn]) { break; }
       if (bn < numBodies) {
         //????? this doesn't seem correct
-        vec3 radius = cf.translation() - (*cp)->getBody1Tran().applyTransform(bodyVec[bn]->getCoG());
+        vec3 radius = cf.translation() - ((*cp)->getBody1Tran().applyTransform(bodyVec[bn]->getCoG())- position::Zero());
 
         //  radius = radius / 1000.0;  // convert to meters
 
