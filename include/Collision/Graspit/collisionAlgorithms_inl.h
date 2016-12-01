@@ -123,13 +123,13 @@ void ContactCallback::leafTest(const Leaf *l1, const Leaf *l2)
         position p1 = (*it).first;
         position p2 = (*it).second;
         //compute normals
-        vec3 n1 = normalise(p1 - p2);
-        vec3 n2 = normalise(p2 - p1);
+        vec3 n1 = (p1 - p2).normalized();
+        vec3 n2 = (p2 - p1).normalized();
         //convert one contact point back to the coordinate system of the leaf l1
-        p1 = p1 * mTran2To1;
-        n1 = n1 * mTran2To1;
+        p1 = mTran2To1.applyRotation(p1);
+        n1 = mTran2To1.applyRotation(n1);
         //add new contact to list. No check for duplication is performed
-        mReport.push_back(ContactData(p1, p2, n1, n2, (p1 - p2) % (p1 - p2)));
+        mReport.push_back(ContactData(p1, p2, n1, n2, (p1 - p2).dot(p1 - p2)));
       }
 
       /*
@@ -191,7 +191,7 @@ void DistanceCallback::leafTest(const Leaf *l1, const Leaf *l2)
       //both points get computed in the coordinate system of leaf 2
       double distSq = triangleTriangleDistanceSq(t1, *it2, p1, p2);
       if (distSq < mMinDistSq) {
-        p1 = p1 * mTran2To1;
+        p1 = mTran2To1.applyRotation(p1);
         if (distSq >= 0.0) {
           mP1 = p1; mP2 = p2;
         } else {
@@ -220,7 +220,7 @@ ClosestPtCallback::leafTest(const Leaf *l1, const Leaf *l2)
     //closest pt callback operates in body coordinates
     position p1 = closestPtTriangle(t1, mRefPosition);
     //distance sq from point to triangle
-    double distSq = (p1 - mRefPosition).len_sq();//point triangle test
+    double distSq = (p1 - mRefPosition).squaredNorm();//point triangle test
     if (distSq < mMinDistSq) {
       mMinDistSq = distSq;
       mClosestPt = p1;
@@ -264,9 +264,9 @@ RegionCallback::leafTest(const Leaf *l1, const Leaf *l2)
     //check normal first
     vec3 normal = t1.normal();
     //remember that contact normal points inwards
-    if (normal % mNormal > 0) { continue; }
+    if (normal.dot(mNormal) > 0) { continue; }
     position p1 = closestPtTriangle(t1, mRefPosition);
-    double distSq = (p1 - mRefPosition).len_sq();
+    double distSq = (p1 - mRefPosition).squaredNorm();
     if (distSq > mRadiusSq) { continue; }
     insertPoint(t1.v1);
     insertPoint(t1.v2);

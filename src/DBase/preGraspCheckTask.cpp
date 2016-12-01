@@ -191,7 +191,7 @@ bool PreGraspCheckTask::checkSetGrasp(db_planner::Grasp *grasp)
 
   /*
   //move the grasp back by 42mm
-  transf t(Quaternion::IDENTITY, vec3(-42, 0, 0));
+  transf t(Quaternion::Identity(), vec3(-42, 0, 0));
   GraspitDBGrasp* dbg = static_cast<GraspitDBGrasp*>(grasp);
 
   GraspPlanningState *movedPreGrasp = new GraspPlanningState(dbg->getPreGraspPlanningState());

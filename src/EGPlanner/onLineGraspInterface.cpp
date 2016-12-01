@@ -75,7 +75,7 @@ OnLineGraspInterface::getSuggestedDOF(const GraspPlanningState *s, double *initi
   transf handTran = mHand->getTran();
   transf solTran = s->getTotalTran();
   vec3 app = handTran.translation() - solTran.translation();
-  double dist = app.len();
+  double dist = app.norm();
 
   //first find how much we should open the fingers, based on distance from solution
   double openFingers = dist / 200.0;

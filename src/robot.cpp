@@ -280,15 +280,18 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       return FAILURE;
     }
     vec3 zdir = vec3(locX, locY, locZ);
-    zdir = normalise(zdir);
+    zdir = zdir.normalized();
 
     vec3 xdir;
-    if (fabs(zdir % vec3(1, 0, 0)) > 0.9) { xdir = vec3(0, 1, 0); }
+    if (fabs(zdir.dot(vec3(1, 0, 0))) > 0.9) { xdir = vec3(0, 1, 0); }
     else { xdir = vec3(1, 0, 0); }
-    vec3 ydir = zdir * xdir;
-    xdir = ydir * zdir;
+    vec3 ydir = zdir.cross(xdir);
+    xdir = ydir.cross(zdir);
 
-    mat3 r(xdir, ydir, zdir);
+    mat3 r;
+    r.col(0) = xdir;
+    r.col(1) = ydir;
+    r.col(2) = zdir;
     approachTran.set(r, aPt);
   }
   addApproachGeometry();
@@ -857,18 +860,18 @@ Robot::invKinematics(const transf &targetPos, double *dofVals, int chainNum)
 
     vec3 v1, v2;
     mat3 m1, m2;
-    currentPos.rotation().ToRotationMatrix(m1);
-    targetPos.rotation().ToRotationMatrix(m2);
+    m1 = currentPos.rotation().toRotationMatrix();
+    m2 = targetPos.rotation().toRotationMatrix();
 
-    v1 = vec3(m1.element(0, 0), m1.element(0, 1), m1.element(0, 2));
-    v2 = vec3(m2.element(0, 0), m2.element(0, 1), m2.element(0, 2));
-    dtOrientation = v1 * v2;
-    v1 = vec3(m1.element(1, 0), m1.element(1, 1), m1.element(1, 2));
-    v2 = vec3(m2.element(1, 0), m2.element(1, 1), m2.element(1, 2));
-    dtOrientation += v1 * v2;
-    v1 = vec3(m1.element(2, 0), m1.element(2, 1), m1.element(2, 2));
-    v2 = vec3(m2.element(2, 0), m2.element(2, 1), m2.element(2, 2));
-    dtOrientation += v1 * v2;
+    v1 = vec3(m1(0, 0), m1(0, 1), m1(0, 2));
+    v2 = vec3(m2(0, 0), m2(0, 1), m2(0, 2));
+    dtOrientation = v1.cross(v2);
+    v1 = vec3(m1(1, 0), m1(1, 1), m1(1, 2));
+    v2 = vec3(m2(1, 0), m2(1, 1), m2(1, 2));
+    dtOrientation += v1.cross(v2);
+    v1 = vec3(m1(2, 0), m1(2, 1), m1(2, 2));
+    v2 = vec3(m2(2, 0), m2(2, 1), m2(2, 2));
+    dtOrientation += v1.cross(v2);
     dtOrientation *= 0.5;
 
     deltaPR.elem(0, 0) = dtLocation[0];
@@ -1798,9 +1801,9 @@ along the approach direction.
 double
 Robot::getApproachDistance(Body *object, double maxDist)
 {
-  position p0 = position(0, 0, 0) * getApproachTran() * getTran();
+  position p0 = getTran().applyRotation(getApproachTran().applyRotation(position(0, 0, 0)));
   position p = p0;
-  vec3 app = vec3(0, 0, 1) * getApproachTran() * getTran();
+  vec3 app = getTran().applyRotation(getApproachTran().applyRotation(vec3(0, 0, 1)));
   bool done = false;
   double totalDist = 0;
   vec3 direction;
@@ -1813,11 +1816,11 @@ Robot::getApproachDistance(Body *object, double maxDist)
     //current closest point on the object
     position pc = p; pc += direction;
     //and its direction rel. to approach direction
-    if (normalise(pc - p0) % app > 0.86) {
+    if ((pc - p0).normalized().dot(app) > 0.86) {
       done = true;
     }
     //advance along approach direction
-    double d = direction.len();
+    double d = direction.norm();
     totalDist += d;
     p += d * app;
     if (totalDist > maxDist) { done = true; }
@@ -2050,12 +2053,14 @@ Robot::generateCartesianTrajectory(const transf &startTr, const transf &endTr,
   vec3 newPos, axis;
   Quaternion newRot;
 
-  (endTr.rotation() * startTr.rotation().inverse()).ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa (endTr.rotation() * startTr.rotation().inverse());
+  angle = aa.angle();
+  axis = aa.axis();
 
   if (timeNeeded <= 0.0) {
     if (defaultTranslVel == 0.0 || defaultRotVel == 0.0) { return; }
     timeNeeded =
-      MAX((endTr.translation() - startTr.translation()).len() / defaultTranslVel,
+      MAX((endTr.translation() - startTr.translation()).norm() / defaultTranslVel,
           fabs(angle) / defaultRotVel);
   }
 
@@ -2084,7 +2089,7 @@ Robot::generateCartesianTrajectory(const transf &startTr, const transf &endTr,
       tpow *= t;
       dist += tpow * coeffs[j];
     }
-    newRot = Quaternion::Slerp(dist, startTr.rotation(), endTr.rotation());
+    newRot = startTr.rotation().slerp(dist, endTr.rotation());
     newPos = (1.0 - dist) * startTr.translation() + dist * endTr.translation();
     traj.push_back(transf(newRot, newPos));
   }
@@ -2408,7 +2413,7 @@ state that is collision-free.
 bool
 Hand::approachToContact(double moveDist, bool oneStep)
 {
-  transf newTran = translate_transf(vec3(0, 0, moveDist) * getApproachTran()) * getTran();
+  transf newTran = transf::TRANSLATION(getApproachTran().applyRotation(vec3(0, 0, moveDist))) * getTran();
   bool result;
   if (oneStep) {
     result = moveTo(newTran, WorldElement::ONE_STEP, WorldElement::ONE_STEP);
@@ -2434,8 +2439,7 @@ Hand::findInitialContact(double moveDist)
 {
   CollisionReport colReport;
   while (myWorld->getCollisionReport(&colReport)) {
-    transf newTran = translate_transf(vec3(0, 0, -moveDist / 2.0) *
-                                      getApproachTran()) * getTran();
+    transf newTran = transf::TRANSLATION(getApproachTran().applyRotation(vec3(0, 0, -moveDist / 2.0))) * getTran();
     setTran(newTran);
   }
   return approachToContact(moveDist, false);

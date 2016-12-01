@@ -23,9 +23,9 @@ PotentialQualityEnergy::energy() const
     contact->computeWrenches(true, false);
     contact->getObjectDistanceAndNormal(mObject, &p, NULL);
     n = contact->getWorldNormal();
-    double dist = p.len();
-    p = normalise(p); //idiot programmer forgot to normalise
-    double cosTheta = n % p;
+    double dist = p.norm();
+    p = p.normalized();
+    double cosTheta = n.dot(p);
     double factor = potentialQualityScalingFunction(dist, cosTheta);
     if (verbose)
     {

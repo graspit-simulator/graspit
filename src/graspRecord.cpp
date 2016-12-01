@@ -48,7 +48,7 @@ void GraspRecord::writeToFile(FILE *fp)
   fprintf(fp, "%s\n", mRobotName.latin1());
   //write transform
   Quaternion q = mTran.rotation();
-  fprintf(fp, "%f %f %f %f ", q.x, q.y, q.z, q.w);
+  fprintf(fp, "%f %f %f %f ", q.x(), q.y(), q.z(), q.w());
   vec3 t = mTran.translation();
   fprintf(fp, "%f %f %f\n", t.x(), t.y(), t.z());
   //write pose

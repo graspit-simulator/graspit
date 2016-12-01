@@ -40,6 +40,8 @@
 #include "grasp_coordinates.h"
 #include <iostream>
 
+#include <QtGlobal>
+
 #define cout std::cout
 #define endl std::endl
 
@@ -47,28 +49,28 @@
 /*!
   Initializes vec3 class with \a a , \a b , \a c .
 */
-coordinates::coordinates(double a, double b, double c) : vec3(a, b, c)
+coordinates::coordinates(double a, double b, double c) : mvec(a, b, c)
 {
 }
 
 /*!
   Initializes vec3 class with a copy of the values in \a c .
 */
-coordinates::coordinates(coordinates *c) : vec3(c->x(), c->y(), c->z())
+coordinates::coordinates(coordinates *c) : mvec(c->x(), c->y(), c->z())
 {
 }
 
 /*!
   Initializes vec3 class by copying the values of \a v .
 */
-coordinates::coordinates(vec3 v) : vec3(v.x(), v.y(), v.z())
+coordinates::coordinates(vec3 v) : mvec(v.x(), v.y(), v.z())
 {
 }
 
 /*!
   Initializes vec3 class with 0,0,0.
 */
-coordinates::coordinates() : vec3(0., 0., 0.)
+coordinates::coordinates() : mvec(0., 0., 0.)
 {
 }
 
@@ -97,7 +99,7 @@ coordinates::set_coord_system_type(coord_system_type ct)
 cartesian_coordinates
 coordinates::get_pos_cartesian() const
 {
-  return cartesian_coordinates(x(), y(), z());
+  return cartesian_coordinates(mvec.x(), mvec.y(), mvec.z());
 }
 
 /*!
@@ -106,7 +108,7 @@ coordinates::get_pos_cartesian() const
 cylindrical_coordinates
 coordinates::get_pos_cylindrical() const
 {
-  return cylindrical_coordinates(x(), y(), z());
+  return cylindrical_coordinates(mvec.x(), mvec.y(), mvec.z());
 }
 
 /*!
@@ -115,7 +117,7 @@ coordinates::get_pos_cylindrical() const
 spherical_coordinates
 coordinates::get_pos_spherical() const
 {
-  return spherical_coordinates(x(), y(), z());
+  return spherical_coordinates(mvec.x(), mvec.y(), mvec.z());
 }
 
 /*!
@@ -124,8 +126,8 @@ coordinates::get_pos_spherical() const
 cartesian_coordinates
 coordinates::get_vec_cartesian(coordinates from) const
 {
-  cout << "PL_OUT: get_vec_whatever of base class coordinates should not be called; makes no sense" << from << endl;
-  return cartesian_coordinates(x(), y(), z());
+  cout << "PL_OUT: get_vec_whatever of base class coordinates should not be called; makes no sense" << from.mvec << endl;
+  return cartesian_coordinates(mvec.x(), mvec.y(), mvec.z());
 }
 
 /*!
@@ -134,8 +136,8 @@ coordinates::get_vec_cartesian(coordinates from) const
 cylindrical_coordinates
 coordinates::get_vec_cylindrical(coordinates from) const
 {
-  cout << "PL_OUT: get_vec_whatever of base class coordinates should not be called; makes no sense" << from << endl;
-  return cylindrical_coordinates(x(), y(), z());
+  cout << "PL_OUT: get_vec_whatever of base class coordinates should not be called; makes no sense" << from.mvec << endl;
+  return cylindrical_coordinates(mvec.x(), mvec.y(), mvec.z());
 }
 
 /*!
@@ -144,8 +146,8 @@ coordinates::get_vec_cylindrical(coordinates from) const
 spherical_coordinates
 coordinates::get_vec_spherical(coordinates from) const
 {
-  cout << "PL_OUT: get_vec_whatever of base class coordinates should not be called; makes no sense" << from << endl;
-  return spherical_coordinates(x(), y(), z());
+  cout << "PL_OUT: get_vec_whatever of base class coordinates should not be called; makes no sense" << from.mvec << endl;
+  return spherical_coordinates(mvec.x(), mvec.y(), mvec.z());
 }
 
 /*!
@@ -169,7 +171,7 @@ coordinates::operator==(coordinates c)
 double
 coordinates::distanceTo(coordinates to) const
 {
-  cout << "PL_OUT: Distance in coordinates base class makes no sense: NOT IMPLEMENTED. Returning 0.0" << to << endl;
+  cout << "PL_OUT: Distance in coordinates base class makes no sense: NOT IMPLEMENTED. Returning 0.0" << to.mvec << endl;
   return 0.0;
 }
 
@@ -196,7 +198,7 @@ cartesian_coordinates::cartesian_coordinates(cartesian_coordinates *cc) : coordi
 /*!
   Copies coordinate values from \a cc .
 */
-cartesian_coordinates::cartesian_coordinates(const cartesian_coordinates &cc) : coordinates(cc.x(), cc.y(), cc.z())
+cartesian_coordinates::cartesian_coordinates(const cartesian_coordinates &cc) : coordinates(cc.mvec.x(), cc.mvec.y(), cc.mvec.z())
 {
   set_coord_system_type(cartesian);
 }
@@ -234,10 +236,10 @@ cylindrical_coordinates
 cartesian_coordinates::get_pos_cylindrical() const
 {
   double R, phi;
-  R   = sqrt(x() * x() + y() * y());
-  phi = atan2(y(), x());
+  R   = sqrt(mvec.x() * mvec.x() + mvec.y() * mvec.y());
+  phi = atan2(mvec.y(), mvec.x());
   // z = z();
-  return cylindrical_coordinates(R , phi , z());
+  return cylindrical_coordinates(R , phi , mvec.z());
 }
 
 /*!
@@ -248,9 +250,9 @@ spherical_coordinates
 cartesian_coordinates::get_pos_spherical() const
 {
   double r, teta, phi;
-  r    = sqrt(x() * x() + y() * y() + z() * z());
-  teta = atan2(sqrt(x() * x() + y() * y()), z());
-  phi  = atan2(y(), x());
+  r    = sqrt(mvec.x() * mvec.x() + mvec.y() * mvec.y() + mvec.z() * mvec.z());
+  teta = atan2(sqrt(mvec.x() * mvec.x() + mvec.y() * mvec.y()), mvec.z());
+  phi  = atan2(mvec.y(), mvec.x());
   return spherical_coordinates(r, teta, phi);
 }
 
@@ -260,7 +262,7 @@ cartesian_coordinates::get_pos_spherical() const
 cartesian_coordinates
 cartesian_coordinates::get_vec_cartesian(cartesian_coordinates from) const
 {
-  from.x() = 0;  // get rid of unused parameter warning
+  from.mvec.x() = 0;  // get rid of unused parameter warning
   return cartesian_coordinates(*this);
 }
 
@@ -272,10 +274,10 @@ cartesian_coordinates::get_vec_cylindrical(cartesian_coordinates from) const
 {
   double Ar, Aphi;
   double phi = from.get_pos_cylindrical().y();
-  Ar   = x() * cos(phi) + y() * sin(phi);          /* Ar   =  Ax * cos(phi) + Ay * sin(phi) */
-  Aphi = (-1) * x() * sin(phi) +  y() * cos(phi);  /* Aphi = -Ax * sin(phi) + Ay * cos(phi) */
+  Ar   = mvec.x() * cos(phi) + mvec.y() * sin(phi);          /* Ar   =  Ax * cos(phi) + Ay * sin(phi) */
+  Aphi = (-1) * mvec.x() * sin(phi) +  mvec.y() * cos(phi);  /* Aphi = -Ax * sin(phi) + Ay * cos(phi) */
   // z = z();
-  return cylindrical_coordinates(Ar , Aphi , z());
+  return cylindrical_coordinates(Ar , Aphi , mvec.z());
 }
 
 /*!
@@ -287,14 +289,14 @@ cartesian_coordinates::get_vec_spherical(cartesian_coordinates from) const
   double Ar, Ateta, Aphi;
   double teta = from.get_pos_spherical().y();
   double phi  = from.get_pos_spherical().z();
-  Ar =  x() * sin(teta) * cos(phi)
-        + y() * sin(teta) * sin(phi)
-        + z() * cos(teta);                       /* Ar = Ax * sin(teta) * cos(phi) + Ay * sin(teta) * sin(phi) + Az * cos(teta) */
-  Ateta = x() * cos(teta) * cos(phi)
-          + y() * cos(teta) * sin(phi)
-          - z() * sin(teta);                       /* Ateta = Ax * cos(teta) * cos(phi) + Ay * cos(teta) * sin(phi) - Az * sin(teta) */
-  Aphi  = - x() * sin(phi)
-          + y() * cos(phi);                        /* Aphi = -Ax * sin(phi) + Ay * cos(phi) */
+  Ar =  mvec.x() * sin(teta) * cos(phi)
+        + mvec.y() * sin(teta) * sin(phi)
+        + mvec.z() * cos(teta);                       /* Ar = Ax * sin(teta) * cos(phi) + Ay * sin(teta) * sin(phi) + Az * cos(teta) */
+  Ateta = mvec.x() * cos(teta) * cos(phi)
+          + mvec.y() * cos(teta) * sin(phi)
+          - mvec.z() * sin(teta);                       /* Ateta = Ax * cos(teta) * cos(phi) + Ay * cos(teta) * sin(phi) - Az * sin(teta) */
+  Aphi  = - mvec.x() * sin(phi)
+          + mvec.y() * cos(phi);                        /* Aphi = -Ax * sin(phi) + Ay * cos(phi) */
   return spherical_coordinates(Ar, Ateta, Aphi);
 }
 
@@ -304,7 +306,7 @@ cartesian_coordinates::get_vec_spherical(cartesian_coordinates from) const
 inline cartesian_coordinates
 cartesian_coordinates::operator+(cartesian_coordinates in)
 {
-  return cartesian_coordinates(x() + in[0], y() + in[1], z() + in[2]);
+  return cartesian_coordinates(mvec.x() + in.mvec(0), mvec.y() + in.mvec(1), mvec.z() + in.mvec(2));
 }
 
 /*!
@@ -313,7 +315,7 @@ cartesian_coordinates::operator+(cartesian_coordinates in)
 inline cartesian_coordinates
 cartesian_coordinates::operator-(cartesian_coordinates in)
 {
-  return cartesian_coordinates(x() - in[0], y() - in[1], z() - in[2]);
+  return cartesian_coordinates(mvec.x() - in.mvec(0), mvec.y() - in.mvec(1), mvec.z() - in.mvec(2));
 }
 
 /*!
@@ -324,7 +326,8 @@ double
 cartesian_coordinates::distanceTo(coordinates to) const
 {
   /* dist divided by max length of dist */
-  return ((*this - to).len() / (len() > to.len() ? len() : to.len())) / 2.0;
+  double max_length = (mvec.norm() > to.mvec.norm() ? mvec.norm() : to.mvec.norm());
+  return ((this->mvec - to.mvec).norm() / max_length) / 2.0;
 }
 
 /*
@@ -350,7 +353,7 @@ cylindrical_coordinates::cylindrical_coordinates(cylindrical_coordinates *cc) : 
 /*!
   Copies the values in \a cc
 */
-cylindrical_coordinates::cylindrical_coordinates(const cylindrical_coordinates &cc) : coordinates(cc.x(), cc.y(), cc.z())
+cylindrical_coordinates::cylindrical_coordinates(const cylindrical_coordinates &cc) : coordinates(cc.mvec.x(), cc.mvec.y(), cc.mvec.z())
 {
   set_coord_system_type(cylindrical);
 }
@@ -379,10 +382,10 @@ cartesian_coordinates
 cylindrical_coordinates::get_pos_cartesian() const
 {
   double cx, cy;
-  cx = x() * cos(y());   // x = R * cos(phi)
-  cy = x() * sin(y());   // y = R * sin(phi)
+  cx = mvec.x() * cos(mvec.y());   // x = R * cos(phi)
+  cy = mvec.x() * sin(mvec.y());   // y = R * sin(phi)
   // z = z
-  return cartesian_coordinates(cx, cy, z());
+  return cartesian_coordinates(cx, cy, mvec.z());
 }
 
 
@@ -403,9 +406,9 @@ spherical_coordinates
 cylindrical_coordinates::get_pos_spherical() const
 {
   double r, teta;
-  r    = sqrt(x() * x() + z() * z());   // r = sqrt(R*R+z*z)
-  teta = atan2(x(), z());               // teta = atan(R/z)
-  return spherical_coordinates(r, teta, y()); // phi = phi
+  r    = sqrt(mvec.x() * mvec.x() + mvec.z() * mvec.z());   // r = sqrt(R*R+z*z)
+  teta = atan2(mvec.x(), mvec.z());               // teta = atan(R/z)
+  return spherical_coordinates(r, teta, mvec.y()); // phi = phi
 }
 
 /*!
@@ -416,10 +419,10 @@ cylindrical_coordinates::get_vec_cartesian(cylindrical_coordinates from) const
 {
   double Ax, Ay;
   double phi = from.y();
-  Ax = x() * cos(phi) - y() * sin(phi); /* Ax = Ar * cos(phi) - Aphi * sin(phi) */
-  Ay = x() * sin(phi) + y() * cos(phi); /* Ay = Ar * sin(phi) + Aphi * cos(phi) */
+  Ax = mvec.x() * cos(phi) - mvec.y() * sin(phi); /* Ax = Ar * cos(phi) - Aphi * sin(phi) */
+  Ay = mvec.x() * sin(phi) + mvec.y() * cos(phi); /* Ay = Ar * sin(phi) + Aphi * cos(phi) */
   /* z = z */
-  return cartesian_coordinates(Ax, Ay, z());
+  return cartesian_coordinates(Ax, Ay, mvec.z());
 }
 
 /*!
@@ -428,7 +431,7 @@ cylindrical_coordinates::get_vec_cartesian(cylindrical_coordinates from) const
 cylindrical_coordinates
 cylindrical_coordinates::get_vec_cylindrical(cylindrical_coordinates from) const
 {
-  from.x() = 0;  // get rid of unused parameter warning
+  Q_UNUSED(from);  // get rid of unused parameter warning
   return cylindrical_coordinates(*this);
 }
 
@@ -440,10 +443,10 @@ cylindrical_coordinates::get_vec_spherical(cylindrical_coordinates from) const
 {
   double Ar, Ateta;
   double teta = from.get_pos_spherical().y();
-  Ar    = x() * sin(teta) + z() * cos(teta);  /* Ar_sph = Ar_cyl * sin(teta) + Az * cos(teta) */
-  Ateta = x() * cos(teta) - z() * sin(teta);  /* Ateta  = Ar_cyl * cos(teta) - Az * (sin(teta) */
+  Ar    = mvec.x() * sin(teta) + mvec.z() * cos(teta);  /* Ar_sph = Ar_cyl * sin(teta) + Az * cos(teta) */
+  Ateta = mvec.x() * cos(teta) - mvec.z() * sin(teta);  /* Ateta  = Ar_cyl * cos(teta) - Az * (sin(teta) */
   // phi_sph = phi_cyl
-  return spherical_coordinates(Ar, Ateta, y());
+  return spherical_coordinates(Ar, Ateta, mvec.y());
 }
 
 
@@ -469,9 +472,9 @@ double
 cylindrical_coordinates::distanceTo(cylindrical_coordinates to) const
 {
   /* dist divided by max length of dist */
-  return ((this->get_pos_cartesian() - to.get_pos_cartesian()).len() /
-          (get_pos_cartesian().len() > to.get_pos_cartesian().len() ?
-           get_pos_cartesian().len() : to.get_pos_cartesian().len())) /
+  return ((this->get_pos_cartesian() - to.get_pos_cartesian()).norm() /
+          (get_pos_cartesian().norm() > to.get_pos_cartesian().norm() ?
+           get_pos_cartesian().norm() : to.get_pos_cartesian().norm())) /
          2.0;
 }
 
@@ -498,7 +501,7 @@ spherical_coordinates::spherical_coordinates(spherical_coordinates *cc) : coordi
 /*!
   Copies the values from \a cc.
 */
-spherical_coordinates::spherical_coordinates(const spherical_coordinates &cc) : coordinates(cc.x(), cc.y(), cc.z())
+spherical_coordinates::spherical_coordinates(const spherical_coordinates &cc) : coordinates(cc.mvec.x(), cc.mvec.y(), cc.mvec.z())
 {
   set_coord_system_type(spherical);
 }
@@ -526,9 +529,9 @@ cartesian_coordinates
 spherical_coordinates::get_pos_cartesian() const
 {
   double cx, cy, cz;
-  cx = x() * sin(y()) * cos(z()); // x = r * sin(teta) * cos(phi)
-  cy = x() * sin(y()) * sin(z()); // y = r * sin(teta) * sin(phi)
-  cz = x() * cos(y());            // z = r * cos(teta)
+  cx = mvec.x() * sin(mvec.y()) * cos(mvec.z()); // x = r * sin(teta) * cos(phi)
+  cy = mvec.x() * sin(mvec.y()) * sin(mvec.z()); // y = r * sin(teta) * sin(phi)
+  cz = mvec.x() * cos(mvec.y());            // z = r * cos(teta)
   return cartesian_coordinates(cx, cy, cz);
 }
 
@@ -539,10 +542,10 @@ cylindrical_coordinates
 spherical_coordinates::get_pos_cylindrical() const
 {
   double R, cz;
-  R = x() * sin(y());             // R = r * sin(teta)
-  cz = x() * cos(y());             // z = r * cos(teta)
+  R = mvec.x() * sin(mvec.y());             // R = r * sin(teta)
+  cz = mvec.x() * cos(mvec.y());             // z = r * cos(teta)
   // phi = phi
-  return cylindrical_coordinates(R, z(), cz);
+  return cylindrical_coordinates(R, mvec.z(), cz);
 }
 
 /*!
@@ -563,14 +566,14 @@ spherical_coordinates::get_vec_cartesian(spherical_coordinates from) const
   double Ax, Ay, Az;
   double teta = from.y();
   double phi = from.z();
-  Ax = x() * sin(teta) * cos(phi)
-       + y() * cos(teta) * cos(phi)
-       - z() * sin(phi);            /* Ax = Ar * sin(teta) * sin(phi) + Ateta * cos(teta) * cos(phi) - Aphi * sin(phi) */
-  Ay = x() * sin(teta) * sin(phi)
-       + y() * cos(teta) * sin(phi)
-       + z() * cos(phi);            /* Ay = Ar * sin(teta) * sin(phi) + Ateta * cos(teta) * sin(phi) + Aphi * cos(phi) */
-  Az = x() * cos(teta)
-       - y() * sin(teta);           /* Az = Ar * cos(teta) - Ateta * sin(teta) */
+  Ax = mvec.x() * sin(teta) * cos(phi)
+       + mvec.y() * cos(teta) * cos(phi)
+       - mvec.z() * sin(phi);            /* Ax = Ar * sin(teta) * sin(phi) + Ateta * cos(teta) * cos(phi) - Aphi * sin(phi) */
+  Ay = mvec.x() * sin(teta) * sin(phi)
+       + mvec.y() * cos(teta) * sin(phi)
+       + mvec.z() * cos(phi);            /* Ay = Ar * sin(teta) * sin(phi) + Ateta * cos(teta) * sin(phi) + Aphi * cos(phi) */
+  Az = mvec.x() * cos(teta)
+       - mvec.y() * sin(teta);           /* Az = Ar * cos(teta) - Ateta * sin(teta) */
   return cartesian_coordinates(Ax, Ay, Az);
 }
 
@@ -582,12 +585,12 @@ spherical_coordinates::get_vec_cylindrical(spherical_coordinates from) const
 {
   double Ar, Az;
   double teta = from.y();
-  Ar = x() * sin(teta)
-       + y() * cos(teta);   /* Ar_cyl = Ar_sph * sin(teta) + Ateta *cos(teta) */
+  Ar = mvec.x() * sin(teta)
+       + mvec.y() * cos(teta);   /* Ar_cyl = Ar_sph * sin(teta) + Ateta *cos(teta) */
   // Aphi_cyl = Aphi_sph
-  Az = x() * cos(teta)
-       - y() * sin(teta);   /* Az = Ar_sph * cos(teta) - Ateta * sin(teta) */
-  return cylindrical_coordinates(Ar, z(), Az);
+  Az = mvec.x() * cos(teta)
+       - mvec.y() * sin(teta);   /* Az = Ar_sph * cos(teta) - Ateta * sin(teta) */
+  return cylindrical_coordinates(Ar, mvec.z(), Az);
 }
 
 /*!
@@ -596,7 +599,7 @@ spherical_coordinates::get_vec_cylindrical(spherical_coordinates from) const
 spherical_coordinates
 spherical_coordinates::get_vec_spherical(spherical_coordinates from) const
 {
-  from.x() = 0; // get rid of unused parameter warning
+  Q_UNUSED(from); // get rid of unused parameter warning
   return spherical_coordinates(*this);
 }
 //  SEE HEADER FILE
@@ -617,9 +620,9 @@ double
 spherical_coordinates::distanceTo(spherical_coordinates to) const
 {
   /* dist divided by max length of dist */
-  return ((this->get_pos_cartesian() - to.get_pos_cartesian()).len() /
-          (get_pos_cartesian().len() > to.get_pos_cartesian().len() ?
-           get_pos_cartesian().len() : to.get_pos_cartesian().len())) /
+  return ((this->get_pos_cartesian() - to.get_pos_cartesian()).norm() /
+          (get_pos_cartesian().norm() > to.get_pos_cartesian().norm() ?
+           get_pos_cartesian().norm() : to.get_pos_cartesian().norm())) /
          2.0;
 }
 

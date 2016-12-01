@@ -26,8 +26,6 @@
 #ifndef _GLOVEINTERFACE_H_
 #define _GLOVEINTERFACE_H_
 
-class vec3;
-class position;
 class CyberGlove;
 class Robot;
 

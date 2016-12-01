@@ -107,17 +107,17 @@ void buildForceTransform(transf &T, vec3 &p, double *transformMat)
   static double Rcross[9];
   static vec3 radius;
 
-  R[0] = T.affine().element(0, 0);
-  R[1] = T.affine().element(0, 1);
-  R[2] = T.affine().element(0, 2);
+  R[0] = T.affine()(0, 0);
+  R[1] = T.affine()(0, 1);
+  R[2] = T.affine()(0, 2);
 
-  R[3] = T.affine().element(1, 0);
-  R[4] = T.affine().element(1, 1);
-  R[5] = T.affine().element(1, 2);
+  R[3] = T.affine()(1, 0);
+  R[4] = T.affine()(1, 1);
+  R[5] = T.affine()(1, 2);
 
-  R[6] = T.affine().element(2, 0);
-  R[7] = T.affine().element(2, 1);
-  R[8] = T.affine().element(2, 2);
+  R[6] = T.affine()(2, 0);
+  R[7] = T.affine()(2, 1);
+  R[8] = T.affine()(2, 2);
   /*
     R[0] = T.affine().element(0,0);
     R[1] = T.affine().element(1,0);
@@ -210,15 +210,15 @@ moveBodies(int numBodies, std::vector<DynamicBody *> bodyVec, double h)
     memcpy(currv, bodyVec[bn]->getVelocity(), 6 * sizeof(double));;
 
     Quaternion tmpQuat(currq[3], currq[4], currq[5], currq[6]);
-    tmpQuat.ToRotationMatrix(Rot);
+    Rot = tmpQuat.toRotationMatrix();
 
     // The rotation matrix returned by ToRotationMatrix is expressed as
     // a graphics style rot matrix (new axes are in rows), the R_N_B matrix
     // is a robotics style rot matrix (new axes in columns)
 
-    R_N_B[0] = Rot[0];  R_N_B[3] = Rot[1];  R_N_B[6] = Rot[2];
-    R_N_B[1] = Rot[3];  R_N_B[4] = Rot[4];  R_N_B[7] = Rot[5];
-    R_N_B[2] = Rot[6];  R_N_B[5] = Rot[7];  R_N_B[8] = Rot[8];
+    R_N_B[0] = Rot(0);  R_N_B[3] = Rot(1);  R_N_B[6] = Rot(2);
+    R_N_B[1] = Rot(3);  R_N_B[4] = Rot(4);  R_N_B[7] = Rot(5);
+    R_N_B[2] = Rot(6);  R_N_B[5] = Rot(7);  R_N_B[8] = Rot(8);
 
     // B relates the angular velocity of the body (expressed in
     // the body frame) to the time derivative of the Euler parameters
@@ -509,15 +509,15 @@ iterateDynamics(std::vector<Robot *> robotVec,
 
     currq = qnew + 7 * bn;
     Quaternion tmpQuat(currq[3], currq[4], currq[5], currq[6]);
-    tmpQuat.ToRotationMatrix(Rot);
+    Rot = tmpQuat.toRotationMatrix();
 
     // The rotation matrix returned by ToRotationMatrix is expressed as
     // a graphics style rot matrix (new axes are in rows), the R_N_B matrix
     // is a robotics style rot matrix (new axes in columns)
 
-    R_N_B[0] = Rot[0];  R_N_B[3] = Rot[1];  R_N_B[6] = Rot[2];
-    R_N_B[1] = Rot[3];  R_N_B[4] = Rot[4];  R_N_B[7] = Rot[5];
-    R_N_B[2] = Rot[6];  R_N_B[5] = Rot[7];  R_N_B[8] = Rot[8];
+    R_N_B[0] = Rot(0);  R_N_B[3] = Rot(1);  R_N_B[6] = Rot(2);
+    R_N_B[1] = Rot(3);  R_N_B[4] = Rot(4);  R_N_B[7] = Rot(5);
+    R_N_B[2] = Rot(6);  R_N_B[5] = Rot(7);  R_N_B[8] = Rot(8);
 
     // Jcg_N = R_N_B * Jcg_B * R_N_B';
     // where Jcg_B is inertia matrix in body coords
@@ -621,24 +621,24 @@ iterateDynamics(std::vector<Robot *> robotVec,
       transf cf  = (*cp)->getContactFrame() * (*cp)->getBody1Tran();
       transf cf2 = (*cp)->getMate()->getContactFrame() * (*cp)->getBody2Tran();
 
-      DBGP("CONTACT DISTANCE: " << (cf.translation() - cf2.translation()).len());
+      DBGP("CONTACT DISTANCE: " << (cf.translation() - cf2.translation()).norm());
       if (useContactEps) {
         contactEps[cn] = MIN(0.0, -ERP / h *
-                             (Contact::THRESHOLD / 2.0 - (cf.translation() - cf2.translation()).len()));
+                             (Contact::THRESHOLD / 2.0 - (cf.translation() - cf2.translation()).norm()));
       }
       DBGP(" EPS: " << contactEps[cn]);
-      vec3 normal(cf.affine().element(2, 0), cf.affine().element(2, 1), cf.affine().element(2, 2));
+      vec3 normal(cf.affine()(2, 0), cf.affine()(2, 1), cf.affine()(2, 2));
 
       // find which body is this contact from
       for (bn = 0; bn < numBodies; bn++)
         if ((*cp)->getBody1() == bodyVec[bn]) { break; }
       if (bn < numBodies) {
         //????? this doesn't seem correct
-        vec3 radius = cf.translation() - (bodyVec[bn]->getCoG() * (*cp)->getBody1Tran() - position::ORIGIN);
+        vec3 radius = cf.translation() - (*cp)->getBody1Tran().applyRotation(bodyVec[bn]->getCoG());
 
         //  radius = radius / 1000.0;  // convert to meters
 
-        vec3 RcrossN = radius * normal;
+        vec3 RcrossN = radius.cross(normal);
         DBGP("body1 normal: " << normal);
         DBGP("body1 radius: " << radius);
 
@@ -649,7 +649,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         Wn[cn * Hrows + 6 * bn + 4] = RcrossN.y();
         Wn[cn * Hrows + 6 * bn + 5] = RcrossN.z();
 
-        vec3 bodyOrigin = bodyVec[bn]->getCoG() * (*cp)->getBody1Tran() - position::ORIGIN;
+        vec3 bodyOrigin = (*cp)->getBody1Tran().applyRotation(bodyVec[bn]->getCoG()) - position::Zero();
         buildForceTransform(cf, bodyOrigin, Ftform_N_C);
 
         /* dgemm("N","N", 6,Contact::numFrictionEdges,6, 1.0,Ftform_N_C,6, Contact::frictionEdges,6,
@@ -670,9 +670,9 @@ iterateDynamics(std::vector<Robot *> robotVec,
         //normal = vec3(cf2.affine().element(2,0), cf2.affine().element(2,1),cf2.affine().element(2,2));
         normal = -normal;
 
-        //vec3 radius = cf2.translation() - (bodyVec[bn]->getCoG() * (*cp)->getBody2Tran() - position::ORIGIN);
-        vec3 radius = cf.translation() - (bodyVec[bn]->getCoG() * (*cp)->getBody2Tran() - position::ORIGIN);
-        vec3 RcrossN = radius * normal;
+        //vec3 radius = cf2.translation() - (bodyVec[bn]->getCoG() * (*cp)->getBody2Tran() - position::Zero());
+        vec3 radius = cf.translation() - ((*cp)->getBody2Tran().applyRotation(bodyVec[bn]->getCoG())  - position::Zero());
+        vec3 RcrossN = radius.cross(normal);
         DBGP("body2 normal: " << normal);
         DBGP("body2 radius: " << radius);
 
@@ -683,7 +683,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         Wn[cn * Hrows + 6 * bn + 4] = RcrossN.y();
         Wn[cn * Hrows + 6 * bn + 5] = RcrossN.z();
 
-        vec3 bodyOrigin = bodyVec[bn]->getCoG() * (*cp)->getBody2Tran() - position::ORIGIN;
+        vec3 bodyOrigin = (*cp)->getBody2Tran().applyRotation(bodyVec[bn]->getCoG())  - position::Zero();
         buildForceTransform(cf, bodyOrigin, Ftform_N_C);
         //buildForceTransform(cf2,bodyOrigin,Ftform_N_C);
 
@@ -876,7 +876,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         transf cf = (*cp)->getContactFrame() * (*cp)->getBody1Tran();
         transf cf2 = (*cp)->getMate()->getContactFrame() * (*cp)->getBody2Tran();
         vec3 cvec(contactForce);
-        cvec = cvec * cf * cf2.inverse();
+        cvec = cf2.inverse().applyRotation(cf.applyRotation(cvec));
         contactForce[0] = cvec[0];
         contactForce[1] = cvec[1];
         contactForce[2] = cvec[2];

@@ -436,7 +436,7 @@ SensorInputDlg::flockAndGloveFuzzyGrasp(std::vector<transf> &birdTransf)
       steps++;
       collision = true;
       collisionTran = robot->getTran();
-      transf newTran = translate_transf(vec3(0, 0, -10.0) *
+      transf newTran = transf::TRANSLATION(vec3(0, 0, -10.0) *
                                         robot->getApproachTran()) * robot->getTran();
       robot->setTran(newTran);
       numCollisions = mWorld->getCollisionReport(&colReport, &interestList);

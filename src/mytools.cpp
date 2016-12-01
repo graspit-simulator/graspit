@@ -266,7 +266,9 @@ bool getPosition(const TiXmlElement *root, vec3 &pos) {
     QTWARNING("Invalid position input");
     return false;
   }
-  pos.set(x, y, z);
+  pos.x() = x;
+  pos.y() = y;
+  pos.z() = z;
   return true;
 }
 
@@ -309,7 +311,7 @@ bool getTransform(const TiXmlElement *root, transf &totalTran)
         QTWARNING("Invalid translation transformation input");
         return false;
       }
-      newTran.set(Quaternion::IDENTITY, vec3(x, y, z));
+      newTran.set(Quaternion::Identity(), vec3(x, y, z));
     }
     else if (defString == "rotation") {
       if (l.count() != 2) {
@@ -324,11 +326,17 @@ bool getTransform(const TiXmlElement *root, transf &totalTran)
       rotationAngle *= M_PI / 180.0;
       QString rotationAxis = l[1];
       if (rotationAxis == "x") {
-        newTran.set(Quaternion(rotationAngle, vec3::X), vec3(0, 0, 0));
+        Eigen::AngleAxisd aa = Eigen::AngleAxisd(rotationAngle, vec3(1,0,0));
+        Quaternion q(aa);
+        newTran.set(q, vec3(0, 0, 0));
       } else if (rotationAxis == "y") {
-        newTran.set(Quaternion(rotationAngle, vec3::Y), vec3(0, 0, 0));
+        Eigen::AngleAxisd aa = Eigen::AngleAxisd(rotationAngle, vec3(0,1,0));
+        Quaternion q(aa);
+        newTran.set(q, vec3(0, 0, 0));
       } else if (rotationAxis == "z") {
-        newTran.set(Quaternion(rotationAngle, vec3::Z), vec3(0, 0, 0));
+        Eigen::AngleAxisd aa = Eigen::AngleAxisd(rotationAngle, vec3(0,0,1));
+        Quaternion q(aa);
+        newTran.set(q, vec3(0, 0, 0));
       } else {
         QTWARNING("Invalid rotation transformation input");
         return false;

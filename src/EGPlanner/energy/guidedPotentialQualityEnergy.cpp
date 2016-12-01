@@ -37,7 +37,7 @@ double GuidedPotentialQualityEnergy::contactEnergy() const
   {
     contact = (VirtualContact *)mHand->getGrasp()->getContact(i);
     contact->getObjectDistanceAndNormal(mObject, &p, NULL);
-    double dist = p.len();
+    double dist = p.norm();
 
     //this should never happen anymore since we're never inside the object
     //if ( (-1.0 * p) % n < 0) dist = -dist;
@@ -51,8 +51,8 @@ double GuidedPotentialQualityEnergy::contactEnergy() const
 
     //new version
     cn = contact->getWorldNormal();
-    n = normalise(p);
-    double d = 1 - cn % n;
+    n = p.normalized();
+    double d = 1 - cn.dot(n);
     totalError += d * 100.0 / 2.0;
   }
 
@@ -75,9 +75,9 @@ double GuidedPotentialQualityEnergy::potentialQualityEnergy() const
     contact->computeWrenches(true, false);
     contact->getObjectDistanceAndNormal(mObject, &p, NULL);
     n = contact->getWorldNormal();
-    double dist = p.len();
-    p = normalise(p); //idiot programmer forgot to normalise
-    double cosTheta = n % p;
+    double dist = p.norm();
+    p = p.normalized();
+    double cosTheta = n.dot(p);
     double factor = potentialQualityScalingFunction(dist, cosTheta);
     if (verbose)
     {

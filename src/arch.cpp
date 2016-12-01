@@ -168,12 +168,14 @@ void create_arch(World *world, double inner_radius, double outer_radius, double 
     addBlock->cloneFrom(block); //this also adds it to collision detection!
     world->addBody(addBlock);
 
-    Quaternion r(theta * (2 * i + 1) , vec3(0, -1, 0));
+    Eigen::AngleAxisd aa = Eigen::AngleAxisd(theta * (2 * i + 1) , vec3(0, -1, 0));
+    Quaternion r(aa);
+
     //use radius + THRESHOLD so we don't have interpenetrating blocks due to numerical error
     vec3 t(radius + 0.1 , 0, 0);
 
     blockRot.set(r, vec3(0, 0, 0));
-    blockTran.set(Quaternion::IDENTITY, t);
+    blockTran.set(Quaternion::Identity(), t);
 
     addBlock->setTran(blockTran * blockRot);
 
@@ -191,12 +193,14 @@ void create_arch(World *world, double inner_radius, double outer_radius, double 
     rightSupport->addToIvc();
 
     vec3 t(radius + 1, 0, -(50 + Contact::THRESHOLD));
-    blockTran.set(Quaternion::IDENTITY, t);
+    blockTran.set(Quaternion::Identity(), t);
     leftSupport->setTran(blockTran);
     world->addBody(leftSupport);
 
-    t.set(-radius - 1, 0, -(50 + Contact::THRESHOLD));
-    blockTran.set(Quaternion::IDENTITY, t);
+    t.x() = -radius - 1;
+    t.y() = 0;
+    t.z() = -(50 + Contact::THRESHOLD);
+    blockTran.set(Quaternion::Identity(), t);
     rightSupport->setTran(blockTran);
     world->addBody(rightSupport);
   }

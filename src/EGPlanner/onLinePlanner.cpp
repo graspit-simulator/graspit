@@ -212,7 +212,9 @@ OnLinePlanner::distanceOutsideApproach(const transf &solTran, const transf &hand
 
   //get angular change
   double angle; vec3 axis;
-  changeTran.rotation().ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa(changeTran.rotation());
+  axis = aa.axis();
+  angle = aa.angle();
 
   //get translation change
   vec3 approach = changeTran.translation();
@@ -224,7 +226,7 @@ OnLinePlanner::distanceOutsideApproach(const transf &solTran, const transf &hand
     f = 1.0;
   }
   approach.z() = 0;
-  double dist = approach.len();
+  double dist = approach.norm();
 
   //compute final value
   if (angle > M_PI) { angle -= 2 * M_PI; }

@@ -55,7 +55,7 @@ void GraspitDBPlanner::moveBy(vec3 v)
 {
   transf newTran;
   // calculate the new position of the hand after the transform of v
-  newTran = translate_transf(v * mHand->getApproachTran()) * mHand->getTran();
+  newTran = transf::TRANSLATION(mHand->getApproachTran().applyRotation(v)) * mHand->getTran();
   mHand->setTran(newTran);
 }
 

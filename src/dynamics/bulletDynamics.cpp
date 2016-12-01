@@ -582,7 +582,7 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
     btRigidBody *btbase = btBodyMap.find(robot->getBase())->second;
 
     //! convert the velocity from along the robot's approach direction (+z sticking out of palm) to the world frame.
-    transf velocityInWorldFrame = translate_transf(robot->getLinearVelocity() * robot->getApproachTran()) * robot->getTran();
+    transf velocityInWorldFrame = transf::TRANSLATION(robot->getLinearVelocity() * robot->getApproachTran()) * robot->getTran();
 
     btVector3 velocity(velocityInWorldFrame.translation().x() - robot->getTran().translation().x(),
                        velocityInWorldFrame.translation().y() - robot->getTran().translation().y(),

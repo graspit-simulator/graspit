@@ -347,7 +347,7 @@ Grasp::updateWrenchSpaces(std::vector<int> useDimensions)
 
   //compute the direction of world gravity forces relative to the object
   if (useGravity && object) {
-    gravDirection = gravDirection * object->getTran().inverse();
+    gravDirection = object->getTran().inverse().applyRotation(gravDirection);
   }
 
   // rebuild grasp wrench spaces
@@ -423,7 +423,7 @@ vec3 Grasp::virtualCentroid()
     if (pos.z() < bottomCorner.z()) { bottomCorner.z() = pos.z(); }
   }
   cog = 0.5 * (topCorner - bottomCorner);
-  cog = vec3(bottomCorner.toSbVec3f()) + cog;
+  cog = bottomCorner + cog;
 
   return cog;
 }
@@ -442,8 +442,8 @@ Grasp::setVirtualCentroid()
   double maxRadius = 0;
   for (int i = 0; i < (int)contactVec.size(); i++) {
     pos = ((VirtualContact *)contactVec[i])->getWorldLocation();
-    radius =  vec3(pos.toSbVec3f()) - cog;
-    if (radius.len() > maxRadius) { maxRadius = radius.len(); }
+    radius =  pos - cog;
+    if (radius.norm() > maxRadius) { maxRadius = radius.norm(); }
   }
 
   //FIXED radius to allow better inter-grasp comparison (exact value pulled out of thin air)
@@ -452,7 +452,7 @@ Grasp::setVirtualCentroid()
   //fprintf(stderr,"Max radius: %f\n",maxRadius);
 
   for (int i = 0; i < (int)contactVec.size(); i++) {
-    ((VirtualContact *)contactVec[i])->setCenter(position(cog.toSbVec3f()));
+    ((VirtualContact *)contactVec[i])->setCenter(cog);
     ((VirtualContact *)contactVec[i])->setRadius(maxRadius);
     //((VirtualContact*)contactVec[i])->getWorldIndicator();
   }
@@ -465,7 +465,7 @@ Grasp::setVirtualCentroid()
 void
 Grasp::setRealCentroid(GraspableBody *body)
 {
-  position cog = body->getCoG() * body->getTran();
+  position cog = body->getTran().applyRotation(body->getCoG());
   double maxRadius = body->getMaxRadius();
   for (int i = 0; i < (int)contactVec.size(); i++) {
     ((VirtualContact *)contactVec[i])->setCenter(cog);
@@ -601,16 +601,16 @@ Grasp::getLinkJacobian(int f, int l)
     p = T.translation();
 
     if (jointPtr->getType() == REVOLUTE) {
-      jac[col * 6]   += k * (-m.element(0, 0) * p.y() + m.element(0, 1) * p.x());
-      jac[col * 6 + 1] += k * (-m.element(1, 0) * p.y() + m.element(1, 1) * p.x());
-      jac[col * 6 + 2] += k * (-m.element(2, 0) * p.y() + m.element(2, 1) * p.x());
-      jac[col * 6 + 3] += k * m.element(0, 2);
-      jac[col * 6 + 4] += k * m.element(1, 2);
-      jac[col * 6 + 5] += k * m.element(2, 2);
+      jac[col * 6]   += k * (-m(0, 0) * p.y() + m(0, 1) * p.x());
+      jac[col * 6 + 1] += k * (-m(1, 0) * p.y() + m(1, 1) * p.x());
+      jac[col * 6 + 2] += k * (-m(2, 0) * p.y() + m(2, 1) * p.x());
+      jac[col * 6 + 3] += k * m(0, 2);
+      jac[col * 6 + 4] += k * m(1, 2);
+      jac[col * 6 + 5] += k * m(2, 2);
     } else {
-      jac[col * 6]   += k * m.element(0, 2);
-      jac[col * 6 + 1] += k * m.element(1, 2);
-      jac[col * 6 + 2] += k * m.element(2, 2);
+      jac[col * 6]   += k * m(0, 2);
+      jac[col * 6 + 1] += k * m(1, 2);
+      jac[col * 6 + 2] += k * m(2, 2);
       jac[col * 6 + 3] += 0.0;
       jac[col * 6 + 4] += 0.0;
       jac[col * 6 + 5] += 0.0;
@@ -692,7 +692,7 @@ Grasp::CoGJacobian(const std::list<Joint *> &joints,
   std::list< std::pair<transf, Link *> > cog_locations;
   std::list<Link *>::const_iterator link_it;
   for (link_it = links.begin(); link_it != links.end(); link_it++) {
-    transf tr(Quaternion::IDENTITY, vec3((*link_it)->getCoG().toSbVec3f()));
+    transf tr(Quaternion::Identity(), (*link_it)->getCoG());
     cog_locations.push_back(std::pair<transf, Link *>(tr, *link_it));
   }
   return contactJacobian(joints, cog_locations);
@@ -704,7 +704,7 @@ Grasp::gravityMatrix(const std::list<Joint *> &joints,
                      const std::list<Link *> &links,
                      vec3 gravityWorldDirection)
 {
-  normalise(gravityWorldDirection);
+  gravityWorldDirection.normalize();
   Matrix J(CoGJacobian(joints, links));
   J.transpose();
   Matrix f(Matrix::ZEROES<Matrix>(links.size() * 6, 1));
@@ -940,7 +940,7 @@ Grasp::computeQuasistaticForces(const Matrix &robotTau)
   vec3 force(extWrench[0], extWrench[1], extWrench[2]);
   vec3 torque(extWrench[3], extWrench[4], extWrench[5]);
   //take into account the scaling that has taken place
-  double wrenchError = objVal * 1.0e-6 - (force.len_sq() + torque.len_sq()) * 1.0e6;
+  double wrenchError = objVal * 1.0e-6 - (force.norm()*force.norm() + torque.norm()*torque.norm()) * 1.0e6;
   //units here are N * 1.0e-6; errors should be in the range on miliN
   if (wrenchError > 1.0e3) {
     DBGA("Wrench sanity check error: " << wrenchError);
@@ -1444,9 +1444,9 @@ Grasp::accumulateAndDisplayObjectWrenches(std::list<Contact *> *contacts,
       DynamicBody *object = (DynamicBody *)(contact->getBody2());
       //compute force and torque in body reference frame
       //and scale them down for now for rendering and output purposes
-      force = 1.0e-6 * force * object->getTran().inverse();
+      force = 1.0e-6 * object->getTran().inverse().applyRotation(force);
       //torque is also scaled by maxRadius in conversion matrix
-      torque = 1.0e-6 * torque * object->getTran().inverse();
+      torque = 1.0e-6 * object->getTran().inverse().applyRotation(torque) ;
       //accumulate them on object
       object->addForce(force);
       object->addTorque(torque);

@@ -113,7 +113,7 @@ GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer, GWS *g, double *c,
     hullTran->translation.connectFrom(&object->getIVTran()->translation);
     hullTran->rotation.connectFrom(&object->getIVTran()->rotation);
   } else {
-    hullTran->translation = gws->getGrasp()->getCoG().toSbVec3f();
+    hullTran->translation = toSbVec3f(gws->getGrasp()->getCoG());
   }
 
   sg = new SoSeparator;

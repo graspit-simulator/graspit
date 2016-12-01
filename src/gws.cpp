@@ -333,8 +333,8 @@ GWS::projectTo3D(double *projCoords, std::set<int> fixedCoordSet,
           indices[j] = neighbor->visitid - 1;
         }
 
-        if (j > 0 && ((hullCoords[indices[j]] - hullCoords[indices[j - 1]]).len() < IVTOL ||
-                      (hullCoords[indices[j]] - hullCoords[indices[0]]).len() < IVTOL))
+        if (j > 0 && ((hullCoords[indices[j]] - hullCoords[indices[j - 1]]).norm() < IVTOL ||
+                      (hullCoords[indices[j]] - hullCoords[indices[0]]).norm() < IVTOL))
         {
           numInLoop--;
         }
@@ -353,10 +353,10 @@ GWS::projectTo3D(double *projCoords, std::set<int> fixedCoordSet,
     }
 
     // check if the current orientation of the face matches the plane's normal
-    testNormal = (hullCoords[indices[1]] - hullCoords[indices[0]]) * (hullCoords[indices[j - 1]] - hullCoords[indices[0]]);
+    testNormal = (hullCoords[indices[1]] - hullCoords[indices[0]]).cross(hullCoords[indices[j - 1]] - hullCoords[indices[0]]);
     refNormal = vec3(planes[vertex_i][0], planes[vertex_i][1], planes[vertex_i][2]);
 
-    if ((dot = testNormal % refNormal) > 0.0) {
+    if ((dot = testNormal.dot(refNormal)) > 0.0) {
       for (j = 0; j < numInLoop; j++) {
         hullIndices.push_back(indices[j]);
       }
@@ -762,8 +762,8 @@ LInfGWS::build(std::vector<int> useDimensions)
   }
 
   Wrench initSum;
-  initSum.force = vec3::ZERO;
-  initSum.torque = vec3::ZERO;
+  initSum.force = vec3::Zero();
+  initSum.torque = vec3::Zero();
 
   int wrenchNum = 0;
   minkowskiSum(grasp, 0, wrenchNum, array, initSum, useDimensions);

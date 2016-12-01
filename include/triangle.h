@@ -64,13 +64,13 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
 double
 Triangle::area() const
 {
-  return  0.5 * ((v2 - v1) * (v3 - v1)).len();
+  return  0.5 * ((v2 - v1).cross(v3 - v1)).norm();
 }
 
 vec3
 Triangle::normal() const
 {
-  return normalise((v2 - v1) * (v3 - v1));
+  return ((v2 - v1).cross(v3 - v1)).normalized();
 }
 
 position
@@ -82,9 +82,9 @@ Triangle::centroid() const
 void
 Triangle::applyTransform(const transf &t)
 {
-  v1 = v1 * t;
-  v2 = v2 * t;
-  v3 = v3 * t;
+  v1 = t.applyRotation(v1);
+  v2 = t.applyRotation(v2);
+  v3 = t.applyRotation(v3);
 }
 
 #ifdef GRASPIT_RELEASE

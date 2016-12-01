@@ -202,8 +202,8 @@ void CalibrationPose::writeToFile(FILE *fp)
     fprintf(fp, "\n");
   } else { fprintf(fp, "0\n"); }
   //transform rotation
-  fprintf(fp, "%f %f %f %f\n", mTransf.rotation().x, mTransf.rotation().y,
-          mTransf.rotation().z, mTransf.rotation().w);
+  fprintf(fp, "%f %f %f %f\n", mTransf.rotation().x(), mTransf.rotation().y(),
+          mTransf.rotation().z(), mTransf.rotation().w());
   //transform translation
   fprintf(fp, "%f %f %f\n", mTransf.translation().x(), mTransf.translation().y(),
           mTransf.translation().z());
@@ -1047,11 +1047,11 @@ double GloveInterface::getPoseError(vec3 *error, position *thumbLocation)
     *thumbLocation = p1;
   }
 
-  p1 = p1 * thumbTip->getTran() * mRobot->getChain(4)->getTran().inverse();
-  p2 = p2 * indexTip->getTran() * mRobot->getChain(4)->getTran().inverse();
+  p1 = mRobot->getChain(4)->getTran().inverse().applyRotation(thumbTip->getTran().applyRotation(p1));
+  p2 = mRobot->getChain(4)->getTran().inverse().applyRotation(indexTip->getTran().applyRotation(p2));
   measuredVector = p2 - p1;
 
-  expectedVector = normalise(measuredVector);
+  expectedVector = (measuredVector).normalized();
   expectedVector = (cFactor + shellDistance) * expectedVector;
 
   //this isn't really the error, it's the motion that will COMPENSATE for the error
@@ -1063,10 +1063,10 @@ double GloveInterface::getPoseError(vec3 *error, position *thumbLocation)
   }
 
   //  fprintf(stderr,"Compensated: %f\n",rawDistance - shellDistance);
-  //  fprintf(stderr,"Expected: %f; abs error: %f\n",cFactor, e.len());
+  //  fprintf(stderr,"Expected: %f; abs error: %f\n",cFactor, e.norm());
   //  fprintf(stderr,"X: %f  Y: %f  Z: %f\n",e.x(), e.y(), e.z());
 
-  return e.len();
+  return e.norm();
 }
 
 double GloveInterface::getTotalError()

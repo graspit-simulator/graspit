@@ -194,8 +194,13 @@ World::~World()
  */
 void World::getBoundingBox(vec3 &minPoint, vec3 &maxPoint)
 {
-  minPoint.set(0, 0, 0);
-  maxPoint.set(0, 0, 0);
+  minPoint.x() = 0;
+  minPoint.y() = 0;
+  minPoint.z() = 0;
+
+  maxPoint.x() = 0;
+  maxPoint.y() = 0;
+  maxPoint.z() = 0;
 
   // viewport required for any viewport-dependent
   // nodes (eg text), but not required for others
@@ -205,8 +210,14 @@ void World::getBoundingBox(vec3 &minPoint, vec3 &maxPoint)
   SbBox3f bbox = bbAction.getBoundingBox();
   const SbVec3f &minIV = bbox.getMin();
   const SbVec3f &maxIV = bbox.getMax();
-  minPoint.set(minIV[0], minIV[1], minIV[2]);
-  maxPoint.set(maxIV[0], maxIV[1], maxIV[2]);
+
+  minPoint.x() = minIV[0];
+  minPoint.y() = minIV[1];
+  minPoint.z() = minIV[2];
+
+  maxPoint.x() = maxIV[0];
+  maxPoint.y() = maxIV[1];
+  maxPoint.z() = maxIV[2];
 }
 
 /*! Returns the material id of a material with name \a matName
@@ -1623,9 +1634,9 @@ World::findVirtualContact(Link *link, Body *object)
 {
   position p1, p2;
   getDist(link, object, p1, p2);
-  vec3 n = p1 * link->getTran() - p2 * object->getTran();
-  n = normalise(n);
-  n = n * link->getTran().inverse();
+  vec3 n = link->getTran().applyRotation(p1)  - object->getTran().applyRotation(p2);
+  n = n.normalized();
+  n = link->getTran().inverse().applyRotation(n);
 
   return ContactData(p1, p2, n, -n) ;
 }

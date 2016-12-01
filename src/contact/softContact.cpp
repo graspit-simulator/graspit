@@ -33,12 +33,14 @@ SoftContact::SoftContact(Body *b1, Body *b2, position pos, vec3 norm,
   vec3 temp;
 
   for (itr = bn->begin(); itr != bn->end(); itr++) {
-    temp.set(itr->x(), itr->y(), itr->z());
+    temp.x() = itr->x();
+    temp.y() = itr->y();
+    temp.z() = itr->z();
     //places bodyNghbd in frame of contact with the z-axis pointing out
     //bodyNghbd[i] = frame.affine().inverse() * ( temp - frame.translation() );
     position posit;
-    posit = position(temp.toSbVec3f()) * frame.inverse();
-    bodyNghbd[i] = vec3(posit.toSbVec3f());
+    posit = frame.inverse().applyRotation(temp) ;
+    bodyNghbd[i] = posit;
     i++;
   }
   numPts = (int) bn->size();
@@ -202,17 +204,21 @@ int SoftContact::CalcRelPhi()
   vec3 temp, t;
   vec3 R11, R12;    //directions of relative curvatures in world frame
 
-  temp.set(1, 0 , 0);
+  temp.x() = 1;
+  temp.y() = 0.0;
+  temp.z() = 0.0;
   t = fitRot * temp;
-  R11 = t * frame;
-  R11 = R11 * body1->getTran();
+  R11 = frame.applyRotation(t);
+  R11 = body1->getTran().applyRotation(R11);
 
-  temp.set(1, 0 , 0);
+  temp.x() = 1;
+  temp.y() = 0.0;
+  temp.z() = 0.0;
   t = ((SoftContact *)getMate())->fitRot * temp;
-  R12 = t * ((SoftContact *)getMate())->frame;
-  R12 = R12 * body2->getTran();
+  R12 = ((SoftContact *)getMate())->frame.applyRotation(t);
+  R12 = body2->getTran().applyRotation(R12);
 
-  relPhi = acos((R11 % R12) / (R11.len() * R12.len()));
+  relPhi = acos((R11.dot(R12)) / (R11.norm() * R12.norm()));
   ((SoftContact *)getMate())->relPhi = relPhi ;
 
   //fprintf( stderr, "Rel Phi   %f", relPhi );

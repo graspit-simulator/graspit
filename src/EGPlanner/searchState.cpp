@@ -593,7 +593,7 @@ HandObjectState::distance(const HandObjectState *s) const
   transf t2 = mHand->getApproachTran() * s->getTotalTran();
 
   vec3 dvec = t1.translation() - t2.translation();
-  double d = dvec.len();
+  double d = dvec.norm();
 
   if (mTargetObject->isA("GraspableBody")) {
     d = d / ((GraspableBody *)mTargetObject)->getMaxRadius();
@@ -603,7 +603,9 @@ HandObjectState::distance(const HandObjectState *s) const
 
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa(qvec);
+  angle = aa.angle();
+  axis = aa.axis();
   double q = 0.5 * fabs(angle) / M_PI; //0.5 weight out of thin air
 
   return std::max(d, q);

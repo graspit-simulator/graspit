@@ -31,6 +31,7 @@
 
 #include "robots/barrett.h"
 #include "world.h"
+#include "flockTransform.h"
 
 #ifdef HARDWARE_LIB
 #include "BarrettHand.h"

@@ -460,13 +460,13 @@ grasp_tester::testIt()
 */
 void
 grasp_tester::saveGrasp(double quality) {
-  graspOut << my_hand->getTran().translation()[0] << " " <<
-           my_hand->getTran().translation()[1] << " " <<
-           my_hand->getTran().translation()[2] << " " <<
-           my_hand->getTran().rotation().w << " " <<
-           my_hand->getTran().rotation().x << " " <<
-           my_hand->getTran().rotation().y << " " <<
-           my_hand->getTran().rotation().z << " " <<
+  graspOut << my_hand->getTran().translation()(0) << " " <<
+           my_hand->getTran().translation()(1) << " " <<
+           my_hand->getTran().translation()(2) << " " <<
+           my_hand->getTran().rotation().w() << " " <<
+           my_hand->getTran().rotation().x() << " " <<
+           my_hand->getTran().rotation().y() << " " <<
+           my_hand->getTran().rotation().z() << " " <<
            my_hand->getDOF(0)->getVal() * 180.0 / M_PI << " " <<
            quality << endl;
 }
@@ -509,14 +509,13 @@ grasp_tester::iteration(plannedGrasp &pg)
 
     /* get actual tran */
     actTran = my_hand->getTran();
-    toVec  = actTran.translation() - backStepDist * pg.get_graspDirection().get_dir() / pg.get_graspDirection().get_dir().len();
+    toVec  = actTran.translation() - backStepDist * pg.get_graspDirection().get_dir().mvec / pg.get_graspDirection().get_dir().norm();
 
 
     /* take a step back */
-    transf to = coordinate_transf(position(toVec.x(), toVec.y(), toVec.z()),
-                                  (- pg.get_fixedFingerDirection()) *
-                                  pg.get_graspDirection().get_dir(),
-                                  - pg.get_fixedFingerDirection());
+    transf to = transf::COORDINATE(position(toVec.x(), toVec.y(), toVec.z()),
+                                   (-pg.get_fixedFingerDirection().mvec.cross(pg.get_graspDirection().get_dir().mvec)),
+                                  - pg.get_fixedFingerDirection().mvec);
 
     if (my_hand->setTran(to)) { return false; }
 
@@ -700,12 +699,11 @@ grasp_tester::putIt(plannedGrasp *pg, bool render_in) {
 
   int result;
   transf to =
-    coordinate_transf(position(pg->get_graspDirection().get_point().x(),
+    transf::COORDINATE(position(pg->get_graspDirection().get_point().x(),
                                pg->get_graspDirection().get_point().y(),
                                pg->get_graspDirection().get_point().z()),
-                      (- pg->get_fixedFingerDirection()) *
-                      pg->get_graspDirection().get_dir(),
-                      - pg->get_fixedFingerDirection());
+                      (- pg->get_fixedFingerDirection().mvec).cross(pg->get_graspDirection().get_dir().mvec),
+                      - pg->get_fixedFingerDirection().mvec);
 
   result = my_hand->setTran(to);
   if (render_in) {
@@ -751,7 +749,7 @@ grasp_tester::moveIt(cartesianGraspDirection gd, bool render_in)
 {
 
   transf to(my_hand->getTran().rotation(),
-            my_hand->getTran().translation() + 1000 * gd.get_dir());
+            my_hand->getTran().translation() + 1000 * gd.get_dir().mvec);
 
   my_hand->moveTo(to, 50 * Contact::THRESHOLD, M_PI / 36.0);
 

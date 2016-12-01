@@ -514,16 +514,16 @@ grasp_planner::existsInList(plannedGrasp pg, std::list<plannedGrasp *> pgList)
   std::list<plannedGrasp*>::iterator it;
   // sorry for this! But it looks really impressing, doesn't it?
   for (it=pgList.begin(); it!=pgList.end(); it++){
-    if (((pg.get_graspDirection().get_dir()/pg.get_graspDirection().get_dir().len()) %
-   ((*it)->get_graspDirection().get_dir()/(*it)->get_graspDirection().get_dir().len())) == 1.0){
-      if((pg.get_graspDirection().get_point() - (*it)->get_graspDirection().get_point()).len() != 0.0)
+    if (((pg.get_graspDirection().get_dir()/pg.get_graspDirection().get_dir().norm()) %
+   ((*it)->get_graspDirection().get_dir()/(*it)->get_graspDirection().get_dir().norm())) == 1.0){
+      if((pg.get_graspDirection().get_point() - (*it)->get_graspDirection().get_point()).norm() != 0.0)
   pDiff = (pg.get_graspDirection().get_point() - (*it)->get_graspDirection().get_point()) /
-    (pg.get_graspDirection().get_point() - (*it)->get_graspDirection().get_point()).len();
+    (pg.get_graspDirection().get_point() - (*it)->get_graspDirection().get_point()).norm();
       else pDiff = (pg.get_graspDirection().get_point() - (*it)->get_graspDirection().get_point());
-      if ((pDiff % (pg.get_graspDirection().get_dir()/pg.get_graspDirection().get_dir().len()) == 1.0) ||
-    (((-1)*pDiff) % (pg.get_graspDirection().get_dir()/pg.get_graspDirection().get_dir().len()) == 1.0) ||
-    (pDiff.len() == 0.0)){
-  if((pg.get_fixedFingerDirection() - (*it)->get_fixedFingerDirection()).len() < 0.0001)
+      if ((pDiff % (pg.get_graspDirection().get_dir()/pg.get_graspDirection().get_dir().norm()) == 1.0) ||
+    (((-1)*pDiff) % (pg.get_graspDirection().get_dir()/pg.get_graspDirection().get_dir().norm()) == 1.0) ||
+    (pDiff.norm() == 0.0)){
+  if((pg.get_fixedFingerDirection() - (*it)->get_fixedFingerDirection()).norm() < 0.0001)
     return true;
       }
     }
@@ -716,14 +716,14 @@ grasp_planner::localToGlobalCoordinates(std::list<plannedGrasp *> &graspList,
 
     //ATM: This silliness is necessary because Steffen used a vec3 for both
     //the grasp point and grasp dir
-    position graspPos = (*it)->get_graspDirection().get_point() + position::ORIGIN;
-    cgd.set_point(graspPos * primTran - position::ORIGIN);
+    position graspPos = (*it)->get_graspDirection().get_point().mvec + position::Zero();
+    cgd.set_point(coordinates(primTran.applyRotation(graspPos)  - position::Zero()));
 
-    cgd.set_dir((*it)->get_graspDirection().get_dir()*primTran);
+    cgd.set_dir(coordinates(primTran.applyRotation((*it)->get_graspDirection().get_dir().mvec)));
 
     // update both the grasp direction and finger direction
     (*it)->set_graspDirection(cgd);
-    (*it)->set_fixedFingerDirection((*it)->get_fixedFingerDirection()*primTran);
+    (*it)->set_fixedFingerDirection(primTran.applyRotation((*it)->get_fixedFingerDirection().mvec));
   }
 }
 
@@ -809,8 +809,8 @@ grasp_planner::getCylinderGraspDirections(SoPath *sop)
 
   /* top direction  in (R, phi, Z) */
   cgd = new cartesianGraspDirection;
-  ccpoint[0] = 0.0;   ccpoint[1] = 0.0;   ccpoint[2] = height / 2 + STARTING_DISTANCE;
-  ccdir[0]   = 0.0;   ccdir[1]   = 0.0;   ccdir[2]   = -1.0;
+  ccpoint.mvec(0) = 0.0;   ccpoint.mvec(1) = 0.0;   ccpoint.mvec(2) = height / 2 + STARTING_DISTANCE;
+  ccdir.mvec(0)  = 0.0;   ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)   = -1.0;
   /* fill structure */
   cgd->set_point(ccpoint.get_pos_cartesian());
   cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -820,8 +820,8 @@ grasp_planner::getCylinderGraspDirections(SoPath *sop)
 
   /* bottom direction */
   cgd = new cartesianGraspDirection;
-  ccpoint[0] = 0.0;   ccpoint[1] = 0.0;   ccpoint[2] = (-1) * (height / 2 + STARTING_DISTANCE);
-  ccdir[0]   = 0.0;   ccdir[1]   = 0.0;   ccdir[2]   = 1.0;
+  ccpoint.mvec(0) = 0.0;   ccpoint.mvec(1) = 0.0;   ccpoint.mvec(2) = (-1) * (height / 2 + STARTING_DISTANCE);
+  ccdir.mvec(0)   = 0.0;   ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)  = 1.0;
   /* fill structure */
   cgd->set_point(ccpoint.get_pos_cartesian());
   cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -834,8 +834,8 @@ grasp_planner::getCylinderGraspDirections(SoPath *sop)
     plane_height = -height / 2 + curr_plane * (height / (nr_of_parallel_planes_height + 1));
     for (double step = 0.0; step <= 2 * M_PI - DELTA_360_DEG_ERROR; step += (2 * M_PI) / nr_of_360_deg_steps) {
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = radius + STARTING_DISTANCE; ccpoint[1] = step; ccpoint[2] = plane_height;
-      ccdir[0]   = -1.0;                       ccdir[1]   = 0.0;  ccdir[2]   = 0.0;
+      ccpoint.mvec(0) = radius + STARTING_DISTANCE; ccpoint.mvec(1) = step; ccpoint.mvec(2) = plane_height;
+      ccdir.mvec(0)   = -1.0;                       ccdir.mvec(1)   = 0.0;  ccdir.mvec(2) = 0.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -854,16 +854,16 @@ grasp_planner::getCylinderGraspDirections(SoPath *sop)
 
   for (gd_it = gd_list.begin(); gd_it != gd_list.end(); gd_it++) {
     /* swap y and z */
-    cartesian_coordinates cctmp((*gd_it)->get_point());
-    double ytmp = cctmp[1];
-    cctmp[1] = cctmp[2];
-    cctmp[2] = ytmp;
+    cartesian_coordinates cctmp((*gd_it)->get_point().mvec);
+    double ytmp = cctmp.mvec(1);
+    cctmp.mvec(1) = cctmp.mvec(2);
+    cctmp.mvec(2) = ytmp;
     (*gd_it)->set_point(cctmp);
 
-    cctmp = (*gd_it)->get_dir();
-    ytmp = cctmp[1];
-    cctmp[1] = cctmp[2];
-    cctmp[2] = ytmp;
+    cctmp.mvec = (*gd_it)->get_dir().mvec;
+    ytmp = cctmp.mvec(1);
+    cctmp.mvec(1) = cctmp.mvec(2);
+    cctmp.mvec(2) = ytmp;
     (*gd_it)->set_dir(cctmp);
   }
   return gd_list;
@@ -902,8 +902,8 @@ grasp_planner::getCubeGraspDirections(SoPath *sop)
       plane_heightB = - depth / 2 + curr_planeB * (depth / (nr_of_parallel_planes_depth + 1));
 
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = plane_heightA;   ccpoint[1] = height + STARTING_DISTANCE;  ccpoint[2] = plane_heightB;
-      ccdir[0]   = 0.0;             ccdir[1]   = -1.0;                        ccdir[2]   = 0.0;
+      ccpoint.mvec(0) = plane_heightA;   ccpoint.mvec(1) = height + STARTING_DISTANCE;  ccpoint.mvec(2) = plane_heightB;
+      ccdir.mvec(0)   = 0.0;             ccdir.mvec(1)   = -1.0;                        ccdir.mvec(2)   = 0.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -919,8 +919,8 @@ grasp_planner::getCubeGraspDirections(SoPath *sop)
       plane_heightB = - depth / 2 + curr_planeB * (depth / (nr_of_parallel_planes_depth + 1));
 
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = plane_heightA;   ccpoint[1] = -1 * (height + STARTING_DISTANCE);  ccpoint[2] = plane_heightB;
-      ccdir[0]   = 0.0;             ccdir[1]   = 1.0;                                ccdir[2]   = 0.0;
+      ccpoint.mvec(0) = plane_heightA;   ccpoint.mvec(1) = -1 * (height + STARTING_DISTANCE);  ccpoint.mvec(2) = plane_heightB;
+      ccdir.mvec(0)   = 0.0;             ccdir.mvec(1)   = 1.0;                                ccdir.mvec(2)  = 0.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -936,8 +936,8 @@ grasp_planner::getCubeGraspDirections(SoPath *sop)
       plane_heightB = - depth / 2 + curr_planeB * (depth / (nr_of_parallel_planes_depth + 1));
 
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = width + STARTING_DISTANCE;   ccpoint[1] = plane_heightA;   ccpoint[2] = plane_heightB;
-      ccdir[0]   = -1.0;                        ccdir[1]   = 0.0;   ccdir[2]   = 0.0;
+      ccpoint.mvec(0) = width + STARTING_DISTANCE;   ccpoint.mvec(1) = plane_heightA;   ccpoint.mvec(2) = plane_heightB;
+      ccdir.mvec(0)   = -1.0;                        ccdir.mvec(1)  = 0.0;   ccdir.mvec(2)   = 0.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -953,8 +953,8 @@ grasp_planner::getCubeGraspDirections(SoPath *sop)
       plane_heightB = - depth / 2 + curr_planeB * (depth / (nr_of_parallel_planes_depth + 1));
 
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = -1 * (width + STARTING_DISTANCE);   ccpoint[1] = plane_heightA;   ccpoint[2] = plane_heightB;
-      ccdir[0]   =  1.0;                               ccdir[1]   = 0.0;   ccdir[2]   = 0.0;
+      ccpoint.mvec(0) = -1 * (width + STARTING_DISTANCE);   ccpoint.mvec(1) = plane_heightA;   ccpoint.mvec(2) = plane_heightB;
+      ccdir.mvec(0)   =  1.0;                               ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)   = 0.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -970,8 +970,8 @@ grasp_planner::getCubeGraspDirections(SoPath *sop)
       plane_heightB = - height / 2 + curr_planeB * (height / (nr_of_parallel_planes_height + 1));
 
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = plane_heightA;   ccpoint[1] = plane_heightB;   ccpoint[2] = depth + STARTING_DISTANCE;
-      ccdir[0]   = 0.0;     ccdir[1]   = 0.0;      ccdir[2]   = -1.0;
+      ccpoint.mvec(0) = plane_heightA;   ccpoint.mvec(1) = plane_heightB;   ccpoint.mvec(2) = depth + STARTING_DISTANCE;
+      ccdir.mvec(0)   = 0.0;     ccdir.mvec(1)   = 0.0;      ccdir.mvec(2)   = -1.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -987,8 +987,8 @@ grasp_planner::getCubeGraspDirections(SoPath *sop)
       plane_heightB = - height / 2 + curr_planeB * (height / (nr_of_parallel_planes_height + 1));
 
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = plane_heightA;   ccpoint[1] = plane_heightB;   ccpoint[2] = -1 * (depth + STARTING_DISTANCE);
-      ccdir[0]   = 0.0;     ccdir[1]   = 0.0;      ccdir[2]   = 1.0;
+      ccpoint.mvec(0) = plane_heightA;   ccpoint.mvec(1) = plane_heightB;   ccpoint.mvec(2) = -1 * (depth + STARTING_DISTANCE);
+      ccdir.mvec(0)   = 0.0;     ccdir.mvec(1)   = 0.0;      ccdir.mvec(2)   = 1.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1025,8 +1025,8 @@ grasp_planner::getSphereGraspDirections(SoPath *sop)
   for (teta = 0.0; teta <= M_PI; teta += M_PI / (nr_of_360_deg_steps / 2)) {
     if (teta == 0.0 || teta >= M_PI) {
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = radius + STARTING_DISTANCE;  ccpoint[1] = teta;   ccpoint[2] = 0.0;
-      ccdir[0]   = -1.0;                        ccdir[1]   = 0.0;   ccdir[2]   = 0.0;
+      ccpoint.mvec(0) = radius + STARTING_DISTANCE;  ccpoint.mvec(1) = teta;   ccpoint.mvec(2) = 0.0;
+      ccdir.mvec(0)   = -1.0;                        ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)   = 0.0;
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1038,8 +1038,8 @@ grasp_planner::getSphereGraspDirections(SoPath *sop)
       for (phi = 0.0; phi <= 2 * M_PI; phi += (2 * M_PI) / ((int)(nr_of_360_deg_steps * sin(teta)) + 1)) {
 
         cgd = new cartesianGraspDirection;
-        ccpoint[0] = radius + STARTING_DISTANCE;  ccpoint[1] = teta;   ccpoint[2] = phi;
-        ccdir[0]   = -1.0;                        ccdir[1]   = 0.0;   ccdir[2]   = 0.0;
+        ccpoint.mvec(0) = radius + STARTING_DISTANCE;  ccpoint.mvec(1) = teta;   ccpoint.mvec(2) = phi;
+        ccdir.mvec(0)   = -1.0;                        ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)   = 0.0;
         /* fill structure */
         cgd->set_point(ccpoint.get_pos_cartesian());
         cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1082,8 +1082,8 @@ grasp_planner::getConeGraspDirections(SoPath *sop)
 
   /* top direction  in (R, phi, Z) */
   cgd = new cartesianGraspDirection;
-  ccpoint[0] = 0.0;   ccpoint[1] = 0.0;   ccpoint[2] = height / 2 + STARTING_DISTANCE;
-  ccdir[0]   = 0.0;   ccdir[1]   = 0.0;   ccdir[2]   = -1.0;
+  ccpoint.mvec(0) = 0.0;   ccpoint.mvec(1) = 0.0;   ccpoint.mvec(2) = height / 2 + STARTING_DISTANCE;
+  ccdir.mvec(0)   = 0.0;   ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)   = -1.0;
   /* fill structure */
   cgd->set_point(ccpoint.get_pos_cartesian());
   cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1093,8 +1093,8 @@ grasp_planner::getConeGraspDirections(SoPath *sop)
 
   /* bottom direction */
   cgd = new cartesianGraspDirection;
-  ccpoint[0] = 0.0;   ccpoint[1] = 0.0;   ccpoint[2] = (-1) * (height / 2 + STARTING_DISTANCE);
-  ccdir[0]   = 0.0;   ccdir[1]   = 0.0;   ccdir[2]   = 1.0;
+  ccpoint.mvec(0) = 0.0;   ccpoint.mvec(1) = 0.0;   ccpoint.mvec(2) = (-1) * (height / 2 + STARTING_DISTANCE);
+  ccdir.mvec(0)   = 0.0;   ccdir.mvec(1)   = 0.0;   ccdir.mvec(2)   = 1.0;
   /* fill structure */
   cgd->set_point(ccpoint.get_pos_cartesian());
   cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1108,13 +1108,13 @@ grasp_planner::getConeGraspDirections(SoPath *sop)
 
     for (double step = 0.0; step <= 2 * M_PI - DELTA_360_DEG_ERROR; step += (2 * M_PI) / nr_of_360_deg_steps) {
       cgd = new cartesianGraspDirection;
-      ccpoint[0] = bottomRadius - plane_height * cos(bottomAngle) + STARTING_DISTANCE * sin(bottomAngle);
-      ccpoint[1] = step;
-      ccpoint[2] = -height / 2 + plane_height * sin(bottomAngle) + STARTING_DISTANCE * cos(bottomAngle);
+      ccpoint.mvec(0) = bottomRadius - plane_height * cos(bottomAngle) + STARTING_DISTANCE * sin(bottomAngle);
+      ccpoint.mvec(1) = step;
+      ccpoint.mvec(2) = -height / 2 + plane_height * sin(bottomAngle) + STARTING_DISTANCE * cos(bottomAngle);
 
-      ccdir[0]   = (-1) * sin(bottomAngle);
-      ccdir[1]   = 0.0;
-      ccdir[2]   = (-1) * cos(bottomAngle);
+      ccdir.mvec(0)   = (-1) * sin(bottomAngle);
+      ccdir.mvec(1)   = 0.0;
+      ccdir.mvec(2)   = (-1) * cos(bottomAngle);
       /* fill structure */
       cgd->set_point(ccpoint.get_pos_cartesian());
       cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1127,13 +1127,13 @@ grasp_planner::getConeGraspDirections(SoPath *sop)
   /* radial direction (one DoF left) towards bottom edge */
   for (double step = 0.0; step <= 2 * M_PI - DELTA_360_DEG_ERROR; step += (2 * M_PI) / nr_of_360_deg_steps) {
     cgd = new cartesianGraspDirection;
-    ccpoint[0] = bottomRadius + STARTING_DISTANCE * cos(bottomAngle / 2);
-    ccpoint[1] = step;
-    ccpoint[2] = -height / 2 - STARTING_DISTANCE * sin(bottomAngle / 2);
+    ccpoint.mvec(0) = bottomRadius + STARTING_DISTANCE * cos(bottomAngle / 2);
+    ccpoint.mvec(1) = step;
+    ccpoint.mvec(2) = -height / 2 - STARTING_DISTANCE * sin(bottomAngle / 2);
 
-    ccdir[0]   = (-1) * cos(bottomAngle / 2);
-    ccdir[1]   = 0.0;
-    ccdir[2]   = sin(bottomAngle / 2);
+    ccdir.mvec(0)   = (-1) * cos(bottomAngle / 2);
+    ccdir.mvec(1)   = 0.0;
+    ccdir.mvec(2)   = sin(bottomAngle / 2);
     /* fill structure */
     cgd->set_point(ccpoint.get_pos_cartesian());
     cgd->set_dir(ccdir.get_vec_cartesian(ccpoint));
@@ -1152,16 +1152,16 @@ grasp_planner::getConeGraspDirections(SoPath *sop)
 
   for (gd_it = gd_list.begin(); gd_it != gd_list.end(); gd_it++) {
     /* swap y and z */
-    cartesian_coordinates cctmp((*gd_it)->get_point());
-    double ytmp = cctmp[1];
-    cctmp[1] = cctmp[2];
-    cctmp[2] = ytmp;
+    cartesian_coordinates cctmp((*gd_it)->get_point().mvec);
+    double ytmp = cctmp.mvec(1);
+    cctmp.mvec(1) = cctmp.mvec(2);
+    cctmp.mvec(2) = ytmp;
     (*gd_it)->set_point(cctmp);
 
-    cctmp = (*gd_it)->get_dir();
-    ytmp = cctmp[1];
-    cctmp[1] = cctmp[2];
-    cctmp[2] = ytmp;
+    cctmp.mvec = (*gd_it)->get_dir().mvec;
+    ytmp = cctmp.mvec(1);
+    cctmp.mvec(1) = cctmp.mvec(2);
+    cctmp.mvec(2) = ytmp;
     (*gd_it)->set_dir(cctmp);
   }
   return gd_list;
@@ -1248,54 +1248,54 @@ grasp_planner::computeCubeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
     pg = new plannedGrasp((*it)->get_graspDirection());
     comp_preshape.set_preshapeType(PRESHAPE_CUBE_GRASP);
     pg->set_preshape(comp_preshape);
-    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * help);
+    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(help.mvec));
     pg->set_fixedFingerDirection(ffd);
     /* check if object isnt too big for this grasp */
-    if ((ffd[0] != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
-        (ffd[1] != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
-        (ffd[2] != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
+    if ((ffd.mvec(0) != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
+        (ffd.mvec(1) != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
+        (ffd.mvec(2) != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
       retList.push_back(pg);
     }
     else { delete pg; }
 
-    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
     pg = new plannedGrasp((*it)->get_graspDirection());
     comp_preshape.set_preshapeType(PRESHAPE_CUBE_GRASP);
     pg->set_preshape(comp_preshape);
     pg->set_fixedFingerDirection(ffd);
     /* check if object isnt too big for this grasp */
-    if ((ffd[0] != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
-        (ffd[1] != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
-        (ffd[2] != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
+    if ((ffd.mvec(0) != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
+        (ffd.mvec(1) != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
+        (ffd.mvec(2) != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
       retList.push_back(pg);
     }
     else { delete pg; }
 
-    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
     if (nr_of_180_deg_grasps == 2) {
       pg = new plannedGrasp((*it)->get_graspDirection());
       comp_preshape.set_preshapeType(PRESHAPE_CUBE_GRASP);
       pg->set_preshape(comp_preshape);
       pg->set_fixedFingerDirection(ffd);
       /* check if object isnt too big for this grasp */
-      if ((ffd[0] != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
-          (ffd[1] != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
-          (ffd[2] != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
+      if ((ffd.mvec(0) != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
+          (ffd.mvec(1) != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
+          (ffd.mvec(2) != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
         retList.push_back(pg);
       }
       else { delete pg; }
     }
 
-    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+    ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
     if (nr_of_180_deg_grasps == 2) {
       pg = new plannedGrasp((*it)->get_graspDirection());
       comp_preshape.set_preshapeType(PRESHAPE_CUBE_GRASP);
       pg->set_preshape(comp_preshape);
       pg->set_fixedFingerDirection(ffd);
       /* check if object isnt too big for this grasp */
-      if ((ffd[0] != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
-          (ffd[1] != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
-          (ffd[2] != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
+      if ((ffd.mvec(0) != 0.0 && width  <= GP_MAX_CUBE_SIZE && width  >= GP_MIN_CUBE_SIZE) ||
+          (ffd.mvec(1) != 0.0 && height <= GP_MAX_CUBE_SIZE && height >= GP_MIN_CUBE_SIZE) ||
+          (ffd.mvec(2) != 0.0 && depth  <= GP_MAX_CUBE_SIZE && depth  >= GP_MIN_CUBE_SIZE)) {
         retList.push_back(pg);
       }
       else { delete pg; }
@@ -1342,13 +1342,13 @@ grasp_planner::computeCylinderGraspPreshapes(std::list<plannedGrasp *> &graspLis
         comp_preshape.set_preshapeType(PRESHAPE_CYLINDER_TOP_BOTTOM_GRASP);
 
         help1 = cartesian_coordinates(1.0, 0.0, 0.0);
-        help2 = (*it)->get_graspDirection().get_dir() * help1;
+        help2 = (*it)->get_graspDirection().get_dir().mvec.cross(help1.mvec);
 
         for (int i = 0; i < nr_of_grasp_rotations; i++) {
           step = (double)i * 2.0 * M_PI / (double)nr_of_grasp_rotations;
           pg = new plannedGrasp((*it)->get_graspDirection());
           pg->set_preshape(comp_preshape);
-          ffd = cartesian_coordinates(cos(step) * help1 + sin(step) * help2);
+          ffd = cartesian_coordinates(cos(step) * help1.mvec + sin(step) * help2.mvec);
           pg->set_fixedFingerDirection(ffd);
           retList.push_back(pg);
         }
@@ -1361,7 +1361,7 @@ grasp_planner::computeCylinderGraspPreshapes(std::list<plannedGrasp *> &graspLis
       /* radial grasp */
       pg = new plannedGrasp((*it)->get_graspDirection());
       pg->set_preshape(comp_preshape);
-      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * cartesian_coordinates(0.0, 1.0, 0.0));
+      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(cartesian_coordinates(0.0, 1.0, 0.0).mvec));
       pg->set_fixedFingerDirection(ffd);
       if ((radius <= GP_MAX_CYL_SIDEGRASP_DIAMETER) &&
           (radius >= GP_MIN_CYL_SIDEGRASP_DIAMETER) &&
@@ -1373,7 +1373,7 @@ grasp_planner::computeCylinderGraspPreshapes(std::list<plannedGrasp *> &graspLis
       /* thumb parallel to height axis */
       pg = new plannedGrasp((*it)->get_graspDirection());
       pg->set_preshape(comp_preshape);
-      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
       pg->set_fixedFingerDirection(ffd);
       if (height <= GP_MAX_CYL_SIDEGRASP_HEIGHT) {
         retList.push_back(pg);
@@ -1384,7 +1384,7 @@ grasp_planner::computeCylinderGraspPreshapes(std::list<plannedGrasp *> &graspLis
         /* radial grasp */
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
         pg->set_fixedFingerDirection(ffd);
         if ((radius <= GP_MAX_CYL_SIDEGRASP_DIAMETER) &&
             (radius >= GP_MIN_CYL_SIDEGRASP_DIAMETER) &&
@@ -1396,7 +1396,7 @@ grasp_planner::computeCylinderGraspPreshapes(std::list<plannedGrasp *> &graspLis
         /* thumb parallel to height axis */
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
         pg->set_fixedFingerDirection(ffd);
         if (height <= GP_MAX_CYL_SIDEGRASP_HEIGHT) {
           retList.push_back(pg);
@@ -1449,20 +1449,20 @@ grasp_planner::computeSphereGraspPreshapes(std::list<plannedGrasp *> &graspList,
       /* sorry for all these meaningful names */
       help3 = cartesian_coordinates(1., 0., 0.);
       help4 = cartesian_coordinates(0., 1., 1.);
-      if ((*it)->get_graspDirection().get_dir() % help3 > (*it)->get_graspDirection().get_dir() % help4) {
+      if ((*it)->get_graspDirection().get_dir().mvec.dot(help3.mvec) > (*it)->get_graspDirection().get_dir().mvec.dot(help4.mvec)) {
         help3 = help4;
       }
       /* now help3 is NOT parallel to direction, we can do a cross product */
-      help1 = cartesian_coordinates((*it)->get_graspDirection().get_dir() * help3);
+      help1 = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(help3.mvec));
       /* now help1 is perpendicular to grasp direction */
-      help2 = (*it)->get_graspDirection().get_dir() * help1;
+      help2 = (*it)->get_graspDirection().get_dir().mvec.cross(help1.mvec);
       /* now help1 and help2 are perpendicular to grasp direction, with help1 perp to help2 */
 
       for (int i = 0; i < nr_of_grasp_rotations; i++) {
         step = (double)i * 2.0 * M_PI / (double)nr_of_grasp_rotations;
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates(cos(step) * help1 + sin(step) * help2);
+        ffd = cartesian_coordinates(cos(step) * help1.mvec + sin(step) * help2.mvec);
         pg->set_fixedFingerDirection(ffd);
         retList.push_back(pg);
       }
@@ -1511,13 +1511,13 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
         comp_preshape.set_preshapeType(PRESHAPE_CONE_TOP_BOTTOM_GRASP);
 
         help1 = cartesian_coordinates(1.0, 0.0, 0.0);
-        help2 = (*it)->get_graspDirection().get_dir() * help1;
+        help2 = (*it)->get_graspDirection().get_dir().mvec.cross( help1.mvec);
 
         for (int i = 0; i < nr_of_grasp_rotations; i++) {
           step = (double)i * 2.0 * M_PI / (double)nr_of_grasp_rotations;
           pg = new plannedGrasp((*it)->get_graspDirection());
           pg->set_preshape(comp_preshape);
-          ffd = cartesian_coordinates(cos(step) * help1 + sin(step) * help2);
+          ffd = cartesian_coordinates(cos(step) * help1.mvec + sin(step) * help2.mvec);
           pg->set_fixedFingerDirection(ffd);
           retList.push_back(pg);
         }
@@ -1532,13 +1532,13 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
         comp_preshape.set_preshapeType(PRESHAPE_CONE_TOP_BOTTOM_GRASP);
 
         help1 = cartesian_coordinates(1.0, 0.0, 0.0);
-        help2 = (*it)->get_graspDirection().get_dir() * help1;
+        help2 = (*it)->get_graspDirection().get_dir().mvec.cross(help1.mvec);
 
         for (int i = 0; i < nr_of_grasp_rotations; i++) {
           step = (double)i * 2.0 * M_PI / (double)nr_of_grasp_rotations;
           pg = new plannedGrasp((*it)->get_graspDirection());
           pg->set_preshape(comp_preshape);
-          ffd = cartesian_coordinates(cos(step) * help1 + sin(step) * help2);
+          ffd = cartesian_coordinates(cos(step) * help1.mvec + sin(step) * help2.mvec);
           pg->set_fixedFingerDirection(ffd);
           retList.push_back(pg);
         }
@@ -1556,10 +1556,10 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
       if ((*it)->get_graspDirection().get_dir().x() != 0.0 ||
           (*it)->get_graspDirection().get_dir().y() != 1.0 ||
           (*it)->get_graspDirection().get_dir().z() != 0.0) {
-        ffd = cartesian_coordinates(normalise((*it)->get_graspDirection().get_dir() * cartesian_coordinates(0.0, 1.0, 0.0)));
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(cartesian_coordinates(0.0, 1.0, 0.0).mvec).normalized());
       }
       else {
-        ffd = cartesian_coordinates(normalise((*it)->get_graspDirection().get_dir() * cartesian_coordinates(1.0, 0.0, 0.0)));
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(cartesian_coordinates(1.0, 0.0, 0.0).mvec).normalized());
       }
 
       pg->set_fixedFingerDirection(ffd);
@@ -1573,7 +1573,7 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
       /* thumb parallel to height axis */
       pg = new plannedGrasp((*it)->get_graspDirection());
       pg->set_preshape(comp_preshape);
-      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
       pg->set_fixedFingerDirection(ffd);
       if (height <= GP_MAX_CONE_SIDEGRASP_HEIGHT) {
         retList.push_back(pg);
@@ -1584,7 +1584,7 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
         /* radial grasp */
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
         pg->set_fixedFingerDirection(ffd);
         if ((bottomRadius <= GP_MAX_CONE_SIDEGRASP_DIAMETER) &&
             (bottomRadius >= GP_MIN_CONE_SIDEGRASP_DIAMETER) &&
@@ -1596,7 +1596,7 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
         /* thumb parallel to height axis */
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
         pg->set_fixedFingerDirection(ffd);
         if (height <= GP_MAX_CONE_SIDEGRASP_HEIGHT) {
           retList.push_back(pg);
@@ -1616,10 +1616,10 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
       if ((*it)->get_graspDirection().get_dir().x() != 0.0 ||
           (*it)->get_graspDirection().get_dir().y() != 1.0 ||
           (*it)->get_graspDirection().get_dir().z() != 0.0) {
-        ffd = cartesian_coordinates(normalise((*it)->get_graspDirection().get_dir() * cartesian_coordinates(0.0, 1.0, 0.0)));
-      }
-      else {
-        ffd = cartesian_coordinates(normalise((*it)->get_graspDirection().get_dir() * cartesian_coordinates(1.0, 0.0, 0.0)));
+          ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(cartesian_coordinates(0.0, 1.0, 0.0).mvec).normalized());
+        }
+        else {
+          ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(cartesian_coordinates(1.0, 0.0, 0.0).mvec).normalized());
       }
 
       pg->set_fixedFingerDirection(ffd);
@@ -1633,7 +1633,7 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
       /* thumb parallel to height axis */
       pg = new plannedGrasp((*it)->get_graspDirection());
       pg->set_preshape(comp_preshape);
-      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+      ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
       pg->set_fixedFingerDirection(ffd);
       if (height <= GP_MAX_CONE_EDGEGRASP_HEIGHT) {
         retList.push_back(pg);
@@ -1644,7 +1644,7 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
         /* radial grasp */
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
         pg->set_fixedFingerDirection(ffd);
         if ((bottomRadius <= GP_MAX_CONE_EDGEGRASP_DIAMETER) &&
             (bottomRadius >= GP_MIN_CONE_EDGEGRASP_DIAMETER) &&
@@ -1656,7 +1656,7 @@ grasp_planner::computeConeGraspPreshapes(std::list<plannedGrasp *> &graspList, S
         /* thumb parallel to height axis */
         pg = new plannedGrasp((*it)->get_graspDirection());
         pg->set_preshape(comp_preshape);
-        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir() * ffd);
+        ffd = cartesian_coordinates((*it)->get_graspDirection().get_dir().mvec.cross(ffd.mvec));
         pg->set_fixedFingerDirection(ffd);
         if (height <= GP_MAX_CONE_EDGEGRASP_HEIGHT) {
           retList.push_back(pg);

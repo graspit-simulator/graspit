@@ -41,10 +41,10 @@ double
 contactDistance(Body *body1, Body *body2, ContactData &cp)
 {
   position b1_pos(cp.b1_pos), b2_pos(cp.b2_pos);
-  b1_pos = b1_pos * body1->getTran();
-  b2_pos = b2_pos * body2->getTran();
+  b1_pos = body1->getTran().applyRotation(b1_pos) ;
+  b2_pos = body2->getTran().applyRotation(b2_pos) ;
   vec3 dist_vec = (b1_pos - b2_pos);
-  return dist_vec.len();
+  return dist_vec.norm();
 }
 
 /*
@@ -56,22 +56,22 @@ checkContactNormals(Body *b1, Body *b2, ContactData *c)
   bool r = true;
   vec3 n1(c->b1_normal);
   vec3 n2(c->b2_normal);
-  n1 = n1 * b1->getTran();
-  n2 = n2 * b2->getTran();
+  n1 = b1->getTran().applyRotation(n1);
+  n2 = b2->getTran().applyRotation(n2);
 
   position p1(c->b1_pos);
   position p2(c->b2_pos);
-  p1 = p1 * b1->getTran();
-  p2 = p2 * b2->getTran();
+  p1 = b1->getTran().applyRotation(p1);
+  p2 =  b2->getTran().applyRotation(p2);
 
   vec3 d = p2 - p1;
-  if (d % n1 > 0) {
+  if (d.dot(n1) > 0) {
     r = false;
     for (int i = 0; i < 3; i++) {
       c->b1_normal[i] = -c->b1_normal[i];
     }
   }
-  if (d % n2 < 0) {
+  if (d.dot(n2) < 0) {
     r = false;
     for (int i = 0; i < 3; i++) {
       c->b2_normal[i] = - c->b2_normal[i];

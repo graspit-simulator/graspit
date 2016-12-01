@@ -27,16 +27,16 @@ void FitParaboloid(vec3 *points, int numpts, double *coeffs)
   //x_1=coeff x^2, x_2=coeff y^2, x_3=coeff xy
 
   mat3 A, A_add, A_inverse;
-  vec3 z, z_add, x;
+  vec3  z_add, x;
 
-  z.set(0, 0, 0);
-  A = mat3::ZERO;
+  vec3 z = vec3::Zero();
+  A = mat3::Zero();
 
   for (int i = 0; i < numpts; i++)
   {
-    z_add.set(points[i].x()*points[i].x()*points[i].z(),
-              points[i].y()*points[i].y()*points[i].z(),
-              points[i].x()*points[i].y()*points[i].z());
+    z_add.x() = points[i].x()*points[i].x()*points[i].z();
+    z_add.y() = points[i].y()*points[i].y()*points[i].z();
+    z_add.z() = points[i].x()*points[i].y()*points[i].z();
     z += z_add;
 
     double M [9] = {points[i].x() *points[i].x() *points[i].x() *points[i].x(), //0,0
@@ -50,7 +50,7 @@ void FitParaboloid(vec3 *points, int numpts, double *coeffs)
                     points[i].x() *points[i].x() *points[i].y() *points[i].y()
                    }; //2,2
 
-    A_add.set(M);
+    A_add = mat3(M);
 
     A += A_add;
   }
@@ -111,10 +111,21 @@ void RotateParaboloid(double *coeff, double *R1, double *R2, mat3 *Rot, double *
     sintheta = sin(theta);
     costheta = cos(theta);
 
-    col1.set(costheta, sintheta, 0.0);
-    col2.set(-1.0 * sintheta, costheta, 0.0);
-    col3.set(0.0, 0.0, 1.0);
-    Rot->set(col1, col2, col3);
+    col1.x() = costheta;
+    col1.y() = sintheta;
+    col1.z() = 0.0;
+
+    col2.x() = -1.0 * sintheta;
+    col2.y() = costheta;
+    col2.z() = 0.0;
+
+    col3.x() = 0.0;
+    col3.y() = 0.0;
+    col3.z() = 1.0;
+
+    Rot->col(0) = col1;
+    Rot->col(1) = col2;
+    Rot->col(2) = col3;
 
     double temp1 = (coeff[0] * costheta * costheta + coeff[1] * sintheta * sintheta
                     - coeff[2] * sintheta * costheta) * 2;
@@ -147,7 +158,7 @@ void RotateParaboloid(double *coeff, double *R1, double *R2, mat3 *Rot, double *
     }
 
     *rotAngle = 0;
-    *Rot = mat3::IDENTITY;
+    *Rot = mat3::Identity();
 
   }
 

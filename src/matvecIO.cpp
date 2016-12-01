@@ -29,9 +29,153 @@
 
 #include "matvecIO.h"
 #include <qstringlist.h>
-//Added by qt3to4:
 #include <QTextStream>
 #include "mytools.h"
+
+/*! Reads the values of a vector \a v from stream \a is formatted as
+  "[#, #, #]"
+ */
+std::istream &
+operator>>(std::istream &is, vec3 &v)
+{
+  char ch;
+  double x, y, z;
+  if (is >> ch && ch == '[' && is >> x && is >> y && is >> z &&
+      is >> ch && ch == ']') {
+    v.x() = x; v.y() = y; v.z() = z;
+  }
+  //  else
+  //    is.setstate(ios::failbit);
+
+  return is;
+}
+
+/*! Writes the values of vector \a v to a stream \a os in the format
+  "[#, #, #]".
+ */
+std::ostream &
+operator<<(std::ostream &os, const vec3 v)
+{
+#if defined(WIN32) && !defined(__MINGW32__)
+  int oldFlags = os.setf(std::ios_base::showpos);
+#else
+#ifdef GCC22
+  int oldFlags = os.setf(ios::showpos);
+#else
+  std::_Ios_Fmtflags oldFlags = os.setf(std::ios_base::showpos);
+#endif
+#endif
+  os << '[' << v.x() << ' ' << v.y() << ' ' << v.z() << ']';
+  os.flags(oldFlags);
+  return os;
+}
+
+
+/*! Reads the 9 consecutive values of a 3x3 matrix in column major format. */
+std::istream &
+operator>>(std::istream &is, mat3 &m)
+{
+  is >> m(0) >> m(3) >> m(6);
+  is >> m(1) >> m(4) >> m(7);
+  is >> m(2) >> m(5) >> m(8);
+  return is;
+}
+
+/*!
+  Writes the matrix out on 3 lines in the following format:
+\verbatim
+[ # # #]
+[ # # #]
+[ # # #]
+\endverbatim
+*/
+std::ostream &
+operator<<(std::ostream &os, const mat3 &m)
+{
+#if defined(WIN32) && !defined(__MINGW32__)
+  int oldFlags = os.setf(std::ios_base::showpos);
+#else
+#ifdef GCC22
+  int oldFlags = os.setf(ios::showpos);
+#else
+  std::_Ios_Fmtflags oldFlags = os.setf(std::ios_base::showpos);
+#endif
+#endif
+  os << '[' << m(0) << ' ' << m(3) << ' ' << m(6) << ']' << std::endl;
+  os << '[' << m(1) << ' ' << m(4) << ' ' << m(7) << ']' << std::endl;
+  os << '[' << m(2) << ' ' << m(5) << ' ' << m(8) << ']' << std::endl;
+  os.flags(oldFlags);
+  return os;
+}
+
+/*!
+  Reads the 4 values of a quaternion \a q formatted as "(w, x, y, z)" from a
+  stream \a is.
+*/
+std::istream &
+operator>>(std::istream &is, Quaternion &q)
+{
+  char ch;
+  double w, x, y, z;
+  if (is >> ch && ch == '(' && is >> w && is >> x && is >> y && is >> z &&
+      is >> ch && ch == ')') {
+    q.w() = w; q.x() = x; q.y() = y; q.z() = z;
+  }
+  //  else
+  //    is.setstate(ios::failbit);
+
+  return is;
+}
+
+/*!
+  Writes the 4 values of a quaternion \a q in the format "(w, x, y, z)" to as
+  stream \a os.
+*/
+std::ostream &
+operator<<(std::ostream &os, const Quaternion &q)
+{
+#if defined(WIN32) && !defined(__MINGW32__)
+  int oldFlags = os.setf(std::ios_base::showpos);
+#else
+#ifdef GCC22
+  int oldFlags = os.setf(ios::showpos);
+#else
+  std::_Ios_Fmtflags oldFlags = os.setf(std::ios_base::showpos);
+#endif
+#endif
+  os << '(' << q.w() << ' ' << q.x() << ' ' << q.y() << ' ' << q.z() << ')';
+  os.flags(oldFlags);
+  return os;
+}
+
+/*!
+  Reads the 7 values of a transform \a tr formated as "(w, x, y, z) [v1,v2,v3]"
+  from stream \a is.
+*/
+std::istream &
+operator>>(std::istream &is, transf &tr)
+{
+  Quaternion q;
+  vec3 v;
+
+  if (is >> q && is >> v) {
+    tr.set(q, v);
+  }
+  //  else
+  //    is.setstate(ios::failbit);
+
+  return is;
+}
+
+/*!
+  Writes the 7 values of a transform \a tr formated as
+  "(w, x, y, z) [v1,v2,v3]" to stream \a os.
+*/
+std::ostream &
+operator<<(std::ostream &os, const transf &tr)
+{
+  return os << tr.rot << tr.t;
+}
 
 /*!
   Reads a vec3 from a QTextStream.  The format should be "[x y z]".
@@ -59,31 +203,6 @@ operator<<(QTextStream &os, const vec3 &v)
   return os;
 }
 
-/*!
-  Reads a position from a QTextStream.  The format should be "[x y z]".
-*/
-QTextStream &
-operator>>(QTextStream &is, position &p)
-{
-  QChar ch;
-  double x, y, z;
-  is >> ch >> x >> y >> z >> ch;
-  p[0] = x; p[1] = y; p[2] = z;
-
-  return is;
-}
-
-/*!
-  Writes a position to a QTextStream in the format "[x y z]".
-*/
-QTextStream &
-operator<<(QTextStream &os, const position &p)
-{
-  int oldFlags = os.setf(QTextStream::showpos);
-  os << '[' << p[0] << ' ' << p[1] << ' ' << p[2] << ']';
-  os.flags(oldFlags);
-  return os;
-}
 
 /*!
   Reads a mat3 from a QTextStream.  The format should be:
@@ -96,9 +215,9 @@ operator<<(QTextStream &os, const position &p)
 QTextStream &
 operator>>(QTextStream &is, mat3 &m)
 {
-  is >> m[0] >> m[3] >> m[6];
-  is >> m[1] >> m[4] >> m[7];
-  is >> m[2] >> m[5] >> m[8];
+  is >> m(0) >> m(3) >> m(6);
+  is >> m(1) >> m(4) >> m(7);
+  is >> m(2) >> m(5) >> m(8);
   return is;
 }
 
@@ -114,9 +233,9 @@ QTextStream &
 operator<<(QTextStream &os, const mat3 &m)
 {
   int oldFlags = os.setf(QTextStream::showpos);
-  os << '[' << m[0] << ' ' << m[3] << ' ' << m[6] << ']' << endl;
-  os << '[' << m[1] << ' ' << m[4] << ' ' << m[7] << ']' << endl;
-  os << '[' << m[2] << ' ' << m[5] << ' ' << m[8] << ']' << endl;
+  os << '[' << m(0) << ' ' << m(3) << ' ' << m(6) << ']' << endl;
+  os << '[' << m(1) << ' ' << m(4) << ' ' << m(7) << ']' << endl;
+  os << '[' << m(2) << ' ' << m(5) << ' ' << m(8) << ']' << endl;
   os.flags(oldFlags);
   return os;
 }
@@ -131,7 +250,7 @@ operator>>(QTextStream &is, Quaternion &q)
   QChar ch;
   double w, x, y, z;
   is >> ch >> w >> x >> y >> z >> ch;
-  q.w = w; q.x = x; q.y = y; q.z = z;
+  q.w() = w; q.x() = x; q.y() = y; q.z() = z;
   return is;
 }
 
@@ -142,7 +261,7 @@ QTextStream &
 operator<<(QTextStream &os, const Quaternion &q)
 {
   int oldFlags = os.setf(QTextStream::showpos);
-  os << '(' << q.w << ' ' << q.x << ' ' << q.y << ' ' << q.z << ')';
+  os << '(' << q.w() << ' ' << q.x() << ' ' << q.y() << ' ' << q.z() << ')';
   os.flags(oldFlags);
   return os;
 }
@@ -221,12 +340,12 @@ readTransRotFromQTextStream(QTextStream &stream, transf &tr)
           theta *= M_PI / 180.0;
         }
 
-        if (axis == 'x') { tmpVec = vec3::X; }
-        else if (axis == 'y') { tmpVec = vec3::Y; }
-        else if (axis == 'z') { tmpVec = vec3::Z; }
+        if (axis == 'x') { tmpVec = vec3(1,0,0); }
+        else if (axis == 'y') { tmpVec = vec3(0,1,0); }
+        else if (axis == 'z') { tmpVec = vec3(0,0,1); }
         else { return FAILURE; }
 
-        tmpTr = rotate_transf(theta, tmpVec);
+        tmpTr = transf::AXIS_ANGLE_ROTATION(theta, tmpVec);
       }
       else if (line[0] == 't') { /* translation */
         strings = QStringList::split(QChar(' '), line);
@@ -236,7 +355,7 @@ readTransRotFromQTextStream(QTextStream &stream, transf &tr)
         z = strings[3].toDouble(&ok); if (!ok) { return FAILURE; }
         tmpVec = vec3(x, y, z);
         //  printf("   Reading translation transform...\n");
-        tmpTr = translate_transf(tmpVec);
+        tmpTr = transf::TRANSLATION(tmpVec);
       }
       else if (line[0] == 'T') { /* full transform: (Quaternion)[Translation] */
         QString trStr = line.section(' ', 1, -1);
@@ -246,7 +365,7 @@ readTransRotFromQTextStream(QTextStream &stream, transf &tr)
       else if (line[0] == 'R') { /* Rotation matrix */
         mat3 tmpMat;
         stream >> tmpMat;
-        tmpTr = transf(tmpMat, vec3::ZERO);
+        tmpTr = transf(tmpMat, vec3::Zero());
         line = stream.readLine();
       }
       tr = tmpTr * tr;

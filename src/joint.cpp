@@ -77,10 +77,10 @@ void DHTransform::computeTran()
   atrans[1] = 0.0;
   atrans[2] = 0.0;
 
-  tr1 = rotate_transf(theta, vec3(0, 0, 1));
-  tr2 = translate_transf(dtrans);
-  tr3 = translate_transf(atrans);
-  tr4 = rotate_transf(alpha, vec3(1, 0, 0));
+  tr1 = transf::AXIS_ANGLE_ROTATION(theta, vec3(0, 0, 1));
+  tr2 = transf::TRANSLATION(dtrans);
+  tr3 = transf::TRANSLATION(atrans);
+  tr4 = transf::AXIS_ANGLE_ROTATION(alpha, vec3(1, 0, 0));
   tr4TimesTr3 = tr4 * tr3;
 
   tran = tr4TimesTr3 * tr2 * tr1;
@@ -94,7 +94,7 @@ void DHTransform::setD(double q)
 {
   d = q;
   dtrans[2] = d;
-  tr2 = translate_transf(dtrans);
+  tr2 = transf::TRANSLATION(dtrans);
 
   tran = tr4TimesTr3 * tr2 * tr1;
 }
@@ -106,7 +106,7 @@ of the transform.
 void DHTransform::setTheta(double q)
 {
   theta = q;
-  tr1 = rotate_transf(theta, vec3(0, 0, 1));
+  tr1 = transf::AXIS_ANGLE_ROTATION(theta, vec3(0, 0, 1));
 
   tran = tr4TimesTr3 * tr2 * tr1;
 }
@@ -178,7 +178,7 @@ Joint::jacobian(const Joint *joint, const transf &jointTran,
   transf T;
   if (worldCoords) {
     // the translation from joint coordinate system to world coordinate system
-    T = transf(Quaternion::IDENTITY, toTarget.translation()) * jointTran.inverse();
+    T = transf(Quaternion::Identity(), toTarget.translation()) * jointTran.inverse();
   } else {
     T = toTarget * jointTran.inverse();
   }

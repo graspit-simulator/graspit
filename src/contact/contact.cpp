@@ -74,17 +74,17 @@ Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
   body2Tran = b2->getTran();
 
   updateCof();
-  normal = normalise(norm);
+  normal = norm.normalized();
   loc = pos;
   vec3 tangentX, tangentY;
 
-  if (fabs(normal % vec3(1, 0, 0)) > 1.0 - MACHINE_ZERO) {
-    tangentX = normalise(normal * vec3(0, 0, 1));
+  if (fabs(normal.dot(vec3(1, 0, 0))) > 1.0 - MACHINE_ZERO) {
+    tangentX = (normal.cross(vec3(0, 0, 1))).normalized();
   } else {
-    tangentX = normalise(normal * vec3(1, 0, 0));
+    tangentX = (normal.cross(vec3(1, 0, 0))).normalized();
   }
-  tangentY = normalise(normal * tangentX);
-  frame = coordinate_transf(loc, tangentX, tangentY);
+  tangentY = (normal.cross(tangentX)).normalized();
+  frame = transf::COORDINATE(loc, tangentX, tangentY);
   coneMat = NULL;
   prevBetas = NULL;
   inheritanceInfo = false;
@@ -135,7 +135,7 @@ void Contact::wrenchFromFrictionEdge(double *edge, const vec3 &radius, Wrench *w
   //max torque is contact_radius * normal_force_magnitude (which is 1) * coeff_of_friction
   //possible torque for this wrench is (friction_edge * max_torque) in the direction of the contact normal
   //the contact_radius coefficient is already taken into account in the friction_edge
-  vec3 torqueVec = ((radius * forceVec) + normal * sCof * edge[5]) / object->getMaxRadius();
+  vec3 torqueVec = ((radius.cross(forceVec)) + normal * sCof * edge[5]) / object->getMaxRadius();
 
   wr->torque = torqueVec;
   wr->force = forceVec;
@@ -345,7 +345,7 @@ Contact::localToWorldWrenchMatrix() const
   //for torque we also multiply by a cross product matrix
   vec3 worldLocation = contactTran.translation();
   vec3 cog = getBody2()->getTran().translation();
-  mat3 C; C.setCrossProductMatrix(worldLocation - cog);
+  mat3 C; setCrossProductMatrix(C, worldLocation - cog);
   Matrix CR(3, 3);
   matrixMultiply(Matrix::ROTATION(C.transpose()), Rot, CR);
   //also scale by object max radius so we get same units as force
@@ -389,7 +389,7 @@ Contact::localToWorldWrenchBlockMatrix(const std::list<Contact *> &contacts)
 */
 bool Contact::preventsMotion(const transf &motion) const
 {
-  if ((loc * motion - loc) % normal < -MACHINE_ZERO) { return true; }
+  if ((motion.applyRotation(loc)- loc).dot(normal) < -MACHINE_ZERO) { return true; }
   return false;
 }
 
@@ -417,23 +417,34 @@ double
 Contact::getCof() const
 {
   DynamicBody *db;
-  vec3 radius, vel1(vec3::ZERO), vel2(vec3::ZERO), rotvel;
+  vec3 radius, vel1(vec3::Zero()), vel2(vec3::Zero()), rotvel;
 
   if (body1->isDynamic()) {
     db = (DynamicBody *)body1;
     radius = db->getTran().rotation() * (loc - db->getCoG());
-    vel1.set(db->getVelocity()[0], db->getVelocity()[1], db->getVelocity()[2]);
-    rotvel.set(db->getVelocity()[3], db->getVelocity()[4], db->getVelocity()[5]);
-    vel1 += radius * rotvel;
+    vel1.x() = db->getVelocity()[0];
+    vel1.y() = db->getVelocity()[1];
+    vel1.z() = db->getVelocity()[2];
+
+    rotvel.x() = db->getVelocity()[3];
+    rotvel.y() = db->getVelocity()[4];
+    rotvel.z() = db->getVelocity()[5];
+
+    vel1 += radius.cross(rotvel);
   }
   if (body2->isDynamic()) {
     db = (DynamicBody *)body2;
     radius = db->getTran().rotation() * (mate->loc - db->getCoG());
-    vel2.set(db->getVelocity()[0], db->getVelocity()[1], db->getVelocity()[2]);
-    rotvel.set(db->getVelocity()[3], db->getVelocity()[4], db->getVelocity()[5]);
-    vel2 += radius * rotvel;
+    vel2.x() = db->getVelocity()[0];
+    vel2.y() = db->getVelocity()[1];
+    vel2.z() = db->getVelocity()[2];
+
+    rotvel.x() = db->getVelocity()[3];
+    rotvel.y() = db->getVelocity()[4];
+    rotvel.z() = db->getVelocity()[5];
+    vel2 += radius.cross(rotvel);
   }
-  if ((vel1 - vel2).len() > 1.0) {
+  if ((vel1 - vel2).norm() > 1.0) {
     DBGP("SLIDING!");
     return kcof;
   }
@@ -470,7 +481,7 @@ Contact::getConstraintError()
 {
   transf cf = frame * body1->getTran();
   transf cf2 = mate->getContactFrame() * body2->getTran();
-  return MAX(0.0, Contact::THRESHOLD / 2.0 - (cf.translation() - cf2.translation()).len());
+  return MAX(0.0, Contact::THRESHOLD / 2.0 - (cf.translation() - cf2.translation()).norm());
 }
 
 /*! Attempts to save some information from a previously computed dynamics

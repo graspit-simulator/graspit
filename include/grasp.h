@@ -33,6 +33,8 @@
 #include <set>
 #include <QObject>
 
+#include "matvec3D.h"
+
 //Inventor includes
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
@@ -40,9 +42,7 @@ class SoTransform;
 class SoCoordinate3;
 class SoIndexedFaceSet;
 
-class vec3;
 class transf;
-class position;
 class Hand;
 class GraspableBody;
 class Contact;

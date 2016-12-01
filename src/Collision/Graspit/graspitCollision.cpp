@@ -442,16 +442,16 @@ GraspitCollision::pointToBodyDistance(const Body *body1, position point,
     return 0;
   }
   //this callback operates in body coordinates
-  ClosestPtCallback pc(model, point * body1->getTran().inverse());
+  ClosestPtCallback pc(model, body1->getTran().inverse().applyRotation(point));
   startRecursion(model, NULL, &pc);
   DBGST(pc.printStatistics());
   //go back to world coordinates
-  closestPoint = pc.getClosestPt() * body1->getTran();
+  closestPoint = body1->getTran().applyRotation(pc.getClosestPt());
   //we compute the normal as being in the direction that
   //relates the two points. There is really no need to do this here,
   //but it is the legacy interface. The PQP interface looks at the normal of
   //the triangle instead, but I believe this is better
-  closestNormal = normalise(closestPoint - point);
+  closestNormal = (closestPoint - point).normalized();
   return pc.getMin();
 }
 
@@ -471,8 +471,8 @@ GraspitCollision::bodyToBodyDistance(const Body *body1, const Body *body2,
   DBGST(dc.printStatistics());
   dc.getClosestPoints(p1, p2);
   //the legacy interface requests p1 and p2 in each body's coordinate system
-  p1 = p1 * body1->getTran().inverse();
-  p2 = p2 * body2->getTran().inverse();
+  p1 = body1->getTran().inverse().applyRotation(p1);
+  p2 = body1->getTran().inverse().applyRotation(p2);
   return dc.getMin();
 }
 

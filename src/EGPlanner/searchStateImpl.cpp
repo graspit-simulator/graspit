@@ -138,10 +138,10 @@ void PositionStateComplete::setTran(const transf &t)
   getVariable("Tx")->setValue(t.translation().x());
   getVariable("Ty")->setValue(t.translation().y());
   getVariable("Tz")->setValue(t.translation().z());
-  getVariable("Qw")->setValue(t.rotation().w);
-  getVariable("Qx")->setValue(t.rotation().x);
-  getVariable("Qy")->setValue(t.rotation().y);
-  getVariable("Qz")->setValue(t.rotation().z);
+  getVariable("Qw")->setValue(t.rotation().w());
+  getVariable("Qx")->setValue(t.rotation().x());
+  getVariable("Qy")->setValue(t.rotation().y());
+  getVariable("Qz")->setValue(t.rotation().z());
 }
 
 void PositionStateAA::createVariables()
@@ -162,8 +162,8 @@ transf PositionStateAA::getCoreTran() const
   double theta = readVariable("theta");
   double phi = readVariable("phi");
   double alpha = readVariable("alpha");
-  transf coreTran = rotate_transf(alpha, vec3(sin(theta) * cos(phi) , sin(theta) * sin(phi) , cos(theta))) *
-                    translate_transf(vec3(tx, ty, tz));
+  transf coreTran = transf::AXIS_ANGLE_ROTATION(alpha, vec3(sin(theta) * cos(phi) , sin(theta) * sin(phi) , cos(theta))) *
+                    transf::TRANSLATION(vec3(tx, ty, tz));
   //transform now returned relative to hand approach transform
   return mHand->getApproachTran().inverse() * coreTran;
 
@@ -178,7 +178,10 @@ void PositionStateAA::setTran(const transf &t)
   getVariable("Tz")->setValue(rt.translation().z());
 
   vec3 axis; double angle;
-  rt.rotation().ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa( rt.rotation());
+  axis = aa.axis();
+  angle = aa.angle();
+
   if (angle < 0) {
     angle = -angle;
     axis = -1.0 * axis;
@@ -231,15 +234,19 @@ transf PositionStateEllipsoid::getCoreTran() const
   //compute normal direction - for some reason this always points INSIDE the ellipsoid
   vec3 n1(-a * sin(beta)*cos(gamma), -b * sin(beta)*sin(gamma), c * cos(beta));
   vec3 n2(-a * cos(beta)*sin(gamma),  b * cos(beta)*cos(gamma), 0);
-  vec3 normal = normalise(n1) * normalise(n2);
+  vec3 normal = n1.normalized().cross(n2.normalized());
 
   vec3 xdir(1, 0, 0);
-  vec3 ydir = normal * normalise(xdir);
-  xdir = ydir * normal;
-  mat3 r(xdir, ydir, normal);
+  vec3 ydir = normal.cross(xdir.normalized());
+  xdir = ydir.cross(normal);
+  mat3 r;
+  r.col(0) = xdir;
+  r.col(1) = ydir;
+  r.col(2) = normal;
 
   transf handTran = transf(r, vec3(px, py, pz) - distance * normal);
-  Quaternion zrot(tau, vec3(0, 0, 1));
+  Eigen::AngleAxisd aa = Eigen::AngleAxisd(tau, vec3(0, 0, 1));
+  Quaternion zrot(aa);
   handTran = transf(zrot, vec3(0, 0, 0)) * handTran;
   return mHand->getApproachTran().inverse() * handTran;
   //So: hand tranform is: move onto the ellipsoid and rotate z axis in normal direction
@@ -263,8 +270,8 @@ transf PositionStateApproach::getCoreTran() const
   double dist = readVariable("dist");
   double rx = readVariable("wrist 1");
   double ry = readVariable("wrist 2");
-  transf handTran = transf(Quaternion::IDENTITY, vec3(0, 0, dist));
-  handTran = handTran * rotate_transf(rx, vec3(1, 0, 0)) * rotate_transf(ry, vec3(0, 1, 0));
+  transf handTran = transf(Quaternion::Identity(), vec3(0, 0, dist));
+  handTran = handTran * transf::AXIS_ANGLE_ROTATION(rx, vec3(1, 0, 0)) * transf::AXIS_ANGLE_ROTATION(ry, vec3(0, 1, 0));
   return mHand->getApproachTran().inverse() * handTran * mHand->getApproachTran();
 }
 void PositionStateApproach::setTran(const transf &t)

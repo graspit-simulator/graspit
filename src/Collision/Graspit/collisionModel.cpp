@@ -69,7 +69,7 @@ double Leaf::getMedianProjection(const vec3 &axis)
   for (it = mTriangles.begin(); it != mTriangles.end(); it++) {
     position mean = (*it).v1 + (*it).v2 + (*it).v3;
     mean = (1.0 / 3.0) * mean;
-    double projection = (mean - position::ORIGIN) % axis;
+    double projection = (mean - position::Zero()).dot(axis);
     projections.push_back(projection);
   }
   if (projections.size() == 1) {
@@ -82,10 +82,10 @@ double Leaf::getMedianProjection(const vec3 &axis)
 void boxSize(const position &p, vec3 &min, vec3 &max,
              const vec3 &x, const vec3 &y, const vec3 &z, double tolerance)
 {
-  vec3 d = p - position::ORIGIN;
-  double dx = d % x;
-  double dy = d % y;
-  double dz = d % z;
+  vec3 d = p - position::Zero();
+  double dx = d.dot(x);
+  double dy = d.dot(y);
+  double dz = d.dot(z);
   if (dx + tolerance > max.x()) { max.x() = dx + tolerance; }
   if (dy + tolerance > max.y()) { max.y() = dy + tolerance; }
   if (dz + tolerance > max.z()) { max.z() = dz + tolerance; }
@@ -190,10 +190,13 @@ void Leaf::computeBboxOO()
   //set up rotation matrix
   vec3 xAxis(v[0][first], v[1][first], v[2][first]);
   vec3 yAxis(v[0][second], v[1][second], v[2][second]);
-  vec3 zAxis = normalise(xAxis) * normalise(yAxis);
-  yAxis = zAxis * normalise(xAxis);
-  xAxis = yAxis * zAxis;
-  mat3 R(xAxis, yAxis, zAxis);
+  vec3 zAxis = xAxis.normalized().cross(yAxis.normalized());
+  yAxis = zAxis.cross(xAxis.normalized());
+  xAxis = yAxis.cross(zAxis);
+  mat3 R;
+  R.col(0) = xAxis;
+  R.col(1) = yAxis;
+  R.col(2) = zAxis;
 
   DBGP("Matrix: " << R);
 
@@ -208,12 +211,12 @@ void Leaf::computeBboxOO()
   transf rotate = transf::IDENTITY;
   if (first == 1) {
     // y has the largest extent, rotate around z
-    rotate = rotate_transf(M_PI / 2.0, vec3(0, 0, 1));
+    rotate = transf::AXIS_ANGLE_ROTATION(M_PI / 2.0, vec3(0, 0, 1));
   } else if (first == 2) {
     // z has the largest extent, rotate around y
-    rotate = rotate_transf(M_PI / 2.0, vec3(0, 1, 0));
+    rotate = transf::AXIS_ANGLE_ROTATION(M_PI / 2.0, vec3(0, 1, 0));
   }
-  halfSize = halfSize * rotate;
+  halfSize = rotate.applyRotation(halfSize);
   for (int i = 0; i < 3; i++) {
     if (halfSize[i] < 0) { halfSize[i] = -halfSize[i]; }
   }
@@ -226,7 +229,7 @@ void Leaf::computeBboxOO()
 
 void Leaf::computeBboxAA()
 {
-  mat3 R(vec3::X, vec3::Y, vec3::Z);
+  mat3 R = mat3::Identity();
   vec3 halfSize, center;
   fitBox(R, center, halfSize);
   mBbox.halfSize = halfSize;
@@ -251,9 +254,9 @@ Branch *Leaf::split()
   //choose axis as dominant axis of bbox
   //the box is rotated after fitting so that the x axis always points in the direction
   //of the largest extent
-  vec3 xAxis = vec3(1, 0, 0) * mBbox.getTran();
-  vec3 yAxis = vec3(0, 1, 0) * mBbox.getTran();
-  vec3 zAxis = vec3(0, 0, 1) * mBbox.getTran();
+  vec3 xAxis = mBbox.getTran().applyRotation(vec3(1, 0, 0));
+  vec3 yAxis = mBbox.getTran().applyRotation(vec3(0, 1, 0));
+  vec3 zAxis = mBbox.getTran().applyRotation(vec3(0, 0, 1));
   if (mBbox.halfSize.y() > mBbox.halfSize.x() + 1.0e-5) {
     DBGA("Unexpected bounding box dominant axis. Extents: ");
     DBGA(mBbox.halfSize.x() << " " << mBbox.halfSize.y() << " " << mBbox.halfSize.z());
@@ -272,7 +275,7 @@ Branch *Leaf::split()
 
 
   //choose point as mean of triangle vertices
-  double sepPoint = (getMeanVertex() - position::ORIGIN) % xAxis;
+  double sepPoint = (getMeanVertex() - position::Zero()).dot(xAxis);
 
   //choose point as median of triangle centroids
   //double sepPoint = getMedianProjection(xAxis);
@@ -324,8 +327,8 @@ void Leaf::balancedSplit(vec3 axis, double sepPoint, Leaf *child1, Leaf *child2)
     median = median + (*it).v2;
     median = median + (*it).v3;
     median = (1.0 / 3.0) * median;
-    vec3 m = median - position::ORIGIN;
-    double d = m % axis;
+    vec3 m = median - position::Zero();
+    double d = m.dot(axis);
     if (d < sepPoint) {
       child1->addTriangle(*it);
     } else {
@@ -370,7 +373,7 @@ Leaf::optimalSplit(const vec3 &x, const vec3 &y, const vec3 &z, Leaf *child1, Le
   for (it = mTriangles.begin(); it != mTriangles.end(); it++) {
     position median = (*it).v1 + (*it).v2 + (*it).v3;
     median = (1.0 / 3.0) * median;
-    double projection = (median - position::ORIGIN) % x;
+    double projection = (median - position::Zero()).dot(x);
     sortedTriangles.push_back(std::pair<Triangle, double>(*it, projection));
   }
   std::sort(sortedTriangles.begin(), sortedTriangles.end(), compareProjections);
@@ -389,8 +392,12 @@ Leaf::optimalSplit(const vec3 &x, const vec3 &y, const vec3 &z, Leaf *child1, Le
   }
   //and bbox volumes going down
   std::vector<double> volumesDown;
-  max.set(-1.0e10, -1.0e10, -1.0e10);
-  min.set(1.0e10,  1.0e10,  1.0e10);
+  max.x() = -1.0e10;
+  max.y() = -1.0e10;
+  max.z() = -1.0e10;
+  min.x() = 1.0e10;
+  min.y() = 1.0e10;
+  min.z() = 1.0e10;
   std::vector< std::pair<Triangle, double> >::reverse_iterator it3;
   for (it3 = sortedTriangles.rbegin(); it3 != sortedTriangles.rend(); it3++) {
     boxSize((*it3).first.v1, min, max, x, y, z, Leaf::TOLERANCE);

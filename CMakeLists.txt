@@ -42,6 +42,7 @@ find_package(Qhull REQUIRED)
 find_package(SoQt4 REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 
 if (DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
@@ -138,6 +139,8 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/timer_calls.h 
     ${GSRC}/include/triangle_inl.h 
     ${GSRC}/include/triangle.h 
+    ${GSRC}/include/transform.h
+    ${GSRC}/include/flockTransform.h
     ${GSRC}/include/worldElement.h 
     ${GSRC}/include/worldElementFactory.h 
     ${GSRC}/include/world.h 
@@ -381,6 +384,8 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/worldElement.cpp 
     ${GSRC}/src/worldElementFactory.cpp 
     ${GSRC}/src/math/matrix.cpp 
+    ${GSRC}/src/transform.cpp
+    ${GSRC}/src/flockTransform.cpp
     ${GSRC}/src/Collision/collisionInterface.cpp 
     ${GSRC}/src/Planner/grasp_visualization.cpp 
     ${GSRC}/src/Planner/grasp_tester.cpp 
@@ -691,6 +696,7 @@ set (GRASPIT_INCLUDES
 include_directories(
     ${GRASPIT_INCLUDES}
     ${TINYXML_INCLUDES}
+    EIGEN3_INCLUDE_DIR
 )
 
 

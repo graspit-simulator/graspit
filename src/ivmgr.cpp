@@ -621,11 +621,16 @@ IVmgr::transRot(DraggerInfo *dInfo)
       DBGP("last center: " << dInfo->lastCent[0] << " " <<
            dInfo->lastCent[1] << " " <<
            dInfo->lastCent[2]);
-      scale.set(dInfo->draggerTran->scaleFactor.getValue());
-      center.set(myCenterball->center.getValue());
+      scale.x() = dInfo->draggerTran->scaleFactor.getValue()[0];
+      scale.y() = dInfo->draggerTran->scaleFactor.getValue()[1];
+      scale.z() = dInfo->draggerTran->scaleFactor.getValue()[2];
+
+      center.x() = myCenterball->center.getValue()[0];
+      center.y() = myCenterball->center.getValue()[1];
+      center.z() = myCenterball->center.getValue()[2];
       center *= scale[0];
-      transf recenterTran = translate_transf(center) *
-                            dInfo->selectedElement->getTran() * translate_transf(-center);
+      transf recenterTran = transf::TRANSLATION(center) *
+                            dInfo->selectedElement->getTran() * transf::TRANSLATION(-center);
       dInfo->centerballTransl = recenterTran.translation();
       dInfo->lastCent = myCenterball->center.getValue();
       return;
@@ -648,8 +653,8 @@ IVmgr::transRot(DraggerInfo *dInfo)
       //if (enabled) myHandleBox->enableValueChangedCallbacks(TRUE);
       return;
     }
-    desiredTranslation.set(myHandleBox->translation.getValue());
-    scale.set(dInfo->draggerTran->scaleFactor.getValue());
+    SbVec3fTovec3(myHandleBox->translation.getValue(),desiredTranslation);
+    SbVec3fTovec3(dInfo->draggerTran->scaleFactor.getValue(), scale);
     desiredTranslation[0] *= scale[0];
     desiredTranslation[1] *= scale[1];
     desiredTranslation[2] *= scale[2];
@@ -658,7 +663,7 @@ IVmgr::transRot(DraggerInfo *dInfo)
 
     DBGP("desired Translation: " << desiredTranslation);
     //not needed?
-    //if ((desiredTranslation - origTranslation).len() == 0.0) return;
+    //if ((desiredTranslation - origTranslation).norm() == 0.0) return;
     newTran = transf(origRotation, desiredTranslation);
   } else {
     if (myCenterball->rotation.getValue().equals(dInfo->lastRot, 0.00001f)) {
@@ -666,28 +671,31 @@ IVmgr::transRot(DraggerInfo *dInfo)
       //if (enabled) myCenterball->enableValueChangedCallbacks(TRUE);
       return;
     }
-    desiredRotation.set(myCenterball->rotation.getValue());
-    scale.set(dInfo->draggerTran->scaleFactor.getValue());
-    center.set(myCenterball->center.getValue());
+    desiredRotation.x() = myCenterball->rotation.getValue()[0];
+    desiredRotation.y() = myCenterball->rotation.getValue()[1];
+    desiredRotation.z() = myCenterball->rotation.getValue()[2];
+    desiredRotation.w() = myCenterball->rotation.getValue()[3];
+    SbVec3fTovec3(dInfo->draggerTran->scaleFactor.getValue(), scale);
+    SbVec3fTovec3(myCenterball->center.getValue(),center);
     center *= scale[0];
     //this does not work if the centerball has been recentered
     //hope to fix this at some point
-    newTran = translate_transf(-center) * transf(desiredRotation, vec3::ZERO) *
-              translate_transf(center) * translate_transf(dInfo->centerballTransl);
+    newTran = transf::TRANSLATION(-center) * transf(desiredRotation, vec3::Zero()) *
+              transf::TRANSLATION(center) * transf::TRANSLATION(dInfo->centerballTransl);
   }
   dInfo->selectedElement->moveTo(newTran, 50 * Contact::THRESHOLD, M_PI / 36.0);
   world->updateGrasps();
 
   DBGP("new pos: " << dInfo->selectedElement->getTran());
   if (translating) {
-    SbVec3f newPos = (origRotation.inverse() * dInfo->selectedElement->getTran().translation()).toSbVec3f();
+    SbVec3f newPos = toSbVec3f(origRotation.inverse() * dInfo->selectedElement->getTran().translation());
     newPos[0] /= scale[0];
     newPos[1] /= scale[1];
     newPos[2] /= scale[2];
     dInfo->lastTran = newPos;
     myHandleBox->translation.setValue(newPos);
   } else {
-    SbRotation newRot = dInfo->selectedElement->getTran().rotation().toSbRotation();
+    SbRotation newRot = QuaterniontoSbRotation(dInfo->selectedElement->getTran().rotation());
     dInfo->lastRot = newRot;
     myCenterball->rotation.setValue(newRot);
 #ifdef GRASPITDBG
@@ -916,9 +924,9 @@ IVmgr::makeCenterball(WorldElement *selectedElement, Body *surroundMe)
 
   maxRad /= 2.0;
 
-  draggerTran->translation = selectedElement->getTran().translation().toSbVec3f();
+  draggerTran->translation = toSbVec3f(selectedElement->getTran().translation());
   draggerTran->scaleFactor.setValue(maxRad, maxRad, maxRad);
-  myCenterball->rotation = selectedElement->getTran().rotation().toSbRotation();
+  myCenterball->rotation = QuaterniontoSbRotation(selectedElement->getTran().rotation());
 
   sep->addChild(draggerTran);
   sep->addChild(myCenterball);
@@ -1011,11 +1019,11 @@ IVmgr::makeHandleBox(WorldElement *selectedElement, Body *surroundMe)
     }
   }
 
-  SbRotation rot = selectedElement->getTran().rotation().toSbRotation();
+  SbRotation rot = QuaterniontoSbRotation(selectedElement->getTran().rotation());
 
   SbVec3f transl =
-    (selectedElement->getTran().rotation().inverse() *
-     selectedElement->getTran().translation()).toSbVec3f();
+    toSbVec3f(selectedElement->getTran().rotation().inverse() *
+     selectedElement->getTran().translation());
 
   transl[0] = transl[0] / scale[0];
   transl[1] = transl[1] / scale[1];
@@ -1678,7 +1686,7 @@ IVmgr::setCameraTransf(transf tr)
   const vec3 t = tr.translation();
   const Quaternion q = tr.rotation();
   myViewer->getCamera()->position.setValue(t.x(), t.y(), t.z());
-  myViewer->getCamera()->orientation.setValue(q.x, q.y, q.z, q.w);
+  myViewer->getCamera()->orientation.setValue(q.x(), q.y(), q.z(), q.w());
 }
 
 transf
@@ -1778,11 +1786,11 @@ IVmgr::keyPressed(SoEventCallback *eventCB)
     Body *b2 = world->getGB(1);
     position p1, p2;
     world->getDist(b1, b2, p1, p2);
-    p1 = p1 * b1->getTran();
-    p2 = p2 * b2->getTran();
+    p1 = b1->getTran().applyRotation(p1);
+    p2 = b2->getTran().applyRotation(p2);
 
     //vec3 v3 = world->pointDistanceToBody(p1, b2);
-    //v3 = (p1 - position::ORIGIN) + v3;
+    //v3 = (p1 - position::Zero()) + v3;
     //p2 = position( v3.x(), v3.y(), v3.z());
 
     SoSphere *sphere = new SoSphere();

@@ -36,10 +36,11 @@
 #include <QTextStream>
 #include <iostream>
 
+#include "matvec3D.h"
+
 class TiXmlElement;
 class transf;
 class matvecIO;
-class vec3;
 
 #define SUCCESS 0
 #define FAILURE -1

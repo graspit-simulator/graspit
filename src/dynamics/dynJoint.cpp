@@ -73,17 +73,17 @@ DynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
 
   //set up cross product matrices for translations from joint location
   //the the cog's of the links
-  vec3 prevCOG = (prevLink->getCoG() * prevLink->getTran()) - position::ORIGIN;
-  vec3 nextCOG = (nextLink->getCoG() * nextLink->getTran()) - position::ORIGIN;
+  vec3 prevCOG = prevLink->getTran().applyRotation(prevLink->getCoG()) - position::Zero();
+  vec3 nextCOG = nextLink->getTran().applyRotation(nextLink->getCoG()) - position::Zero();
 
   //the constrained axes transformed for each of the links involved
   //remember that prevTrans is considered the reference transform for this dyn joint
   mat3 prevCross;
-  prevCross.setCrossProductMatrix(prevTrans.translation() - prevCOG);
+  setCrossProductMatrix(prevCross, prevTrans.translation() - prevCOG);
   prevCross *= prevTrans.affine().transpose();
 
   mat3 nextCross;
-  nextCross.setCrossProductMatrix(nextTrans.translation() - nextCOG);
+  setCrossProductMatrix(nextCross, nextTrans.translation() - nextCOG);
   nextCross *= prevTrans.affine().transpose();
 
   //find out which directions we are actually constraining
@@ -104,28 +104,32 @@ DynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
   for (int c = 0; c < 3; c++) {
     if (!constraints[c]) { continue; }
 
-    Nu[(ncn) * 6 * numBodies + prevLinkRow]   -= constrainedAxis[c][0];
-    Nu[(ncn) * 6 * numBodies + prevLinkRow + 1] -= constrainedAxis[c][1];
-    Nu[(ncn) * 6 * numBodies + prevLinkRow + 2] -= constrainedAxis[c][2];
-    Nu[(ncn) * 6 * numBodies + prevLinkRow + 3] -= prevCross[3 * c];
-    Nu[(ncn) * 6 * numBodies + prevLinkRow + 4] -= prevCross[3 * c + 1];
-    Nu[(ncn) * 6 * numBodies + prevLinkRow + 5] -= prevCross[3 * c + 2];
+    Nu[(ncn) * 6 * numBodies + prevLinkRow]   -= constrainedAxis[c](0);
+    Nu[(ncn) * 6 * numBodies + prevLinkRow + 1] -= constrainedAxis[c](1);
+    Nu[(ncn) * 6 * numBodies + prevLinkRow + 2] -= constrainedAxis[c](2);
+    Nu[(ncn) * 6 * numBodies + prevLinkRow + 3] -= prevCross(3 * c);
+    Nu[(ncn) * 6 * numBodies + prevLinkRow + 4] -= prevCross(3 * c + 1);
+    Nu[(ncn) * 6 * numBodies + prevLinkRow + 5] -= prevCross(3 * c + 2);
 
-    Nu[(ncn) * 6 * numBodies + nextLinkRow]   += constrainedAxis[c][0];
-    Nu[(ncn) * 6 * numBodies + nextLinkRow + 1] += constrainedAxis[c][1];
-    Nu[(ncn) * 6 * numBodies + nextLinkRow + 2] += constrainedAxis[c][2];
-    Nu[(ncn) * 6 * numBodies + nextLinkRow + 3] += nextCross[3 * c];
-    Nu[(ncn) * 6 * numBodies + nextLinkRow + 4] += nextCross[3 * c + 1];
-    Nu[(ncn) * 6 * numBodies + nextLinkRow + 5] += nextCross[3 * c + 2];
+    Nu[(ncn) * 6 * numBodies + nextLinkRow]   += constrainedAxis[c](0);
+    Nu[(ncn) * 6 * numBodies + nextLinkRow + 1] += constrainedAxis[c](1);
+    Nu[(ncn) * 6 * numBodies + nextLinkRow + 2] += constrainedAxis[c](2);
+    Nu[(ncn) * 6 * numBodies + nextLinkRow + 3] += nextCross(3 * c);
+    Nu[(ncn) * 6 * numBodies + nextLinkRow + 4] += nextCross(3 * c + 1);
+    Nu[(ncn) * 6 * numBodies + nextLinkRow + 5] += nextCross(3 * c + 2);
 
-    eps[ncn] = -(errorVec % constrainedAxis[c]);
+    eps[ncn] = -(errorVec.dot(constrainedAxis[c]));
     ncn++;
 
   }
 
   // constrain rotations
   double alpha;
-  error.rotation().ToAngleAxis(alpha, errorVec);
+
+  Eigen::AngleAxisd aa(error.rotation());
+  alpha = aa.angle();
+  errorVec = aa.axis();
+
   errorVec = - errorVec * alpha;
   DBGP("Rotation error: " << errorVec);
 
@@ -140,7 +144,7 @@ DynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
     Nu[(ncn) * 6 * numBodies + nextLinkRow + 4] += constrainedAxis[c][1];
     Nu[(ncn) * 6 * numBodies + nextLinkRow + 5] += constrainedAxis[c][2];
 
-    eps[ncn] = -(errorVec % constrainedAxis[c]);
+    eps[ncn] = -(errorVec.dot(constrainedAxis[c]));
     ncn++;
   }
 }
@@ -156,7 +160,7 @@ DynJoint::jacobian(transf toTarget, Matrix *J, bool worldCoords)
   transf T;
   if (worldCoords) {
     // the translation from joint coordinate system to world coordinate system
-    T = transf(Quaternion::IDENTITY, toTarget.translation()) * myTran.inverse();
+    T = transf(Quaternion::Identity(), toTarget.translation()) * myTran.inverse();
   } else {
     T = toTarget * myTran.inverse();
   }
@@ -202,7 +206,9 @@ FixedDynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
   }
 
   double alpha;
-  error.rotation().ToAngleAxis(alpha, errorVec);
+  Eigen::AngleAxisd aa(error.rotation());
+  alpha = aa.angle();
+  errorVec = aa.axis();
   errorVec = - errorVec * alpha;
   DBGP("Rotation error: " << errorVec);
 
@@ -228,16 +234,18 @@ RevoluteDynJoint::updateValues()
   joint->setWorldAxis(axis);
   double vel1 = vec3(prevLink->getVelocity()[3],
                      prevLink->getVelocity()[4],
-                     prevLink->getVelocity()[5]) % axis;
+                     prevLink->getVelocity()[5]).dot(axis);
   double vel2 = vec3(nextLink->getVelocity()[3],
                      nextLink->getVelocity()[4],
-                     nextLink->getVelocity()[5]) % axis;
+                     nextLink->getVelocity()[5]).dot(axis);
   joint->setVelocity(vel2 - vel1);
 
   transf diffTran = joint->getTran(0.0).inverse() * nextLink->getTran() * b1JointTran.inverse();
 
   double val;
-  diffTran.rotation().ToAngleAxis(val, axis);
+  Eigen::AngleAxisd aa(diffTran.rotation());
+  val = aa.angle();
+  axis = aa.axis();
   if (axis.z() < 0) { val = -val; }
 
   DBGP("link " << prevLink->getName().latin1() << " - link " << nextLink->getName().latin1());
@@ -280,25 +288,25 @@ UniversalDynJoint::updateValues()
   // the z axis of the previous link - by definition, the rotation direction of the next joint
   ax0 = b1JointTran.affine().row(2);
   ax2 = b2JointTran.affine().row(2);
-  ax1 = normalise(ax2 * ax0);
+  ax1 = (ax2.cross(ax0)).normalized();
 
-  DBGP("ax0: " << ax0 << " len " << ax0.len());
-  DBGP("ax1: " << ax1 << " len " << ax1.len());
-  DBGP("ax2: " << ax2 << " len " << ax2.len());
+  DBGP("ax0: " << ax0 << " len " << ax0.norm());
+  DBGP("ax1: " << ax1 << " len " << ax1.norm());
+  DBGP("ax2: " << ax2 << " len " << ax2.norm());
 
-  axis = ax1 * ax2;
+  axis = ax1.cross(ax2);
   joint1->setWorldAxis(axis);
   vel1 = vec3(prevLink->getVelocity()[3],
               prevLink->getVelocity()[4],
-              prevLink->getVelocity()[5]) % axis;
+              prevLink->getVelocity()[5]).dot(axis);
   vel2 = vec3(nextLink->getVelocity()[3],
               nextLink->getVelocity()[4],
-              nextLink->getVelocity()[5]) % axis;
+              nextLink->getVelocity()[5]).dot(axis);
   joint1->setVelocity(vel2 - vel1);
 
   vec3 ref1 = (joint2->getTran(0.0) * joint1->getTran(0.0) * b1JointTran).affine().row(2);
   //original GraspIt:
-  val = atan2(ax2 % (ax0 * ref1), ax2 % ref1);
+  val = atan2(ax2.dot(ax0.cross(ref1)), ax2.dot(ref1));
 
   DBGP("link " << prevLink->getName().latin1() << " - link " << nextLink->getName().latin1() << ":");
   DBGP("   joint1 angle: " << val * 180.0 / M_PI << " " << val << " (rad)");
@@ -307,20 +315,20 @@ UniversalDynJoint::updateValues()
   //is this right here? It's different from what's done for joint1
   axis = b2JointTran.affine().row(2);
   //joint2->setWorldAxis(axis);
-  joint2->setWorldAxis(ax0 * ax1);
+  joint2->setWorldAxis(ax0.cross(ax1));
 
   vel1 = vec3(prevLink->getVelocity()[3],
               prevLink->getVelocity()[4],
-              prevLink->getVelocity()[5]) % axis;
+              prevLink->getVelocity()[5]).dot(axis);
   vel2 = vec3(nextLink->getVelocity()[3],
               nextLink->getVelocity()[4],
-              nextLink->getVelocity()[5]) % axis;
+              nextLink->getVelocity()[5]).dot(axis);
 
   joint2->setVelocity(vel2 - vel1);
 
-  vec3 ref2 = (joint2->getTran(0.0) * joint1->getTran(0.0)).inverse().affine().row(2) * b2JointTran;
+  vec3 ref2 = b2JointTran.applyRotation((joint2->getTran(0.0) * joint1->getTran(0.0)).inverse().affine().row(2));
 
-  val = atan2(ref2 % ax1, ref2 % (ax1 * ax2));
+  val = atan2(ref2.dot(ax1), ref2.dot(ax1.cross(ax2)));
 
   joint2->setDynamicsVal(val);
 }
@@ -355,25 +363,25 @@ BallDynJoint::updateValues()
 
   ax0 = b1JointTran.affine().row(2);
   ax2 = b2JointTran.affine().row(2);
-  ax1 = normalise(ax2 * ax0);
+  ax1 = (ax2.cross(ax0)).normalized();
 
-  DBGP("ax0: " << ax0 << " len " << ax0.len());
-  DBGP("ax1: " << ax1 << " len " << ax1.len());
-  DBGP("ax2: " << ax2 << " len " << ax2.len());
+  DBGP("ax0: " << ax0 << " len " << ax0.norm());
+  DBGP("ax1: " << ax1 << " len " << ax1.norm());
+  DBGP("ax2: " << ax2 << " len " << ax2.norm());
 
   //  axis = b1JointTran.affine().row(2);
-  axis = ax1 * ax2;
+  axis = ax1.cross(ax2);
   joint1->setWorldAxis(axis);
   vel1 = vec3(prevLink->getVelocity()[3],
               prevLink->getVelocity()[4],
-              prevLink->getVelocity()[5]) % axis;
+              prevLink->getVelocity()[5]).dot(axis);
   vel2 = vec3(nextLink->getVelocity()[3],
               nextLink->getVelocity()[4],
-              nextLink->getVelocity()[5]) % axis;
+              nextLink->getVelocity()[5]).dot(axis);
   joint1->setVelocity(vel2 - vel1);
 
   vec3 ref1 = (joint2->getTran(0.0) * joint1->getTran(0.0) * b1JointTran).affine().row(2);
-  val = atan2(ax2 % (ax0 * ref1), ax2 % ref1);
+  val = atan2(ax2.dot(ax0.cross(ref1)), ax2.dot(ref1));
 
 
   //  totalTran = nextLink->getTran()*b1JointTran.inverse();
@@ -399,14 +407,14 @@ BallDynJoint::updateValues()
   joint2->setWorldAxis(axis);
   vel1 = vec3(prevLink->getVelocity()[3],
               prevLink->getVelocity()[4],
-              prevLink->getVelocity()[5]) % axis;
+              prevLink->getVelocity()[5]).dot(axis);
   vel2 = vec3(nextLink->getVelocity()[3],
               nextLink->getVelocity()[4],
-              nextLink->getVelocity()[5]) % axis;
+              nextLink->getVelocity()[5]).dot(axis);
 
   joint2->setVelocity(vel2 - vel1);
 
-  val = atan2(ax2 % ax0, ax2 % (ax0 * ax1));
+  val = atan2(ax2.dot(ax0), ax2.dot(ax0.cross(ax1)));
 
 #ifdef GRASPITDBG
   printf("link %s - link %s joint2 angle: %le   %le(rad)\n", prevLink->getName().latin1(),
@@ -417,19 +425,19 @@ BallDynJoint::updateValues()
   //    std::cout << axis << std::endl;
   joint2->setDynamicsVal(val);
 
-  axis = ax0 * ax1;
+  axis = ax0.cross(ax1);
   joint3->setWorldAxis(axis);
   vel1 = vec3(prevLink->getVelocity()[3],
               prevLink->getVelocity()[4],
-              prevLink->getVelocity()[5]) % axis;
+              prevLink->getVelocity()[5]).dot(axis);
   vel2 = vec3(nextLink->getVelocity()[3],
               nextLink->getVelocity()[4],
-              nextLink->getVelocity()[5]) % axis;
+              nextLink->getVelocity()[5]).dot(axis);
 
   joint3->setVelocity(vel2 - vel1);
 
-  vec3 ref2 = (joint2->getTran(0.0) * joint1->getTran(0.0)).inverse().affine().row(2) * b2JointTran;
-  val = atan2(ref2 % ax1, ref2 % (ax1 * ax2));
+  vec3 ref2 = b2JointTran.applyRotation((joint2->getTran(0.0) * joint1->getTran(0.0)).inverse().affine().row(2));
+  val = atan2(ref2.dot(ax1), ref2.dot(ax1.cross(ax2)));
 
 #ifdef GRASPITDBG
   printf("link %s - link %s joint3 angle: %le   %le(rad)\n", prevLink->getName().latin1(),

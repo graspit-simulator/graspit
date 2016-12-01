@@ -124,7 +124,7 @@ LMIOptimizer::buildJacobian()
         dcopy(6 * numDOF, &db0, 0, J, 1);
 
         // Tec: tranform from link base to contact point
-        Tec = rotate_transf(M_PI, vec3(1, 0, 0)) * (*cp)->getContactFrame();
+        Tec = transf::AXIS_ANGLE_ROTATION(M_PI, vec3(1, 0, 0)) * (*cp)->getContactFrame();
         Tv_ec = new double[36];
         Tec.jacobian(Tv_ec);
         // J = Tv_ec * Jee;

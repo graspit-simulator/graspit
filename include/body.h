@@ -35,6 +35,7 @@
 
 #include "worldElement.h"
 #include "contact/contact.h"
+#include "flockTransform.h"
 
 #ifdef CGDB_ENABLED
 #include "DBase/graspit_db_model.h"

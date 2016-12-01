@@ -225,12 +225,15 @@ bool CompliantGraspCopyTask::similarity(const transf &t1, const transf &t2)
   double ANGULAR_THRESHOLD = 0.26;
 
   vec3 dvec = t1.translation() - t2.translation();
-  double d = dvec.len();
+  double d = dvec.norm();
   if (d > DISTANCE_THRESHOLD) { return false; }
 
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa (qvec);
+  angle = aa.angle();
+  axis = aa.axis();
+
   if (angle >  M_PI) { angle -= 2 * M_PI; }
   if (angle < -M_PI) { angle += 2 * M_PI; }
   if (fabs(angle) > ANGULAR_THRESHOLD) { return false; }
@@ -247,10 +250,13 @@ bool CompliantGraspCopyTask::searchSimilarity(const transf &t1, const transf &t2
   double DISTANCE_THRESHOLD = 0.01;
 
   vec3 dvec = t1.translation() - t2.translation();
-  double d = dvec.len() / mObject->getMaxRadius();
+  double d = dvec.norm() / mObject->getMaxRadius();
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa (qvec);
+  angle = aa.angle();
+  axis = aa.axis();
+
   //0.5 weight out of thin air
   double q = 0.5 * fabs(angle) / M_PI;
   if (std::max(d, q) > DISTANCE_THRESHOLD) { return false; }

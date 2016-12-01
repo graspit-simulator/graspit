@@ -36,13 +36,9 @@
 #include <QObject>
 
 #include "material.h"
-
+#include "matvec3D.h"
 #include <Inventor/SoType.h>
 
-class vec3;
-class position;
-class mat3;
-class Quaternion;
 class transf;
 
 class IVmgr;

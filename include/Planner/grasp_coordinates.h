@@ -47,10 +47,10 @@ class spherical_coordinates;
 /*!
   It can convert between the various types of coordinate systems.
 */
-class coordinates :
-  public vec3
+class coordinates
 {
   private:
+
   public:
     //! The three different types of coordinate systems
     enum coord_system_type {
@@ -58,6 +58,8 @@ class coordinates :
       cylindrical, //!< coordinates are r, phi, z
       spherical    //!< coordinates are r, theta, phi
     };
+
+    vec3 mvec;
 
     //! Holds the type of coordinate representation for this instance
     coord_system_type coord_type;
@@ -83,6 +85,11 @@ class coordinates :
 
     /* distance normed on the max of both. 0 <= dist <= 1 */
     virtual double distanceTo(coordinates) const;
+
+    virtual double x() {return mvec.x();}
+    virtual double y() {return mvec.y();}
+    virtual double z() {return mvec.z();}
+    virtual double norm() {return mvec.norm();}
 
     bool operator==(coordinates);
 };

@@ -125,9 +125,9 @@ class DHTransform {
     */
     transf getTran(double thetaVal, double dVal) const
     {
-      return tr4TimesTr3 * translate_transf(vec3(0, 0, dVal)) *
-             rotate_transf(thetaVal, vec3(0, 0, 1));
-    }
+      return tr4TimesTr3 * transf::TRANSLATION(vec3(0, 0, dVal)) *
+             transf::AXIS_ANGLE_ROTATION(thetaVal, vec3(0, 0, 1));
+}
 
 };
 
@@ -238,7 +238,7 @@ class Joint {
 
     /*! Sets the current orientation of the joint axis in world coordinates.
       (computed during dynamics) */
-    void setWorldAxis(const vec3 &wa) {worldAxis = normalise(wa);}
+    void setWorldAxis(const vec3 &wa) {worldAxis = wa.normalized();}
 
     /*! Updates \a draggerAttached when a dragger is added or removed from this joint.*/
     void setDraggerAttached(bool b) {draggerAttached = b;}

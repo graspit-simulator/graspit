@@ -316,7 +316,7 @@ ClientSocket::sendAverageContacts(Body *bod)
   int i, numContacts;
   double totalWrench[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double *wrench;
-  vec3 totalLoc = vec3::ZERO;
+  vec3 totalLoc = vec3::Zero();
 
   numContacts = bod->getNumContacts();
   contactList = bod->getContacts();
