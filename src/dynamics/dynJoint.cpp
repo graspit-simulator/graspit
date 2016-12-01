@@ -73,8 +73,8 @@ DynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
 
   //set up cross product matrices for translations from joint location
   //the the cog's of the links
-  vec3 prevCOG = prevLink->getTran().applyRotation(prevLink->getCoG()) - position::Zero();
-  vec3 nextCOG = nextLink->getTran().applyRotation(nextLink->getCoG()) - position::Zero();
+  vec3 prevCOG = prevLink->getTran().applyTransform(prevLink->getCoG()) - position::Zero();
+  vec3 nextCOG = nextLink->getTran().applyTransform(nextLink->getCoG()) - position::Zero();
 
   //the constrained axes transformed for each of the links involved
   //remember that prevTrans is considered the reference transform for this dyn joint

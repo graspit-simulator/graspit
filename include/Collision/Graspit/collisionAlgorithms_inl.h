@@ -126,7 +126,7 @@ void ContactCallback::leafTest(const Leaf *l1, const Leaf *l2)
         vec3 n1 = (p1 - p2).normalized();
         vec3 n2 = (p2 - p1).normalized();
         //convert one contact point back to the coordinate system of the leaf l1
-        p1 = mTran2To1.applyRotation(p1);
+        p1 = mTran2To1.applyTransform(p1);
         n1 = mTran2To1.applyRotation(n1);
         //add new contact to list. No check for duplication is performed
         mReport.push_back(ContactData(p1, p2, n1, n2, (p1 - p2).dot(p1 - p2)));
@@ -191,7 +191,7 @@ void DistanceCallback::leafTest(const Leaf *l1, const Leaf *l2)
       //both points get computed in the coordinate system of leaf 2
       double distSq = triangleTriangleDistanceSq(t1, *it2, p1, p2);
       if (distSq < mMinDistSq) {
-        p1 = mTran2To1.applyRotation(p1);
+        p1 = mTran2To1.applyTransform(p1);
         if (distSq >= 0.0) {
           mP1 = p1; mP2 = p2;
         } else {

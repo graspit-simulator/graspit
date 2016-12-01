@@ -115,7 +115,7 @@ SbVec3f TendonInsertionPoint::getWorldPosition()
   //PROF_TIMER_FUNC(TIP_GET_WORLD_POSITION);
   position worldPos;
   //worldPos = position(toSbVec3f(mAttachPoint).toSbVec3f()) * (getAttachedLink()->getTran());
-  worldPos = getAttachedLink()->getTran().applyRotation(mAttachPoint);
+  worldPos = getAttachedLink()->getTran().applyTransform(mAttachPoint);
   return toSbVec3f(worldPos);
 }
 
@@ -912,7 +912,7 @@ void Tendon::applyForces()
   {
     Link *link = (*insPt)->getAttachedLink();
     /*convert insertion point location to world coordinates*/
-    position pos = link->getTran().applyRotation((*insPt)->getAttachPoint());
+    position pos = link->getTran().applyTransform((*insPt)->getAttachPoint());
 
     /*insertion point force is already stored in world coordinates*/
     vec3 force = (*insPt)->mInsertionForce;

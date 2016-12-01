@@ -79,9 +79,9 @@ Contact::Contact(Body *b1, Body *b2, position pos, vec3 norm)
   vec3 tangentX, tangentY;
 
   if (fabs(normal.dot(vec3(1, 0, 0))) > 1.0 - MACHINE_ZERO) {
-    tangentX = (normal.cross(vec3(0, 0, 1))).normalized();
+    tangentX = normal.cross(vec3(0, 0, 1)).normalized();
   } else {
-    tangentX = (normal.cross(vec3(1, 0, 0))).normalized();
+    tangentX = normal.cross(vec3(1, 0, 0)).normalized();
   }
   tangentY = (normal.cross(tangentX)).normalized();
   frame = transf::COORDINATE(loc, tangentX, tangentY);
@@ -389,7 +389,7 @@ Contact::localToWorldWrenchBlockMatrix(const std::list<Contact *> &contacts)
 */
 bool Contact::preventsMotion(const transf &motion) const
 {
-  if ((motion.applyRotation(loc)- loc).dot(normal) < -MACHINE_ZERO) { return true; }
+  if ((motion.applyTransform(loc)- loc).dot(normal) < -MACHINE_ZERO) { return true; }
   return false;
 }
 

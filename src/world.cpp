@@ -1634,7 +1634,7 @@ World::findVirtualContact(Link *link, Body *object)
 {
   position p1, p2;
   getDist(link, object, p1, p2);
-  vec3 n = link->getTran().applyRotation(p1)  - object->getTran().applyRotation(p2);
+  vec3 n = link->getTran().applyTransform(p1)  - object->getTran().applyTransform(p2);
   n = n.normalized();
   n = link->getTran().inverse().applyRotation(n);
 

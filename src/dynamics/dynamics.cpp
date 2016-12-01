@@ -634,7 +634,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         if ((*cp)->getBody1() == bodyVec[bn]) { break; }
       if (bn < numBodies) {
         //????? this doesn't seem correct
-        vec3 radius = cf.translation() - (*cp)->getBody1Tran().applyRotation(bodyVec[bn]->getCoG());
+        vec3 radius = cf.translation() - (*cp)->getBody1Tran().applyTransform(bodyVec[bn]->getCoG());
 
         //  radius = radius / 1000.0;  // convert to meters
 
@@ -649,7 +649,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         Wn[cn * Hrows + 6 * bn + 4] = RcrossN.y();
         Wn[cn * Hrows + 6 * bn + 5] = RcrossN.z();
 
-        vec3 bodyOrigin = (*cp)->getBody1Tran().applyRotation(bodyVec[bn]->getCoG()) - position::Zero();
+        vec3 bodyOrigin = (*cp)->getBody1Tran().applyTransform(bodyVec[bn]->getCoG()) - position::Zero();
         buildForceTransform(cf, bodyOrigin, Ftform_N_C);
 
         /* dgemm("N","N", 6,Contact::numFrictionEdges,6, 1.0,Ftform_N_C,6, Contact::frictionEdges,6,
@@ -671,7 +671,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         normal = -normal;
 
         //vec3 radius = cf2.translation() - (bodyVec[bn]->getCoG() * (*cp)->getBody2Tran() - position::Zero());
-        vec3 radius = cf.translation() - ((*cp)->getBody2Tran().applyRotation(bodyVec[bn]->getCoG())  - position::Zero());
+        vec3 radius = cf.translation() - ((*cp)->getBody2Tran().applyTransform(bodyVec[bn]->getCoG())  - position::Zero());
         vec3 RcrossN = radius.cross(normal);
         DBGP("body2 normal: " << normal);
         DBGP("body2 radius: " << radius);
@@ -683,7 +683,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
         Wn[cn * Hrows + 6 * bn + 4] = RcrossN.y();
         Wn[cn * Hrows + 6 * bn + 5] = RcrossN.z();
 
-        vec3 bodyOrigin = (*cp)->getBody2Tran().applyRotation(bodyVec[bn]->getCoG())  - position::Zero();
+        vec3 bodyOrigin = (*cp)->getBody2Tran().applyTransform(bodyVec[bn]->getCoG())  - position::Zero();
         buildForceTransform(cf, bodyOrigin, Ftform_N_C);
         //buildForceTransform(cf2,bodyOrigin,Ftform_N_C);
 

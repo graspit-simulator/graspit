@@ -41,8 +41,8 @@ double
 contactDistance(Body *body1, Body *body2, ContactData &cp)
 {
   position b1_pos(cp.b1_pos), b2_pos(cp.b2_pos);
-  b1_pos = body1->getTran().applyRotation(b1_pos) ;
-  b2_pos = body2->getTran().applyRotation(b2_pos) ;
+  b1_pos = body1->getTran().applyTransform(b1_pos) ;
+  b2_pos = body2->getTran().applyTransform(b2_pos) ;
   vec3 dist_vec = (b1_pos - b2_pos);
   return dist_vec.norm();
 }
@@ -61,8 +61,8 @@ checkContactNormals(Body *b1, Body *b2, ContactData *c)
 
   position p1(c->b1_pos);
   position p2(c->b2_pos);
-  p1 = b1->getTran().applyRotation(p1);
-  p2 =  b2->getTran().applyRotation(p2);
+  p1 = b1->getTran().applyTransform(p1);
+  p2 =  b2->getTran().applyTransform(p2);
 
   vec3 d = p2 - p1;
   if (d.dot(n1) > 0) {

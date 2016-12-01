@@ -465,7 +465,7 @@ Grasp::setVirtualCentroid()
 void
 Grasp::setRealCentroid(GraspableBody *body)
 {
-  position cog = body->getTran().applyRotation(body->getCoG());
+  position cog = body->getTran().applyTransform(body->getCoG());
   double maxRadius = body->getMaxRadius();
   for (int i = 0; i < (int)contactVec.size(); i++) {
     ((VirtualContact *)contactVec[i])->setCenter(cog);

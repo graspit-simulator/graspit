@@ -108,7 +108,7 @@ void ScanSimulator::scan(std::vector<position> *cloud, std::vector<RawScanPoint>
 
         //we get the point in world coordinates
         if (mType == SCANNER_COORDINATES) {
-          rayPoint = mTranInv.applyRotation(rayPoint);
+          rayPoint = mTranInv.applyTransform(rayPoint);
         }
         cloud->push_back(rayPoint);
 

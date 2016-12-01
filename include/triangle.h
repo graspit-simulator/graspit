@@ -82,9 +82,9 @@ Triangle::centroid() const
 void
 Triangle::applyTransform(const transf &t)
 {
-  v1 = t.applyRotation(v1);
-  v2 = t.applyRotation(v2);
-  v3 = t.applyRotation(v3);
+  v1 = t.applyTransform(v1);
+  v2 = t.applyTransform(v2);
+  v3 = t.applyTransform(v3);
 }
 
 #ifdef GRASPIT_RELEASE

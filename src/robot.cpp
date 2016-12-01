@@ -835,18 +835,18 @@ Robot::invKinematics(const transf &targetPos, double *dofVals, int chainNum)
   DBGP("from: " << currentPos.translation().x() << " " <<
        currentPos.translation().y() << " " <<
        currentPos.translation().z() << " " <<
-       currentPos.rotation().w << " " <<
-       currentPos.rotation().x << " " <<
-       currentPos.rotation().y << " " <<
-       currentPos.rotation().z);
+       currentPos.rotation().w() << " " <<
+       currentPos.rotation().x() << " " <<
+       currentPos.rotation().y() << " " <<
+       currentPos.rotation().z());
 
   DBGP("to: " << targetPos.translation().x() << " " <<
        targetPos.translation().y() << " " <<
        targetPos.translation().z() << " " <<
-       targetPos.rotation().w << " " <<
-       targetPos.rotation().x << " " <<
-       targetPos.rotation().y << " " <<
-       targetPos.rotation().z);
+       targetPos.rotation().w() << " " <<
+       targetPos.rotation().x() << " " <<
+       targetPos.rotation().y() << " " <<
+       targetPos.rotation().z());
 
   int safeguard = 0;
   while (++safeguard < safeGuardUpperBound) {
@@ -1801,7 +1801,7 @@ along the approach direction.
 double
 Robot::getApproachDistance(Body *object, double maxDist)
 {
-  position p0 = getTran().applyRotation(getApproachTran().applyRotation(position(0, 0, 0)));
+  position p0 = getTran().applyTransform(getApproachTran().applyTransform(position(0, 0, 0)));
   position p = p0;
   vec3 app = getTran().applyRotation(getApproachTran().applyRotation(vec3(0, 0, 1)));
   bool done = false;

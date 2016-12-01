@@ -2022,7 +2022,7 @@ DynamicBody::addForceAtPos(vec3 force, position pos)
 {
   vec3 worldTorque;
   vec3 worldPos;
-  worldPos = (pos - Tran.applyRotation(CoG));
+  worldPos = (pos - Tran.applyTransform(CoG));
 
   worldTorque = worldPos.cross(force);
   extWrenchAcc[0] += force[0];

@@ -291,7 +291,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p1 = closestPtTriangle(t1, t2.v1);
   p2 = t2.v1;
-  if (((p2 - p1).dot((p2 - p1))) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     contactPoints->push_back(std::pair<position, position>(p1, p2));
   }
   //--
@@ -303,7 +303,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p1 = closestPtTriangle(t1, t2.v3);
   p2 = t2.v3;
-  if (((p2 - p1).dot((p2 - p1))) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     contactPoints->push_back(std::pair<position, position>(p1, p2));
   }
   //vertices on triangle 1 and face on triangle 2
@@ -311,7 +311,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //the vertices from triangle 2
   p2 = closestPtTriangle(t2, t1.v1);
   p1 = t1.v1;
-  if (((p2 - p1).dot((p2 - p1))) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     if (!(p2 == t2.v1) && !(p2 == t2.v2) && !(p2 == t2.v3)) {
       contactPoints->push_back(std::pair<position, position>(p1, p2));
     }
@@ -319,7 +319,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p2 = closestPtTriangle(t2, t1.v2);
   p1 = t1.v2;
-  if (((p2 - p1).dot((p2 - p1))) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     if (!(p2 == t2.v1) && !(p2 == t2.v2) && !(p2 == t2.v3)) {
       contactPoints->push_back(std::pair<position, position>(p1, p2));
     }
@@ -327,7 +327,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p2 = closestPtTriangle(t2, t1.v3);
   p1 = t1.v3;
-  if (((p2 - p1).dot((p2 - p1))) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     if (!(p2 == t2.v1) && !(p2 == t2.v2) && !(p2 == t2.v3)) {
       contactPoints->push_back(std::pair<position, position>(p1, p2));
     }
@@ -406,7 +406,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
 double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
                                   position &p1, position &p2)
 {
-  if (triangleIntersection(t1, t2)) { return -1.0; }
+  if (triangleIntersection(t1, t2)) { return -1; }
 
   double dtmp, dmin;
   position tmp1, tmp2;

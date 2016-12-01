@@ -111,7 +111,7 @@ void VirtualContact::changeFrame(transf tr)
 position
 VirtualContact::getWorldLocation()
 {
-  return body1->getTran().applyRotation(loc);
+  return body1->getTran().applyTransform(loc);
 }
 
 vec3
