@@ -29,10 +29,7 @@ void *exit_graspit(void *ptr )
   //hang here until tests are finished and mtx is released.
   QMutexLocker guard(&mtx_);
 
-  GraspItGUI *gui;
-  gui = (GraspItGUI *) ptr;
-
-  gui->exitMainLoop();
+  graspitCore->exitMainLoop();
 
   return NULL;
 }
@@ -51,7 +48,7 @@ void *run_test(void *ptr )
       sleep(3);
   }
 
-  Grasp *grasp=graspItGUI->getIVmgr()->getWorld()->getCurrentHand()->getGrasp();
+  Grasp *grasp=graspitCore->getWorld()->getCurrentHand()->getGrasp();
 
   QString fileName = QString("models/objects/mug.xml");
   EXPECT_STREQ(grasp->getObject()->getFilename().toStdString().c_str(), fileName.toStdString().c_str());
@@ -73,26 +70,25 @@ void *run_test(void *ptr )
 TEST(TEST_PLANNER, TEST_VALID_GRASP_FOUND) {
   int argc = 0;
   GraspItApp app(argc, NULL);
-  GraspItGUI gui(0, NULL);
+  GraspitCore core(argc, NULL);
 
-  app.setMainWidget(gui.getMainWindow()->mWindow);
+  app.setMainWidget(core.getMainWindow()->mWindow);
 
   QString fileName = QString(QString(getenv("GRASPIT"))+QString("/worlds/") + QString("plannerMug.xml"));
 
-  gui.getMainWindow()->mUI->worldBox->setTitle(fileName);
-  graspItGUI->getIVmgr()->emptyWorld();
-  graspItGUI->getIVmgr()->getWorld()->load(fileName);
-  gui.getMainWindow()->setMainWorld(gui.getIVmgr()->getWorld());
+  graspitCore->getMainWindow()->mUI->worldBox->setTitle(fileName);
+  graspitCore->getWorld()->load(fileName);
+  graspitCore->getMainWindow()->setMainWorld(graspitCore->getWorld());
 
-  int num_bodies = graspItGUI->getIVmgr()->getWorld()->getNumBodies();
+  int num_bodies = graspitCore->getWorld()->getNumBodies();
   EXPECT_EQ(num_bodies, 10);
 
-  QMDlg *d = new QMDlg(gui.getMainWindow()->mWindow);
+  QMDlg *d = new QMDlg(graspitCore->getMainWindow()->mWindow);
   d->show();
   d->addEditQM();
   d->accept();
 
-  PlannerDlg *dlg = new PlannerDlg(gui.getMainWindow()->mWindow);
+  PlannerDlg *dlg = new PlannerDlg(graspitCore->getMainWindow()->mWindow);
   dlg->setAttribute(Qt::WA_ShowModal, false);
   dlg->setAttribute(Qt::WA_DeleteOnClose, true);
   dlg->show();
@@ -103,9 +99,9 @@ TEST(TEST_PLANNER, TEST_VALID_GRASP_FOUND) {
   pthread_t thread1;
   pthread_t thread2;
   int iret2 = pthread_create( &thread1, NULL, run_test, (PlannerDlg*) dlg);
-  int iret1 = pthread_create( &thread2, NULL, exit_graspit, (GraspItGUI*) &gui);
+  int iret1 = pthread_create( &thread2, NULL, exit_graspit, (GraspitCore*) &graspitCore);
 
-  gui.startMainLoop();
+  graspitCore->startMainLoop();
 
   pthread_join( thread1, NULL);
   pthread_join( thread2, NULL);
