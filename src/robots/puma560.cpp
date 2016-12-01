@@ -106,7 +106,7 @@ Puma560::findClosestSol(Puma560Solution *candidates, Puma560Solution *current)
 int
 Puma560::invKinematics(const transf &endTranLocal, double *dofVals, int)
 {
-  transf endTran = endTranLocal * base->getTran().inverse();
+  transf endTran = base->getTran().inverse() % endTranLocal;
   int i;
   const double a2 = 431.8, a3 = 20.3;
   const double d3 = 149.0, d4 = 431.8;

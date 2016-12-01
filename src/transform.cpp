@@ -57,10 +57,10 @@ transf transf::RPY(double rx, double ry, double rz)
   r = transf::AXIS_ANGLE_ROTATION(rx, x);
   y = r.inverse().applyRotation(y);
 
-  r = transf::AXIS_ANGLE_ROTATION(ry, y) * r;
+  r = r % transf::AXIS_ANGLE_ROTATION(ry, y);
   z = r.inverse().applyRotation(z);
 
-  r = transf::AXIS_ANGLE_ROTATION(rz, z) * r;
+  r = r % transf::AXIS_ANGLE_ROTATION(rz, z);
 
   return r;
 }
@@ -143,19 +143,19 @@ transf::tocol_Mat4(col_Mat4 colTran) const
 void
 transf::set(const SoTransform *IVt)
 {
-  float q1, q2, q3, q4, x, y, z;
+  float qw, qx, qy, qz, x, y, z;
 
   // Inventor stores the quaternion as qx,qy,qz,qw
-  IVt->rotation.getValue().getValue(q2, q3, q4, q1);
+  IVt->rotation.getValue().getValue(qx, qy, qz, qw);
   IVt->translation.getValue().getValue(x, y, z);
-  rot.w() = (double)q1; rot.x() = (double)q2; rot.y() = (double)q3; rot.z() = (double)q4;
+  rot.w() = (double)qw; rot.x() = (double)qx; rot.y() = (double)qy; rot.z() = (double)qz;
   t[0] = (double)x; t[1] = (double)y; t[2] = (double)z;
   rot = R;
 }
 
 /*! Multiplies two transforms.  */
 transf
-operator*(const transf &tr2, const transf &tr1)
+operator%(const transf &tr1, const transf &tr2)
 {
   Quaternion newRot = tr1.rotation() * tr2.rotation();
   return transf(newRot, tr1.translation() + tr1.rotation() * tr2.translation());

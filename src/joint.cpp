@@ -81,9 +81,9 @@ void DHTransform::computeTran()
   tr2 = transf::TRANSLATION(dtrans);
   tr3 = transf::TRANSLATION(atrans);
   tr4 = transf::AXIS_ANGLE_ROTATION(alpha, vec3(1, 0, 0));
-  tr4TimesTr3 = tr4 * tr3;
+  tr4TimesTr3 = tr3 % tr4;
 
-  tran = tr4TimesTr3 * tr2 * tr1;
+  tran = tr1 % tr2 % tr4TimesTr3;
 }
 
 /*!
@@ -96,7 +96,7 @@ void DHTransform::setD(double q)
   dtrans[2] = d;
   tr2 = transf::TRANSLATION(dtrans);
 
-  tran = tr4TimesTr3 * tr2 * tr1;
+  tran = tr1 % tr2 % tr4TimesTr3;
 }
 
 /*!
@@ -108,7 +108,7 @@ void DHTransform::setTheta(double q)
   theta = q;
   tr1 = transf::AXIS_ANGLE_ROTATION(theta, vec3(0, 0, 1));
 
-  tran = tr4TimesTr3 * tr2 * tr1;
+  tran = tr1 % tr2 % tr4TimesTr3;
 }
 
 /*!
@@ -178,9 +178,9 @@ Joint::jacobian(const Joint *joint, const transf &jointTran,
   transf T;
   if (worldCoords) {
     // the translation from joint coordinate system to world coordinate system
-    T = transf(Quaternion::Identity(), toTarget.translation()) * jointTran.inverse();
+    T = jointTran.inverse() % transf(Quaternion::Identity(), toTarget.translation());
   } else {
-    T = toTarget * jointTran.inverse();
+    T = jointTran.inverse() % toTarget;
   }
   double M[36];
   T.jacobian(M);

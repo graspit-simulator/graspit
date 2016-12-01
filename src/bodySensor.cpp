@@ -240,6 +240,6 @@ transf TactileSensor::getSensorTran()
                            (mOutput.pos[0][2] + mOutput.pos[1][2]) / 2.0));
 
   transf linkInWorld = mBody->getTran();
-  transf res = sensorInLink * linkInWorld;
+  transf res = linkInWorld % sensorInLink;
   return res;
 }

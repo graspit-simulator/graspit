@@ -168,8 +168,8 @@ bool GraspClusteringTask::clusterGrasps(const GraspitDBGrasp *g1, const GraspitD
   //30 degrees angular threshold
   double ANGULAR_THRESHOLD = 0.52;
 
-  transf t1 = g1->getHand()->getApproachTran() * g1->getFinalGraspPlanningState()->getTotalTran();
-  transf t2 = g2->getHand()->getApproachTran() * g2->getFinalGraspPlanningState()->getTotalTran();
+  transf t1 = g1->getFinalGraspPlanningState()->getTotalTran() % g1->getHand()->getApproachTran();
+  transf t2 = g2->getFinalGraspPlanningState()->getTotalTran() % g2->getHand()->getApproachTran();
 
   vec3 dvec = t1.translation() - t2.translation();
   double d = dvec.norm();

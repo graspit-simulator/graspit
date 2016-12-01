@@ -85,7 +85,7 @@ VirtualContact::VirtualContact(int f, int l, Contact *original) : Contact()
   Eigen::AngleAxisd aa = Eigen::AngleAxisd(3.14159, vec3(1, 0, 0));
   Quaternion q(aa);
   transf newRot(q, vec3(0, 0, 0));
-  frame = newRot * frame;
+  frame = frame % newRot;
   normal = -1 * original->normal;
   body1 = original->body1;
   body2 = original->body2;
@@ -163,7 +163,7 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
   if (!useObjectData) {
     worldLoc = getWorldLocation();
     worldNormal = getWorldNormal();
-    transf worldFrame = frame * body1->getTran();
+    transf worldFrame = body1->getTran() % frame;
     tangentX = worldFrame.affine().row(0);
     tangentY = worldFrame.affine().row(1);
   } else {

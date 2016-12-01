@@ -618,8 +618,8 @@ iterateDynamics(std::vector<Robot *> robotVec,
     for (cp = contactList.begin(), cn = 0; cp != contactList.end(); cp++, cn++) {
 
       //DBGP("contact " << cn);
-      transf cf  = (*cp)->getContactFrame() * (*cp)->getBody1Tran();
-      transf cf2 = (*cp)->getMate()->getContactFrame() * (*cp)->getBody2Tran();
+      transf cf  = (*cp)->getBody1Tran() % (*cp)->getContactFrame();
+      transf cf2 = (*cp)->getBody2Tran() % (*cp)->getMate()->getContactFrame();
 
       DBGP("CONTACT DISTANCE: " << (cf.translation() - cf2.translation()).norm());
       if (useContactEps) {
@@ -873,8 +873,8 @@ iterateDynamics(std::vector<Robot *> robotVec,
         (*cp)->setUpFrictionEdges(true);
 
         dscal(6, -1.0, contactForce, 1);
-        transf cf = (*cp)->getContactFrame() * (*cp)->getBody1Tran();
-        transf cf2 = (*cp)->getMate()->getContactFrame() * (*cp)->getBody2Tran();
+        transf cf = (*cp)->getBody1Tran() % (*cp)->getContactFrame();
+        transf cf2 =  (*cp)->getBody2Tran() % (*cp)->getMate()->getContactFrame();
         vec3 cvec(contactForce);
         cvec = cf2.inverse().applyRotation(cf.applyRotation(cvec));
         contactForce[0] = cvec[0];

@@ -303,7 +303,7 @@ class HandObjectState
     bool dynamicExecute(Hand *h) const;
 
     //! Gives the inner transform (stored in mPosition) multiplied by the reference transform
-    transf getTotalTran() const {return mPosition->getCoreTran() * mRefTran;}
+    transf getTotalTran() const {return mRefTran % mPosition->getCoreTran();}
 
     PostureState *getPosture() {return mPosture;}
     const PostureState *readPosture() const {return mPosture;}

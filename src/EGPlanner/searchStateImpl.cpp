@@ -162,15 +162,14 @@ transf PositionStateAA::getCoreTran() const
   double theta = readVariable("theta");
   double phi = readVariable("phi");
   double alpha = readVariable("alpha");
-  transf coreTran = transf::AXIS_ANGLE_ROTATION(alpha, vec3(sin(theta) * cos(phi) , sin(theta) * sin(phi) , cos(theta))) *
-                    transf::TRANSLATION(vec3(tx, ty, tz));
+  transf coreTran = transf::TRANSLATION(vec3(tx, ty, tz)) % transf::AXIS_ANGLE_ROTATION(alpha, vec3(sin(theta) * cos(phi) , sin(theta) * sin(phi) , cos(theta)));
   //transform now returned relative to hand approach transform
-  return mHand->getApproachTran().inverse() * coreTran;
+  return coreTran % mHand->getApproachTran().inverse();
 
 }
 void PositionStateAA::setTran(const transf &t)
 {
-  transf rt = mHand->getApproachTran() * t;
+  transf rt = t % mHand->getApproachTran();
 
   //translation is direct
   getVariable("Tx")->setValue(rt.translation().x());
@@ -247,8 +246,8 @@ transf PositionStateEllipsoid::getCoreTran() const
   transf handTran = transf(r, vec3(px, py, pz) - distance * normal);
   Eigen::AngleAxisd aa = Eigen::AngleAxisd(tau, vec3(0, 0, 1));
   Quaternion zrot(aa);
-  handTran = transf(zrot, vec3(0, 0, 0)) * handTran;
-  return mHand->getApproachTran().inverse() * handTran;
+  handTran = handTran % transf(zrot, vec3(0, 0, 0));
+  return handTran % mHand->getApproachTran().inverse();
   //So: hand tranform is: move onto the ellipsoid and rotate z axis in normal direction
   //    --> hand approach transform inverted to get to hand origin
 }
@@ -271,8 +270,8 @@ transf PositionStateApproach::getCoreTran() const
   double rx = readVariable("wrist 1");
   double ry = readVariable("wrist 2");
   transf handTran = transf(Quaternion::Identity(), vec3(0, 0, dist));
-  handTran = handTran * transf::AXIS_ANGLE_ROTATION(rx, vec3(1, 0, 0)) * transf::AXIS_ANGLE_ROTATION(ry, vec3(0, 1, 0));
-  return mHand->getApproachTran().inverse() * handTran * mHand->getApproachTran();
+  handTran = transf::AXIS_ANGLE_ROTATION(ry, vec3(0, 1, 0)) % transf::AXIS_ANGLE_ROTATION(rx, vec3(1, 0, 0)) %  handTran;
+  return mHand->getApproachTran() % handTran % mHand->getApproachTran().inverse();
 }
 void PositionStateApproach::setTran(const transf &t)
 {

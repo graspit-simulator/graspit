@@ -72,7 +72,7 @@ void rotateSoTransform(SoTransform *tran, vec3 axis, double angle)
   Eigen::AngleAxisd aa = Eigen::AngleAxisd(angle, axis);
   Quaternion quat(aa);
   transf rot(quat, vec3(0, 0, 0));
-  tr = rot * tr;
+  tr = tr % rot;
   tr.toSoTransform(tran);
 }
 
@@ -612,7 +612,7 @@ void Tendon::getInsertionPointLinkTransforms(std::list< std::pair<transf, Link *
   for (insPt = mInsPointList.begin(); insPt != mInsPointList.end(); insPt++)
   {
     //make the transform relative to the link and insert it in list
-    transf linkTrans =  getInsertionPointWorldTransform(insPt) * (*insPt)->getAttachedLink()->getTran().inverse();
+    transf linkTrans =  (*insPt)->getAttachedLink()->getTran().inverse() % getInsertionPointWorldTransform(insPt);
     insPointLinkTrans.push_back(std::pair<transf, Link *>(linkTrans, (*insPt)->getAttachedLink()));
   }
 }

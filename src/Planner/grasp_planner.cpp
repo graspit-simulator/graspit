@@ -710,7 +710,7 @@ grasp_planner::localToGlobalCoordinates(std::list<plannedGrasp *> &graspList,
   IVprimTran->unref();
 
   // Perform transform from object coordinates to world coordinates.
-  primTran = primTran * objTran;
+  primTran = objTran % primTran;
 
   for (it = graspList.begin(); it != graspList.end(); it++) {
 

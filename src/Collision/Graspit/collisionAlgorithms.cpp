@@ -150,8 +150,8 @@ RecursionCallback::RecursionCallback(const CollisionModel *m1, const CollisionMo
   mModel1(m1), mModel2(m2)
 {
   if (mModel2) {
-    mTran2To1 = mModel2->getTran() * mModel1->getTran().inverse();
-    mTran1To2 = mModel1->getTran() * mModel2->getTran().inverse();
+    mTran2To1 = mModel1->getTran().inverse() % mModel2->getTran();
+    mTran1To2 = mModel2->getTran().inverse() % mModel1->getTran();
   }
 }
 

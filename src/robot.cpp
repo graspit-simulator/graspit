@@ -986,8 +986,8 @@ Robot::simpleContactsPreventMotion(const transf &motion) const
   for (int i = 0; i < numChains; i++) {
     for (int j = 0; j < chainVec[i]->getNumLinks(); j++) {
       if (chainVec[i]->getLink(j)->getNumContacts()) {
-        baseToLink = chainVec[i]->getLink(j)->getTran() * base->getTran().inverse();
-        linkMotion = baseToLink * motion * baseToLink.inverse();
+        baseToLink = base->getTran().inverse() % chainVec[i]->getLink(j)->getTran();
+        linkMotion = baseToLink.inverse() % motion % baseToLink;
         if (chainVec[i]->getLink(j)->externalContactsPreventMotion(linkMotion)) {
           return true;
         }
@@ -995,8 +995,8 @@ Robot::simpleContactsPreventMotion(const transf &motion) const
     }
     // recursively check the motion for any robots attached to this chain
     for (int j = 0; j < chainVec[i]->getNumAttachedRobots(); j++) {
-      baseToLink = chainVec[i]->getAttachedRobot(j)->getBase()->getTran() * base->getTran().inverse();
-      linkMotion = baseToLink * motion * baseToLink.inverse();
+      baseToLink = base->getTran().inverse() % chainVec[i]->getAttachedRobot(j)->getBase()->getTran();
+      linkMotion = baseToLink.inverse() % motion % baseToLink;
       if (chainVec[i]->getAttachedRobot(j)->simpleContactsPreventMotion(linkMotion)) {
         return true;
       }
@@ -1030,7 +1030,7 @@ Robot::contactsPreventMotion(const transf &motion) const
   // if this robot is connected to another before it, try to do inv kinematics
   // and check if contacts on any of those links will prevent this motion
   if (parent) {
-    transf newTran = tranToParentEnd * motion * base->getTran(); // * parent->getBase()->getTran().inverse();
+    transf newTran = base->getTran() % motion % tranToParentEnd; // * parent->getBase()->getTran().inverse();
     KinematicChain *chain = parent->getChain(parentChainNum);
     std::vector<transf> parentTrVec(chain->getNumLinks());
     double *dofVals = new double[parent->getNumDOF()];
@@ -1045,7 +1045,7 @@ Robot::contactsPreventMotion(const transf &motion) const
 
     for (l = 0; l < chain->getNumLinks(); l++) {
       if (chain->getLink(l)->getNumContacts()) {
-        linkMotion = parentTrVec[l] * chain->getLink(l)->getTran().inverse();
+        linkMotion = chain->getLink(l)->getTran().inverse() % parentTrVec[l];
         if (chain->getLink(l)->contactsPreventMotion(linkMotion)) {
           return true;
         }
@@ -1106,7 +1106,7 @@ Robot::setTran(const transf &tr)
 {
   if (parent) {
     double *dofVals = new double[parent->getNumDOF()];
-    transf parentBaseToEnd = tranToParentEnd * tr;
+    transf parentBaseToEnd = tr % tranToParentEnd;
     if (parent->invKinematics(parentBaseToEnd, dofVals, parentChainNum) == FAILURE) {
       delete [] dofVals;
       return FAILURE;
@@ -2413,7 +2413,7 @@ state that is collision-free.
 bool
 Hand::approachToContact(double moveDist, bool oneStep)
 {
-  transf newTran = transf::TRANSLATION(getApproachTran().applyRotation(vec3(0, 0, moveDist))) * getTran();
+  transf newTran = getTran() % transf::TRANSLATION(getApproachTran().applyRotation(vec3(0, 0, moveDist)));
   bool result;
   if (oneStep) {
     result = moveTo(newTran, WorldElement::ONE_STEP, WorldElement::ONE_STEP);
@@ -2439,7 +2439,7 @@ Hand::findInitialContact(double moveDist)
 {
   CollisionReport colReport;
   while (myWorld->getCollisionReport(&colReport)) {
-    transf newTran = transf::TRANSLATION(getApproachTran().applyRotation(vec3(0, 0, -moveDist / 2.0))) * getTran();
+    transf newTran = getTran() % transf::TRANSLATION(getApproachTran().applyRotation(vec3(0, 0, -moveDist / 2.0)));
     setTran(newTran);
   }
   return approachToContact(moveDist, false);

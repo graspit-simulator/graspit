@@ -245,7 +245,7 @@ CompliantPlannerDlg::sampleFace(vec3 x, vec3 y, vec3 z,
         Eigen::AngleAxisd aa = Eigen::AngleAxisd(angle, vec3(1, 0, 0));
         Quaternion q(aa);
         transf rotTran(q, vec3(0, 0, 0));
-        tr = rotTran * tr;
+        tr = tr % rotTran;
         GraspPlanningState *seed = new GraspPlanningState(mHand);
         seed->setObject(mObject);
         seed->setRefTran(mObject->getTran(), false);

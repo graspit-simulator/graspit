@@ -55,11 +55,11 @@ DynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
 {
   //compute the joint coordinate system as seen by both the previous and the
   //next links
-  transf prevTrans = getPrevTrans() * prevLink->getTran();
-  transf nextTrans = getNextTrans() * nextLink->getTran();
+  transf prevTrans = prevLink->getTran() %  getPrevTrans();
+  transf nextTrans = nextLink->getTran() % getNextTrans();
 
   //compute error
-  transf error = nextTrans.inverse() * prevTrans;
+  transf error = prevTrans % nextTrans.inverse();
 
   //we will use the joint coordinate system as reported by the previous link
   //as reference
@@ -156,13 +156,13 @@ DynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
 void
 DynJoint::jacobian(transf toTarget, Matrix *J, bool worldCoords)
 {
-  transf myTran = getPrevTrans() * getPrevLink()->getTran();
+  transf myTran = getPrevLink()->getTran() % getPrevTrans();
   transf T;
   if (worldCoords) {
     // the translation from joint coordinate system to world coordinate system
-    T = transf(Quaternion::Identity(), toTarget.translation()) * myTran.inverse();
+    T = myTran.inverse() % transf(Quaternion::Identity(), toTarget.translation());
   } else {
-    T = toTarget * myTran.inverse();
+    T = myTran.inverse() % toTarget;
   }
   double M[36];
   T.jacobian(M);
@@ -194,8 +194,8 @@ FixedDynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
   int nextLinkRow = 6 * islandIndices[nextLink];
 
   transf prevTrans = getPrevTrans();
-  transf nextTrans = getNextTrans() * nextLink->getTran();
-  transf error = nextTrans.inverse() * prevTrans;
+  transf nextTrans = nextLink->getTran() % getNextTrans();
+  transf error = prevTrans % nextTrans.inverse();
 
   vec3 errorVec = nextTrans.translation() - prevTrans.translation();
 
@@ -227,7 +227,7 @@ FixedDynJoint::buildConstraints(double *Nu, double *eps, int numBodies,
 void
 RevoluteDynJoint::updateValues()
 {
-  transf b1JointTran = prevFrame * prevLink->getTran();
+  transf b1JointTran = prevLink->getTran() % prevFrame;
 
   //the z axis of the previous link, by definition the axis of the one joint
   vec3 axis = b1JointTran.affine().row(2);
@@ -240,7 +240,7 @@ RevoluteDynJoint::updateValues()
                      nextLink->getVelocity()[5]).dot(axis);
   joint->setVelocity(vel2 - vel1);
 
-  transf diffTran = joint->getTran(0.0).inverse() * nextLink->getTran() * b1JointTran.inverse();
+  transf diffTran = b1JointTran.inverse() % nextLink->getTran()  % joint->getTran(0.0).inverse();
 
   double val;
   Eigen::AngleAxisd aa(diffTran.rotation());
@@ -282,8 +282,8 @@ UniversalDynJoint::updateValues()
   vec3 axis, ax0, ax1, ax2;
   double val, vel1, vel2;
 
-  transf b1JointTran = prevFrame * prevLink->getTran();
-  transf b2JointTran = nextFrame * nextLink->getTran();
+  transf b1JointTran = prevLink->getTran() % prevFrame;
+  transf b2JointTran = nextLink->getTran() % nextFrame;
 
   // the z axis of the previous link - by definition, the rotation direction of the next joint
   ax0 = b1JointTran.affine().row(2);
@@ -304,7 +304,7 @@ UniversalDynJoint::updateValues()
               nextLink->getVelocity()[5]).dot(axis);
   joint1->setVelocity(vel2 - vel1);
 
-  vec3 ref1 = (joint2->getTran(0.0) * joint1->getTran(0.0) * b1JointTran).affine().row(2);
+  vec3 ref1 = (b1JointTran %  joint1->getTran(0.0) % joint2->getTran(0.0)).affine().row(2);
   //original GraspIt:
   val = atan2(ax2.dot(ax0.cross(ref1)), ax2.dot(ref1));
 
@@ -326,7 +326,7 @@ UniversalDynJoint::updateValues()
 
   joint2->setVelocity(vel2 - vel1);
 
-  vec3 ref2 = b2JointTran.applyRotation((joint2->getTran(0.0) * joint1->getTran(0.0)).inverse().affine().row(2));
+  vec3 ref2 = b2JointTran.applyRotation((joint1->getTran(0.0) % joint2->getTran(0.0)).inverse().affine().row(2));
 
   val = atan2(ref2.dot(ax1), ref2.dot(ax1.cross(ax2)));
 
@@ -342,7 +342,7 @@ UniversalDynJoint::getPrevTrans()
 transf
 UniversalDynJoint::getNextTrans()
 {
-  return joint1->getDynamicsTran().inverse() * joint2->getDynamicsTran().inverse();
+  return joint2->getDynamicsTran().inverse() % joint1->getDynamicsTran().inverse();
 }
 
 /*!
@@ -358,8 +358,8 @@ BallDynJoint::updateValues()
   vec3 axis, ax0, ax1, ax2;
   double val, vel1, vel2;
 
-  b1JointTran = prevFrame * prevLink->getTran();
-  b2JointTran = nextFrame * nextLink->getTran();
+  b1JointTran = prevLink->getTran() %  prevFrame;
+  b2JointTran = nextLink->getTran() % nextFrame;
 
   ax0 = b1JointTran.affine().row(2);
   ax2 = b2JointTran.affine().row(2);
@@ -380,7 +380,7 @@ BallDynJoint::updateValues()
               nextLink->getVelocity()[5]).dot(axis);
   joint1->setVelocity(vel2 - vel1);
 
-  vec3 ref1 = (joint2->getTran(0.0) * joint1->getTran(0.0) * b1JointTran).affine().row(2);
+  vec3 ref1 = (b1JointTran % joint1->getTran(0.0) % joint2->getTran(0.0)).affine().row(2);
   val = atan2(ax2.dot(ax0.cross(ref1)), ax2.dot(ref1));
 
 
@@ -436,7 +436,7 @@ BallDynJoint::updateValues()
 
   joint3->setVelocity(vel2 - vel1);
 
-  vec3 ref2 = b2JointTran.applyRotation((joint2->getTran(0.0) * joint1->getTran(0.0)).inverse().affine().row(2));
+  vec3 ref2 = b2JointTran.applyRotation((joint1->getTran(0.0) % joint2->getTran(0.0)).inverse().affine().row(2));
   val = atan2(ref2.dot(ax1), ref2.dot(ax1.cross(ax2)));
 
 #ifdef GRASPITDBG
@@ -458,7 +458,5 @@ BallDynJoint::getPrevTrans()
 transf
 BallDynJoint::getNextTrans()
 {
-  return joint1->getDynamicsTran().inverse() *
-         joint2->getDynamicsTran().inverse() *
-         joint3->getDynamicsTran().inverse();
+  return joint3->getDynamicsTran().inverse() % joint2->getDynamicsTran().inverse() % joint1->getDynamicsTran().inverse();
 }

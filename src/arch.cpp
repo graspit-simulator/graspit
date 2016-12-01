@@ -177,7 +177,7 @@ void create_arch(World *world, double inner_radius, double outer_radius, double 
     blockRot.set(r, vec3(0, 0, 0));
     blockTran.set(Quaternion::Identity(), t);
 
-    addBlock->setTran(blockTran * blockRot);
+    addBlock->setTran(blockRot % blockTran);
 
     if (i == n_blocks - 1) {
       rightBase = addBlock;

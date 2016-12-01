@@ -268,7 +268,7 @@ WorldElement::moveTo(transf &newTran, double translStepSize, double rotStepSize)
   nextTranslation = (1.0 - moveIncrement) * origTran.translation() + moveIncrement * newTran.translation();
   nextRotation = origTran.rotation().slerp(moveIncrement, newTran.rotation());
   nextTran = transf(nextRotation, nextTranslation);
-  motion = nextTran * getTran().inverse();
+  motion = getTran().inverse() % nextTran;
 
   if (contactsPreventMotion(motion)) {
     DBGP("contacts prevent motion")

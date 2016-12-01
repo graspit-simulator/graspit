@@ -404,7 +404,7 @@ void HandObjectState::changeHand(Hand *h, bool sticky)
 
 void HandObjectState::saveCurrentHandState()
 {
-  transf newTran = mHand->getTran() * mRefTran.inverse();
+  transf newTran = mRefTran.inverse() % mHand->getTran();
   mPosition->setTran(newTran);
 
   double *dof = new double[mHand->getNumDOF()];
@@ -469,11 +469,11 @@ void HandObjectState::setRefTran(transf t, bool sticky)
 {
   transf totalTran;
   if (sticky) {
-    totalTran = mPosition->getCoreTran() * mRefTran;
+    totalTran = mRefTran % mPosition->getCoreTran();
   }
   mRefTran = t;
   if (sticky) {
-    mPosition->setTran(totalTran * mRefTran.inverse());
+    mPosition->setTran(mRefTran.inverse() % totalTran);
   }
 }
 
@@ -517,7 +517,7 @@ bool HandObjectState::execute(Hand *h) const
   if (!h) { h = mHand; }
   else { assert(h->getNumDOF() == mHand->getNumDOF()); }
 
-  if (h->setTran(mPosition->getCoreTran() * mRefTran) == FAILURE) { return false; }
+  if (h->setTran(mRefTran % mPosition->getCoreTran()) == FAILURE) { return false; }
   double *dof = new double[ h->getNumDOF() ];
   mPosture->getHandDOF(dof);
   //DBGP("Dof: " << dof[0] << " " << dof[1] << " " << dof[2] << " " << dof[3]);
@@ -530,7 +530,7 @@ bool HandObjectState::dynamicExecute(Hand *h) const
 {
   if (!h) { h = mHand; }
   else { assert(h->getNumDOF() == mHand->getNumDOF()); }
-  if (h->setTran(mPosition->getCoreTran() * mRefTran) == FAILURE) { return false; }
+  if (h->setTran( mRefTran % mPosition->getCoreTran()) == FAILURE) { return false; }
   double *dof = new double[ h->getNumDOF() ];
   mPosture->getHandDOF(dof);
   h->setDesiredDOFVals(dof);
@@ -589,8 +589,8 @@ HandObjectState::distance(const HandObjectState *s) const
   */
   //alternative version that only looks at euclidian distance
 
-  transf t1 = mHand->getApproachTran() * getTotalTran();
-  transf t2 = mHand->getApproachTran() * s->getTotalTran();
+  transf t1 = getTotalTran() % mHand->getApproachTran();
+  transf t2 = s->getTotalTran() % mHand->getApproachTran();
 
   vec3 dvec = t1.translation() - t2.translation();
   double d = dvec.norm();
@@ -679,7 +679,7 @@ HandObjectState::getIVRoot()
   //flock transform
   //transf t = mHand->getFlockTran()->getMount() * getTotalTran();
   //approach transform
-  transf t = mHand->getApproachTran() * getTotalTran();
+  transf t = getTotalTran() % mHand->getApproachTran();
   t.toSoTransform(IVTran);
   return IVRoot;
 }

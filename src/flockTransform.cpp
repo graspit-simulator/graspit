@@ -11,12 +11,12 @@ void FlockTransf::identity()
 
 transf FlockTransf::get(transf t) const
 {
-  return mountInv * t * flockBaseInv * mount * objBase;
+  return objBase % mount % flockBaseInv % t % mountInv;
 }
 
 transf FlockTransf::getAbsolute(transf t) const
 {
-  return mountInv * t;
+  return t % mountInv;
 }
 
 /*! Does not multiply with the mount transform. It is meant to use with
@@ -25,5 +25,5 @@ transf FlockTransf::getAbsolute(transf t) const
 */
 transf FlockTransf::get2(transf t) const
 {
-  return mountInv * t * flockBaseInv * objBase;
+  return objBase % flockBaseInv % t % mountInv;
 }

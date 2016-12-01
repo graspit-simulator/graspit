@@ -368,7 +368,7 @@ readTransRotFromQTextStream(QTextStream &stream, transf &tr)
         tmpTr = transf(tmpMat, vec3::Zero());
         line = stream.readLine();
       }
-      tr = tmpTr * tr;
+      tr = tr % tmpTr;
     }
     line = stream.readLine();
   } while (!line.isNull() && (line[0] == 'r' || line[0] == 't' || line[0] == 'T' || line[0] == 'R'));

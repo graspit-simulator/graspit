@@ -81,7 +81,7 @@ closestPtBbox(const BoundingBox &bbox, const position &p)
 void
 BoundingBox::applyTransform(const transf &t)
 {
-  mTran = mTran * t;
+  mTran = t % mTran;
   mTranInv = mTran.inverse();
 }
 
@@ -90,7 +90,7 @@ bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2T
 {
   int i, k;
 
-  transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
+  transf BtoA =  bb1.getTranInv() % tran2To1 % bb2.getTran();
   const mat3 &RMat(BtoA.affine());
 
   double B[3][3];
@@ -271,7 +271,7 @@ double bboxDistanceSq(const BoundingBox &bb1, const BoundingBox &bb2, const tran
   //trying to use the separating axis theorem to get a better distance bound
   int i, k;
 
-  transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
+  transf BtoA = bb1.getTranInv() % tran2To1 % bb2.getTran();
   const mat3 &RMat(BtoA.affine());
 
   double B[3][3];

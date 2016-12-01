@@ -201,14 +201,14 @@ OnLinePlanner::distanceOutsideApproach(const transf &solTran, const transf &hand
   double max_dist = 50.0;
   double f;
   //relative transform between the two
-  transf changeTran = solTran * handTran.inverse();
+  transf changeTran = handTran.inverse() % solTran;
 
   //DBGP("T1: " << solTran.translation());
   //DBGP("T2: " << handTran.translation());
   //DBGP("Change: " << changeTran.translation() );
 
   //get change in terms of approach direction
-  changeTran = mHand->getApproachTran() * changeTran * mHand->getApproachTran().inverse();
+  changeTran = mHand->getApproachTran().inverse() % changeTran % mHand->getApproachTran();
 
   //get angular change
   double angle; vec3 axis;

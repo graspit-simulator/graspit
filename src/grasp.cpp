@@ -596,7 +596,7 @@ Grasp::getLinkJacobian(int f, int l)
     col = jointPtr->getDOFNum();
 
     k = hand->getDOF(jointPtr->getDOFNum())->getStaticRatio(jointPtr);
-    T = T * jointPtr->getDH()->getTran();
+    T = jointPtr->getDH()->getTran() % T;
     m = T.affine();
     p = T.translation();
 
@@ -671,7 +671,7 @@ Grasp::contactJacobian(const std::list<Joint *> &joints,
       if (jointNumInChain > last_joint) { continue; }
       //compute the individual jacobian
       transf joint_tran = jointTransf.at(link->getChainNum()).at(jointNumInChain);
-      transf contact_tran = contact_it->first * link->getTran();
+      transf contact_tran = link->getTran() % contact_it->first;
       //always get the individual jacobian in local coordinates
       Matrix indJ(Joint::jacobian(*joint_it, joint_tran, contact_tran, false));
       //place it at the correct spot in the global jacobian

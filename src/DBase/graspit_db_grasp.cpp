@@ -102,7 +102,7 @@ bool GraspitDBGrasp::Transform(const float array[16]) {
   std::vector<double> position;
 
   PositionState *ps = mPreGrasp->getPosition();
-  ps->setTran(ps->getCoreTran() * transform);
+  ps->setTran(transform % ps->getCoreTran());
   for (int i = 0; i < ps->getNumVariables(); ++i) {
     position.push_back(ps->getVariable(i)->getValue());
   }
@@ -110,7 +110,7 @@ bool GraspitDBGrasp::Transform(const float array[16]) {
 
   position.clear();
   ps = mFinalGrasp->getPosition();
-  ps->setTran(ps->getCoreTran() * transform);
+  ps->setTran(transform % ps->getCoreTran());
   for (int i = 0; i < ps->getNumVariables(); ++i) {
     position.push_back(ps->getVariable(i)->getValue());
   }

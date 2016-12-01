@@ -84,7 +84,7 @@ class transf {
 
     friend std::istream &operator>>(std::istream &is, transf &tr);
     friend std::ostream &operator<<(std::ostream &os, const transf &tr);
-    friend transf operator*(const transf &tr1, const transf &tr2);
+    friend transf operator%(const transf &tr1, const transf &tr2);
 
     static const transf IDENTITY;
 

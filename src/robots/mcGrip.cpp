@@ -195,7 +195,7 @@ McGrip::getRoutingMatrices(Matrix **B, Matrix **a)
         //compute the transform from one joint to the other
         transf thisTran = jointTransf.at(c).at(k);
         //relative transform in thisJoint's coordinate system
-        transf relTran = refTran * thisTran.inverse();
+        transf relTran = thisTran.inverse() % refTran;
         vec3 translation = relTran.translation();
         //for this hand, the z component should always be 0
         if (translation.z() > 1.0e-3) {

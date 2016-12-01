@@ -629,8 +629,7 @@ IVmgr::transRot(DraggerInfo *dInfo)
       center.y() = myCenterball->center.getValue()[1];
       center.z() = myCenterball->center.getValue()[2];
       center *= scale[0];
-      transf recenterTran = transf::TRANSLATION(center) *
-                            dInfo->selectedElement->getTran() * transf::TRANSLATION(-center);
+      transf recenterTran = transf::TRANSLATION(-center) % dInfo->selectedElement->getTran() % transf::TRANSLATION(center);
       dInfo->centerballTransl = recenterTran.translation();
       dInfo->lastCent = myCenterball->center.getValue();
       return;
@@ -680,8 +679,7 @@ IVmgr::transRot(DraggerInfo *dInfo)
     center *= scale[0];
     //this does not work if the centerball has been recentered
     //hope to fix this at some point
-    newTran = transf::TRANSLATION(-center) * transf(desiredRotation, vec3::Zero()) *
-              transf::TRANSLATION(center) * transf::TRANSLATION(dInfo->centerballTransl);
+    newTran = transf::TRANSLATION(dInfo->centerballTransl) % transf::TRANSLATION(center)  % transf(desiredRotation, vec3::Zero()) % transf::TRANSLATION(-center);
   }
   dInfo->selectedElement->moveTo(newTran, 50 * Contact::THRESHOLD, M_PI / 36.0);
   world->updateGrasps();

@@ -125,8 +125,8 @@ class DHTransform {
     */
     transf getTran(double thetaVal, double dVal) const
     {
-      return tr4TimesTr3 * transf::TRANSLATION(vec3(0, 0, dVal)) *
-             transf::AXIS_ANGLE_ROTATION(thetaVal, vec3(0, 0, 1));
+      return transf::AXIS_ANGLE_ROTATION(thetaVal, vec3(0, 0, 1)) % transf::TRANSLATION(vec3(0, 0, dVal))  % tr4TimesTr3;
+
 }
 
 };

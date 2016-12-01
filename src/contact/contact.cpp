@@ -337,7 +337,7 @@ Matrix
 Contact::localToWorldWrenchMatrix() const
 {
   Matrix Ro(Matrix::ZEROES<Matrix>(6, 6));
-  transf contactTran = getContactFrame() * getBody1()->getTran();
+  transf contactTran = getBody1()->getTran() % getContactFrame();
   Matrix Rot(Matrix::ROTATION(contactTran.affine()));
   //the force transform is simple, just the matrix that changes coord. systems
   Ro.copySubMatrix(0, 0, Rot);
@@ -479,8 +479,8 @@ Contact::setContactForce(double *optmx)
 double
 Contact::getConstraintError()
 {
-  transf cf = frame * body1->getTran();
-  transf cf2 = mate->getContactFrame() * body2->getTran();
+  transf cf = body1->getTran() % frame;
+  transf cf2 = body2->getTran() % mate->getContactFrame();
   return MAX(0.0, Contact::THRESHOLD / 2.0 - (cf.translation() - cf2.translation()).norm());
 }
 

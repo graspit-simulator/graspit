@@ -361,7 +361,7 @@ bool getTransform(const TiXmlElement *root, transf &totalTran)
       QTextStream lineStream(&valueStr, QIODevice::ReadOnly);
       lineStream >> newTran;
     }
-    totalTran = newTran * totalTran;
+    totalTran = totalTran % newTran;
     child = child->NextSiblingElement();
   }
   return true;
