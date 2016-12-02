@@ -1784,8 +1784,8 @@ IVmgr::keyPressed(SoEventCallback *eventCB)
     Body *b2 = world->getGB(1);
     position p1, p2;
     world->getDist(b1, b2, p1, p2);
-    p1 = b1->getTran().applyTransform(p1);
-    p2 = b2->getTran().applyTransform(p2);
+    p1 = b1->getTran() * (p1);
+    p2 = b2->getTran() * (p2);
 
     //vec3 v3 = world->pointDistanceToBody(p1, b2);
     //v3 = (p1 - position::Zero()) + v3;

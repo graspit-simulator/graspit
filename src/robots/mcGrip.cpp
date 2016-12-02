@@ -436,15 +436,15 @@ McGripGrasp::tendonAndHandOptimization(Matrix *parameters, double &objValRet)
   Matrix G(graspMapMatrix(R, D));
   //matrix that relates contact forces to joint torques JTD = JTran * D
   Matrix JTran(J.transposed());
-  Matrix JTD(JTran.rows(), D.cols());
+  Matrix JTD(JTran.cols(), D.cols());
   matrixMultiply(JTran, D, JTD);
 
   //get the routing equation matrices
   Matrix *a, *negB;
   static_cast<McGrip *>(hand)->getRoutingMatrices(&negB, &a);
   negB->multiply(-1.0);
-  assert(JTD.rows() == negB->rows());
-  assert(JTD.rows() == a->rows());
+  assert(JTD.cols() == negB->rows());
+  assert(JTD.cols() == a->rows());
   //scale B and a by tendon force
   double tendonForce = 1.0e6;
   negB->multiply(tendonForce);
@@ -458,37 +458,37 @@ McGripGrasp::tendonAndHandOptimization(Matrix *parameters, double &objValRet)
   Matrix p(JTD.cols() + negB->cols() + a->rows(), 1);
 
   //optimization objective
-  Matrix Q(JTD.rows(), p.rows());
+  Matrix Q(JTD.cols(), p.cols());
   Q.copySubMatrix(0, 0, JTD);
   Q.copySubMatrix(0, JTD.cols(), *negB);
   Q.copySubMatrix(0, JTD.cols() + negB->cols(), Matrix::NEGEYE(a->rows(), a->rows()));
 
   //friction matrix padded with zeroes
-  Matrix FO(Matrix::ZEROES<Matrix>(F.rows(), p.rows()));
+  Matrix FO(Matrix::ZEROES<Matrix>(F.cols(), p.cols()));
   FO.copySubMatrix(0, 0, F);
 
   //equality constraint is just grasp map padded with zeroes
-  Matrix EqLeft(Matrix::ZEROES<Matrix>(G.rows(), p.rows()));
+  Matrix EqLeft(Matrix::ZEROES<Matrix>(G.cols(), p.cols()));
   EqLeft.copySubMatrix(0, 0, G);
   //and right hand side is just zeroes
-  Matrix eqRight(Matrix::ZEROES<Matrix>(G.rows(), 1));
+  Matrix eqRight(Matrix::ZEROES<Matrix>(G.cols(), 1));
 
   /*
   //let's add the summation to the equality constraint
-  Matrix EqLeft( Matrix::ZEROES<Matrix>(G.rows() + 1, p.rows()) );
+  Matrix EqLeft( Matrix::ZEROES<Matrix>(G.cols() + 1, p.cols()) );
   EqLeft.copySubMatrix(0, 0, G);
   Matrix sum(1, G.cols());
   sum.setAllElements(1.0);
-  EqLeft.copySubMatrix(G.rows(), 0, sum);
+  EqLeft.copySubMatrix(G.cols(), 0, sum);
   //and the right side of the equality constraint
-  Matrix eqRight( Matrix::ZEROES<Matrix>(G.rows()+1, 1) );
+  Matrix eqRight( Matrix::ZEROES<Matrix>(G.cols()+1, 1) );
   //betas must sum to one
-  eqRight.elem(G.rows(), 0) = 1.0;
+  eqRight.elem(G.cols(), 0) = 1.0;
   */
 
   //lower and upper bounds
-  Matrix lowerBounds(Matrix::MIN_VECTOR(p.rows()));
-  Matrix upperBounds(Matrix::MAX_VECTOR(p.rows()));
+  Matrix lowerBounds(Matrix::MIN_VECTOR(p.cols()));
+  Matrix upperBounds(Matrix::MAX_VECTOR(p.cols()));
   //betas are >= 0
   for (int i = 0; i < JTD.cols(); i++) {
     lowerBounds.elem(i, 0) = 0.0;
@@ -535,7 +535,7 @@ McGripGrasp::tendonAndHandOptimization(Matrix *parameters, double &objValRet)
   double objVal;
   int result = factorizedQPSolver(Q,
                                   EqLeft, eqRight,
-                                  FO, Matrix::ZEROES<Matrix>(FO.rows(), 1),
+                                  FO, Matrix::ZEROES<Matrix>(FO.cols(), 1),
                                   lowerBounds, upperBounds,
                                   p, &objVal);
   objValRet = objVal;
@@ -559,12 +559,12 @@ McGripGrasp::tendonAndHandOptimization(Matrix *parameters, double &objValRet)
   parameters->copySubBlock(0, 0, numParameters, 1, p, JTD.cols(), 0);
 
   //retrieve contact wrenches in local contact coordinate systems
-  Matrix cWrenches(D.rows(), 1);
+  Matrix cWrenches(D.cols(), 1);
   matrixMultiply(D, beta, cWrenches);
   DBGP("Contact forces:\n " << cWrenches);
 
   //compute object wrenches relative to object origin and expressed in world coordinates
-  Matrix objectWrenches(R.rows(), cWrenches.cols());
+  Matrix objectWrenches(R.cols(), cWrenches.cols());
   matrixMultiply(R, cWrenches, objectWrenches);
   DBGP("Object wrenches:\n" << objectWrenches);
 

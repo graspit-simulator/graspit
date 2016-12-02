@@ -877,8 +877,8 @@ CompliantDOF::computeStaticJointTorques(double *jointTorques, double dofForce)
     //also propagate this to previous joint
     if (count == 1 || count == 3 || count == 5 || count == 7) {
       assert(pj);
-      vec3 axis1 = (*j)->getDynJoint()->getPrevLink()->getTran().affine().row(2);
-      vec3 axis2 =   pj->getDynJoint()->getPrevLink()->getTran().affine().row(2);
+      vec3 axis1 = (*j)->getDynJoint()->getPrevLink()->getTran().affine().col(2);
+      vec3 axis2 =   pj->getDynJoint()->getPrevLink()->getTran().affine().col(2);
       double t = fabs(axis1.dot(axis2));
       //todo what about non-revolute joints, complex kinematic chains, etc...
       jointTorques[pj->getNum()] += springTorque * t;

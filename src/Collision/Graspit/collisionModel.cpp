@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <limits>
 
-#define GRASPITDBG
+//#define GRASPITDBG
 #include "debug.h"
 #ifdef MKL
 #include "mkl_wrappers.h"
@@ -96,9 +96,9 @@ void boxSize(const position &p, vec3 &min, vec3 &max,
 
 void Leaf::fitBox(const mat3 &R, vec3 &center, vec3 &halfSize)
 {
-  vec3 x = R.row(0);
-  vec3 y = R.row(1);
-  vec3 z = R.row(2);
+  vec3 x = R.col(0);
+  vec3 y = R.col(1);
+  vec3 z = R.col(2);
   vec3 max(-1.0e10, -1.0e10, -1.0e10);
   vec3 min(1.0e10,  1.0e10,  1.0e10);
   std::list<Triangle>::iterator it;
@@ -116,15 +116,8 @@ void Leaf::fitBox(const mat3 &R, vec3 &center, vec3 &halfSize)
   //halfSize = 0.5 * (max - min);
 
   center = min + halfSize;
-  std::cout << std::endl << "center1: " << center << std::endl;
-  std::cout << "R: " << R << std::endl;
-  std::cout << "R02: " << R(0) << " " << R(1) << " " << R(2) << std::endl;
-  std::cout << "R35: " << R(3) << " " << R(4) << " " << R(5) << std::endl;
-  std::cout << "R68: " << R(6) << " " << R(7) << " " << R(8) << std::endl;
-  std::cout << "R.row(0): " << R.row(0);
-  std::cout << "R.inverse(): " << R.inverse() << std::endl;
-  center = R.inverse() * center;
-  std::cout << "center2: " << center << std::endl;
+  center = R * center;
+
   //sanity check
   for (int i = 0; i < 3; i++) {
     if (halfSize[i] < TOLERANCE) {
@@ -174,7 +167,6 @@ void Leaf::areaWeightedCovarianceMatrix(double covMat[3][3])
 
 void Leaf::computeBboxOO()
 {
-  std::cout << "Leaf::computeBboxOO() start " << std::endl;
   //compute the covariance matrix
   double covMat[3][3], v[3][3];
   areaWeightedCovarianceMatrix(covMat);
@@ -203,14 +195,11 @@ void Leaf::computeBboxOO()
   vec3 zAxis = xAxis.normalized().cross(yAxis.normalized());
   yAxis = zAxis.cross(xAxis.normalized());
   xAxis = yAxis.cross(zAxis);
-  mat3 R;
-  R.row(0) = xAxis;
-  R.row(1) = yAxis;
-  R.row(2) = zAxis;
 
-  std::cout << "xAxis: " << xAxis << std::endl;
-  std::cout << "yAxis: " << yAxis << std::endl;
-  std::cout << "zAxis: " << zAxis << std::endl;
+  mat3 R;
+  R.col(0) = xAxis;
+  R.col(1) = yAxis;
+  R.col(2) = zAxis;
 
   DBGP("Matrix: " << R);
 
@@ -231,18 +220,17 @@ void Leaf::computeBboxOO()
     // z has the largest extent, rotate around y
     rotate = transf::AXIS_ANGLE_ROTATION(M_PI / 2.0, vec3(0, 1, 0));
   }
-  halfSize = rotate.applyRotation(halfSize);
+
+  halfSize = rotate.affine() * (halfSize);
   for (int i = 0; i < 3; i++) {
     if (halfSize[i] < 0) { halfSize[i] = -halfSize[i]; }
   }
 
-  R = rotate.affine() * R;
+  R = rotate.affine()* R;
 
   mBbox.halfSize = halfSize;
   mBbox.setTran(transf(R, center));
 
-  std::cout << "Leaf::computeBboxOO() end " << std::endl;
-  sleep(10);
 }
 
 void Leaf::computeBboxAA()
@@ -251,9 +239,7 @@ void Leaf::computeBboxAA()
   vec3 halfSize, center;
   fitBox(R, center, halfSize);
   mBbox.halfSize = halfSize;
-  std::cout << "computeBboxAA R: " << R << std::endl;
   mBbox.setTran(transf(R, center));
-  sleep(10);
 }
 
 /*! The split process goes through the followins stages:
@@ -274,9 +260,9 @@ Branch *Leaf::split()
   //choose axis as dominant axis of bbox
   //the box is rotated after fitting so that the x axis always points in the direction
   //of the largest extent
-  vec3 xAxis = mBbox.getTran().applyRotation(vec3(1, 0, 0));
-  vec3 yAxis = mBbox.getTran().applyRotation(vec3(0, 1, 0));
-  vec3 zAxis = mBbox.getTran().applyRotation(vec3(0, 0, 1));
+  vec3 xAxis = mBbox.getTran().affine() * (vec3(1, 0, 0));
+  vec3 yAxis = mBbox.getTran().affine() * (vec3(0, 1, 0));
+  vec3 zAxis = mBbox.getTran().affine() * (vec3(0, 0, 1));
   if (mBbox.halfSize.y() > mBbox.halfSize.x() + 1.0e-5) {
     DBGA("Unexpected bounding box dominant axis. Extents: ");
     DBGA(mBbox.halfSize.x() << " " << mBbox.halfSize.y() << " " << mBbox.halfSize.z());

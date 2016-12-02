@@ -48,8 +48,8 @@ void ScanSimulator::setPosition(transf tr, AxesConvention convention)
   mPosition = tr.translation();
   switch (convention) {
     case STEREO_CAMERA:
-      mDirection = tr.affine().row(2);
-      mUp = -1.0 * tr.affine().row(1);
+      mDirection = tr.affine().col(2);
+      mUp = -1.0 * tr.affine().col(1);
       mHorizDirection = mUp.cross(mDirection);
       break;
   }
@@ -63,9 +63,9 @@ void ScanSimulator::setPosition(position p, vec3 optical_axis, vec3 up_axis, Axe
   switch (convention) {
     case STEREO_CAMERA:
       mat3 m;
-      m.row(0) = -1.0 * mHorizDirection;
-      m.row(1) = -1.0 * mUp;
-      m.row(2) = mDirection;
+      m.col(0) = -1.0 * mHorizDirection;
+      m.col(1) = -1.0 * mUp;
+      m.col(2) = mDirection;
       mTran = transf(m, vec3(mPosition.x(), mPosition.y(), mPosition.z()));
       mTranInv = mTran.inverse();
       break;
@@ -108,7 +108,7 @@ void ScanSimulator::scan(std::vector<position> *cloud, std::vector<RawScanPoint>
 
         //we get the point in world coordinates
         if (mType == SCANNER_COORDINATES) {
-          rayPoint = mTranInv.applyTransform(rayPoint);
+          rayPoint = mTranInv * (rayPoint);
         }
         cloud->push_back(rayPoint);
 

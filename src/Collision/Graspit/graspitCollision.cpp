@@ -27,7 +27,7 @@
 
 #include <algorithm>
 
-#define GRASPITDBG
+//#define GRASPITDBG
 #include "debug.h"
 
 #include "body.h"
@@ -442,11 +442,11 @@ GraspitCollision::pointToBodyDistance(const Body *body1, position point,
     return 0;
   }
   //this callback operates in body coordinates
-  ClosestPtCallback pc(model, body1->getTran().inverse().applyTransform(point));
+  ClosestPtCallback pc(model, body1->getTran().inverse() * (point));
   startRecursion(model, NULL, &pc);
   DBGST(pc.printStatistics());
   //go back to world coordinates
-  closestPoint = body1->getTran().applyTransform(pc.getClosestPt());
+  closestPoint = body1->getTran() * (pc.getClosestPt());
   //we compute the normal as being in the direction that
   //relates the two points. There is really no need to do this here,
   //but it is the legacy interface. The PQP interface looks at the normal of
@@ -471,8 +471,8 @@ GraspitCollision::bodyToBodyDistance(const Body *body1, const Body *body2,
   DBGST(dc.printStatistics());
   dc.getClosestPoints(p1, p2);
   //the legacy interface requests p1 and p2 in each body's coordinate system
-  p1 = body1->getTran().inverse().applyTransform(p1);
-  p2 = body2->getTran().inverse().applyTransform(p2);
+  p1 = body1->getTran().inverse() * (p1);
+  p2 = body2->getTran().inverse() * (p2);
   return dc.getMin();
 }
 

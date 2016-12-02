@@ -95,10 +95,10 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   //---------------------------------------
   //start inputing the problem
   //prespecify number of variables to make inputting faster
-  r = MSK_putmaxnumvar(task, sol.rows());
+  r = MSK_putmaxnumvar(task, sol.cols());
   //number of constraints (both equality and inequality)
   if (r == MSK_RES_OK) {
-    r = MSK_putmaxnumcon(task, Eq.rows() + InEq.rows());
+    r = MSK_putmaxnumcon(task, Eq.cols() + InEq.cols());
   }
   //make sure default value is 0 for sparse matrices
   assert(Q.getDefault() == 0.0);
@@ -130,9 +130,9 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   //insert the actual variables and constraints
 
   //append the variables
-  MSK_append(task, MSK_ACC_VAR, sol.rows());
+  MSK_append(task, MSK_ACC_VAR, sol.cols());
   //append the constraints.
-  MSK_append(task, MSK_ACC_CON, Eq.rows() + InEq.rows());
+  MSK_append(task, MSK_ACC_CON, Eq.cols() + InEq.cols());
 
   int i, j;
   double value;
@@ -155,9 +155,9 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   }
 
   //variable bounds
-  assert(sol.rows() == lowerBounds.rows());
-  assert(sol.rows() == upperBounds.rows());
-  for (i = 0; i < sol.rows(); i++) {
+  assert(sol.cols() == lowerBounds.cols());
+  assert(sol.cols() == upperBounds.cols());
+  for (i = 0; i < sol.cols(); i++) {
     if (lowerBounds.elem(i, 0) >= upperBounds.elem(i, 0)) {
       if (lowerBounds.elem(i, 0) > upperBounds.elem(i, 0)) {
         assert(0);
@@ -210,17 +210,17 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   while (Eq.nextSequentialElement(i, j, value)) {
     MSK_putaij(task, i, j, value);
   }
-  for (i = 0; i < Eq.rows(); i++) {
+  for (i = 0; i < Eq.cols(); i++) {
     MSK_putbound(task, MSK_ACC_CON, i, MSK_BK_FX, b.elem(i, 0) / scale, b.elem(i, 0) / scale);
   }
   //inequality constraints, <=
   InEq.sequentialReset();
   while (InEq.nextSequentialElement(i, j, value)) {
-    int eqi = i + Eq.rows();
+    int eqi = i + Eq.cols();
     MSK_putaij(task, eqi, j, value);
   }
-  for (i = 0; i < InEq.rows(); i++) {
-    int eqi = i + Eq.rows();
+  for (i = 0; i < InEq.cols(); i++) {
+    int eqi = i + Eq.cols();
     MSK_putbound(task, MSK_ACC_CON, eqi, MSK_BK_UP, -MSK_INFINITY, ib.elem(i, 0) / scale);
   }
   //specify objective: minimize
@@ -306,10 +306,10 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
     } else {
       assert(0);
     }
-    double *xx = new double[sol.rows()];
+    double *xx = new double[sol.cols()];
     MSK_getsolutionslice(task, MSK_SOL_ITR, MSK_SOL_ITEM_XX,
-                         0, sol.rows(), xx);
-    for (i = 0; i < sol.rows(); i++) {
+                         0, sol.cols(), xx);
+    for (i = 0; i < sol.cols(); i++) {
       sol.elem(i, 0) = scale * xx[i];
       DBGP("x" << i << ": " << xx[i]);
     }

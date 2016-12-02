@@ -2022,7 +2022,7 @@ DynamicBody::addForceAtPos(vec3 force, position pos)
 {
   vec3 worldTorque;
   vec3 worldPos;
-  worldPos = (pos - Tran.applyTransform(CoG));
+  worldPos = (pos - Tran * (CoG));
 
   worldTorque = worldPos.cross(force);
   extWrenchAcc[0] += force[0];
@@ -2303,7 +2303,7 @@ Link::getProximalJointAxis()
 {
   int jointNum = owner->getChain(chainNum)->getLastJoint(linkNum);
   Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
-  vec3 r = j->getTran().inverse().applyRotation(vec3(0, 0, 1));
+  vec3 r = j->getTran().inverse().affine() * (vec3(0, 0, 1));
   return r;
 }
 

@@ -717,13 +717,13 @@ grasp_planner::localToGlobalCoordinates(std::list<plannedGrasp *> &graspList,
     //ATM: This silliness is necessary because Steffen used a vec3 for both
     //the grasp point and grasp dir
     position graspPos = (*it)->get_graspDirection().get_point().mvec + position::Zero();
-    cgd.set_point(coordinates(primTran.applyTransform(graspPos)  - position::Zero()));
+    cgd.set_point(coordinates(primTran * (graspPos)  - position::Zero()));
 
-    cgd.set_dir(coordinates(primTran.applyRotation((*it)->get_graspDirection().get_dir().mvec)));
+    cgd.set_dir(coordinates(primTran.affine() * ((*it)->get_graspDirection().get_dir().mvec)));
 
     // update both the grasp direction and finger direction
     (*it)->set_graspDirection(cgd);
-    (*it)->set_fixedFingerDirection(primTran.applyRotation((*it)->get_fixedFingerDirection().mvec));
+    (*it)->set_fixedFingerDirection(cartesian_coordinates(primTran.affine() * ((*it)->get_fixedFingerDirection().mvec)));
   }
 }
 

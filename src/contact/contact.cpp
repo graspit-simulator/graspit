@@ -123,8 +123,8 @@ Contact::~Contact()
 */
 void Contact::wrenchFromFrictionEdge(double *edge, const vec3 &radius, Wrench *wr)
 {
-  vec3 tangentX = frame.affine().row(0);
-  vec3 tangentY = frame.affine().row(1);
+  vec3 tangentX = frame.affine().col(0);
+  vec3 tangentY = frame.affine().col(1);
 
   GraspableBody *object = (GraspableBody *)body1;
 
@@ -389,8 +389,31 @@ Contact::localToWorldWrenchBlockMatrix(const std::list<Contact *> &contacts)
 */
 bool Contact::preventsMotion(const transf &motion) const
 {
-  if ((motion.applyTransform(loc)- loc).dot(normal) < -MACHINE_ZERO) { return true; }
-  return false;
+  std::cout << "normal" << std::endl;
+  std::cout << normal.x() << std::endl;
+  std::cout << normal.y() << std::endl;
+  std::cout << normal.z() << std::endl;
+
+  std::cout << "loc" << std::endl;
+  std::cout << loc.x() << std::endl;
+  std::cout << loc.y() << std::endl;
+  std::cout << loc.z() << std::endl;
+
+  std::cout << "(motion)" << std::endl;
+  std::cout << motion << std::endl;
+
+  std::cout << "((motion * loc) - loc)" << std::endl;
+  std::cout << ((motion * loc) - loc).x() << std::endl;
+  std::cout << ((motion * loc) - loc).y() << std::endl;
+  std::cout << ((motion * loc) - loc).z() << std::endl;
+
+  std::cout << "((motion * loc) - loc).dot(normal)" << std::endl;
+  std::cout << ((motion * loc) - loc).dot(normal) << std::endl;
+
+  bool result = ((motion * loc) - loc).dot(normal) > MACHINE_ZERO;
+  std::cout << "result" << std::endl;
+  std::cout << result << std::endl;
+  return result;
 }
 
 

@@ -22,9 +22,12 @@ transf::TRANSLATION(const vec3 &v)
 */
 transf
 transf::AXIS_ANGLE_ROTATION(double angle, const vec3 &axis)
-{
-
-  Eigen::AngleAxisd aa = Eigen::AngleAxisd(angle, axis);
+{     
+  if(angle*angle < 0.000001)
+    {
+      return transf::IDENTITY;
+    }
+  Eigen::AngleAxisd aa = Eigen::AngleAxisd(angle, axis.normalized());
   Quaternion q(aa);
   return transf(q, vec3::Zero());
 }
@@ -40,28 +43,22 @@ transf::COORDINATE(const position &o, const vec3 &xaxis, const vec3 &yaxis)
   vec3 newzaxis = (newxaxis.cross(yaxis)).normalized();
   vec3 newyaxis = (newzaxis.cross(newxaxis)).normalized();
   mat3 m;
-  m.row(0) = newxaxis;
-  m.row(1) = newyaxis;
-  m.row(2) = newzaxis;
+  m.col(0) = newxaxis;
+  m.col(1) = newyaxis;
+  m.col(2) = newzaxis;
   return transf(m, o);
 }
 
 transf transf::RPY(double rx, double ry, double rz)
 {
-  transf r;
 
-  vec3 x = vec3::UnitX();
-  vec3 y = vec3::UnitY();
-  vec3 z = vec3::UnitZ();
+  Eigen::AngleAxisd rollAngle(rx, Eigen::Vector3d::UnitZ());
+  Eigen::AngleAxisd yawAngle(ry, Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd pitchAngle(rz, Eigen::Vector3d::UnitX());
 
-  r = transf::AXIS_ANGLE_ROTATION(rx, x);
-  y = r.inverse().applyRotation(y);
+  Eigen::Quaternion<double> q = rollAngle * yawAngle * pitchAngle;
 
-  r = r % transf::AXIS_ANGLE_ROTATION(ry, y);
-  z = r.inverse().applyRotation(z);
-
-  r = r % transf::AXIS_ANGLE_ROTATION(rz, z);
-
+  transf r = transf(q, vec3(0,0,0));
   return r;
 }
 
@@ -165,18 +162,9 @@ operator%(const transf &tr1, const transf &tr2)
  * returns the vector under transformation tr
 */
 vec3
-transf::applyTransform(const vec3 &v) const
+operator*(const transf &tr1, const vec3 &v)
 {
-  return rot * v + t;
-}
-
-/*!
-  Returns a vector that is the result of rotating vector \a v using transform
-  \a tr.
-*/
-vec3 transf::applyRotation(const vec3 &v)const
-{
-  return rot * v;
+  return tr1.rot * v + tr1.t;
 }
 
 

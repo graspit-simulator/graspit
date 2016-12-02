@@ -38,7 +38,7 @@ pointBoxDistanceSq(const BoundingBox &box, const position &p)
 
   double sqDist = 0.0;
   for (int i = 0; i < 3; i++) {
-    double d = v.dot(RMat.row(i));
+    double d = v.dot(RMat.col(i));
     double excess = 0.0;
     // Project vector from box center to p on each axis, getting the distance
     // of p along that axis, and count any excess distance outside box extents
@@ -68,12 +68,12 @@ closestPtBbox(const BoundingBox &bbox, const position &p)
   for (int i = 0; i < 3; i++) {
     // project d onto that axis to get the distance
     // along the axis of d from the box center
-    double dist = d.dot(RMat.row(i));
+    double dist = d.dot(RMat.col(i));
     // If distance farther than the box extents, clamp to the box
     if (dist > bbox.halfSize[i]) { dist = bbox.halfSize[i]; }
     if (dist < -bbox.halfSize[i]) { dist = -bbox.halfSize[i]; }
     // Step that distance along the axis to get world coordinate
-    q += dist * RMat.row(i);
+    q += dist * RMat.col(i);
   }
   return position(q.x(), q.y(), q.z());
 }
@@ -96,7 +96,7 @@ bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2T
   double B[3][3];
   for (i = 0; i < 3 ; i++) {
     for (k = 0; k < 3 ; k++) {
-      B[i][k] = RMat(k, i);
+      B[i][k] = RMat(i, k);
     }
   }
 
@@ -277,7 +277,7 @@ double bboxDistanceSq(const BoundingBox &bb1, const BoundingBox &bb2, const tran
   double B[3][3];
   for (i = 0; i < 3 ; i++) {
     for (k = 0; k < 3 ; k++) {
-      B[i][k] = RMat(k, i);
+      B[i][k] = RMat(i, k);
     }
   }
 

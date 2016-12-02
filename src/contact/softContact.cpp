@@ -39,7 +39,7 @@ SoftContact::SoftContact(Body *b1, Body *b2, position pos, vec3 norm,
     //places bodyNghbd in frame of contact with the z-axis pointing out
     //bodyNghbd[i] = frame.affine().inverse() * ( temp - frame.translation() );
     position posit;
-    posit = frame.inverse().applyRotation(temp) ;
+    posit = frame.inverse().affine() * (temp) ;
     bodyNghbd[i] = posit;
     i++;
   }
@@ -150,8 +150,8 @@ void SoftContact::computeWrenches()
   numFCWrenches = 4 * numFrictionEdges;
   wrench = new Wrench[numFCWrenches];
 
-  vec3 tangentX = frame.affine().row(0);
-  vec3 tangentY = frame.affine().row(1);
+  vec3 tangentX = frame.affine().col(0);
+  vec3 tangentY = frame.affine().col(1);
 
   vec3 radius;
   vec3 baseRadius = loc - ((GraspableBody *)body1)->getCoG();
@@ -208,15 +208,15 @@ int SoftContact::CalcRelPhi()
   temp.y() = 0.0;
   temp.z() = 0.0;
   t = fitRot * temp;
-  R11 = frame.applyRotation(t);
-  R11 = body1->getTran().applyRotation(R11);
+  R11 = frame.affine() * (t);
+  R11 = body1->getTran().affine() * (R11);
 
   temp.x() = 1;
   temp.y() = 0.0;
   temp.z() = 0.0;
   t = ((SoftContact *)getMate())->fitRot * temp;
-  R12 = ((SoftContact *)getMate())->frame.applyRotation(t);
-  R12 = body2->getTran().applyRotation(R12);
+  R12 = ((SoftContact *)getMate())->frame.affine() * (t);
+  R12 = body2->getTran().affine() * (R12);
 
   relPhi = acos((R11.dot(R12)) / (R11.norm() * R12.norm()));
   ((SoftContact *)getMate())->relPhi = relPhi ;

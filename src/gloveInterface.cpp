@@ -1047,8 +1047,8 @@ double GloveInterface::getPoseError(vec3 *error, position *thumbLocation)
     *thumbLocation = p1;
   }
 
-  p1 = mRobot->getChain(4)->getTran().inverse().applyTransform(thumbTip->getTran().applyTransform(p1));
-  p2 = mRobot->getChain(4)->getTran().inverse().applyTransform(indexTip->getTran().applyTransform(p2));
+  p1 = mRobot->getChain(4)->getTran().inverse() * (thumbTip->getTran() * (p1));
+  p2 = mRobot->getChain(4)->getTran().inverse() * (indexTip->getTran() * (p2));
   measuredVector = p2 - p1;
 
   expectedVector = (measuredVector).normalized();

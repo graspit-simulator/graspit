@@ -46,11 +46,17 @@ class transf {
       \a d */
     void set(const Quaternion &r, const vec3 &d) {
       rot = r; t = d; R = rot.toRotationMatrix();
+      //R = R.transpose(); //this will do what graspit used to do
     }
 
     /*! Sets value of the transform with the rotation \a r and the translation
       \a d */
-    void set(const mat3 &r, const vec3 &d) { rot = r; t = d; R = r;}
+    void set(const mat3 &r, const vec3 &d)
+    {
+      rot = r;
+      //rot = r.transpose(); //this will do what graspit used to do
+      t = d; R = r;
+    }
 
     void set(const SoTransform *IVt);
 
@@ -78,13 +84,10 @@ class transf {
     /*! Returns the negation of the == operator. */
     bool operator!=(transf const &tr) const {return !operator==(tr);}
 
-    vec3 applyTransform(const vec3 &v) const;
-
-    vec3 applyRotation(const vec3 &v) const;
-
     friend std::istream &operator>>(std::istream &is, transf &tr);
     friend std::ostream &operator<<(std::ostream &os, const transf &tr);
     friend transf operator%(const transf &tr1, const transf &tr2);
+    friend vec3 operator*(const transf &tr1, const vec3 &v);
 
     static const transf IDENTITY;
 

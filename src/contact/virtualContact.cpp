@@ -105,19 +105,19 @@ void VirtualContact::changeFrame(transf tr)
 {
   frame = tr;
   loc = tr.translation();
-  normal = tr.applyRotation(vec3(0, 0, 1));
+  normal = tr.affine() * vec3(0, 0, 1);
 }
 
 position
 VirtualContact::getWorldLocation()
 {
-  return body1->getTran().applyTransform(loc);
+  return body1->getTran() * loc;
 }
 
 vec3
 VirtualContact::getWorldNormal()
 {
-  return body1->getTran().applyRotation(normal);
+  return body1->getTran().affine() * normal;
 }
 
 /*! The virtual contact, for now, does not compute its own friction
@@ -164,8 +164,8 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
     worldLoc = getWorldLocation();
     worldNormal = getWorldNormal();
     transf worldFrame = body1->getTran() % frame;
-    tangentX = worldFrame.affine().row(0);
-    tangentY = worldFrame.affine().row(1);
+    tangentX = worldFrame.affine().col(0);
+    tangentY = worldFrame.affine().col(1);
   } else {
     //    LOOK AT VIRTUAL CONTACT ON THE HAND
     worldLoc = getWorldLocation();
