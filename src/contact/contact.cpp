@@ -55,7 +55,7 @@
 //#define GRASPITDBG
 #include "debug.h"
 
-const double Contact::THRESHOLD = 0.1;
+const double Contact::THRESHOLD = 0.2;
 const double Contact::INHERITANCE_THRESHOLD = 1;
 const double Contact::INHERITANCE_ANGULAR_THRESHOLD = 0.984; //cosine of 10 degrees
 
