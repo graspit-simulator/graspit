@@ -57,6 +57,7 @@
 #endif
 
 //#define GRASPITDBG
+//#define LEMKE_DBG
 #include "debug.h"
 
 extern FILE *debugfile;
@@ -108,29 +109,16 @@ void buildForceTransform(transf &T, vec3 &p, double *transformMat)
   static vec3 radius;
 
   R[0] = T.affine()(0, 0);
-  R[1] = T.affine()(0, 1);
-  R[2] = T.affine()(0, 2);
+  R[1] = T.affine()(1, 0);
+  R[2] = T.affine()(2, 0);
 
-  R[3] = T.affine()(1, 0);
+  R[3] = T.affine()(0, 1);
   R[4] = T.affine()(1, 1);
-  R[5] = T.affine()(1, 2);
+  R[5] = T.affine()(2, 1);
 
-  R[6] = T.affine()(2, 0);
-  R[7] = T.affine()(2, 1);
+  R[6] = T.affine()(0, 2);
+  R[7] = T.affine()(1, 2);
   R[8] = T.affine()(2, 2);
-  /*
-    R[0] = T.affine().element(0,0);
-    R[1] = T.affine().element(1,0);
-    R[2] = T.affine().element(2,0);
-
-    R[3] = T.affine().element(0,1);
-    R[4] = T.affine().element(1,1);
-    R[5] = T.affine().element(2,1);
-
-    R[6] = T.affine().element(0,2);
-    R[7] = T.affine().element(1,2);
-    R[8] = T.affine().element(2,2);
-  */
 
   for (j = 0; j < 9; j++)
     if (fabs(R[j]) < MACHINE_ZERO) { R[j] = 0.0; }
@@ -209,6 +197,14 @@ moveBodies(int numBodies, std::vector<DynamicBody *> bodyVec, double h)
     memcpy(currq, bodyVec[bn]->getPos(), 7 * sizeof(double));
     memcpy(currv, bodyVec[bn]->getVelocity(), 6 * sizeof(double));;
 
+#ifdef GRASPITDBG
+    fprintf(stdout, "object %s old velocity: \n", bodyVec[bn]->getName().latin1());
+    for (int i = 0; i < 6; i++) { fprintf(stdout, "%le   ", currv[i]); }
+    printf("\n");
+    fprintf(stdout, "object %s old position: \n", bodyVec[bn]->getName().latin1());
+    for (int i = 0; i < 7; i++) { fprintf(stdout, "%le   ", currq[i]); }
+#endif
+
     Quaternion tmpQuat(currq[3], currq[4], currq[5], currq[6]);
     Rot = tmpQuat.toRotationMatrix();
 
@@ -216,9 +212,9 @@ moveBodies(int numBodies, std::vector<DynamicBody *> bodyVec, double h)
     // a graphics style rot matrix (new axes are in rows), the R_N_B matrix
     // is a robotics style rot matrix (new axes in columns)
 
-    R_N_B[0] = Rot(0);  R_N_B[3] = Rot(1);  R_N_B[6] = Rot(2);
-    R_N_B[1] = Rot(3);  R_N_B[4] = Rot(4);  R_N_B[7] = Rot(5);
-    R_N_B[2] = Rot(6);  R_N_B[5] = Rot(7);  R_N_B[8] = Rot(8);
+    R_N_B[0] = Rot(0);  R_N_B[3] = Rot(3);  R_N_B[6] = Rot(6);
+    R_N_B[1] = Rot(1);  R_N_B[4] = Rot(4);  R_N_B[7] = Rot(7);
+    R_N_B[2] = Rot(2);  R_N_B[5] = Rot(5);  R_N_B[8] = Rot(8);
 
     // B relates the angular velocity of the body (expressed in
     // the body frame) to the time derivative of the Euler parameters
@@ -515,9 +511,9 @@ iterateDynamics(std::vector<Robot *> robotVec,
     // a graphics style rot matrix (new axes are in rows), the R_N_B matrix
     // is a robotics style rot matrix (new axes in columns)
 
-    R_N_B[0] = Rot(0);  R_N_B[3] = Rot(1);  R_N_B[6] = Rot(2);
-    R_N_B[1] = Rot(3);  R_N_B[4] = Rot(4);  R_N_B[7] = Rot(5);
-    R_N_B[2] = Rot(6);  R_N_B[5] = Rot(7);  R_N_B[8] = Rot(8);
+    R_N_B[0] = Rot(0);  R_N_B[3] = Rot(3);  R_N_B[6] = Rot(6);
+    R_N_B[1] = Rot(1);  R_N_B[4] = Rot(4);  R_N_B[7] = Rot(7);
+    R_N_B[2] = Rot(2);  R_N_B[5] = Rot(5);  R_N_B[8] = Rot(8);
 
     // Jcg_N = R_N_B * Jcg_B * R_N_B';
     // where Jcg_B is inertia matrix in body coords
@@ -779,6 +775,14 @@ iterateDynamics(std::vector<Robot *> robotVec,
     dgemm("N", "N", Hcols, Hcols, Mrows, 1.0, HtM_i, Hcols, v1, Mrows, 1.0, A, Arows);
     //    dgemv("N",Hcols,Mrows,1.0,HtM_i,Hcols,v2,1,0.0,g,1);
     dgemv("N", Hcols, Mrows, 1.0, HtM_i, Hcols, v2, 1, 1.0, g, 1);
+    //DBGP("M_i:");//GOOD
+   // DBGST(disp_mat(stdout, M_i, 6*numBodies, 6*numBodies));
+    DBGP("A Early:");
+    DBGST(disp_mat(stdout, A, Arows, Arows));
+    DBGP("v1:");
+    DBGST(disp_mat(stdout, v1, Hrows, Hcols));
+    //DBGP("HtM_i:");//GOOD
+    //DBGST(disp_mat(stdout, HtM_i, Hcols, Mrows));
   }
 
   int frictionEdgesCount;
@@ -786,14 +790,6 @@ iterateDynamics(std::vector<Robot *> robotVec,
 
   if (numContacts || numDOFLimits) {
     bool lemkePredict = false;
-    if (lemkePredict) {
-      //try to use information from previous time steps to guess a good starting basis for Lemke's algorithm
-      assembleLCPPrediction(lambda, Arows, numDOFLimits, &contactList);
-      predLambda = new double[Arows];  // keep a copy of the prediction so we can check it later
-      dcopy(Arows, lambda, 1, predLambda, 1);
-      //      fprintf(stderr,"Prediction: \n");
-      //      printLCPBasis(predLambda, Arows, numDOFLimits, numContacts);
-    }
 
     //    double startTime;
     //    startTime = getTime();
@@ -805,7 +801,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
     double CFM = 0.0;
     int lcperr = 1, lcpIter;
     while (CFM < 1.0e-7) {
-      lcperr = myLemke(A, Arows, g, lambda, lemkePredict, false, lcpIter);
+      lcperr = myLemke(A, Arows, g, lambda, lemkePredict, true, lcpIter);
       if (!lcperr) { break; }
       if (CFM == 0) { CFM = 1.0e-11; }
       else { CFM *= 10.0; }

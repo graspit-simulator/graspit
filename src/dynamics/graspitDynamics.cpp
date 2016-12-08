@@ -127,16 +127,16 @@ double GraspitDynamics::moveDynamicBodies(double timeStep) {
     if (numCols) {
       std::cout << "COLLIDE!" << std::endl;
       for (i = 0; i < numCols; i++) {
-        std::cout << colReport[i].first->getName() << " collided with " <<
-                  colReport[i].second->getName() << std::endl;
+        std::cout << colReport[i].first->getName().toStdString().c_str() << " collided with " <<
+                  colReport[i].second->getName().toStdString().c_str() << std::endl;
       }
 
       for (i = 0; i < numCols; i++) {
-        tmpDist = getDist(colReport[i].first, colReport[i].second);
+        tmpDist = mWorld->getDist(colReport[i].first, colReport[i].second);
         if (tmpDist < minDist) { minDist = tmpDist; }
         std::cout << "minDist: " << tmpDist << " between " << std::endl;
-        std::cout << colReport[i].first->getName() << " and " <<
-                  colReport[i].second->getName() << std::endl;
+        std::cout << colReport[i].first->getName().toStdString().c_str() << " and " <<
+                  colReport[i].second->getName().toStdString().c_str() << std::endl;
       }
     }
 #endif
@@ -175,13 +175,14 @@ double GraspitDynamics::moveDynamicBodies(double timeStep) {
           tmpDist = mWorld->getDist(colReport[i].first, colReport[i].second);
           if (tmpDist < minDist) {
             minDist = tmpDist;
-            min_body_1 = colReport[i].first->getName().latin1();
-            min_body_2 = colReport[i].second->getName().latin1();
-            DBGP("minDist: " << minDist << " between " << colReport[i].first->getName() <<
-                 " and " << colReport[i].second->getName());
+            min_body_1 = colReport[i].first->getName().toStdString().c_str();
+            min_body_2 = colReport[i].second->getName().toStdString().c_str();
+            DBGP("minDist: " << minDist << " between " << colReport[i].first->getName().toStdString().c_str() <<
+                 " and " << colReport[i].second->getName().toStdString().c_str());
           }
         }
       }
+
 
       if (jointLimitHit) {
         dofLimitDist = 1.0e10;
@@ -223,15 +224,15 @@ double GraspitDynamics::moveDynamicBodies(double timeStep) {
 
 #ifdef GRASPITDBG
   std::cout << "CHECKING COLLISIONS AT MIDDLE OF STEP: ";
-  numCols = getCollisionReport(colReport);
+  numCols = mWorld->getCollisionReport(&colReport);
 
   if (!numCols) {
     std::cout << "None." << std::endl;
   } else {
     std::cout << numCols << " found!!!" << std::endl;
     for (i = 0; i < numCols; i++) {
-      std::cout << colReport[i].first->getName() << " collided with " <<
-                colReport[i].second->getName() << std::endl;
+      std::cout << colReport[i].first->getName().toStdString().c_str() << " collided with " <<
+                colReport[i].second->getName().toStdString().c_str() << std::endl;
     }
   }
 #endif
@@ -333,12 +334,12 @@ int GraspitDynamics::computeNewVelocities(double timeStep) {
     int numIslandRobots = islandRobots.size();
     std::cout << "Island " << ++islandCount << " Bodies: ";
     for (i = 0; i < numDynBodies; i++) {
-      std::cout << dynIsland[i]->getName() << " ";
+      std::cout << dynIsland[i]->getName().toStdString().c_str() << " ";
     }
     std::cout << std::endl;
     std::cout << "Island Robots" << islandCount << " Robots: ";
     for (i = 0; i < numIslandRobots; i++) {
-      std::cout << islandRobots[i]->getName() << " ";
+      std::cout << islandRobots[i]->getName().toStdString().c_str() << " ";
     }
     std::cout << std::endl << std::endl;
 #endif
