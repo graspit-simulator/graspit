@@ -44,6 +44,13 @@ find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+if(NOT EIGEN3_FOUND)
+  # Fallback to cmake_modules
+  find_package(Eigen REQUIRED)
+  set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
+  set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
+  # ...
+endif()
 
 if (DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
 
