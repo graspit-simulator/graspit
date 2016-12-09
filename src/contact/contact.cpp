@@ -389,30 +389,7 @@ Contact::localToWorldWrenchBlockMatrix(const std::list<Contact *> &contacts)
 */
 bool Contact::preventsMotion(const transf &motion) const
 {
-  std::cout << "normal" << std::endl;
-  std::cout << normal.x() << std::endl;
-  std::cout << normal.y() << std::endl;
-  std::cout << normal.z() << std::endl;
-
-  std::cout << "loc" << std::endl;
-  std::cout << loc.x() << std::endl;
-  std::cout << loc.y() << std::endl;
-  std::cout << loc.z() << std::endl;
-
-  std::cout << "(motion)" << std::endl;
-  std::cout << motion << std::endl;
-
-  std::cout << "((motion * loc) - loc)" << std::endl;
-  std::cout << ((motion * loc) - loc).x() << std::endl;
-  std::cout << ((motion * loc) - loc).y() << std::endl;
-  std::cout << ((motion * loc) - loc).z() << std::endl;
-
-  std::cout << "((motion * loc) - loc).dot(normal)" << std::endl;
-  std::cout << ((motion * loc) - loc).dot(normal) << std::endl;
-
   bool result = ((motion * loc) - loc).dot(normal) > MACHINE_ZERO;
-  std::cout << "result" << std::endl;
-  std::cout << result << std::endl;
   return result;
 }
 

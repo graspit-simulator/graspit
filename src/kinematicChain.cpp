@@ -619,23 +619,12 @@ KinematicChain::infinitesimalMotion(const double *jointVals, std::vector<transf>
   }
   //compute infinitesimal motion
   Matrix dm(6 * numLinks, 1);
-  std::cout << "J" << J << std::endl;
-  std::cout << "theta" << theta << std::endl;
   matrixMultiply(J, theta, dm);
-  std::cout << "dm" << dm << std::endl;
   //and convert it to transforms
   for (int l = 0; l < numLinks; l++) {
     transf translate = transf::TRANSLATION(vec3(dm.elem(6 * l + 0, 0), dm.elem(6 * l + 1, 0), dm.elem(6 * l + 2, 0))) ;
-    std::cout << "rpy" << std::endl;
-    std::cout <<  dm.elem(6 * l + 3, 0) << " " <<  dm.elem(6 * l + 4, 0) << " " << dm.elem(6 * l + 5, 0) << std::endl;
     transf rotate = transf::RPY(dm.elem(6 * l + 3, 0), dm.elem(6 * l + 4, 0), dm.elem(6 * l + 5, 0));
     transf tr = translate % rotate ;
-    std::cout << "translate" << std::endl;
-    std::cout << translate << std::endl;
-    std::cout << "rotate" << std::endl;
-    std::cout << rotate << std::endl;
-    std::cout << "tr" << std::endl;
-    std::cout << tr << std::endl;
     newLinkTranVec[l] = tr;
   }
 }

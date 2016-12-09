@@ -57,7 +57,7 @@
 #include "dmalloc.h"
 #endif
 
-#define GRASPITDBG
+//#define GRASPITDBG
 #include "debug.h"
 
 #define PROF_ENABLED
