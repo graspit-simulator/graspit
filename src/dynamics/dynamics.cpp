@@ -801,7 +801,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
     double CFM = 0.0;
     int lcperr = 1, lcpIter;
     while (CFM < 1.0e-7) {
-      lcperr = myLemke(A, Arows, g, lambda, lemkePredict, true, lcpIter);
+      lcperr = myLemke(A, Arows, g, lambda, lemkePredict, false, lcpIter);
       if (!lcperr) { break; }
       if (CFM == 0) { CFM = 1.0e-11; }
       else { CFM *= 10.0; }
