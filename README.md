@@ -41,7 +41,7 @@ Distribution Contents
 Examples of How to Integrate GraspIt! into your own Project
 ---------------------
 
-https://github.com/JenniferBuehler/graspit-pkgs <br />
 https://github.com/curg/graspit_interface <br />
+https://github.com/JenniferBuehler/graspit-pkgs <br />
 https://github.com/ros-interactive-manipulation/graspit_simulator <br />
 https://github.com/OSUrobotics/graspit_ros_plannings <br />
