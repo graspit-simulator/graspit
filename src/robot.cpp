@@ -280,15 +280,18 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       return FAILURE;
     }
     vec3 zdir = vec3(locX, locY, locZ);
-    zdir = normalise(zdir);
+    zdir = zdir.normalized();
 
     vec3 xdir;
-    if (fabs(zdir % vec3(1, 0, 0)) > 0.9) { xdir = vec3(0, 1, 0); }
+    if (fabs(zdir.dot(vec3(1, 0, 0))) > 0.9) { xdir = vec3(0, 1, 0); }
     else { xdir = vec3(1, 0, 0); }
-    vec3 ydir = zdir * xdir;
-    xdir = ydir * zdir;
+    vec3 ydir = zdir.cross(xdir);
+    xdir = ydir.cross(zdir);
 
-    mat3 r(xdir, ydir, zdir);
+    mat3 r;
+    r.col(0) = xdir;
+    r.col(1) = ydir;
+    r.col(2) = zdir;
     approachTran.set(r, aPt);
   }
   addApproachGeometry();
@@ -832,18 +835,18 @@ Robot::invKinematics(const transf &targetPos, double *dofVals, int chainNum)
   DBGP("from: " << currentPos.translation().x() << " " <<
        currentPos.translation().y() << " " <<
        currentPos.translation().z() << " " <<
-       currentPos.rotation().w << " " <<
-       currentPos.rotation().x << " " <<
-       currentPos.rotation().y << " " <<
-       currentPos.rotation().z);
+       currentPos.rotation().w() << " " <<
+       currentPos.rotation().x() << " " <<
+       currentPos.rotation().y() << " " <<
+       currentPos.rotation().z());
 
   DBGP("to: " << targetPos.translation().x() << " " <<
        targetPos.translation().y() << " " <<
        targetPos.translation().z() << " " <<
-       targetPos.rotation().w << " " <<
-       targetPos.rotation().x << " " <<
-       targetPos.rotation().y << " " <<
-       targetPos.rotation().z);
+       targetPos.rotation().w() << " " <<
+       targetPos.rotation().x() << " " <<
+       targetPos.rotation().y() << " " <<
+       targetPos.rotation().z());
 
   int safeguard = 0;
   while (++safeguard < safeGuardUpperBound) {
@@ -857,18 +860,18 @@ Robot::invKinematics(const transf &targetPos, double *dofVals, int chainNum)
 
     vec3 v1, v2;
     mat3 m1, m2;
-    currentPos.rotation().ToRotationMatrix(m1);
-    targetPos.rotation().ToRotationMatrix(m2);
+    m1 = currentPos.rotation().toRotationMatrix();
+    m2 = targetPos.rotation().toRotationMatrix();
 
-    v1 = vec3(m1.element(0, 0), m1.element(0, 1), m1.element(0, 2));
-    v2 = vec3(m2.element(0, 0), m2.element(0, 1), m2.element(0, 2));
-    dtOrientation = v1 * v2;
-    v1 = vec3(m1.element(1, 0), m1.element(1, 1), m1.element(1, 2));
-    v2 = vec3(m2.element(1, 0), m2.element(1, 1), m2.element(1, 2));
-    dtOrientation += v1 * v2;
-    v1 = vec3(m1.element(2, 0), m1.element(2, 1), m1.element(2, 2));
-    v2 = vec3(m2.element(2, 0), m2.element(2, 1), m2.element(2, 2));
-    dtOrientation += v1 * v2;
+    v1 = vec3(m1(0, 0), m1(0, 1), m1(0, 2));
+    v2 = vec3(m2(0, 0), m2(0, 1), m2(0, 2));
+    dtOrientation = v1.cross(v2);
+    v1 = vec3(m1(1, 0), m1(1, 1), m1(1, 2));
+    v2 = vec3(m2(1, 0), m2(1, 1), m2(1, 2));
+    dtOrientation += v1.cross(v2);
+    v1 = vec3(m1(2, 0), m1(2, 1), m1(2, 2));
+    v2 = vec3(m2(2, 0), m2(2, 1), m2(2, 2));
+    dtOrientation += v1.cross(v2);
     dtOrientation *= 0.5;
 
     deltaPR.elem(0, 0) = dtLocation[0];
@@ -879,19 +882,19 @@ Robot::invKinematics(const transf &targetPos, double *dofVals, int chainNum)
     deltaPR.elem(5, 0) = dtOrientation[2];
 
     Matrix m = chainVec[chainNum]->actuatedJacobian(chainVec[chainNum]->linkJacobian(true));
-    Matrix jointJacobian = m.getSubMatrix(m.rows() - 6, 0, 6, chainVec[chainNum]->getNumJoints());
+    Matrix jointJacobian = m.getSubMatrix(m.cols() - 6, 0, 6, chainVec[chainNum]->getNumJoints());
     Matrix jointToDOFJacobian = getJacobianJointToDOF(chainNum);
-    Matrix DOFJacobian = Matrix(jointJacobian.rows(), jointToDOFJacobian.cols());
+    Matrix DOFJacobian = Matrix(jointJacobian.cols(), jointToDOFJacobian.cols());
     matrixMultiply(jointJacobian, jointToDOFJacobian, DOFJacobian);
 
-    /*    for(int i = 0; i < DOFJacobian.rows(); ++i){
+    /*    for(int i = 0; i < DOFJacobian.cols(); ++i){
           for(int j = 0; j < DOFJacobian.cols(); ++j){
             DBGA(DOFJacobian.elem(i,j) << " ");
           }
           std::cout << std::endl;
         }
 
-        for(int i = 0; i < deltaPR.rows(); ++i){
+        for(int i = 0; i < deltaPR.cols(); ++i){
           for(int j = 0; j < deltaPR.cols(); ++j){
             DBGA(deltaPR.elem(i,j) << " ");
           }
@@ -901,7 +904,7 @@ Robot::invKinematics(const transf &targetPos, double *dofVals, int chainNum)
     //underDeterminedSolveMPInv(DOFJacobian, deltaPR, deltaDOF);
     underDeterminedSolveQR(DOFJacobian, deltaPR, deltaDOF);
     /*    std::cout << "results: \n";
-        for(int i = 0; i < deltaDOF.rows(); ++i){
+        for(int i = 0; i < deltaDOF.cols(); ++i){
           for(int j = 0; j < deltaDOF.cols(); ++j){
             std::cout << deltaDOF.elem(i,j) << " ";
           }
@@ -983,8 +986,8 @@ Robot::simpleContactsPreventMotion(const transf &motion) const
   for (int i = 0; i < numChains; i++) {
     for (int j = 0; j < chainVec[i]->getNumLinks(); j++) {
       if (chainVec[i]->getLink(j)->getNumContacts()) {
-        baseToLink = chainVec[i]->getLink(j)->getTran() * base->getTran().inverse();
-        linkMotion = baseToLink * motion * baseToLink.inverse();
+        baseToLink = base->getTran().inverse() % chainVec[i]->getLink(j)->getTran();
+        linkMotion = baseToLink.inverse() % motion % baseToLink;
         if (chainVec[i]->getLink(j)->externalContactsPreventMotion(linkMotion)) {
           return true;
         }
@@ -992,8 +995,8 @@ Robot::simpleContactsPreventMotion(const transf &motion) const
     }
     // recursively check the motion for any robots attached to this chain
     for (int j = 0; j < chainVec[i]->getNumAttachedRobots(); j++) {
-      baseToLink = chainVec[i]->getAttachedRobot(j)->getBase()->getTran() * base->getTran().inverse();
-      linkMotion = baseToLink * motion * baseToLink.inverse();
+      baseToLink = base->getTran().inverse() % chainVec[i]->getAttachedRobot(j)->getBase()->getTran();
+      linkMotion = baseToLink.inverse() % motion % baseToLink;
       if (chainVec[i]->getAttachedRobot(j)->simpleContactsPreventMotion(linkMotion)) {
         return true;
       }
@@ -1027,7 +1030,7 @@ Robot::contactsPreventMotion(const transf &motion) const
   // if this robot is connected to another before it, try to do inv kinematics
   // and check if contacts on any of those links will prevent this motion
   if (parent) {
-    transf newTran = tranToParentEnd * motion * base->getTran(); // * parent->getBase()->getTran().inverse();
+    transf newTran = base->getTran() % motion % tranToParentEnd; // * parent->getBase()->getTran().inverse();
     KinematicChain *chain = parent->getChain(parentChainNum);
     std::vector<transf> parentTrVec(chain->getNumLinks());
     double *dofVals = new double[parent->getNumDOF()];
@@ -1042,7 +1045,7 @@ Robot::contactsPreventMotion(const transf &motion) const
 
     for (l = 0; l < chain->getNumLinks(); l++) {
       if (chain->getLink(l)->getNumContacts()) {
-        linkMotion = parentTrVec[l] * chain->getLink(l)->getTran().inverse();
+        linkMotion = chain->getLink(l)->getTran().inverse() % parentTrVec[l];
         if (chain->getLink(l)->contactsPreventMotion(linkMotion)) {
           return true;
         }
@@ -1103,7 +1106,7 @@ Robot::setTran(const transf &tr)
 {
   if (parent) {
     double *dofVals = new double[parent->getNumDOF()];
-    transf parentBaseToEnd = tranToParentEnd * tr;
+    transf parentBaseToEnd = tr % tranToParentEnd;
     if (parent->invKinematics(parentBaseToEnd, dofVals, parentChainNum) == FAILURE) {
       delete [] dofVals;
       return FAILURE;
@@ -1418,10 +1421,15 @@ Robot::getJointValuesFromDOF(const double *desiredDofVals, double *actualDofVals
     for (int d = 0; d < numDOF; d++) {
       //this check is now done by each DOF independently
       //if ( fabs(dofVals[d] - dofVec[d]->getVal()) < 1.0e-5) continue;
+      DBGP("dofVec[d]->getVal() " << dofVec[d]->getVal());
       if (dofVec[d]->accumulateMove(desiredDofVals[d], jointVals, stoppedJoints)) {
         moving = true;
+        DBGP("actualDofVals[d] " << actualDofVals[d]);
+        DBGP("desiredDofVals[d] " << desiredDofVals[d]);
         actualDofVals[d] = desiredDofVals[d];
         DBGP("DOF " << d << " is moving");
+        DBGP("actualDofVals[d] " << actualDofVals[d]);
+        DBGP("desiredDofVals[d] " << desiredDofVals[d]);
       } else {
         actualDofVals[d] = dofVec[d]->getVal();
       }
@@ -1440,6 +1448,7 @@ Robot::getJointValuesFromDOF(const double *desiredDofVals, double *actualDofVals
         transf motion = newLinkTran[l];
         if (link->contactsPreventMotion(motion)) {
           DBGP("Chain " << link->getChainNum() << " link " << link->getLinkNum() << " is blocked.");
+
           //we stop all joints that are in the same chain before the stopped link
           stopJointsFromLink(link, jointVals, stoppedJoints);
           done = false;
@@ -1453,6 +1462,7 @@ Robot::getJointValuesFromDOF(const double *desiredDofVals, double *actualDofVals
       DBGP("All movement OK; done.");
     }
   } while (!done);
+   DBGP("returning from getJointValuesFromDOF");
   return moving;
 }
 
@@ -1798,9 +1808,9 @@ along the approach direction.
 double
 Robot::getApproachDistance(Body *object, double maxDist)
 {
-  position p0 = position(0, 0, 0) * getApproachTran() * getTran();
+  position p0 = (getTran() % getApproachTran()) * (position(0, 0, 0));
   position p = p0;
-  vec3 app = vec3(0, 0, 1) * getApproachTran() * getTran();
+  vec3 app = (getTran() % getApproachTran()).affine() * (vec3(0, 0, 1));
   bool done = false;
   double totalDist = 0;
   vec3 direction;
@@ -1813,11 +1823,11 @@ Robot::getApproachDistance(Body *object, double maxDist)
     //current closest point on the object
     position pc = p; pc += direction;
     //and its direction rel. to approach direction
-    if (normalise(pc - p0) % app > 0.86) {
+    if ((pc - p0).normalized().dot(app) > 0.86) {
       done = true;
     }
     //advance along approach direction
-    double d = direction.len();
+    double d = direction.norm();
     totalDist += d;
     p += d * app;
     if (totalDist > maxDist) { done = true; }
@@ -2050,12 +2060,14 @@ Robot::generateCartesianTrajectory(const transf &startTr, const transf &endTr,
   vec3 newPos, axis;
   Quaternion newRot;
 
-  (endTr.rotation() * startTr.rotation().inverse()).ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa ((endTr.rotation() * startTr.rotation().inverse()).normalized());
+  angle = aa.angle();
+  axis = aa.axis();
 
   if (timeNeeded <= 0.0) {
     if (defaultTranslVel == 0.0 || defaultRotVel == 0.0) { return; }
     timeNeeded =
-      MAX((endTr.translation() - startTr.translation()).len() / defaultTranslVel,
+      MAX((endTr.translation() - startTr.translation()).norm() / defaultTranslVel,
           fabs(angle) / defaultRotVel);
   }
 
@@ -2084,7 +2096,7 @@ Robot::generateCartesianTrajectory(const transf &startTr, const transf &endTr,
       tpow *= t;
       dist += tpow * coeffs[j];
     }
-    newRot = Quaternion::Slerp(dist, startTr.rotation(), endTr.rotation());
+    newRot = startTr.rotation().slerp(dist, endTr.rotation());
     newPos = (1.0 - dist) * startTr.translation() + dist * endTr.translation();
     traj.push_back(transf(newRot, newPos));
   }
@@ -2408,7 +2420,7 @@ state that is collision-free.
 bool
 Hand::approachToContact(double moveDist, bool oneStep)
 {
-  transf newTran = translate_transf(vec3(0, 0, moveDist) * getApproachTran()) * getTran();
+  transf newTran = getTran() % transf::TRANSLATION(getApproachTran().affine() * (vec3(0, 0, moveDist)));
   bool result;
   if (oneStep) {
     result = moveTo(newTran, WorldElement::ONE_STEP, WorldElement::ONE_STEP);
@@ -2434,8 +2446,7 @@ Hand::findInitialContact(double moveDist)
 {
   CollisionReport colReport;
   while (myWorld->getCollisionReport(&colReport)) {
-    transf newTran = translate_transf(vec3(0, 0, -moveDist / 2.0) *
-                                      getApproachTran()) * getTran();
+    transf newTran = getTran() % transf::TRANSLATION(getApproachTran().affine() * (vec3(0, 0, -moveDist / 2.0)));
     setTran(newTran);
   }
   return approachToContact(moveDist, false);
@@ -2446,7 +2457,7 @@ Robot::getJacobianJointToDOF(int chainNum) {
   Matrix m = Matrix(chainVec[chainNum]->getNumJoints(), numDOF);
   //initialy they are irrelevant to each other
   m.setAllElements(0.0);
-  for (int i = 0; i < m.rows(); ++i) {
+  for (int i = 0; i < m.cols(); ++i) {
     //for each joint i
     m.elem(i, chainVec[chainNum]->getJoint(i)->getDOFNum()) = chainVec[chainNum]->getJoint(i)->getCouplingRatio();
   }

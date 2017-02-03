@@ -76,9 +76,9 @@ void TableCheckTask::start()
 
   //place the table in the right position
   //start way under the object
-  mTable->setTran(transf(Quaternion::IDENTITY, vec3(0.0, 0.0, -200.0)));
+  mTable->setTran(transf(Quaternion::Identity(), vec3(0.0, 0.0, -200.0)));
   //and move up until it touches the object
-  transf tr(Quaternion::IDENTITY, vec3(0.0, 0.0, 100.0));
+  transf tr(Quaternion::Identity(), vec3(0.0, 0.0, 100.0));
 
   World *world = graspitCore->getWorld();
   world->toggleCollisions(false, mHand, mTable);

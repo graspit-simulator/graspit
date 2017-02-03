@@ -266,7 +266,7 @@ Matrix::ROTATION(const mat3 &rot)
   Matrix R(3, 3);
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      R.elem(i, j) = rot.element(j, i);
+      R.elem(i, j) = rot(j, i);
     }
   }
   return R;

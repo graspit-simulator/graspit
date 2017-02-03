@@ -877,9 +877,9 @@ CompliantDOF::computeStaticJointTorques(double *jointTorques, double dofForce)
     //also propagate this to previous joint
     if (count == 1 || count == 3 || count == 5 || count == 7) {
       assert(pj);
-      vec3 axis1 = (*j)->getDynJoint()->getPrevLink()->getTran().affine().row(2);
-      vec3 axis2 =   pj->getDynJoint()->getPrevLink()->getTran().affine().row(2);
-      double t = fabs(axis1 % axis2);
+      vec3 axis1 = (*j)->getDynJoint()->getPrevLink()->getTran().affine().col(2);
+      vec3 axis2 =   pj->getDynJoint()->getPrevLink()->getTran().affine().col(2);
+      double t = fabs(axis1.dot(axis2));
       //todo what about non-revolute joints, complex kinematic chains, etc...
       jointTorques[pj->getNum()] += springTorque * t;
     }
@@ -1033,7 +1033,7 @@ CompliantDOF::setForce(double f)
     //joint location in body coordinates
     vec3 bodyJoint = (*j)->dynJoint->getNextTrans().translation();
     //vector from joint location to body cog in body coordinates
-    vec3 cog = (body->getCoG()  - position::ORIGIN) - bodyJoint;
+    vec3 cog = (body->getCoG()  - position::Zero()) - bodyJoint;
     //joint axis in body coordinates
     vec3 axis = (*j)->getWorldAxis() * body->getTran().inverse();
     //force is cross product of the two, scaled to desired force magnitude

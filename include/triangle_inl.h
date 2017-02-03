@@ -50,12 +50,12 @@ project6(const vec3 &ax,
          const vec3 &p1, const vec3 &p2, const vec3 &p3,
          const vec3 &q1, const vec3 &q2, const vec3 &q3)
 {
-  double P1 = ax % p1;
-  double P2 = ax % p2;
-  double P3 = ax % p3;
-  double Q1 = ax % q1;
-  double Q2 = ax % q2;
-  double Q3 = ax % q3;
+  double P1 = ax.dot(p1);
+  double P2 = ax.dot(p2);
+  double P3 = ax.dot(p3);
+  double Q1 = ax.dot(q1);
+  double Q2 = ax.dot(q2);
+  double Q3 = ax.dot(q3);
 
   double mx1 = gmax(P1, P2, P3);
   double mn1 = gmin(P1, P2, P3);
@@ -98,25 +98,25 @@ bool triangleIntersection(const Triangle &t1, const Triangle &t2)
   f2[0] = q3[0] - q2[0];  f2[1] = q3[1] - q2[1];  f2[2] = q3[2] - q2[2];
   f3[0] = q1[0] - q3[0];  f3[1] = q1[1] - q3[1];  f3[2] = q1[2] - q3[2];
 
-  n1 = e1 * e2;
-  m1 = f1 * f2;
+  n1 = e1.cross(e2);
+  m1 = f1.cross(f2);
 
-  g1 = e1 * n1;
-  g2 = e2 * n1;
-  g3 = e3 * n1;
-  h1 = f1 * m1;
-  h2 = f2 * m1;
-  h3 = f3 * m1;
+  g1 = e1.cross(n1);
+  g2 = e2.cross(n1);
+  g3 = e3.cross(n1);
+  h1 = f1.cross(m1);
+  h2 = f2.cross(m1);
+  h3 = f3.cross(m1);
 
-  ef11 = e1 * f1;
-  ef12 = e1 * f2;
-  ef13 = e1 * f3;
-  ef21 = e2 * f1;
-  ef22 = e2 * f2;
-  ef23 = e2 * f3;
-  ef31 = e3 * f1;
-  ef32 = e3 * f2;
-  ef33 = e3 * f3;
+  ef11 = e1.cross(f1);
+  ef12 = e1.cross(f2);
+  ef13 = e1.cross(f3);
+  ef21 = e2.cross(f1);
+  ef22 = e2.cross(f2);
+  ef23 = e2.cross(f3);
+  ef31 = e3.cross(f1);
+  ef32 = e3.cross(f2);
+  ef33 = e3.cross(f3);
 
   // now begin the series of tests
 
@@ -152,14 +152,14 @@ position closestPtTriangle(const Triangle &t, const position &p)
   vec3 ab = t.v2 - t.v1;
   vec3 ac = t.v3 - t.v1;
   vec3 ap = p - t.v1;
-  double d1 = ab % ap;
-  double d2 = ac % ap;
+  double d1 = ab.dot(ap);
+  double d2 = ac.dot(ap);
   if (d1 <= 0.0f && d2 <= 0.0f) { return t.v1; } // barycentric coordinates (1,0,0)
 
   // Check if P in vertex region outside t.v2
   vec3 bp = p - t.v2;
-  double d3 = ab % bp;
-  double d4 = ac % bp;
+  double d3 = ab.dot(bp);
+  double d4 = ac.dot(bp);
   if (d3 >= 0.0f && d4 <= d3) { return t.v2; } // barycentric coordinates (0,1,0)
 
   // Check if P in edge region of AB, if so return projection of P onto AB
@@ -171,8 +171,8 @@ position closestPtTriangle(const Triangle &t, const position &p)
 
   // Check if P in vertex region outside t.v3
   vec3 cp = p - t.v3;
-  double d5 = ab % cp;
-  double d6 = ac % cp;
+  double d5 = ab.dot(cp);
+  double d6 = ac.dot(cp);
   if (d6 >= 0.0f && d5 <= d6) { return t.v3; } // barycentric coordinates (0,0,1)
 
   // Check if P in edge region of AC, if so return projection of P onto AC
@@ -214,9 +214,9 @@ inline double segmSegmDistanceSq(const position &p1, const position &q1,
   vec3 d1 = q1 - p1; // Direction vector of segment S1
   vec3 d2 = q2 - p2; // Direction vector of segment S2
   vec3 r = p1 - p2;
-  double a = d1 % d1; // Squared length of segment S1, always nonnegative
-  double e = d2 % d2; // Squared length of segment S2, always nonnegative
-  double f = d2 % r;
+  double a = d1.dot(d1); // Squared length of segment S1, always nonnegative
+  double e = d2.dot(d2); // Squared length of segment S2, always nonnegative
+  double f = d2.dot(r);
   double s, t;
 
   // Check if either or both segments degenerate into points
@@ -225,7 +225,7 @@ inline double segmSegmDistanceSq(const position &p1, const position &q1,
     s = t = 0.0f;
     c1 = p1;
     c2 = p2;
-    return (c1 - c2) % (c1 - c2);
+    return (c1 - c2).dot((c1 - c2));
   }
   if (a <= EPSILON) {
     // First segment degenerates into a point
@@ -233,14 +233,14 @@ inline double segmSegmDistanceSq(const position &p1, const position &q1,
     t = f / e; // s = 0 => t = (b*s + f) / e = f / e
     t = Clamp(t, 0.0f, 1.0f);
   } else {
-    double c = d1 % r;
+    double c = d1.dot(r);
     if (e <= EPSILON) {
       // Second segment degenerates into a point
       t = 0.0f;
       s = Clamp(-c / a, 0.0f, 1.0f); // t = 0 => s = (b*t - c) / a = -c / a
     } else {
       // The general nondegenerate case starts here
-      double b = d1 % d2;
+      double b = d1.dot(d2);
       double denom = a * e - b * b; // Always nonnegative
 
       // If segments not parallel, compute closest point on L1 to L2, and
@@ -268,7 +268,7 @@ inline double segmSegmDistanceSq(const position &p1, const position &q1,
 
   c1 = p1 + d1 * s;
   c2 = p2 + d2 * t;
-  return (c1 - c2) % (c1 - c2);
+  return (c1 - c2).dot((c1 - c2));
 }
 
 /*! Does all 6 vertex-face tests and all 9 edge-edge tests and adds to the report
@@ -291,19 +291,19 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p1 = closestPtTriangle(t1, t2.v1);
   p2 = t2.v1;
-  if (((p2 - p1) % (p2 - p1)) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     contactPoints->push_back(std::pair<position, position>(p1, p2));
   }
   //--
   p1 = closestPtTriangle(t1, t2.v2);
   p2 = t2.v2;
-  if (((p2 - p1) % (p2 - p1)) < threshSq) {
+  if (((p2 - p1).dot((p2 - p1))) < threshSq) {
     contactPoints->push_back(std::pair<position, position>(p1, p2));
   }
   //--
   p1 = closestPtTriangle(t1, t2.v3);
   p2 = t2.v3;
-  if (((p2 - p1) % (p2 - p1)) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     contactPoints->push_back(std::pair<position, position>(p1, p2));
   }
   //vertices on triangle 1 and face on triangle 2
@@ -311,7 +311,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //the vertices from triangle 2
   p2 = closestPtTriangle(t2, t1.v1);
   p1 = t1.v1;
-  if (((p2 - p1) % (p2 - p1)) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     if (!(p2 == t2.v1) && !(p2 == t2.v2) && !(p2 == t2.v3)) {
       contactPoints->push_back(std::pair<position, position>(p1, p2));
     }
@@ -319,7 +319,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p2 = closestPtTriangle(t2, t1.v2);
   p1 = t1.v2;
-  if (((p2 - p1) % (p2 - p1)) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     if (!(p2 == t2.v1) && !(p2 == t2.v2) && !(p2 == t2.v3)) {
       contactPoints->push_back(std::pair<position, position>(p1, p2));
     }
@@ -327,7 +327,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
   //--
   p2 = closestPtTriangle(t2, t1.v3);
   p1 = t1.v3;
-  if (((p2 - p1) % (p2 - p1)) < threshSq) {
+  if ((p2 - p1).dot((p2 - p1)) < threshSq) {
     if (!(p2 == t2.v1) && !(p2 == t2.v2) && !(p2 == t2.v3)) {
       contactPoints->push_back(std::pair<position, position>(p1, p2));
     }
@@ -406,7 +406,7 @@ triangleTriangleContact(const Triangle &t1, const Triangle &t2, double threshSq,
 double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
                                   position &p1, position &p2)
 {
-  if (triangleIntersection(t1, t2)) { return -1.0; }
+  if (triangleIntersection(t1, t2)) { return -1; }
 
   double dtmp, dmin;
   position tmp1, tmp2;
@@ -414,11 +414,11 @@ double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
   //--
   p1 = closestPtTriangle(t1, t2.v1);
   p2 = t2.v1;
-  dmin = (p2 - p1) % (p2 - p1);
+  dmin = (p2 - p1).dot((p2 - p1));
   //--
   tmp1 = closestPtTriangle(t1, t2.v2);
   tmp2 = t2.v2;
-  dtmp = (tmp2 - tmp1) % (tmp2 - tmp1);
+  dtmp = (tmp2 - tmp1).dot((tmp2 - tmp1));
   if (dtmp < dmin) {
     dmin = dtmp;
     p1 = tmp1; p2 = tmp2;
@@ -426,7 +426,7 @@ double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
   //--
   tmp1 = closestPtTriangle(t1, t2.v3);
   tmp2 = t2.v3;
-  dtmp = (tmp2 - tmp1) % (tmp2 - tmp1);
+  dtmp = (tmp2 - tmp1).dot((tmp2 - tmp1));
   if (dtmp < dmin) {
     dmin = dtmp;
     p1 = tmp1; p2 = tmp2;
@@ -434,7 +434,7 @@ double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
   //--
   tmp2 = closestPtTriangle(t2, t1.v1);
   tmp1 = t1.v1;
-  dtmp = (tmp2 - tmp1) % (tmp2 - tmp1);
+  dtmp = (tmp2 - tmp1).dot((tmp2 - tmp1));
   if (dtmp < dmin) {
     dmin = dtmp;
     p1 = tmp1; p2 = tmp2;
@@ -442,7 +442,7 @@ double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
   //--
   tmp2 = closestPtTriangle(t2, t1.v2);
   tmp1 = t1.v2;
-  dtmp = (tmp2 - tmp1) % (tmp2 - tmp1);
+  dtmp = (tmp2 - tmp1).dot((tmp2 - tmp1));
   if (dtmp < dmin) {
     dmin = dtmp;
     p1 = tmp1; p2 = tmp2;
@@ -450,7 +450,7 @@ double triangleTriangleDistanceSq(const Triangle &t1, const Triangle &t2,
   //--
   tmp2 = closestPtTriangle(t2, t1.v3);
   tmp1 = t1.v3;
-  dtmp = (tmp2 - tmp1) % (tmp2 - tmp1);
+  dtmp = (tmp2 - tmp1).dot((tmp2 - tmp1));
   if (dtmp < dmin) {
     dmin = dtmp;
     p1 = tmp1; p2 = tmp2;

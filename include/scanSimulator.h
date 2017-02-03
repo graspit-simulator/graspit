@@ -93,10 +93,7 @@ class ScanSimulator {
     ScanSimulator();
     void setPosition(transf tr, AxesConvention convention);
     void setPosition(position p, vec3 optical_axis, vec3 up_axis, AxesConvention convention);
-    void setPosition(vec3 p, vec3 optical_axis, vec3 up_axis, AxesConvention convention) {
-      position pp(p.x(), p.y(), p.z());
-      setPosition(pp, optical_axis, up_axis, convention);
-    }
+
     void getPosition(position &p, vec3 &optical_axis, vec3 &up_axis) {
       p = mPosition; optical_axis = mDirection; up_axis = mUp;
     }

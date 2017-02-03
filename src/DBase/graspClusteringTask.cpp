@@ -168,16 +168,19 @@ bool GraspClusteringTask::clusterGrasps(const GraspitDBGrasp *g1, const GraspitD
   //30 degrees angular threshold
   double ANGULAR_THRESHOLD = 0.52;
 
-  transf t1 = g1->getHand()->getApproachTran() * g1->getFinalGraspPlanningState()->getTotalTran();
-  transf t2 = g2->getHand()->getApproachTran() * g2->getFinalGraspPlanningState()->getTotalTran();
+  transf t1 = g1->getFinalGraspPlanningState()->getTotalTran() % g1->getHand()->getApproachTran();
+  transf t2 = g2->getFinalGraspPlanningState()->getTotalTran() % g2->getHand()->getApproachTran();
 
   vec3 dvec = t1.translation() - t2.translation();
-  double d = dvec.len();
+  double d = dvec.norm();
   if (d > DISTANCE_THRESHOLD) { return false; }
 
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle, axis);
+  Eigen::AngleAxisd aa (qvec);
+  angle = aa.angle();
+  axis = aa.axis();
+
   if (angle >  M_PI) { angle -= 2 * M_PI; }
   if (angle < -M_PI) { angle += 2 * M_PI; }
   if (fabs(angle) > ANGULAR_THRESHOLD) { return false; }

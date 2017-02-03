@@ -45,25 +45,28 @@ void ScanSimulator::setPosition(transf tr, AxesConvention convention)
 {
   mTran = tr;
   mTranInv = mTran.inverse();
-  mPosition.set(tr.translation());
+  mPosition = tr.translation();
   switch (convention) {
     case STEREO_CAMERA:
-      mDirection = tr.affine().row(2);
-      mUp = -1.0 * tr.affine().row(1);
-      mHorizDirection = mUp * mDirection;
+      mDirection = tr.affine().col(2);
+      mUp = -1.0 * tr.affine().col(1);
+      mHorizDirection = mUp.cross(mDirection);
       break;
   }
 }
 
 void ScanSimulator::setPosition(position p, vec3 optical_axis, vec3 up_axis, AxesConvention convention)
 {
-  mPosition = p; mDirection = normalise(optical_axis); mUp = normalise(up_axis);
-  mHorizDirection = normalise(mUp * mDirection);
-  mUp = mDirection * mHorizDirection;
+  mPosition = p; mDirection = optical_axis.normalized(); mUp = up_axis.normalized();
+  mHorizDirection = (mUp.cross(mDirection)).normalized();
+  mUp = mDirection.cross(mHorizDirection);
   switch (convention) {
     case STEREO_CAMERA:
-      mTran = transf(mat3(-1.0 * mHorizDirection, -1.0 * mUp, mDirection),
-                     vec3(mPosition.x(), mPosition.y(), mPosition.z()));
+      mat3 m;
+      m.col(0) = -1.0 * mHorizDirection;
+      m.col(1) = -1.0 * mUp;
+      m.col(2) = mDirection;
+      mTran = transf(m, vec3(mPosition.x(), mPosition.y(), mPosition.z()));
       mTranInv = mTran.inverse();
       break;
   }
@@ -101,11 +104,11 @@ void ScanSimulator::scan(std::vector<position> *cloud, std::vector<RawScanPoint>
 
       if (shootRay(rayDirection, rayPoint)) {
         vec3 dist = rayPoint - mPosition;
-        rawPoint.distance = dist.len();
+        rawPoint.distance = dist.norm();
 
         //we get the point in world coordinates
         if (mType == SCANNER_COORDINATES) {
-          rayPoint = rayPoint * mTranInv;
+          rayPoint = mTranInv * (rayPoint);
         }
         cloud->push_back(rayPoint);
 
@@ -127,8 +130,10 @@ void ScanSimulator::scan(std::vector<position> *cloud, std::vector<RawScanPoint>
 
 void ScanSimulator::computeRayDirection(float hAngle, float vAngle, vec3 &rayDirection)
 {
-  Quaternion r1(vAngle, mHorizDirection);
-  Quaternion r2(hAngle, r1 * mUp);
+  Eigen::AngleAxisd r1aa = Eigen::AngleAxisd(vAngle, mHorizDirection);
+  Quaternion r1(r1aa);
+  Eigen::AngleAxisd r2aa = Eigen::AngleAxisd(hAngle, r1 * mUp);
+  Quaternion r2(r2aa);
   rayDirection = r2 * r1 * mDirection;
 }
 
@@ -136,7 +141,7 @@ bool ScanSimulator::shootRay(const vec3 &rayDirection, position &rayPoint)
 {
   SoRayPickAction action(graspitCore->getIVmgr()->getViewer()->getViewportRegion());
 
-  action.setRay(mPosition.toSbVec3f(), rayDirection.toSbVec3f(), 0.0, -1.0);
+  action.setRay(toSbVec3f(mPosition), toSbVec3f(rayDirection), 0.0, -1.0);
   action.setPickAll(false);
 
   action.apply((SoNode *)graspitCore->getWorld()->getIVRoot());
@@ -144,7 +149,7 @@ bool ScanSimulator::shootRay(const vec3 &rayDirection, position &rayPoint)
   SoPickedPoint *pp = action.getPickedPoint();
   if (!pp) { return false; }
 
-  rayPoint = position(pp->getPoint());
+  rayPoint = SbVec3fTovec3(pp->getPoint());
   return true;
 }
 

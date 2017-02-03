@@ -226,7 +226,10 @@ CompliantPlannerDlg::sampleFace(vec3 x, vec3 y, vec3 z,
                                 double sz1, double sz2, vec3 tln, double res,
                                 std::list<GraspPlanningState *> *sampling)
 {
-  mat3 R(x, y, z);
+  mat3 R;
+  R.col(0) = x;
+  R.col(1) = y;
+  R.col(2) = z;
   int rotSamples = 2;
 
   double m1 = (2.0 * sz1 - floor(2.0 * sz1 / res) * res) / 2.0;
@@ -239,8 +242,10 @@ CompliantPlannerDlg::sampleFace(vec3 x, vec3 y, vec3 z,
       transf tr(R, myTln);
       for (int rot = 0; rot < rotSamples; rot++) {
         double angle = M_PI * ((double)rot) / rotSamples;
-        transf rotTran(Quaternion(angle, vec3(1, 0, 0)), vec3(0, 0, 0));
-        tr = rotTran * tr;
+        Eigen::AngleAxisd aa = Eigen::AngleAxisd(angle, vec3(1, 0, 0));
+        Quaternion q(aa);
+        transf rotTran(q, vec3(0, 0, 0));
+        tr = tr % rotTran;
         GraspPlanningState *seed = new GraspPlanningState(mHand);
         seed->setObject(mObject);
         seed->setRefTran(mObject->getTran(), false);

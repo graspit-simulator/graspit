@@ -112,7 +112,7 @@ WorldElement::interpolateTo(transf lastTran, transf newTran, const CollisionRepo
     deltat /= 2.0;
 
     nextTranslation = (1.0 - t) * lastTran.translation() + t * newTran.translation();
-    nextRotation = Quaternion::Slerp(t, lastTran.rotation(), newTran.rotation());
+    nextRotation = lastTran.rotation().slerp(t, newTran.rotation());
     nextTran = transf(nextRotation, nextTranslation);
     DBGP("moving to time : " << t);
     if (setTran(nextTran) == FAILURE) {
@@ -239,9 +239,12 @@ WorldElement::moveTo(transf &newTran, double translStepSize, double rotStepSize)
     origTran.rotation().z << " " << "\n";
   */
   //calculate the difference
-  translationLength = (newTran.translation() - origTran.translation()).len();
+  translationLength = (newTran.translation() - origTran.translation()).norm();
   nextRotation = newTran.rotation() * origTran.rotation().inverse();
-  nextRotation.ToAngleAxis(angle, axis);
+
+  Eigen::AngleAxisd aa(nextRotation);
+  angle = aa.angle();
+  axis = aa.axis();
 
   moveIncrement = 1.0;
   if (translationLength != 0.0) {
@@ -263,9 +266,9 @@ WorldElement::moveTo(transf &newTran, double translStepSize, double rotStepSize)
 
   // check contacts
   nextTranslation = (1.0 - moveIncrement) * origTran.translation() + moveIncrement * newTran.translation();
-  nextRotation = Quaternion::Slerp(moveIncrement, origTran.rotation(), newTran.rotation());
+  nextRotation = origTran.rotation().slerp(moveIncrement, newTran.rotation());
   nextTran = transf(nextRotation, nextTranslation);
-  motion = nextTran * getTran().inverse();
+  motion = getTran().inverse() % nextTran;
 
   if (contactsPreventMotion(motion)) {
     DBGP("contacts prevent motion")
@@ -281,7 +284,7 @@ WorldElement::moveTo(transf &newTran, double translStepSize, double rotStepSize)
     }
 
     nextTranslation = (1.0 - percentComplete) * origTran.translation() + percentComplete * newTran.translation();
-    nextRotation = Quaternion::Slerp(percentComplete, origTran.rotation(), newTran.rotation());
+    nextRotation = origTran.rotation().slerp(percentComplete, newTran.rotation());
     nextTran = transf(nextRotation, nextTranslation);
     /*
       std::cout << "moveTo NextTran: " << nextTran.translation().x() << " " <<

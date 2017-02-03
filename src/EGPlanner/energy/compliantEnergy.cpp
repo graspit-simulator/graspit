@@ -20,7 +20,9 @@ double CompliantEnergy::energy() const
 
   //close the hand, but do additional processing when each new contact happens
   mCompUnbalanced = false;
-  mMaxUnbalancedForce.set(0.0, 0.0, 0.0);
+  mMaxUnbalancedForce.x() = 0.0;
+  mMaxUnbalancedForce.y() = 0.0;
+  mMaxUnbalancedForce.z() = 0.0;
 
   QObject::connect(mHand, SIGNAL(moveDOFStepTaken(int, bool &)),
                    this, SLOT(autoGraspStep(int, bool &)));
@@ -28,7 +30,7 @@ double CompliantEnergy::energy() const
   QObject::disconnect(mHand, SIGNAL(moveDOFStepTaken(int, bool &)),
                       this, SLOT(autoGraspStep(int, bool &)));
 
-  if (mCompUnbalanced || mMaxUnbalancedForce.len() > unbalancedForceThreshold) {
+  if (mCompUnbalanced || mMaxUnbalancedForce.norm() > unbalancedForceThreshold) {
     //the equivalent of an unstable grasp
   }
 
@@ -69,10 +71,10 @@ double CompliantEnergy::energy() const
   if (epsQual < 0.05) { return 1.0; }
 
   PROF_PRINT(QS);
-  PRINT_STAT(mOut, "torque: " << torque << " " << torque.len());
-  PRINT_STAT(mOut, "force: " << force << " " << force.len());
+  PRINT_STAT(mOut, "torque: " << torque << " " << torque.norm());
+  PRINT_STAT(mOut, "force: " << force << " " << force.norm());
 
-  return -200.0 + force.len();// + torque.len();
+  return -200.0 + force.norm();// + torque.norm();
 }
 
 
@@ -102,7 +104,7 @@ CompliantEnergy::autoGraspStep(int numCols, bool &stopRequest) const
   assert(mObject->isDynamic());
   double *extWrench = static_cast<DynamicBody *>(mObject)->getExtWrenchAcc();
   vec3 force(extWrench[0], extWrench[1], extWrench[2]);
-  if (force.len() > mMaxUnbalancedForce.len()) {
+  if (force.norm() > mMaxUnbalancedForce.norm()) {
     mMaxUnbalancedForce = force;
   }
   //we could do an early exit here as well

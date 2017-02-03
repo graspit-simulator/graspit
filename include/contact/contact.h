@@ -321,7 +321,7 @@ class Contact
     //! Returns the IV root of the visual markers that shows the location of this contact
     virtual SoSeparator *getVisualIndicator() {return NULL;}
 
-    virtual mat3 getRot() {return mat3::IDENTITY;}
+    virtual mat3 getRot() {return mat3::Identity();}
 
     //! Get dynamic sovler LCP information from the previous time step
     double getPrevCn() {return prevCn;}
@@ -346,7 +346,7 @@ class Contact
     //! Testing static force output.  Default implementation for baseclass is trivial
     virtual void getStaticContactInfo(std::vector<position> &pVec, std::vector<double> &floatVec) {pVec.push_back(loc); floatVec.push_back(1);}
     //! Only used in SoftFinger contact
-    virtual mat3 getCommonFrameRot() { return mat3::IDENTITY; }
+    virtual mat3 getCommonFrameRot() { return mat3::Identity(); }
 
 };
 #endif

@@ -75,8 +75,8 @@ void Pr2Gripper2010::setJointValuesAndUpdate(const double *jointVals)
   transf initial_fingertip_tran = chainVec[mCompliance]->getLink(1)->getTran();
   Robot::setJointValuesAndUpdate(jointVals);
   transf final_fingertip_tran = chainVec[mCompliance]->getLink(1)->getTran();
-  transf relative_tran = initial_fingertip_tran * final_fingertip_tran.inverse();
-  setTran(relative_tran * getTran());
+  transf relative_tran = final_fingertip_tran.inverse() % initial_fingertip_tran;
+  setTran( getTran() % relative_tran);
 }
 
 void Pr2Gripper2010::compliantClose()

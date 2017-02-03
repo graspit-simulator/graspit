@@ -88,7 +88,7 @@ CollisionInterface::compactContactSet(ContactReport *contacts)
   std::list<ContactReport>::iterator sp;
   for (cp = contacts->begin(); cp != contacts->end(); cp++) {
     for (sp = contactGroups.begin(); sp != contactGroups.end(); sp++) {
-      if (sp->begin()->b1_normal % cp->b1_normal > 1.0 - NORMAL_TOLERANCE) { break; }
+      if (sp->begin()->b1_normal.dot(cp->b1_normal) > 1.0 - NORMAL_TOLERANCE) { break; }
     }
     if (sp == contactGroups.end()) {
       contactGroups.push_back(ContactReport());
@@ -98,7 +98,7 @@ CollisionInterface::compactContactSet(ContactReport *contacts)
       ContactReport::iterator it;
       for (it = sp->begin(); it != sp->end(); it++) {
         vec3 dist = it->b1_pos - cp->b1_pos;
-        if (dist.len_sq() < DISTANCE_TOLERANCE) { break; }
+        if (dist.squaredNorm() < DISTANCE_TOLERANCE) { break; }
       }
       if (it == sp->end()) { sp->push_back(*cp); }
     }
@@ -135,11 +135,11 @@ CollisionInterface::replaceContactSetWithPerimeter(ContactReport &contactSet)
   for (cp = contactSet.begin(); cp != contactSet.end(); cp++) {
     currLine = endPt2->b1_pos - endPt1->b1_pos;
     testLine = cp->b1_pos - endPt1->b1_pos;
-    vec3 crossProd = testLine * currLine;
-    if (crossProd.len() > my_resabs) { break; }   // not colinear
-    double dot = testLine % currLine;
+    vec3 crossProd = testLine.cross(currLine);
+    if (crossProd.norm() > my_resabs) { break; }   // not colinear
+    double dot = testLine.dot(currLine);
     if (dot < 0) { endPt1 = cp; }
-    if (dot > currLine % currLine) { endPt2 = cp; }
+    if (dot > currLine.dot(currLine)) { endPt2 = cp; }
   }
 
   if (cp == contactSet.end()) {
@@ -154,20 +154,20 @@ CollisionInterface::replaceContactSetWithPerimeter(ContactReport &contactSet)
 
   // compute the origin of the projection frame
   vec3 contactNormal = contactSet.begin()->b1_normal;
-  vec3 normal = normalise(testLine * currLine);
-  double Soffset = contactSet.begin()->b1_pos % normal;
+  vec3 normal = (testLine.cross(currLine)).normalized();
+  double Soffset = contactSet.begin()->b1_pos.dot(normal);
   vec3 origin_pr = Soffset * normal;
 
   // compute 2 other axes along the plane of S
-  vec3 axis1 = normalise(testLine);
-  vec3 axis2 = normal * axis1;
+  vec3 axis1 = (testLine).normalized();
+  vec3 axis2 = normal.cross(axis1);
 
   coordT *array = new coordT[contactSet.size() * 2];
   coordT *ptr = &array[0];
   volatile int ptCount = 0;
   for (cp = contactSet.begin(); cp != contactSet.end(); cp++) {
-    *ptr++ = (cp->b1_pos - position::ORIGIN) % axis1;
-    *ptr++ = (cp->b1_pos - position::ORIGIN) % axis2;
+    *ptr++ = (cp->b1_pos - position::Zero()).dot(axis1);
+    *ptr++ = (cp->b1_pos - position::Zero()).dot(axis2);
     ptCount++;
   }
 
@@ -262,8 +262,8 @@ CollisionInterface::removeContactDuplicates(ContactReport *contacts, double dupl
     bool removeMe = false;
     ContactReport::iterator it2 = it + 1;
     while (it2 != contacts->end()) {
-      if ((it2->b1_pos - it->b1_pos).len_sq() > threshSq ||
-          (it2->b2_pos - it->b2_pos).len_sq() > threshSq) {
+      if ((it2->b1_pos - it->b1_pos).squaredNorm() > threshSq ||
+          (it2->b2_pos - it->b2_pos).squaredNorm() > threshSq) {
         //not the same contact
         it2++;
       } else {

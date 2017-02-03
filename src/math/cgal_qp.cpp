@@ -39,7 +39,7 @@ int cgalNNQPSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   Program qp(CGAL::SMALLER, true, 0, false, 0);
 
   //set the equality constraints
-  for (int i = 0; i < Eq.rows(); i++) {
+  for (int i = 0; i < Eq.cols(); i++) {
     for (int j = 0; j < Eq.cols(); j++) {
       qp.set_a(j, i, Eq.elem(i, j));
     }
@@ -47,8 +47,8 @@ int cgalNNQPSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
     qp.set_r(i, CGAL::EQUAL);
   }
   //set the inequality constraints
-  for (int i = 0; i < InEq.rows(); i++) {
-    int eqi = i + Eq.rows();
+  for (int i = 0; i < InEq.cols(); i++) {
+    int eqi = i + Eq.cols();
     for (int j = 0; j < InEq.cols(); j++) {
       qp.set_a(j, eqi, InEq.elem(i, j));
     }
@@ -57,7 +57,7 @@ int cgalNNQPSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   }
   //set the symmetric Q matrix; only upper triangle is needed
   //remember to double the value
-  for (int i = 0; i < Q.rows(); i++) {
+  for (int i = 0; i < Q.cols(); i++) {
     for (int j = 0; j <= i; j++) {
       qp.set_d(i, j, 2.0 * Q.elem(i, j));
     }

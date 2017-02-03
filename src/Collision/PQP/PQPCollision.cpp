@@ -358,7 +358,7 @@ PQPCollision::pointToBodyDistance(const Body *body1, position point,
   closestPoint = closestPoint * body1->getTran();
   closestNormal = normalise(closestNormal) * body1->getTran();
   vec3 dif = point - closestPoint;
-  return dif.len();
+  return dif.norm();
 }
 
 double

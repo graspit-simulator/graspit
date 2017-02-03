@@ -82,9 +82,10 @@ VirtualContact::VirtualContact(int f, int l, Contact *original) : Contact()
   loc = original->loc;
   frame = original->frame;
   //we now rotate the frame so that the normal points outwards, as the contact on the object would
-  Quaternion q(3.14159, vec3(1, 0, 0));
+  Eigen::AngleAxisd aa = Eigen::AngleAxisd(3.14159, vec3(1, 0, 0));
+  Quaternion q(aa);
   transf newRot(q, vec3(0, 0, 0));
-  frame = newRot * frame;
+  frame = frame % newRot;
   normal = -1 * original->normal;
   body1 = original->body1;
   body2 = original->body2;
@@ -103,20 +104,20 @@ VirtualContact::~VirtualContact()
 void VirtualContact::changeFrame(transf tr)
 {
   frame = tr;
-  loc = position(tr.translation().toSbVec3f());
-  normal = vec3(0, 0, 1) * tr;
+  loc = tr.translation();
+  normal = tr.affine() * vec3(0, 0, 1);
 }
 
 position
 VirtualContact::getWorldLocation()
 {
-  return loc * body1->getTran();
+  return body1->getTran() * loc;
 }
 
 vec3
 VirtualContact::getWorldNormal()
 {
-  return normal * body1->getTran();
+  return body1->getTran().affine() * normal;
 }
 
 /*! The virtual contact, for now, does not compute its own friction
@@ -162,16 +163,16 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
   if (!useObjectData) {
     worldLoc = getWorldLocation();
     worldNormal = getWorldNormal();
-    transf worldFrame = frame * body1->getTran();
-    tangentX = worldFrame.affine().row(0);
-    tangentY = worldFrame.affine().row(1);
+    transf worldFrame = body1->getTran() % frame;
+    tangentX = worldFrame.affine().col(0);
+    tangentY = worldFrame.affine().col(1);
   } else {
     //    LOOK AT VIRTUAL CONTACT ON THE HAND
     worldLoc = getWorldLocation();
     worldNormal = getWorldNormal();
-    tangentX = vec3(0, 1, 0) * worldNormal;
-    tangentX = normalise(tangentX);
-    tangentY = worldNormal * tangentX;
+    tangentX = vec3(0, 1, 0).cross(worldNormal);
+    tangentX = tangentX.normalized();
+    tangentY = worldNormal.cross(tangentX);
   }
 
   //mCenter needs to be already set to object cog if needed as such
@@ -182,7 +183,7 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
     numFCWrenches = 1; //this is hack-ish, should be fixed
     wrench = new Wrench[1];
     wrench[0].force = worldNormal;
-    wrench[0].torque = (radius * worldNormal) / mMaxRadius;
+    wrench[0].torque = (radius.cross(worldNormal)) / mMaxRadius;
     return;
   }
 
@@ -197,7 +198,7 @@ VirtualContact::computeWrenches(bool useObjectData, bool simplify)
 
     wrench[i].force = forceVec;
 
-    wrench[i].torque = ((radius * forceVec) + worldNormal * sCof * frictionEdges[6 * i + 5]) / mMaxRadius;
+    wrench[i].torque = ((radius.cross(forceVec)) + worldNormal * sCof * frictionEdges[6 * i + 5]) / mMaxRadius;
     //max torque is contact_radius * normal_force_magnitude (which is 1) * coeff_of_friction
     //possible torque for this wrench is (friction_edge * max_torque) in the direction of the contact normal
     //the contact_radius coefficient is already taken into account in the friction_edge
@@ -244,7 +245,7 @@ VirtualContact::getWorldIndicator(bool useObjectData)
 
   SoTransform *tran = new SoTransform;
   SbMatrix tr;
-  tr.setTranslate(worldLoc.toSbVec3f());
+  tr.setTranslate(toSbVec3f(worldLoc));
   tran->setMatrix(tr);
 
   SbVec3f *points = (SbVec3f *)calloc(numFCWrenches + 1, sizeof(SbVec3f));
@@ -253,7 +254,7 @@ VirtualContact::getWorldIndicator(bool useObjectData)
   points[0].setValue(0, 0, 0);
 
   for (int i = 0; i < numFCWrenches; i++) {
-    //if ( wrench[i].torque.len() != 0 ) continue;
+    //if ( wrench[i].torque.norm() != 0 ) continue;
     forceVec = wrench[i].force;
     forceVec = Body::CONE_HEIGHT * forceVec;
     points[i + 1].setValue(forceVec.x(), forceVec.y(), forceVec.z());
@@ -389,7 +390,7 @@ VirtualContact::writeToFile(std::ofstream &outFile)
   //frame
   Quaternion q = frame.rotation();
   vec3 t = frame.translation();
-  outFile << q.w << " " << q.x << " " << q.y << " " << q.z << std::endl;
+  outFile << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << std::endl;
   outFile << t.x() << " " << t.y() << " " << t.z() << std::endl;
 
   //normal
@@ -447,19 +448,18 @@ VirtualContact::readFromFile(std::ifstream &inFile)
   loc = position(x, y, z);
 
   //frame
-  Quaternion q;
-  vec3 t;
   inFile >> v >> x >> y >> z;
   if (inFile.fail()) {
     DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame orientation");
   }
-  q.set(v, x, y, z);
+  Quaternion q(v, x, y, z);
+
   inFile >> x >> y >> z;
   if (inFile.fail()) {
     DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame location");
   }
 
-  t.set(x, y, z);
+  vec3 t(x, y, z);
   frame.set(q, t);
 
   //normal
@@ -468,7 +468,9 @@ VirtualContact::readFromFile(std::ifstream &inFile)
     DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
     return false;
   }
-  normal.set(x, y, z);
+  normal.x() = x;
+  normal.y() = y;
+  normal.z() = z;
 
   //sCof
   inFile >> v;

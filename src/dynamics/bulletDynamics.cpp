@@ -266,9 +266,9 @@ void BulletDynamics::addChain(KinematicChain *chain, btRigidBody *btbase)
       Quaternion rot01 = rotqj01;
       Quaternion rot10 = rot01.inverse();
       //get the joint0 x,y,z in new frame(after two transformation T1,T2)
-      vec3 zjoint0new = rot10 * vec3(0, 0, 1);
-      vec3 xjoint0new = rot10 * vec3(1, 0, 0);
-      vec3 yjoint0new = rot10 * vec3(0, 1, 0);
+      vec3 zjoint0new = transf(rot10, vec3::Zero()).affine() * vec3(0, 0, 1);
+      vec3 xjoint0new = transf(rot10, vec3::Zero()).affine() * vec3(1, 0, 0);
+      vec3 yjoint0new = transf(rot10, vec3::Zero()).affine() * vec3(0, 1, 0);
       btVector3 btzjoint0new(zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
       btVector3 btxjoint0new(xjoint0new.x(), xjoint0new.y(), xjoint0new.z());
       btVector3 btyjoint0new(yjoint0new.x(), yjoint0new.y(), yjoint0new.z());
@@ -377,23 +377,23 @@ void BulletDynamics::addChain(KinematicChain *chain, btRigidBody *btbase)
       Quaternion rot20 = rot02.inverse();
       Quaternion rot21 = rotqj12.inverse();
       //get the joint0 x,y,z in new frame(after two transformation T1,T2)
-      vec3 zjoint0new = rot20 * vec3(0, 0, 1);
-      vec3 xjoint0new = rot20 * vec3(1, 0, 0);
-      vec3 yjoint0new = rot20 * vec3(0, 1, 0);
+      vec3 zjoint0new = transf(rot20, vec3::Zero()).affine() * vec3(0, 0, 1);
+      vec3 xjoint0new = transf(rot20, vec3::Zero()).affine() * vec3(1, 0, 0);
+      vec3 yjoint0new = transf(rot20, vec3::Zero()).affine() * vec3(0, 1, 0);
       btVector3 btzjoint0new(zjoint0new.x(), zjoint0new.y(), zjoint0new.z());
       btVector3 btxjoint0new(xjoint0new.x(), xjoint0new.y(), xjoint0new.z());
       btVector3 btyjoint0new(yjoint0new.x(), yjoint0new.y(), yjoint0new.z());
 
       //get the joint1 x,y,z in new frame(after 1 transformation T2)
-      vec3 zjoint1new = rot21 * vec3(0, 0, 1);
-      vec3 xjoint1new = rot21 * vec3(1, 0, 0);
-      vec3 yjoint1new = rot21 * vec3(0, 1, 0);
+      vec3 zjoint1new = transf(rot21, vec3::Zero()).affine() * vec3(0, 0, 1);
+      vec3 xjoint1new = transf(rot21, vec3::Zero()).affine() * vec3(1, 0, 0);
+      vec3 yjoint1new = transf(rot21, vec3::Zero()).affine() * vec3(0, 1, 0);
       btVector3 btzjoint1new(zjoint1new.x(), zjoint1new.y(), zjoint1new.z());
       btVector3 btxjoint1new(xjoint1new.x(), xjoint1new.y(), xjoint1new.z());
       btVector3 btyjoint1new(yjoint1new.x(), yjoint1new.y(), yjoint1new.z());
 
       // joint1 z axis in the frame of joint0
-      vec3 zjoint1infram0 = rotqj01 * vec3(0, 0, 1);
+      vec3 zjoint1infram0 = transf(rotqj01, vec3::Zero()).affine() * vec3(0, 0, 1);
 
 
       // universal constraint
@@ -463,10 +463,10 @@ void BulletDynamics::turnOnDynamics()
     Body *tempbody = mWorld->getBody(j);
     transf temptrans = tempbody->getTran();
 
-    btScalar wrot(temptrans.rotation().w);
-    btScalar xrot(temptrans.rotation().x);
-    btScalar yrot(temptrans.rotation().y);
-    btScalar zrot(temptrans.rotation().z);
+    btScalar wrot(temptrans.rotation().w());
+    btScalar xrot(temptrans.rotation().x());
+    btScalar yrot(temptrans.rotation().y());
+    btScalar zrot(temptrans.rotation().z());
 
     btScalar xtrans(temptrans.translation().x());
     btScalar ytrans(temptrans.translation().y());
@@ -582,7 +582,7 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
     btRigidBody *btbase = btBodyMap.find(robot->getBase())->second;
 
     //! convert the velocity from along the robot's approach direction (+z sticking out of palm) to the world frame.
-    transf velocityInWorldFrame = translate_transf(robot->getLinearVelocity() * robot->getApproachTran()) * robot->getTran();
+    transf velocityInWorldFrame = robot->getTran() % transf::TRANSLATION(robot->getApproachTran() * robot->getLinearVelocity());
 
     btVector3 velocity(velocityInWorldFrame.translation().x() - robot->getTran().translation().x(),
                        velocityInWorldFrame.translation().y() - robot->getTran().translation().y(),
@@ -591,12 +591,12 @@ double BulletDynamics::moveDynamicBodies(double timeStep) {
     btbase->setLinearVelocity(velocity);
 
     //! Convert the angular velocity defined  in the approach frame of reference to the world frame.
-    transf rotFrame = rotXYZ(robot->getAngularVelocity().x(), robot->getAngularVelocity().y(), robot->getAngularVelocity().z());
-    transf rotFrameInWorld = rotFrame  * robot->getApproachTran() * robot->getTran();
+    transf rotFrame = transf::RPY(robot->getAngularVelocity().x(), robot->getAngularVelocity().y(), robot->getAngularVelocity().z());
+    transf rotFrameInWorld =  robot->getTran() % robot->getApproachTran() % rotFrame;
 
-    double r;
-    vec3 rAxis;
-    rotFrameInWorld.rotation().ToAngleAxis(r, rAxis);
+    Eigen::AngleAxisd aa (rotFrameInWorld.rotation());
+    double r = aa.angle();
+    vec3 rAxis = aa.axis();
 
     btVector3 angularVelocity(r * rAxis.x(), r * rAxis.y(), r * rAxis.z());
 
@@ -629,10 +629,12 @@ int BulletDynamics::computeNewVelocities(double timeStep) {
     btQuaternion btrotation = feedbacktransform.getRotation();
     btVector3 bttranslation = feedbacktransform.getOrigin();
 
-    Quaternion *rot = new Quaternion(btrotation.getAngle() ,
-                                     vec3(btrotation.getAxis()[0] ,
-                                          btrotation.getAxis()[1] ,
-                                          btrotation.getAxis()[2]));
+    Eigen::AngleAxisd aa = Eigen::AngleAxisd(btrotation.getAngle(),
+                                             vec3(btrotation.getAxis()[0] ,
+                                             btrotation.getAxis()[1] ,
+                                             btrotation.getAxis()[2]));
+    Quaternion *rot = new Quaternion(aa);
+
     vec3 *transl = new vec3(bttranslation.getX() , bttranslation.getY() , bttranslation.getZ());
     Quaternion rotfix = *rot;
     vec3 translfix = *transl;

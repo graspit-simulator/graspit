@@ -34,8 +34,9 @@
 #include <memory>
 #include <cstdio>
 
+#include "matvec3D.h"
+
 class transf;
-class mat3;
 
 //! A class for storing and performing operations on general 2-dimensional matrices
 /*! The Matrix is a general 2-dimensional matrix, along with a (growing)

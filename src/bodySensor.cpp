@@ -234,12 +234,12 @@ TactileSensor::~TactileSensor() {
 //! Get the position of the sensor in the world frame of reference.
 transf TactileSensor::getSensorTran()
 {
-  transf sensorInLink(Quaternion::IDENTITY,
+  transf sensorInLink(Quaternion::Identity(),
                       vec3((mOutput.pos[0][0] + mOutput.pos[1][0]) / 2.0,
                            (mOutput.pos[0][1] + mOutput.pos[1][1]) / 2.0,
                            (mOutput.pos[0][2] + mOutput.pos[1][2]) / 2.0));
 
   transf linkInWorld = mBody->getTran();
-  transf res = sensorInLink * linkInWorld;
+  transf res = linkInWorld % sensorInLink;
   return res;
 }

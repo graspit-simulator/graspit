@@ -83,26 +83,26 @@ bool GraspitDBGrasp::SetGraspParameters(const std::vector<double> &prejoint,
 bool GraspitDBGrasp::Transform(const float array[16]) {
   // synthesize the transformation matrix
   mat3 m;
-  m[0] = array[0];
-  m[1] = array[1];
-  m[2] = array[2];
-  m[3] = array[4];
-  m[4] = array[5];
-  m[5] = array[6];
-  m[6] = array[8];
-  m[7] = array[9];
-  m[8] = array[10];
+  m(0) = array[0];
+  m(1) = array[1];
+  m(2) = array[2];
+  m(3) = array[4];
+  m(4) = array[5];
+  m(5) = array[6];
+  m(6) = array[8];
+  m(7) = array[9];
+  m(8) = array[10];
   vec3 v;
-  v[0] = array[3];
-  v[1] = array[7];
-  v[2] = array[11];
+  v(0) = array[3];
+  v(1) = array[7];
+  v(2) = array[11];
   transf transform;
   transform.set(m, v);
 
   std::vector<double> position;
 
   PositionState *ps = mPreGrasp->getPosition();
-  ps->setTran(ps->getCoreTran() * transform);
+  ps->setTran(transform % ps->getCoreTran());
   for (int i = 0; i < ps->getNumVariables(); ++i) {
     position.push_back(ps->getVariable(i)->getValue());
   }
@@ -110,7 +110,7 @@ bool GraspitDBGrasp::Transform(const float array[16]) {
 
   position.clear();
   ps = mFinalGrasp->getPosition();
-  ps->setTran(ps->getCoreTran() * transform);
+  ps->setTran(transform % ps->getCoreTran());
   for (int i = 0; i < ps->getNumVariables(); ++i) {
     position.push_back(ps->getVariable(i)->getValue());
   }

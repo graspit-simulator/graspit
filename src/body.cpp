@@ -1111,12 +1111,12 @@ Body::checkContactInheritance(Contact *c)
       continue;
     }
     vec3 d = (*cp)->getPosition() - c->getPosition();
-    if (d.len() > Contact::INHERITANCE_THRESHOLD) {
+    if (d.norm() > Contact::INHERITANCE_THRESHOLD) {
       continue;
     }
     vec3 n1 = (*cp)->getNormal();
     vec3 n2 = c->getNormal();
-    double theta = n1 % n2;
+    double theta = n1.dot(n2);
     if (theta < Contact::INHERITANCE_ANGULAR_THRESHOLD) {
       continue;
     }
@@ -1308,7 +1308,7 @@ DynamicBody::init()
   useDynamics = true;
   bbox_min = vec3(-1e+6, -1e+6, -1e+6);
   bbox_max = vec3(1e+6, 1e+6, 1e+6);
-  CoG.set(0.0, 0.0, 0.0);
+  CoG = position::Zero();
   for (int i = 0; i < 9; i++) {
     I[i] = 0.0;
   }
@@ -1328,14 +1328,14 @@ DynamicBody::resetDynamics()
     v[i] = 0.0;
   }
   Quaternion quat = Tran.rotation();
-  vec3 cogOffset = quat * (CoG - position::ORIGIN);
+  vec3 cogOffset = quat * (CoG - position::Zero());
   q[0] = Tran.translation().x() + cogOffset.x();
   q[1] = Tran.translation().y() + cogOffset.y();
   q[2] = Tran.translation().z() + cogOffset.z();
-  q[3] = quat.w;
-  q[4] = quat.x;
-  q[5] = quat.y;
-  q[6] = quat.z;
+  q[3] = quat.w();
+  q[4] = quat.x();
+  q[5] = quat.y();
+  q[6] = quat.z();
 }
 
 /*! Constructs an empty DynamicBody.  Use load() to initialize this class
@@ -1535,7 +1535,7 @@ DynamicBody::computeDefaultMaxRadius()
   }
   double maxRad = 0.0;
   for (int i = 0; i < (int)vertices.size(); i++) {
-    double tmpRadius = (CoG - vertices[i]).len();
+    double tmpRadius = (CoG - vertices[i]).norm();
     if (tmpRadius > maxRad) { maxRad = tmpRadius; }
   }
   return maxRad;
@@ -1667,9 +1667,17 @@ DynamicBody::computeDefaultInertiaMatrix(std::vector<Triangle> &triangles, doubl
 
 
   for (i = 0; i < (int)triangles.size(); i++) {
-    triangles[i].v1.get(v1);
-    triangles[i].v2.get(v2);
-    triangles[i].v3.get(v3);
+    v1[0] = triangles[i].v1.x();
+    v1[1] = triangles[i].v1.y();
+    v1[2] = triangles[i].v1.z();
+
+    v2[0] = triangles[i].v2.x();
+    v2[1] = triangles[i].v2.y();
+    v2[2] = triangles[i].v2.z();
+
+    v3[0] = triangles[i].v3.x();
+    v3[1] = triangles[i].v3.y();
+    v3[2] = triangles[i].v3.z();
 
     dx1 = f.verts[1][0] - f.verts[0][0];
     dy1 = f.verts[1][1] - f.verts[0][1];
@@ -1870,10 +1878,14 @@ computeDefaultCoG(std::vector<Triangle> &triangles, position &defaultCoG)
         }
       }
     }
-    defaultCoG.set(center_of_mass);
+    defaultCoG.x() = center_of_mass[0];
+    defaultCoG.y() = center_of_mass[1];
+    defaultCoG.z() = center_of_mass[2];
     return SUCCESS;
   } else {
-    defaultCoG.set(0, 0, 0);
+      defaultCoG.x() = 0;
+      defaultCoG.y() = 0;
+      defaultCoG.z() = 0;
     return FAILURE;
   }
 }
@@ -1889,7 +1901,9 @@ DynamicBody::computeDefaultMassProp(position &defaultCoG, double *defaultI)
   getGeometryTriangles(&triangles);
   if (triangles.empty()) {
     DBGA("No triangles found when computing mass properties!");
-    defaultCoG.set(0, 0, 0);
+    defaultCoG.x() = 0.0;
+    defaultCoG.y() = 0.0;
+    defaultCoG.z() = 0.0;
     return;
   }
   if (computeDefaultInertiaMatrix(triangles, defaultI) == FAILURE) {
@@ -2008,9 +2022,9 @@ DynamicBody::addForceAtPos(vec3 force, position pos)
 {
   vec3 worldTorque;
   vec3 worldPos;
-  worldPos = (pos - CoG * Tran);
+  worldPos = (pos - Tran * (CoG));
 
-  worldTorque = worldPos * force;
+  worldTorque = worldPos.cross(force);
   extWrenchAcc[0] += force[0];
   extWrenchAcc[1] += force[1];
   extWrenchAcc[2] += force[2];
@@ -2032,8 +2046,8 @@ DynamicBody::addForceAtRelPos(vec3 force, position pos)
   vec3 worldForce;
   vec3 worldTorque;
 
-  worldForce = Tran.rotation() * force;
-  worldTorque = Tran.rotation() * ((pos - CoG) * force);
+  worldForce = Tran.rotation() * (force);
+  worldTorque = Tran.rotation() * ((pos - CoG).cross(force));
   extWrenchAcc[0] += worldForce[0];
   extWrenchAcc[1] += worldForce[1];
   extWrenchAcc[2] += worldForce[2];
@@ -2064,7 +2078,7 @@ DynamicBody::setPos(const double *new_q)
   q[5] /= norm;
   q[6] /= norm;
   Quaternion rot(q[3], q[4], q[5], q[6]);
-  vec3 cogOffset = rot * (CoG - position::ORIGIN);
+  vec3 cogOffset = rot * (CoG - position::Zero());
   transf tr = transf(rot, vec3(q[0], q[1], q[2]) - cogOffset);
 
   Tran = tr;
@@ -2158,14 +2172,14 @@ DynamicBody::setTran(transf const &tr)
   if (tr == Tran) { return SUCCESS; }
   if (Body::setTran(tr) == FAILURE) { return FAILURE; }
   Quaternion quat = Tran.rotation();
-  vec3 cogOffset = quat * (CoG - position::ORIGIN);
+  vec3 cogOffset = quat * (CoG - position::Zero());
   q[0] = Tran.translation().x() + cogOffset.x();
   q[1] = Tran.translation().y() + cogOffset.y();
   q[2] = Tran.translation().z() + cogOffset.z();
-  q[3] = quat.w;
-  q[4] = quat.x;
-  q[5] = quat.y;
-  q[6] = quat.z;
+  q[3] = quat.w();
+  q[4] = quat.x();
+  q[5] = quat.y();
+  q[6] = quat.z();
   if (fixed) {
     if (!dynJoint->getPrevLink()) {
       //if the previous link of the dynamic joint is NULL this means
@@ -2289,7 +2303,7 @@ Link::getProximalJointAxis()
 {
   int jointNum = owner->getChain(chainNum)->getLastJoint(linkNum);
   Joint *j = owner->getChain(chainNum)->getJoint(jointNum);
-  vec3 r = vec3(0, 0, 1) * j->getTran().inverse();
+  vec3 r = j->getTran().inverse().affine() * (vec3(0, 0, 1));
   return r;
 }
 

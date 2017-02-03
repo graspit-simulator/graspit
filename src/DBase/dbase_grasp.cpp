@@ -443,7 +443,7 @@ void DBaseBatchPlanner::takeScans()
                distance * cos(theta) * sin(phi),
                distance * sin(theta));
       //looking back towards the origin
-      vec3 dir = -1 * normalise(loc);
+      vec3 dir = -1 * loc.normalized();
       vec3 up(0, 0, 1);
       sim.setPosition(loc, dir, up, ScanSimulator::STEREO_CAMERA);
 

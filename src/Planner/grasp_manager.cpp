@@ -241,9 +241,9 @@ grasp_manager::readCandidateGraspsFile(const QString &filename)
   graspList.clear();
 
   while (!stream.atEnd()) {
-    stream >> pt >> dir >> thumbdir >> spreadAngle; stream.readLine();
+    stream >> pt.mvec >> dir.mvec >> thumbdir.mvec >> spreadAngle; stream.readLine();
 #ifdef GRASPITDBG
-    std::cout << "read " << pt << dir << thumbdir << spreadAngle << std::endl;
+    std::cout << "read " << pt.mvec << dir.mvec << thumbdir.mvec << spreadAngle << std::endl;
 #endif
     gd.set_point(pt);
     gd.set_dir(dir);

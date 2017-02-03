@@ -26,13 +26,13 @@ GuidedAutoGraspQualityEnergy::energy() const
     contact = (VirtualContact *)mHand->getGrasp()->getContact(i);
     contact->getObjectDistanceAndNormal(mObject, &p, &n);
 
-    double dist = p.len();
-    if ((-1.0 * p) % n  < 0) { dist = -dist; }
+    double dist = p.norm();
+    if ((-1.0 * p).dot(n)  < 0) { dist = -dist; }
 
     //BEST WORKING VERSION, strangely enough
     virtualError += fabs(dist);
     cn = -1.0 * contact->getWorldNormal();
-    double d = 1 - cn % n;
+    double d = 1 - cn.dot(n);
     virtualError += d * 100.0 / 2.0;
 
     if (fabs(dist) < 20 && d < 0.3) { closeContacts++; }

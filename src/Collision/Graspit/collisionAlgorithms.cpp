@@ -150,8 +150,8 @@ RecursionCallback::RecursionCallback(const CollisionModel *m1, const CollisionMo
   mModel1(m1), mModel2(m2)
 {
   if (mModel2) {
-    mTran2To1 = mModel2->getTran() * mModel1->getTran().inverse();
-    mTran1To2 = mModel1->getTran() * mModel2->getTran().inverse();
+    mTran2To1 = mModel1->getTran().inverse() % mModel2->getTran();
+    mTran1To2 = mModel2->getTran().inverse() % mModel1->getTran();
   }
 }
 
@@ -178,8 +178,8 @@ ContactCallback::insertContactNoDuplicates(const position &p1, const position &p
   ContactReport::iterator cit = mReport.begin();
   while (cit != mReport.end() && insert) {
     bool remove = false;
-    if ((cit->b1_pos - p1).len_sq() < thresh * thresh) {
-      if ((cit->b2_pos - p2).len_sq() < thresh * thresh) {
+    if ((cit->b1_pos - p1).squaredNorm() < thresh * thresh) {
+      if ((cit->b2_pos - p2).squaredNorm() < thresh * thresh) {
         //exact same contact, no need to insert
         insert = false;
       } else {
@@ -189,7 +189,7 @@ ContactCallback::insertContactNoDuplicates(const position &p1, const position &p
           remove = true;
         }
       }
-    } else if ((cit->b2_pos - p2).len_sq() < thresh * thresh) {
+    } else if ((cit->b2_pos - p2).squaredNorm() < thresh * thresh) {
       if (cit->distSq < distSq) {
         insert = false;
       } else {

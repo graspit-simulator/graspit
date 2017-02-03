@@ -47,7 +47,7 @@ void oasesFromMatrix(std::vector<double> &O, const Matrix &M, double scale = 1.0
   double value;
   M.sequentialReset();
   O.resize(0);
-  O.resize(M.rows()*M.cols(), 0.0);
+  O.resize(M.cols()*M.cols(), 0.0);
   while (M.nextSequentialElement(i, j, value)) {
     O.at(i * M.cols() + j) = value / scale;
   }
@@ -70,9 +70,9 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
                            Matrix &sol, double *objVal)
 {
   // number of variables
-  int nV = sol.rows();
+  int nV = sol.cols();
   // number of constraints
-  int nC = Eq.rows() + InEq.rows();
+  int nC = Eq.cols() + InEq.cols();
   // set up QProblem object
   qpOASES::QProblem problem(nV, nC);
   problem.setPrintLevel(qpOASES::PL_LOW);
@@ -102,7 +102,7 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
   std::vector<double> ubA;
   oasesFromMatrix(ubA, GubA, scale);
   //lower bounds; min inf for inequalities
-  SparseMatrix GlbA(Matrix::BLOCKCOLUMN<SparseMatrix>(b, Matrix::MIN_VECTOR(ib.rows())));
+  SparseMatrix GlbA(Matrix::BLOCKCOLUMN<SparseMatrix>(b, Matrix::MIN_VECTOR(ib.cols())));
   std::vector<double> lbA;
   oasesFromMatrix(lbA, GlbA, scale);
 
@@ -122,7 +122,7 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
 
   //g vector, all zeroes
   std::vector<double> g;
-  g.resize(sol.rows(), 0.0);
+  g.resize(sol.cols(), 0.0);
 
   // solve QP
   int nWSR = 1000;
@@ -148,7 +148,7 @@ int QPOASESSolverWrapperQP(const Matrix &Q,
 
   // retrieve the solution
   std::vector<double> xOpt;
-  xOpt.resize(sol.rows());
+  xOpt.resize(sol.cols());
   retVal = problem.getPrimalSolution(&xOpt[0]);
   if (retVal != qpOASES::SUCCESSFUL_RETURN) {
     DBGA("qpOASES QP:failed to retrieve solution");
@@ -175,9 +175,9 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
                            Matrix &sol, double *objVal)
 {
   // number of variables
-  int nV = sol.rows();
+  int nV = sol.cols();
   // number of constraints
-  int nC = Eq.rows() + InEq.rows();
+  int nC = Eq.cols() + InEq.cols();
   // set up QProblem object, inform it of 0 Hessian (since we have an LP)
   qpOASES::QProblem problem(nV, nC, qpOASES::HST_ZERO);
   problem.setPrintLevel(qpOASES::PL_LOW);
@@ -195,7 +195,7 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
   }
 
   // prepare the objective matrix
-  assert(Q.rows() == 1);
+  assert(Q.cols() == 1);
   std::vector<double> g;
   oasesFromMatrix(g, Q);
 
@@ -208,7 +208,7 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
   std::vector<double> ubA;
   oasesFromMatrix(ubA, GubA, scale);
   //lower bounds; min inf for inequalities
-  SparseMatrix GlbA(Matrix::BLOCKCOLUMN<SparseMatrix>(b, Matrix::MIN_VECTOR(ib.rows())));
+  SparseMatrix GlbA(Matrix::BLOCKCOLUMN<SparseMatrix>(b, Matrix::MIN_VECTOR(ib.cols())));
   std::vector<double> lbA;
   oasesFromMatrix(lbA, GlbA, scale);
 
@@ -250,7 +250,7 @@ int QPOASESSolverWrapperLP(const Matrix &Q,
 
   // retrieve the solution
   std::vector<double> xOpt;
-  xOpt.resize(sol.rows());
+  xOpt.resize(sol.cols());
   retVal = problem.getPrimalSolution(&xOpt[0]);
   if (retVal != qpOASES::SUCCESSFUL_RETURN) {
     DBGA("qpOASES LP: failed to retrieve solution");

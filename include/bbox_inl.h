@@ -32,13 +32,13 @@
 double
 pointBoxDistanceSq(const BoundingBox &box, const position &p)
 {
-  vec3 v = (p - position::ORIGIN) - box.getTran().translation();
+  vec3 v = (p - position::Zero()) - box.getTran().translation();
   const mat3 &RMat(box.getTran().affine());
 
 
   double sqDist = 0.0;
   for (int i = 0; i < 3; i++) {
-    double d = v % RMat.row(i);
+    double d = v.dot(RMat.col(i));
     double excess = 0.0;
     // Project vector from box center to p on each axis, getting the distance
     // of p along that axis, and count any excess distance outside box extents
@@ -59,7 +59,7 @@ pointBoxDistanceSq(const BoundingBox &box, const position &p)
 position
 closestPtBbox(const BoundingBox &bbox, const position &p)
 {
-  vec3 d = (p - position::ORIGIN) - bbox.getTran().translation();
+  vec3 d = (p - position::Zero()) - bbox.getTran().translation();
   const mat3 &RMat(bbox.getTran().affine());
 
   // Start result at center of box; make steps from there
@@ -68,12 +68,12 @@ closestPtBbox(const BoundingBox &bbox, const position &p)
   for (int i = 0; i < 3; i++) {
     // project d onto that axis to get the distance
     // along the axis of d from the box center
-    double dist = d % RMat.row(i);
+    double dist = d.dot(RMat.col(i));
     // If distance farther than the box extents, clamp to the box
     if (dist > bbox.halfSize[i]) { dist = bbox.halfSize[i]; }
     if (dist < -bbox.halfSize[i]) { dist = -bbox.halfSize[i]; }
     // Step that distance along the axis to get world coordinate
-    q += dist * RMat.row(i);
+    q += dist * RMat.col(i);
   }
   return position(q.x(), q.y(), q.z());
 }
@@ -81,7 +81,7 @@ closestPtBbox(const BoundingBox &bbox, const position &p)
 void
 BoundingBox::applyTransform(const transf &t)
 {
-  mTran = mTran * t;
+  mTran = t % mTran;
   mTranInv = mTran.inverse();
 }
 
@@ -90,13 +90,13 @@ bboxOverlap(const BoundingBox &bb1, const BoundingBox &bb2, const transf &tran2T
 {
   int i, k;
 
-  transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
+  transf BtoA =  bb1.getTranInv() % tran2To1 % bb2.getTran();
   const mat3 &RMat(BtoA.affine());
 
   double B[3][3];
   for (i = 0; i < 3 ; i++) {
     for (k = 0; k < 3 ; k++) {
-      B[i][k] = RMat.element(k, i);
+      B[i][k] = RMat(i, k);
     }
   }
 
@@ -260,9 +260,9 @@ double bboxDistanceApp(const BoundingBox &bb1, const BoundingBox &bb2)
   //uses three sqrt's, maybe could use less
 
   vec3 t = bb1.getTran().translation() - bb2.getTran().translation();
-  double dist = t.len();
-  dist -= bb1.halfSize.len();
-  dist -= bb2.halfSize.len();
+  double dist = t.norm();
+  dist -= bb1.halfSize.norm();
+  dist -= bb2.halfSize.norm();
   return dist;
 }
 
@@ -271,13 +271,13 @@ double bboxDistanceSq(const BoundingBox &bb1, const BoundingBox &bb2, const tran
   //trying to use the separating axis theorem to get a better distance bound
   int i, k;
 
-  transf BtoA = bb2.getTran() * tran2To1 * bb1.getTranInv();
+  transf BtoA = bb1.getTranInv() % tran2To1 % bb2.getTran();
   const mat3 &RMat(BtoA.affine());
 
   double B[3][3];
   for (i = 0; i < 3 ; i++) {
     for (k = 0; k < 3 ; k++) {
-      B[i][k] = RMat.element(k, i);
+      B[i][k] = RMat(i, k);
     }
   }
 

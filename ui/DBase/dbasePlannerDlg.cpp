@@ -390,15 +390,15 @@ void DBasePlannerDlg::show3DObject(bool isNbr) {
     if (mAligner->Align(*m, *mPlanningModel, elmts)) {
       mat3 mat;
       vec3 v(elmts[3], elmts[7], elmts[11]);
-      mat[0] = elmts[0];
-      mat[1] = elmts[1];
-      mat[2] = elmts[2];
-      mat[3] = elmts[4];
-      mat[4] = elmts[5];
-      mat[5] = elmts[6];
-      mat[6] = elmts[8];
-      mat[7] = elmts[9];
-      mat[8] = elmts[10];
+      mat(0) = elmts[0];
+      mat(1) = elmts[1];
+      mat(2) = elmts[2];
+      mat(3) = elmts[4];
+      mat(4) = elmts[5];
+      mat(5) = elmts[6];
+      mat(6) = elmts[8];
+      mat(7) = elmts[9];
+      mat(8) = elmts[10];
       tr.set(mat, v);
     }
     static_cast<GraspitDBModel *>(m)->getGraspableBody()->setTran(tr);

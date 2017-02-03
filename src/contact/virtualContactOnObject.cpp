@@ -63,7 +63,6 @@ VirtualContactOnObject::readFromFile(std::ifstream &inFile)
 
   // (w,x,y,z) is already a quaternion, if you want to do frame rotate v rad along a vector (x,y,z),
   //you can use q(v,vec(x,y,z))
-  Quaternion q;
   vec3 t;
   inFile >> w >> x >> y >> z;
   if (inFile.fail()) {
@@ -71,7 +70,7 @@ VirtualContactOnObject::readFromFile(std::ifstream &inFile)
     return false;
   }
 
-  q.set(w, x, y, z);
+  Quaternion q(w, x, y, z);
 
   inFile >> x >> y >> z;
   if (inFile.fail()) {
@@ -79,7 +78,9 @@ VirtualContactOnObject::readFromFile(std::ifstream &inFile)
     return false;
   }
 
-  t.set(x, y, z);
+  t.x() = x;
+  t.y() = y;
+  t.z() = z;
   loc = position(x, y, z);
   frame.set(q, t);
 
@@ -90,7 +91,9 @@ VirtualContactOnObject::readFromFile(std::ifstream &inFile)
     return false;
   }
 
-  normal.set(x, y, z);
+  normal.x() = x;
+  normal.y() = y;
+  normal.z() = z;
 
   //sCof
   inFile >> w;
@@ -125,7 +128,7 @@ VirtualContactOnObject::writeToFile(std::ofstream &outFile) {
   //frame
   Quaternion q = frame.rotation();
   vec3 t = frame.translation();
-  outFile << q.w << " " << q.x << " " << q.y << " " << q.z << std::endl;
+  outFile << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << std::endl;
 
   //normal
   outFile << normal.x() << " " << normal.y() << " " << normal.z() << std::endl;

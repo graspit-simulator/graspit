@@ -36,8 +36,6 @@
 
 class Body;
 class transf;
-class position;
-class vec3;
 
 /*! A neighborhood is a list of vertices on the surface of a body.
   Usually they are all within some threshold distance of a reference

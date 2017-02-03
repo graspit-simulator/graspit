@@ -40,7 +40,6 @@
 struct VCReportType;
 class SbVec3f;
 class transf;
-class position;
 
 class QWidget;
 class SoQtExaminerViewer;

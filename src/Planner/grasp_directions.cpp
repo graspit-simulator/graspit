@@ -157,8 +157,8 @@ cartesianGraspDirection::cartesianGraspDirection()
 */
 cartesianGraspDirection::cartesianGraspDirection(GraspDirection *p)
 {
-  point = new cartesian_coordinates(p->get_point());
-  dir = new cartesian_coordinates(p->get_dir());
+  point = new cartesian_coordinates(p->get_point().mvec);
+  dir = new cartesian_coordinates(p->get_dir().mvec);
   empty = p->get_empty();
   set_gdType(p->get_gdType());
 }
@@ -169,8 +169,8 @@ cartesianGraspDirection::cartesianGraspDirection(GraspDirection *p)
 */
 cartesianGraspDirection::cartesianGraspDirection(cartesianGraspDirection *p)
 {
-  point = new cartesian_coordinates(p->get_point());
-  dir = new cartesian_coordinates(p->get_dir());
+  point = new cartesian_coordinates(p->get_point().mvec);
+  dir = new cartesian_coordinates(p->get_dir().mvec);
   empty = p->get_empty();
   set_gdType(p->get_gdType());
 }
@@ -181,8 +181,8 @@ cartesianGraspDirection::cartesianGraspDirection(cartesianGraspDirection *p)
 */
 cartesianGraspDirection::cartesianGraspDirection(const cartesianGraspDirection &p) : GraspDirection()
 {
-  point = new cartesian_coordinates(p.get_point());
-  dir = new cartesian_coordinates(p.get_dir());
+  point = new cartesian_coordinates(p.get_point().mvec);
+  dir = new cartesian_coordinates(p.get_dir().mvec);
   empty = p.get_empty();
   set_gdType(p.get_gdType());
 }
@@ -261,8 +261,8 @@ cylindricalGraspDirection::cylindricalGraspDirection(GraspDirection *p) : GraspD
 */
 cylindricalGraspDirection::cylindricalGraspDirection(cylindricalGraspDirection *p) : GraspDirection()
 {
-  point = new cylindrical_coordinates(p->get_point());
-  dir = new cylindrical_coordinates(p->get_dir());
+  point = new cylindrical_coordinates(p->get_point().mvec);
+  dir = new cylindrical_coordinates(p->get_dir().mvec);
   empty = p->get_empty();
   set_gdType(p->get_gdType());
 }
@@ -273,8 +273,8 @@ cylindricalGraspDirection::cylindricalGraspDirection(cylindricalGraspDirection *
 */
 cylindricalGraspDirection::cylindricalGraspDirection(const cylindricalGraspDirection &p) : GraspDirection()
 {
-  point = new cylindrical_coordinates(p.get_point());
-  dir = new cylindrical_coordinates(p.get_dir());
+  point = new cylindrical_coordinates(p.get_point().mvec);
+  dir = new cylindrical_coordinates(p.get_dir().mvec);
   empty = p.get_empty();
   set_gdType(p.get_gdType());
 }
@@ -294,17 +294,17 @@ cylindricalGraspDirection::~cylindricalGraspDirection()
 void
 cylindricalGraspDirection::set_point(coordinates in)
 {
-  (*point)[0] = in[0];
+  (*point).mvec(0) = in.mvec(0);
 
-  while (in[1] > (2 * M_PI)) {
-    in[1] -= (2 * M_PI);
+  while (in.mvec(1) > (2 * M_PI)) {
+    in.mvec(1) -= (2 * M_PI);
   }
-  while (in[1] < (2 * M_PI)) {
-    in[1] += (2 * M_PI);
+  while (in.mvec(1) < (2 * M_PI)) {
+    in.mvec(1) += (2 * M_PI);
   }
-  (*point)[1] = in[1];
+  (*point).mvec(1) = in.mvec(1);
 
-  (*point)[2] = in[2];
+  (*point).mvec(2) = in.mvec(2);
 }
 
 /*!
@@ -313,9 +313,9 @@ cylindricalGraspDirection::set_point(coordinates in)
 void
 cylindricalGraspDirection::set_dir(coordinates in)
 {
-  (*dir)[0] = in[0];
-  (*dir)[1] = (in[1] > (2 * M_PI)) ? (2 * M_PI) : in[1];
-  (*dir)[2] = in[2];
+  (*dir).mvec(0) = in.mvec(0);
+  (*dir).mvec(1) = (in.mvec(1) > (2 * M_PI)) ? (2 * M_PI) : in.mvec(1);
+  (*dir).mvec(2) = in.mvec(2);
 }
 
 
@@ -353,8 +353,8 @@ sphericalGraspDirection::sphericalGraspDirection(GraspDirection *p) : GraspDirec
 */
 sphericalGraspDirection::sphericalGraspDirection(sphericalGraspDirection *p) : GraspDirection()
 {
-  point = new spherical_coordinates(p->get_point());
-  dir = new spherical_coordinates(p->get_dir());
+  point = new spherical_coordinates(p->get_point().mvec);
+  dir = new spherical_coordinates(p->get_dir().mvec);
   empty = p->get_empty();
   set_gdType(p->get_gdType());
 }
@@ -365,8 +365,8 @@ sphericalGraspDirection::sphericalGraspDirection(sphericalGraspDirection *p) : G
 */
 sphericalGraspDirection::sphericalGraspDirection(const sphericalGraspDirection &p) : GraspDirection()
 {
-  point = new spherical_coordinates(p.get_point());
-  dir = new spherical_coordinates(p.get_dir());
+  point = new spherical_coordinates(p.get_point().mvec);
+  dir = new spherical_coordinates(p.get_dir().mvec);
   empty = p.get_empty();
   set_gdType(p.get_gdType());
 }
@@ -386,23 +386,23 @@ sphericalGraspDirection::~sphericalGraspDirection()
 void
 sphericalGraspDirection::set_point(coordinates in)
 {
-  (*point)[0] = in[0];
+  (*point).mvec(0) = in.mvec(0);
 
-  while (in[1] > M_PI) {
-    in[1] -= M_PI;
+  while (in.mvec(1) > M_PI) {
+    in.mvec(1) -= M_PI;
   }
-  while (in[1] < M_PI) {
-    in[1] += M_PI;
+  while (in.mvec(1) < M_PI) {
+    in.mvec(1) += M_PI;
   }
-  (*point)[1] = in[1];
+  (*point).mvec(1) = in.mvec(1);
 
-  while (in[2] > (2 * M_PI)) {
-    in[2] -= (2 * M_PI);
+  while (in.mvec(2) > (2 * M_PI)) {
+    in.mvec(2) -= (2 * M_PI);
   }
-  while (in[2] < (2 * M_PI)) {
-    in[2] += (2 * M_PI);
+  while (in.mvec(2) < (2 * M_PI)) {
+    in.mvec(2) += (2 * M_PI);
   }
-  (*point)[2] = in[2];
+  (*point).mvec(2) = in.mvec(2);
 }
 
 /*!
@@ -411,9 +411,9 @@ sphericalGraspDirection::set_point(coordinates in)
 void
 sphericalGraspDirection::set_dir(coordinates in)
 {
-  (*dir)[0] = in[0];
-  (*dir)[1] = (in[1] > M_PI) ? M_PI : in[1];
-  (*dir)[2] = (in[1] > (2 * M_PI)) ? (2 * M_PI) : in[1];
+  (*dir).mvec(0) = in.mvec(0);
+  (*dir).mvec(1) = (in.mvec(1) > M_PI) ? M_PI : in.mvec(1);
+  (*dir).mvec(2) = (in.mvec(1) > (2 * M_PI)) ? (2 * M_PI) : in.mvec(1);
 
 }
 

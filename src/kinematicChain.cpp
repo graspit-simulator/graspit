@@ -521,7 +521,7 @@ KinematicChain::updateLinkPoses()
   }
 
   for (int j = 0; j < numChildren; j++) {
-    children[j]->simpleSetTran(childOffsetTran[j]*newLinkTranVec[numLinks - 1]);
+    children[j]->simpleSetTran(newLinkTranVec[numLinks - 1] % childOffsetTran[j]);
   }
 
   if (owner->inherits("HumanHand")) {
@@ -542,13 +542,13 @@ KinematicChain::updateLinkPoses()
 void
 KinematicChain::fwdKinematics(const double *jointVals, std::vector<transf> &newLinkTranVec) const
 {
-  transf total = tran * owner->getTran();
+  transf total = owner->getTran() % tran;
   int l = 0;
   for (int j = 0; j < numJoints; j++) {
     if (!jointVals) {
-      total = jointVec[j]->getTran(jointVec[j]->getVal()) * total;
+      total = total % jointVec[j]->getTran(jointVec[j]->getVal());
     } else {
-      total = jointVec[j]->getTran(jointVals[firstJointNum + j]) * total;
+      total = total % jointVec[j]->getTran(jointVals[firstJointNum + j]);
     }
     if (l < numLinks && lastJoint[l] == j) {
       newLinkTranVec[l] = total;
@@ -578,13 +578,13 @@ KinematicChain::fwdKinematics(const double *jointVals, std::vector<transf> &newL
 void
 KinematicChain::getJointLocations(const double *jointVals, std::vector<transf> &jointTranVec) const
 {
-  transf total = tran * owner->getTran();
+  transf total = owner->getTran() % tran;
   for (int j = 0; j < numJoints; j++) {
     jointTranVec[j] = total;
     if (!jointVals) {
-      total = jointVec[j]->getTran(jointVec[j]->getVal()) * total;
+      total = total % jointVec[j]->getTran(jointVec[j]->getVal());
     } else {
-      total = jointVec[j]->getTran(jointVals[firstJointNum + j]) * total;
+      total = total % jointVec[j]->getTran(jointVals[firstJointNum + j]);
     }
   }
 }
@@ -622,8 +622,9 @@ KinematicChain::infinitesimalMotion(const double *jointVals, std::vector<transf>
   matrixMultiply(J, theta, dm);
   //and convert it to transforms
   for (int l = 0; l < numLinks; l++) {
-    transf tr = rotXYZ(dm.elem(6 * l + 3, 0), dm.elem(6 * l + 4, 0), dm.elem(6 * l + 5, 0)) *
-                translate_transf(vec3(dm.elem(6 * l + 0, 0), dm.elem(6 * l + 1, 0), dm.elem(6 * l + 2, 0)));
+    transf translate = transf::TRANSLATION(vec3(dm.elem(6 * l + 0, 0), dm.elem(6 * l + 1, 0), dm.elem(6 * l + 2, 0))) ;
+    transf rotate = transf::RPY(dm.elem(6 * l + 3, 0), dm.elem(6 * l + 4, 0), dm.elem(6 * l + 5, 0));
+    transf tr = translate % rotate ;
     newLinkTranVec[l] = tr;
   }
 }
@@ -668,7 +669,7 @@ Matrix
 KinematicChain::activeLinkJacobian(bool worldCoords)
 {
   Matrix J(linkJacobian(worldCoords));
-  if (!J.rows() || !J.cols()) { return Matrix(0, 0); }
+  if (!J.cols() || !J.cols()) { return Matrix(0, 0); }
   int activeLinks = 0;
   for (int l = 0; l < numLinks; l++) {
     if (linkVec[l]->getNumContacts()) {
@@ -701,7 +702,7 @@ KinematicChain::actuatedJacobian(const Matrix &fullColumnJ) const
 {
   std::vector<DynJoint *> dynJoints;
   getDynamicJoints(&dynJoints);
-  int activeRows = fullColumnJ.rows();
+  int activeRows = fullColumnJ.cols();
   if (!activeRows) { return Matrix(0, 0); }
   //first count the constraints
   int numConstrained = 0;

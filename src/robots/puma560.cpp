@@ -106,20 +106,19 @@ Puma560::findClosestSol(Puma560Solution *candidates, Puma560Solution *current)
 int
 Puma560::invKinematics(const transf &endTranLocal, double *dofVals, int)
 {
-  transf endTran = endTranLocal * base->getTran().inverse();
+  transf endTran = base->getTran().inverse() % endTranLocal;
   int i;
   const double a2 = 431.8, a3 = 20.3;
   const double d3 = 149.0, d4 = 431.8;
-  mat3 rot;
-  endTran.rotation().ToRotationMatrix(rot);
+  mat3 rot = endTran.rotation().toRotationMatrix();
 
-  double r21 = rot.element(1, 0);
-  double r22 = rot.element(1, 1);
-  double r23 = rot.element(1, 2);
+  double r21 = rot(1, 0);
+  double r22 = rot(1, 1);
+  double r23 = rot(1, 2);
 
-  double r31 = rot.element(2, 0);
-  double r32 = rot.element(2, 1);
-  double r33 = rot.element(2, 2);
+  double r31 = rot(2, 0);
+  double r32 = rot(2, 1);
+  double r33 = rot(2, 2);
 
   double px = endTran.translation()[0];
   double py = endTran.translation()[1];
