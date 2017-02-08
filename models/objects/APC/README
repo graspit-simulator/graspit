@@ -1,0 +1,9 @@
+This folder contains an incomplete list of object models used in Amazon Picking Challenge. Each
+object has a 3D mesh file (.wrl) and texture/color file (.png).
+
+The .xml files describe the objects and load corresponding .wrl files. The properties (material,
+mass, and inertia matrix) are randomly picked as a placeholder; please fill in them carefully if
+the values are useful in your simulation.
+
+Please contact Wenzhao Lian at lianwenzhao@gmail.com if you have any questions.
+
