@@ -63,6 +63,7 @@
 #include "taskDispatcher.h"
 #endif
 
+#include "searchEnergyFactory.h"
 int GraspitCore::initResult = SUCCESS;
 
 //! This is the system wide pointer to the graspit user interface.
@@ -97,6 +98,7 @@ GraspitCore::GraspitCore(int argc, char **argv):
   mainWindow(NULL),
   world(NULL)
 {
+SearchEnergyFactory::registerBuiltinCreators();
   GraspitParser *graspitParser = new GraspitParser();
   graspitParser->parseArgs(argc, argv);
   cmdline::parser *args = graspitParser->parseArgs(argc, argv);

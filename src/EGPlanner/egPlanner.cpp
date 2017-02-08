@@ -39,6 +39,8 @@
 #include "eigenGrasp.h" //for glove input
 #include "Collision/collisionInterface.h"
 
+#include "searchEnergyFactory.h"
+
 //#define GRASPITDBG
 #include "debug.h"
 
@@ -260,7 +262,8 @@ EGPlanner::setEnergyType(SearchEnergyType s)
   if (!mEnergyCalculator->isType(s))
   {
     delete mEnergyCalculator;
-    mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
+      mEnergyCalculator = SearchEnergyFactory::getInstance()->createEnergy("CONTACT_ENERGY");
+//    mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
   }
 }
 

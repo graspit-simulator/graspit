@@ -180,6 +180,7 @@ set (GRASPIT_EGPLANNER_HEADERS
 
 set (GRASPIT_EGPLANNER_ENERGY_HEADERS
     ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/searchEnergyFactory.h
     ${GSRC}/include/EGPlanner/energy/autograspQualityEnergy.h 
     ${GSRC}/include/EGPlanner/energy/compliantEnergy.h
     ${GSRC}/include/EGPlanner/energy/contactEnergy.h 
@@ -398,7 +399,8 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/simAnn.cpp 
     ${GSRC}/src/EGPlanner/searchState.cpp 
     ${GSRC}/src/EGPlanner/searchStateImpl.cpp 
-    ${GSRC}/src/EGPlanner/energy/searchEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/searchEnergy.cpp
+    ${GSRC}/src/EGPlanner/energy/searchEnergyFactory.cpp
     ${GSRC}/src/EGPlanner/onLinePlanner.cpp 
     ${GSRC}/src/EGPlanner/egPlanner.cpp 
     ${GSRC}/src/EGPlanner/simAnnPlanner.cpp 
