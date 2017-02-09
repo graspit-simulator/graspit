@@ -898,16 +898,58 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-# Make test executable
-add_executable(graspit_simple_test
-    ${GSRC}/test/simple_test.cpp
+# Make test executables
+add_executable(primative_planner_tests
+    ${GSRC}/test/primative_planner_tests.cpp
 )
 
-add_dependencies(graspit_simple_test googletest)
+add_executable(eigen_tests
+    ${GSRC}/test/eigen_tests.cpp
+)
 
-target_link_libraries(graspit_simple_test
+add_executable(transform_tests
+    ${GSRC}/test/transform_tests.cpp
+)
+
+add_executable(graspit_collision_tests
+    ${GSRC}/test/graspit_collision_tests.cpp
+)
+
+set_target_properties( primative_planner_tests eigen_tests transform_tests graspit_collision_tests
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
+)
+
+add_dependencies(primative_planner_tests googletest)
+add_dependencies(eigen_tests googletest)
+add_dependencies(transform_tests googletest)
+add_dependencies(graspit_collision_tests googletest)
+
+target_link_libraries(primative_planner_tests
    graspit
    ${GTEST_BOTH_LIBRARIES}
 )
+
+target_link_libraries(eigen_tests
+   graspit
+   ${GTEST_BOTH_LIBRARIES}
+)
+
+target_link_libraries(transform_tests
+   graspit
+   ${GTEST_BOTH_LIBRARIES}
+)
+
+target_link_libraries(graspit_collision_tests
+   graspit
+   ${GTEST_BOTH_LIBRARIES}
+)
+
+
+
+
+
 
 endif(BUILD_TESTS)
