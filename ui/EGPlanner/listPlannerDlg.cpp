@@ -326,7 +326,7 @@ ListPlannerDlg::showResult()
  
 	if ( d!=0 ){
 		const GraspPlanningState *s = mPlanner->getGrasp(mBestGraspNum);
-        mPlanner->showState(mBestGraspNum);
+		mPlanner->showFinalState(mBestGraspNum);
 		rank = mBestGraspNum+1;
 		size = d;
 		energy = s->getEnergy();
@@ -340,7 +340,7 @@ ListPlannerDlg::showResult()
 	n1.setNum(energy,'f',3);
 	energyLabel->setText("Energy: " + n1);
 	n1.setNum(iteration);
-    showOne();
+	showOne();
 	iterationLabel->setText("Iteration: " + n1);
 
 }
@@ -357,8 +357,8 @@ ListPlannerDlg::showOne()
         DBGA("Wrong test number selected");
         return;
     }
-    DBGA("Testing pre-grasp #" << num);
-    mPlanner->showState(num);
+    DBGA("Showing Planned Grasp #" << num);
+    mPlanner->showFinalState(num);
 }
 
 void

@@ -59,7 +59,11 @@ class ListPlanner : public EGPlanner
     virtual void mainLoop();
 
     //! Pulls the state at the given index from the input list
-    GraspPlanningState *getState(int index);
+    GraspPlanningState *getInitialState(int index);
+
+    //! Pulls the state at the given index from the final list
+    GraspPlanningState *getFinalState(int index);
+
   public:
     ListPlanner(Hand *h);
     ~ListPlanner();
@@ -79,7 +83,10 @@ class ListPlanner : public EGPlanner
     void testState(int index);
 
     //! Shows the unprocessed state at the given index in the input list
-    void showState(int index);
+    void showInitialState(int index);
+
+    //! Shows the state at the given index in the best list
+    void showFinalState(int index);
 
     //! A hack; shows the state and also does approachToContact as the SearchEnergy would
     void prepareState(int index);

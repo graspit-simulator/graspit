@@ -80,7 +80,7 @@ ListPlanner::setInput(std::list<GraspPlanningState*> input)
 }
 
 GraspPlanningState*
-ListPlanner::getState(int index)
+ListPlanner::getInitialState(int index)
 {
 	std::list<GraspPlanningState*>::iterator it = mInputList.begin();
 	int count = 0;
@@ -94,10 +94,25 @@ ListPlanner::getState(int index)
 	return *it;
 }
 
+GraspPlanningState*
+ListPlanner::getFinalState(int index)
+{
+    std::list<GraspPlanningState*>::iterator it = mBestList.begin();
+    int count = 0;
+    while (it!=mBestList.end() && count < index) {
+        count++; it++;
+    }
+    if (it==mBestList.end()) {
+        DBGA("Requested grasp not in list");
+        return NULL;
+    }
+    return *it;
+}
+
 void 
 ListPlanner::testState(int index)
 {
-	GraspPlanningState *state = getState(index);
+    GraspPlanningState *state = getInitialState(index);
 	if (!state) return;
 	bool legal; double energy;
 	mEnergyCalculator->analyzeState(legal, energy, state, false);
@@ -105,17 +120,25 @@ ListPlanner::testState(int index)
 }
 
 void
-ListPlanner::showState(int index)
+ListPlanner::showInitialState(int index)
 {
-	GraspPlanningState *state = getState(index);
+    GraspPlanningState *state = getInitialState(index);
 	if (!state) return;
 	state->execute();
 }
 
 void
+ListPlanner::showFinalState(int index)
+{
+    GraspPlanningState *state = getFinalState(index);
+    if (!state) return;
+    state->execute();
+}
+
+void
 ListPlanner::prepareState(int index)
 {
-	showState(index);
+    showInitialState(index);
     mHand->findInitialContact(200);
 }
 
@@ -137,7 +160,6 @@ ListPlanner::mainLoop()
 	bool legal; double energy;
 	PRINT_STAT(mOut, mCurrentStep);
 
-
     (*mPlanningIterator)->execute();
     mHand->findInitialContact(200);
 
@@ -156,6 +178,7 @@ ListPlanner::mainLoop()
 		else worstEnergy = mBestList.back()->getEnergy();
 		if (energy < worstEnergy) {
 			GraspPlanningState *insertState = new GraspPlanningState(*mPlanningIterator);
+            insertState->saveCurrentHandState();
 			insertState->setEnergy(energy);
 			insertState->setItNumber(mCurrentStep);
 			DBGP("Solution at step " << mCurrentStep);
