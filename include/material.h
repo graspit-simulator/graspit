@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s):  Andrew T. Miller 
+// Author(s):  Andrew T. Miller
 //
 // $Id: material.h,v 1.3 2009/03/25 22:10:23 cmatei Exp $
 //
@@ -25,7 +25,7 @@
 
 #ifndef MATERIAL_HXX
 
-enum materialT {frictionless, glass, metal, wood,plastic, rubber, stone, invalid};
+enum materialT {frictionless, glass, metal, wood, plastic, rubber, stone, invalid};
 
 #define NUM_MATERIAL 8
 
@@ -35,7 +35,7 @@ extern char matNameList[NUM_MATERIAL][30];
 
 void initCof();
 materialT readMaterial(const char *matStr);
-void getMaterialStr(materialT mat,char *str);
+void getMaterialStr(materialT mat, char *str);
 const char *getMaterialStr(materialT mat);
 
 #define MATERIAL_HXX

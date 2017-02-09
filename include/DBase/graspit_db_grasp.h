@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the %GraspitDBGrasp class
  */
 
@@ -46,67 +46,67 @@ class GraspitDBModel;
 using std::string;
 /*! This is the class to define the data entry of grasps in CGDB
 */
-class GraspitDBGrasp : public db_planner::Grasp{
-	//! Search State stores the actual grasps
-	GraspPlanningState *mPreGrasp, *mFinalGrasp;
-	//! Stores the test scores in cross correlation
-	std::vector<double> mTestScores;
-	//! The hand associated with this grasp
-	Hand* mHand;
+class GraspitDBGrasp : public db_planner::Grasp {
+    //! Search State stores the actual grasps
+    GraspPlanningState *mPreGrasp, *mFinalGrasp;
+    //! Stores the test scores in cross correlation
+    std::vector<double> mTestScores;
+    //! The hand associated with this grasp
+    Hand *mHand;
 
-public:
-	GraspitDBGrasp(const GraspitDBGrasp& grasp2);
-        GraspitDBGrasp(Hand* h) : mPreGrasp(NULL), mFinalGrasp(NULL), mHand(h) {}
-	~GraspitDBGrasp();
-	//! Returns the pre-grasp of this GraspitDBGrasp
-	GraspPlanningState* getPreGraspPlanningState() { return mPreGrasp; }
-	//! Returns the final-grasp of this GraspitDBGrasp
-	GraspPlanningState* getFinalGraspPlanningState() { return mFinalGrasp; }
-	//! Returns the pre-grasp of this GraspitDBGrasp
-	const GraspPlanningState* getPreGraspPlanningState() const { return mPreGrasp; }
-	//! Returns the final-grasp of this GraspitDBGrasp
-	const GraspPlanningState* getFinalGraspPlanningState() const { return mFinalGrasp; }
+  public:
+    GraspitDBGrasp(const GraspitDBGrasp &grasp2);
+    GraspitDBGrasp(Hand *h) : mPreGrasp(NULL), mFinalGrasp(NULL), mHand(h) {}
+    ~GraspitDBGrasp();
+    //! Returns the pre-grasp of this GraspitDBGrasp
+    GraspPlanningState *getPreGraspPlanningState() { return mPreGrasp; }
+    //! Returns the final-grasp of this GraspitDBGrasp
+    GraspPlanningState *getFinalGraspPlanningState() { return mFinalGrasp; }
+    //! Returns the pre-grasp of this GraspitDBGrasp
+    const GraspPlanningState *getPreGraspPlanningState() const { return mPreGrasp; }
+    //! Returns the final-grasp of this GraspitDBGrasp
+    const GraspPlanningState *getFinalGraspPlanningState() const { return mFinalGrasp; }
 
-	//! Records the test score in the memory, not in CGDB, these scores will not be stored
-	void addTestScore(double s) { mTestScores.push_back( s < 0 ? 0 : s); }
-	//! Returns the score of the i-th test
-	double getTestScore(int i) { return mTestScores[i]; }
-	//! Returns the number of tests that have just been done
-	int getNumTestScores() { return (int)mTestScores.size(); }
-	//! Returns the average of the scores of the past tests
-	double getTestAverageScore();
-	//! Transform this grasp 
-	bool Transform(const float array[16]);
-	//! Set the pregrasp planning state and modify the original pregrasp in db_planner::grasp as well
-	void setPreGraspPlanningState(GraspPlanningState* p);
-	//! Set the finalgrasp planning state 
-	/*! Modify the original finalgrasp and contacts in db_planner::grasp as well */
-	void setFinalGraspPlanningState(GraspPlanningState* p);
-	/*! Set the joints and positions of the pre-grasp and final grasp, the base class should
-	    have no idea of what GraspitDBGrasp looks like
-	*/
-	virtual bool SetGraspParameters(const vector<double>& pregrasp_joints, 
-									const vector<double>& pregrasp_position, 
-									const vector<double>& grasp_joints,
-									const vector<double>& grasp_position);
-	//! Returns the hand associated with this grasp
-	const Hand *getHand() const {return mHand;}
+    //! Records the test score in the memory, not in CGDB, these scores will not be stored
+    void addTestScore(double s) { mTestScores.push_back(s < 0 ? 0 : s); }
+    //! Returns the score of the i-th test
+    double getTestScore(int i) { return mTestScores[i]; }
+    //! Returns the number of tests that have just been done
+    int getNumTestScores() { return (int)mTestScores.size(); }
+    //! Returns the average of the scores of the past tests
+    double getTestAverageScore();
+    //! Transform this grasp
+    bool Transform(const float array[16]);
+    //! Set the pregrasp planning state and modify the original pregrasp in db_planner::grasp as well
+    void setPreGraspPlanningState(GraspPlanningState *p);
+    //! Set the finalgrasp planning state
+    /*! Modify the original finalgrasp and contacts in db_planner::grasp as well */
+    void setFinalGraspPlanningState(GraspPlanningState *p);
+    /*! Set the joints and positions of the pre-grasp and final grasp, the base class should
+        have no idea of what GraspitDBGrasp looks like
+    */
+    virtual bool SetGraspParameters(const vector<double> &pregrasp_joints,
+                                    const vector<double> &pregrasp_position,
+                                    const vector<double> &grasp_joints,
+                                    const vector<double> &grasp_position);
+    //! Returns the hand associated with this grasp
+    const Hand *getHand() const {return mHand;}
 };
 
 /*! For now, the hand is passed to the constructor. In the future,
-	we will probably allow the hand to be changed for this 
-	allocator.
+  we will probably allow the hand to be changed for this
+  allocator.
 */
 class GraspitDBGraspAllocator : public db_planner::GraspAllocator
 {
-private:
-	//! The hand that all grasps are initialized with
-	Hand *mHand;
-public:
-	GraspitDBGraspAllocator(Hand *h) : mHand(h) {}
-	db_planner::Grasp* Get() const {
-		return new GraspitDBGrasp(mHand);
-	}
+  private:
+    //! The hand that all grasps are initialized with
+    Hand *mHand;
+  public:
+    GraspitDBGraspAllocator(Hand *h) : mHand(h) {}
+    db_planner::Grasp *Get() const {
+      return new GraspitDBGrasp(mHand);
+    }
 };
 
 #endif

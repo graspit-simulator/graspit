@@ -33,35 +33,35 @@
 class transf;
 
 //! For all the grasps of the given object, computes and stores their compliant equivalents
-/*! A compliant equivalent grasp of a given grasp is obtained by doing a "compliant open" 
+/*! A compliant equivalent grasp of a given grasp is obtained by doing a "compliant open"
   (meaning opening around one of the fingers).
 
   We are inheriting from the PreGraspCheckTask as this shares some of the functionality,
-  
+
  */
 class CompliantGraspCopyTask : public PreGraspCheckTask {
- private:
-  //! Does all the compliant copy work for one particular grasp
-  bool compliantCopy(const db_planner::Grasp *grasp, Pr2Gripper2010::ComplianceType compliance);
+  private:
+    //! Does all the compliant copy work for one particular grasp
+    bool compliantCopy(const db_planner::Grasp *grasp, Pr2Gripper2010::ComplianceType compliance);
 
-  //! Stores a new grasp in the database as a compliant copy of the original
-  bool checkStoreGrasp(const db_planner::Grasp *original);
+    //! Stores a new grasp in the database as a compliant copy of the original
+    bool checkStoreGrasp(const db_planner::Grasp *original);
 
-  //! Returns true if two transforms are "close" to each other
-  bool similarity(const transf &t1, const transf &t2);
+    //! Returns true if two transforms are "close" to each other
+    bool similarity(const transf &t1, const transf &t2);
 
-  //! Same thing, but using the distance measure also used in grasp planning
-  bool searchSimilarity(const transf &t1, const transf &t2);
+    //! Same thing, but using the distance measure also used in grasp planning
+    bool searchSimilarity(const transf &t1, const transf &t2);
 
- public:
-  //! Just a stub for now
-  CompliantGraspCopyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-                         db_planner::TaskRecord rec);
-  //! Nothing to do here
-  ~CompliantGraspCopyTask(){}
+  public:
+    //! Just a stub for now
+    CompliantGraspCopyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                           db_planner::TaskRecord rec);
+    //! Nothing to do here
+    ~CompliantGraspCopyTask() {}
 
-  //! Actually does all the work
-  virtual void start();
+    //! Actually does all the work
+    virtual void start();
 };
 
 

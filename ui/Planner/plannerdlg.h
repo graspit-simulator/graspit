@@ -18,14 +18,14 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
-// $Id: 
+// $Id:
 //
 //######################################################################
 
 /*! \file
-  \brief Implements the PlannerDlg, the grasp planner dialog box. 
+  \brief Implements the PlannerDlg, the grasp planner dialog box.
 */
 
 //Added by qt3to4:
@@ -68,26 +68,26 @@ class grasp_manager;
 
 class PlannerDlg : public QDialog, public Ui::PlannerDlgUI
 {
-	Q_OBJECT
-private:
+    Q_OBJECT
+  private:
     QTextStream stream;
     QFile masterFile;
     grasp_manager *myGraspManager;
 
-	void init();
-	void destroy() ;
-public:
-	PlannerDlg(QWidget *parent = 0) : QDialog(parent) {
-		setupUi(this);
-		init();
-	}
-	~PlannerDlg(){destroy();}
-public Q_SLOTS:
-	void generateGrasps();
-	void showGrasp();
-	void newQM();
-	void chooseFile();
-	void chooseSaveFile();
-	void testGrasps();
-	void enableShowButton();
+    void init();
+    void destroy() ;
+  public:
+    PlannerDlg(QWidget *parent = 0) : QDialog(parent) {
+      setupUi(this);
+      init();
+    }
+    ~PlannerDlg() {destroy();}
+  public Q_SLOTS:
+    void generateGrasps();
+    void showGrasp();
+    void newQM();
+    void chooseFile();
+    void chooseSaveFile();
+    void testGrasps();
+    void enableShowButton();
 };

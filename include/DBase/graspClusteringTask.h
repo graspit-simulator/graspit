@@ -40,24 +40,24 @@ class GraspitDBGrasp;
 
   Will set the "cluster_rep" property of ALL grasps in the list based on what it
   thinks, i.e. mark it "true" for all those it thinks should be cluster reps and
-  "false" for all others. 
+  "false" for all others.
  */
 class GraspClusteringTask : public Task {
- private:
-  //! The record of the actual planning task
-  db_planner::PlanningTaskRecord mPlanningTask;
+  private:
+    //! The record of the actual planning task
+    db_planner::PlanningTaskRecord mPlanningTask;
 
-  //! Returns true if two grasps are close enough to be clustered together
-  bool clusterGrasps(const GraspitDBGrasp *g1, const GraspitDBGrasp *g2);
- public:
-  //! Just a stub for now
-  GraspClusteringTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-		      db_planner::TaskRecord rec);
-  //! Nothing to do here
-  ~GraspClusteringTask(){}
+    //! Returns true if two grasps are close enough to be clustered together
+    bool clusterGrasps(const GraspitDBGrasp *g1, const GraspitDBGrasp *g2);
+  public:
+    //! Just a stub for now
+    GraspClusteringTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                        db_planner::TaskRecord rec);
+    //! Nothing to do here
+    ~GraspClusteringTask() {}
 
-  //! Actually does all the work
-  virtual void start();
+    //! Actually does all the work
+    virtual void start();
 };
 
 

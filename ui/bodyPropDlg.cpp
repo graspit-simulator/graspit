@@ -51,26 +51,27 @@
 */
 void BodyPropDlg::init()
 {
-  int i,c,l;
-  World *w=graspitCore->getWorld();
+  int i, c, l;
+  World *w = graspitCore->getWorld();
   std::list<WorldElement *> elemList = w->getSelectedElementList();
   std::list<WorldElement *>::iterator ep;
-  
-  dynBod=NULL;
-  massLineEdit->setValidator(new QDoubleValidator(0,1.0e+100,6,this));
-  
-  for (ep=elemList.begin();ep!=elemList.end();ep++) {
-    if ((*ep)->inherits("Body")) bodyVec.push_back((Body *)(*ep));
+
+  dynBod = NULL;
+  massLineEdit->setValidator(new QDoubleValidator(0, 1.0e+100, 6, this));
+
+  for (ep = elemList.begin(); ep != elemList.end(); ep++) {
+    if ((*ep)->inherits("Body")) { bodyVec.push_back((Body *)(*ep)); }
     else if ((*ep)->inherits("Robot")) {
       Robot *r = (Robot *)(*ep);
       bodyVec.push_back(r->getBase());
-      for (c=0;c<r->getNumChains();c++)
-	for (l=0;l<r->getChain(c)->getNumLinks();l++)
-	  bodyVec.push_back(r->getChain(c)->getLink(l));
+      for (c = 0; c < r->getNumChains(); c++)
+        for (l = 0; l < r->getChain(c)->getNumLinks(); l++) {
+          bodyVec.push_back(r->getChain(c)->getLink(l));
+        }
     }
   }
   numBodies = bodyVec.size();
-  
+
   if (numBodies > 1) {
     dynamicCheckBox->setEnabled(false);
     axesCheckBox->setEnabled(false);
@@ -81,9 +82,9 @@ void BodyPropDlg::init()
     if (bodyVec[0]->inherits("DynamicBody")) {
       dynBod = (DynamicBody *)bodyVec[0];
       if (dynBod->isDynamic()) {
-	axesCheckBox->setChecked(dynBod->axesShown());
-	dynamicForcesCheckBox->setChecked(dynBod->dynContactForcesShown());
-	massLineEdit->setText(QString::number(dynBod->getMass()));
+        axesCheckBox->setChecked(dynBod->axesShown());
+        dynamicForcesCheckBox->setChecked(dynBod->dynContactForcesShown());
+        massLineEdit->setText(QString::number(dynBod->getMass()));
       }
       dynamicCheckBox->setChecked(dynBod->isDynamic());
     }
@@ -93,9 +94,9 @@ void BodyPropDlg::init()
       massLineEdit->setEnabled(false);
     }
   }
-  
+
   //save original values in case user cancels
-  for (i=0;i<numBodies;i++) {
+  for (i = 0; i < numBodies; i++) {
     origMaterials.push_back(bodyVec[i]->getMaterial());
     origShowFC.push_back(bodyVec[i]->frictionConesShown());
     origTransparencies.push_back(bodyVec[i]->getTransparency());
@@ -106,72 +107,74 @@ void BodyPropDlg::init()
     origAxesShown = dynBod->axesShown();
     origDynContactForcesShown = dynBod->dynContactForcesShown();
   }
-  else origIsDynamic = false;
-  
-  for (i=0;i<w->getNumMaterials();i++)
+  else { origIsDynamic = false; }
+
+  for (i = 0; i < w->getNumMaterials(); i++) {
     materialComboBox->insertItem(w->getMaterialName(i));
+  }
   int firstMat = bodyVec[0]->getMaterial();
-  for (i=1;i<numBodies;i++)
-    if (bodyVec[i]->getMaterial() != firstMat) break;
-  if (i==numBodies) materialComboBox->setCurrentItem(firstMat);
+  for (i = 1; i < numBodies; i++)
+    if (bodyVec[i]->getMaterial() != firstMat) { break; }
+  if (i == numBodies) { materialComboBox->setCurrentItem(firstMat); }
   else {
     materialComboBox->insertItem(QString("Keep Original"));
     materialComboBox->setCurrentItem(w->getNumMaterials());
   }
-  
+
   bool showFC = bodyVec[0]->frictionConesShown();
-  for (i=1;i<numBodies;i++)
-    if (bodyVec[i]->frictionConesShown() != showFC) break;
-  if (i==numBodies) fcCheckBox->setChecked(showFC);
+  for (i = 1; i < numBodies; i++)
+    if (bodyVec[i]->frictionConesShown() != showFC) { break; }
+  if (i == numBodies) { fcCheckBox->setChecked(showFC); }
   else {
     fcCheckBox->setTristate(true);
     fcCheckBox->setNoChange();
   }
-  
+
   float transp = bodyVec[0]->getTransparency();
-  for (i=1;i<numBodies;i++)
-    if (bodyVec[i]->getTransparency() != transp) break;
-  if (i==numBodies)  transparencySlider->setValue((int) (transp*transparencySlider->maxValue()));
+  for (i = 1; i < numBodies; i++)
+    if (bodyVec[i]->getTransparency() != transp) { break; }
+  if (i == numBodies) { transparencySlider->setValue((int)(transp * transparencySlider->maxValue())); }
 
   boundingCheckBox->setChecked(false);
   boundingSpinBox->setEnabled(false);
-  QObject::connect( boundingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showBvs()) );
-  QObject::connect( boundingSpinBox, SIGNAL(valueChanged(int)), this, SLOT(showBvs()) );
-    
+  QObject::connect(boundingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showBvs()));
+  QObject::connect(boundingSpinBox, SIGNAL(valueChanged(int)), this, SLOT(showBvs()));
+
 }
 
 /*!
   When the transparency slider is changed, the transparency of the affected
   bodies is immediately updated to show the change.
 */
-void BodyPropDlg::setTransparency( int val )
+void BodyPropDlg::setTransparency(int val)
 {
-  float ratio = (float)val/(float)transparencySlider->maxValue();
-  for (int i=0;i<numBodies;i++)
+  float ratio = (float)val / (float)transparencySlider->maxValue();
+  for (int i = 0; i < numBodies; i++) {
     bodyVec[i]->setTransparency(ratio);
+  }
 }
 
 /*!
   When the showAxes box is toggled, this updates the axes display for the
   selected body immediately.
  */
-void BodyPropDlg::setShowAxes( int state)
+void BodyPropDlg::setShowAxes(int state)
 {
-  if (!dynBod) return;
-  if (state == QCheckBox::On) dynBod->showAxes(true);
-  else if (state == QCheckBox::Off) dynBod->showAxes(false);
+  if (!dynBod) { return; }
+  if (state == QCheckBox::On) { dynBod->showAxes(true); }
+  else if (state == QCheckBox::Off) { dynBod->showAxes(false); }
 }
 
 /*!
   When the show friction cones box is toggled, this updates the cones display
   for the affected bodies immediately.
 */
-void BodyPropDlg::setShowFC( int state )
+void BodyPropDlg::setShowFC(int state)
 {
-  for (int i=0;i<numBodies;i++)
-    if (state == QCheckBox::On) bodyVec[i]->showFrictionCones(true);
-    else if (state == QCheckBox::Off) bodyVec[i]->showFrictionCones(false);
-    else if (state == QCheckBox::NoChange) bodyVec[i]->showFrictionCones(origShowFC[i]);
+  for (int i = 0; i < numBodies; i++)
+    if (state == QCheckBox::On) { bodyVec[i]->showFrictionCones(true); }
+    else if (state == QCheckBox::Off) { bodyVec[i]->showFrictionCones(false); }
+    else if (state == QCheckBox::NoChange) { bodyVec[i]->showFrictionCones(origShowFC[i]); }
 }
 
 /*!
@@ -183,10 +186,10 @@ void BodyPropDlg::setShowFC( int state )
   The lower half of the dialog box relating to dynamic properties is enabled
   and disabled based on the setting of the dynamics check box.
 */
-void BodyPropDlg::setDynamic( int state )
+void BodyPropDlg::setDynamic(int state)
 {
   if (dynBod) {
-    if (state==QCheckBox::On)  dynBod->setUseDynamics(true);
+    if (state == QCheckBox::On) { dynBod->setUseDynamics(true); }
     else if (state == QCheckBox::Off) {
       dynBod->setUseDynamics(false);
       axesCheckBox->setEnabled(false);
@@ -194,10 +197,10 @@ void BodyPropDlg::setDynamic( int state )
       massLineEdit->setEnabled(false);
     }
   }
-  else if (state==QCheckBox::On) {
-	bodyVec[0]->getWorld()->deselectElement(bodyVec[0]);
-    dynBod = bodyVec[0]->getWorld()->makeBodyDynamic(bodyVec[0],DynamicBody::defaultMass);
-	dynBod->getWorld()->selectElement(dynBod);
+  else if (state == QCheckBox::On) {
+    bodyVec[0]->getWorld()->deselectElement(bodyVec[0]);
+    dynBod = bodyVec[0]->getWorld()->makeBodyDynamic(bodyVec[0], DynamicBody::defaultMass);
+    dynBod->getWorld()->selectElement(dynBod);
     origMass = dynBod->getMass();
     origAxesShown = dynBod->axesShown();
     origDynContactForcesShown = dynBod->dynContactForcesShown();
@@ -215,11 +218,11 @@ void BodyPropDlg::setDynamic( int state )
 /*!
   Toggles the DynamicBody 's show dynamic contact forces flag.
  */
-void BodyPropDlg::setShowDynContactForces( int state )
+void BodyPropDlg::setShowDynContactForces(int state)
 {
-  if (!dynBod) return;
-  if (state == QCheckBox::On) dynBod->showDynContactForces(true);
-  else if (state == QCheckBox::Off) dynBod->showDynContactForces(false);
+  if (!dynBod) { return; }
+  if (state == QCheckBox::On) { dynBod->showDynContactForces(true); }
+  else if (state == QCheckBox::Off) { dynBod->showDynContactForces(false); }
 }
 
 /*!
@@ -228,18 +231,20 @@ void BodyPropDlg::setShowDynContactForces( int state )
   "Keep original" is chosen, this will reset each body to the material it had
   when this dialog box was opened.
 */
-void BodyPropDlg::setMaterial( int choice )
+void BodyPropDlg::setMaterial(int choice)
 {
-  World *w=graspitCore->getWorld();
-  
+  World *w = graspitCore->getWorld();
+
   if (choice == w->getNumMaterials()) {
-    for (int i=0;i<numBodies;i++) 
+    for (int i = 0; i < numBodies; i++) {
       bodyVec[i]->setMaterial(origMaterials[i]);
+    }
   }
   else {
-    for (int i=0;i<numBodies;i++)
+    for (int i = 0; i < numBodies; i++) {
       bodyVec[i]->setMaterial(choice);
-  }      
+    }
+  }
 }
 
 /*!
@@ -248,8 +253,8 @@ void BodyPropDlg::setMaterial( int choice )
  */
 void BodyPropDlg::revertAndClose()
 {
- //revert to original values
-  for (int i=0;i<numBodies;i++) {
+  //revert to original values
+  for (int i = 0; i < numBodies; i++) {
     bodyVec[i]->setTransparency(origTransparencies[i]);
     bodyVec[i]->showFrictionCones(origShowFC[i]);
     bodyVec[i]->setMaterial(origMaterials[i]);
@@ -264,29 +269,29 @@ void BodyPropDlg::revertAndClose()
 }
 
 /*! Shows the bounding box hierarchy of the currently selected bodies
-	from the collision detection system, up to the depth specified
-	in the depth spin box. The bounding boxes are retrieved from the
-	bodies themselves, where they are also colored. Then they are 
-	attached back to the geometry root of the bodies. This is generally
-	for debugging the collision detection system.
+  from the collision detection system, up to the depth specified
+  in the depth spin box. The bounding boxes are retrieved from the
+  bodies themselves, where they are also colored. Then they are
+  attached back to the geometry root of the bodies. This is generally
+  for debugging the collision detection system.
 */
 void
 BodyPropDlg::showBvs()
 {
-	std::vector<BoundingBox> bvs;
-	World *w=graspitCore->getWorld();
-	int depth = -1;
-	if (!boundingCheckBox->isChecked()) {
-		boundingSpinBox->setEnabled(false);
-	} else {
-		boundingSpinBox->setEnabled(true);
-		depth = boundingSpinBox->value();
-	}
-	for (int i=0; i<numBodies; i++) {
-		bvs.clear();
-		if (depth >= 0) {
-			w->getBvs(bodyVec[i], depth, &bvs);
-		}
-		bodyVec[i]->setBVGeometry(bvs);
-	}
+  std::vector<BoundingBox> bvs;
+  World *w = graspitCore->getWorld();
+  int depth = -1;
+  if (!boundingCheckBox->isChecked()) {
+    boundingSpinBox->setEnabled(false);
+  } else {
+    boundingSpinBox->setEnabled(true);
+    depth = boundingSpinBox->value();
+  }
+  for (int i = 0; i < numBodies; i++) {
+    bvs.clear();
+    if (depth >= 0) {
+      w->getBvs(bodyVec[i], depth, &bvs);
+    }
+    bodyVec[i]->setBVGeometry(bvs);
+  }
 }

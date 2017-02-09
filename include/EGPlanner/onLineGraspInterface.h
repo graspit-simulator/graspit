@@ -33,39 +33,39 @@ class Hand;
 class GraspPlanningState;
 class BarrettHand;
 
-/*! This class is designed to perform interactive grasping tasks where 
-	GraspIt helps the user by planning grasps interactively. It uses a 
-	list of planned grasps (presumably by some planner) and knows which 
-	hand to shape.
+/*! This class is designed to perform interactive grasping tasks where
+  GraspIt helps the user by planning grasps interactively. It uses a
+  list of planned grasps (presumably by some planner) and knows which
+  hand to shape.
 
-	Planning good grasps is one thing; actually executing them is 
-	another. It's not enough to know a number of f-c grasps. You have to 
-	decide which one to choose, how to close the fingers gradually, etc. 
-	In this context	you are also interacting with a human operator. You 
-	have to decide which grasp to use depending on what the	operator is 
-	doing, shape the fingers,close them gradually as the operator is 
-	approaching the object etc.
-	
-	These are all complicated problems in themselves. My main goal is to 
-	plan the grasps, how they are used is a different problem. There are 
-	probably better ways of accomplishing this, this one is just a 
-	proof-of-concept implementation to show how the OnLinePlanner can be 
-	applied.
+  Planning good grasps is one thing; actually executing them is
+  another. It's not enough to know a number of f-c grasps. You have to
+  decide which one to choose, how to close the fingers gradually, etc.
+  In this context you are also interacting with a human operator. You
+  have to decide which grasp to use depending on what the operator is
+  doing, shape the fingers,close them gradually as the operator is
+  approaching the object etc.
+
+  These are all complicated problems in themselves. My main goal is to
+  plan the grasps, how they are used is a different problem. There are
+  probably better ways of accomplishing this, this one is just a
+  proof-of-concept implementation to show how the OnLinePlanner can be
+  applied.
 */
 class OnLineGraspInterface
 {
-private:
-	ActionType mAction;
-	Hand *mHand;
-	//! When using a real Barrett hand this is the communicator with it
-	BarrettHand *mBarrettHand;
-	bool getSuggestedDOF(const GraspPlanningState *s, double *initialDof, double *finalDof);
-public:
-	OnLineGraspInterface(Hand *h);
-	GraspPlanningState* updateHand(const std::list<GraspPlanningState*> *solutionList);
-	void action(ActionType a);
-	void useRealBarrettHand(bool s);
-	ActionType getAction(){return mAction;}
+  private:
+    ActionType mAction;
+    Hand *mHand;
+    //! When using a real Barrett hand this is the communicator with it
+    BarrettHand *mBarrettHand;
+    bool getSuggestedDOF(const GraspPlanningState *s, double *initialDof, double *finalDof);
+  public:
+    OnLineGraspInterface(Hand *h);
+    GraspPlanningState *updateHand(const std::list<GraspPlanningState *> *solutionList);
+    void action(ActionType a);
+    void useRealBarrettHand(bool s);
+    ActionType getAction() {return mAction;}
 };
 
 #endif

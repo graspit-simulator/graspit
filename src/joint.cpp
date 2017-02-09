@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
 \brief Implements the classes: DHTransform, DOF, RevoluteJoint, and PrismaticJoint.
 */
 
@@ -59,31 +59,31 @@
 #include "debug.h"
 
 /*! Initializes the DHTransform with the 4 DH parameters. */
-DHTransform::DHTransform(double thval,double dval,double aval,double alval) :
-theta(thval),d(dval),a(aval),alpha(alval)
+DHTransform::DHTransform(double thval, double dval, double aval, double alval) :
+  theta(thval), d(dval), a(aval), alpha(alval)
 {
   computeTran();
 }
 
 void DHTransform::computeTran()
 {
-  transf tr3,tr4;
-  
+  transf tr3, tr4;
+
   dtrans[0] = 0.0;
   dtrans[1] = 0.0;
   dtrans[2] = d;
-  
+
   atrans[0] = a;
   atrans[1] = 0.0;
   atrans[2] = 0.0;
-  
-  tr1 = rotate_transf(theta,vec3(0,0,1));
-  tr2 = translate_transf(dtrans);
-  tr3 = translate_transf(atrans);
-  tr4 = rotate_transf(alpha,vec3(1,0,0));
-  tr4TimesTr3 = tr4 * tr3;
-  
-  tran = tr4TimesTr3 * tr2 * tr1;
+
+  tr1 = transf::AXIS_ANGLE_ROTATION(theta, vec3(0, 0, 1));
+  tr2 = transf::TRANSLATION(dtrans);
+  tr3 = transf::TRANSLATION(atrans);
+  tr4 = transf::AXIS_ANGLE_ROTATION(alpha, vec3(1, 0, 0));
+  tr4TimesTr3 = tr3 % tr4;
+
+  tran = tr1 % tr2 % tr4TimesTr3;
 }
 
 /*!
@@ -94,9 +94,9 @@ void DHTransform::setD(double q)
 {
   d = q;
   dtrans[2] = d;
-  tr2 = translate_transf(dtrans);
-  
-  tran = tr4TimesTr3 * tr2 * tr1;
+  tr2 = transf::TRANSLATION(dtrans);
+
+  tran = tr1 % tr2 % tr4TimesTr3;
 }
 
 /*!
@@ -106,9 +106,9 @@ of the transform.
 void DHTransform::setTheta(double q)
 {
   theta = q;
-  tr1 = rotate_transf(theta,vec3(0,0,1));
-  
-  tran = tr4TimesTr3 * tr2 * tr1;
+  tr1 = transf::AXIS_ANGLE_ROTATION(theta, vec3(0, 0, 1));
+
+  tran = tr1 % tr2 % tr4TimesTr3;
 }
 
 /*!
@@ -117,163 +117,163 @@ associated with this joint.
 */
 Joint::~Joint()
 {
-	IVTran->unref(); delete DH;
+  IVTran->unref(); delete DH;
 }
 
 void
 Joint::cloneFrom(const Joint *original)
 {
-	DOFnum  = original->DOFnum;
-	jointNum = original->jointNum;
-	minVal = original->minVal;
-	maxVal = original->maxVal;
-	mCouplingRatio = original->mCouplingRatio;
-	c = original->c;
-	f1 = original->f1;
-	f0 = original->f0;
-	mK = original->mK;
-	mRestVal = original->mRestVal;
-	worldAxis = original->worldAxis;
-	DH = new DHTransform(original->DH);
-	DH->getTran().toSoTransform(IVTran);
+  DOFnum  = original->DOFnum;
+  jointNum = original->jointNum;
+  minVal = original->minVal;
+  maxVal = original->maxVal;
+  mCouplingRatio = original->mCouplingRatio;
+  c = original->c;
+  f1 = original->f1;
+  f0 = original->f0;
+  mK = original->mK;
+  mRestVal = original->mRestVal;
+  worldAxis = original->worldAxis;
+  DH = new DHTransform(original->DH);
+  DH->getTran().toSoTransform(IVTran);
 }
 
 int
 Joint::getChainNum() const
 {
-	return owner->getNum();
+  return owner->getNum();
 }
 
 void
 Joint::applyPassiveInternalWrenches()
 {
-	double f = getFriction();
-	DBGP("Friction coeffs: " << f0 << " " << f1);
-	DBGP("Friction force: " << f);
-	if (f != 0.0) applyInternalWrench(f);
+  double f = getFriction();
+  DBGP("Friction coeffs: " << f0 << " " << f1);
+  DBGP("Friction force: " << f);
+  if (f != 0.0) { applyInternalWrench(f); }
 
-	f = getSpringForce();
-	DBGP("Spring force: " << f);
-	applyInternalWrench(-f);
+  f = getSpringForce();
+  DBGP("Spring force: " << f);
+  applyInternalWrench(-f);
 }
 
 /*! Assumes a linear spring with the rest value specified*/
 double
-Joint::getSpringForce() const 
+Joint::getSpringForce() const
 {
-    DBGP( "mK: " << mK << " getDisplacement(): " << getDisplacement() << std::endl);
-	return mK * getDisplacement();
+  DBGP("mK: " << mK << " getDisplacement(): " << getDisplacement() << std::endl);
+  return mK * getDisplacement();
 }
 
 /*! The joint Jacobian is a 6x1 matrix that relates movement of a joint
-(1 DOF) to movement (translation and rotation) of a point in 3D space 
-placed at world coordinates	\a toTarget. If worldCoords is true, the 
+(1 DOF) to movement (translation and rotation) of a point in 3D space
+placed at world coordinates \a toTarget. If worldCoords is true, the
 jacobian is expressed in world coordinate system; otherwise, it is
 expressed in the local coordinate system of the target point.
 */
-Matrix 
-Joint::jacobian(const Joint *joint, const transf &jointTran, 
-				const transf &toTarget, bool worldCoords)
+Matrix
+Joint::jacobian(const Joint *joint, const transf &jointTran,
+                const transf &toTarget, bool worldCoords)
 {
-	transf T;
-	if (worldCoords) {
-		// the translation from joint coordinate system to world coordinate system
-		T = transf(Quaternion::IDENTITY, toTarget.translation()) * jointTran.inverse();
-	} else {
-		T = toTarget * jointTran.inverse();	
-	}
-	double M[36];
-	T.jacobian(M);
-	Matrix fullJ(M,6,6,true);
-	Matrix J(Matrix::ZEROES<Matrix>(6,1));
-	if (joint->getType() == REVOLUTE) {
-		//keep rotation against z
-		J.copySubBlock(0, 0, 6, 1, fullJ, 0, 5);
-	} else if (joint->getType() == PRISMATIC) {
-		//keep translation along z
-		J.copySubBlock(0, 0, 6, 1, fullJ, 0, 2);
-	} else {
-		assert(0);
-	}
-	return J;
+  transf T;
+  if (worldCoords) {
+    // the translation from joint coordinate system to world coordinate system
+    T = jointTran.inverse() % transf(Quaternion::Identity(), toTarget.translation());
+  } else {
+    T = jointTran.inverse() % toTarget;
+  }
+  double M[36];
+  T.jacobian(M);
+  Matrix fullJ(M, 6, 6, true);
+  Matrix J(Matrix::ZEROES<Matrix>(6, 1));
+  if (joint->getType() == REVOLUTE) {
+    //keep rotation against z
+    J.copySubBlock(0, 0, 6, 1, fullJ, 0, 5);
+  } else if (joint->getType() == PRISMATIC) {
+    //keep translation along z
+    J.copySubBlock(0, 0, 6, 1, fullJ, 0, 2);
+  } else {
+    assert(0);
+  }
+  return J;
 }
 
-/*! Initializes a prismatic joint from an XML DOM read from the robot 
-	configuration file.  Returns FAILURE if it could not read all the 
-	necessary values from the provided XML, otherwise it returns SUCESS.
+/*! Initializes a prismatic joint from an XML DOM read from the robot
+  configuration file.  Returns FAILURE if it could not read all the
+  necessary values from the provided XML, otherwise it returns SUCESS.
 */
 int
-PrismaticJoint::initJointFromXml(const TiXmlElement* root, int jnum)
+PrismaticJoint::initJointFromXml(const TiXmlElement *root, int jnum)
 {
-	char dStr[40],num[40],*tmp;
-	QString dQStr;
-	double theta,d,a,alpha;
-	jointNum = jnum;
-	const TiXmlElement* element = findXmlElement(root,"d");
-	if(element){
-		dQStr = element->GetText();
-		dQStr = dQStr.stripWhiteSpace();
-		strcpy(dStr,dQStr.toStdString().c_str());
-	} else {
-		return FAILURE;
-	}
-	if(!getDouble(root,"theta", theta)) return FAILURE;
-	if(!getDouble(root,"a", a)) return FAILURE;
-	if(!getDouble(root,"alpha", alpha)) return FAILURE;
-	if(!getDouble(root,"minValue", minVal)) return FAILURE;
-	if(!getDouble(root,"maxValue", maxVal))	return FAILURE;
-    if (!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
-	if (!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
-    if (!getDouble(root,"springStiffness", mK)) mK = 0.0;
-	if (!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
+  char dStr[40], num[40], *tmp;
+  QString dQStr;
+  double theta, d, a, alpha;
+  jointNum = jnum;
+  const TiXmlElement *element = findXmlElement(root, "d");
+  if (element) {
+    dQStr = element->GetText();
+    dQStr = dQStr.stripWhiteSpace();
+    strcpy(dStr, dQStr.toStdString().c_str());
+  } else {
+    return FAILURE;
+  }
+  if (!getDouble(root, "theta", theta)) { return FAILURE; }
+  if (!getDouble(root, "a", a)) { return FAILURE; }
+  if (!getDouble(root, "alpha", alpha)) { return FAILURE; }
+  if (!getDouble(root, "minValue", minVal)) { return FAILURE; }
+  if (!getDouble(root, "maxValue", maxVal)) { return FAILURE; }
+  if (!getDouble(root, "viscousFriction", f1)) { f1 = 0.0; }
+  if (!getDouble(root, "CoulombFriction", f0)) { f0 = 0.0; }
+  if (!getDouble(root, "springStiffness", mK)) { mK = 0.0; }
+  if (!getDouble(root, "restValue", mRestVal)) { mRestVal = 0.0; }
 
-	DBGP("thStr: " << theta << " d: " << dStr << " a: " << a << " alpha: " 
-		<< alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: " 
-		<< f1 << " f0:" << f0 << " mK: " << mK << " mRestVal: " << mRestVal);
+  DBGP("thStr: " << theta << " d: " << dStr << " a: " << a << " alpha: "
+       << alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: "
+       << f1 << " f0:" << f0 << " mK: " << mK << " mRestVal: " << mRestVal);
 
-	//convert to graspit force units which for now seem to be the
-	//rather strange N * 1.0e6
-	mK *= 1.0e6; 
+  //convert to graspit force units which for now seem to be the
+  //rather strange N * 1.0e6
+  mK *= 1.0e6;
 
-	theta *= M_PI/180.0;
-	alpha *= M_PI/180.0;
+  theta *= M_PI / 180.0;
+  alpha *= M_PI / 180.0;
 
-	d = 0.0;
-	tmp = dStr+1;
-	sscanf(tmp,"%[0-9]",num);
-	DOFnum = atoi(num);
-	tmp += strlen(num);
-	if (DOFnum > owner->getOwner()->getNumDOF()) {
-		pr_error("DOF number is out of range\n");
-		return FAILURE;
-	}
-	if (*tmp=='*') {
-		tmp++;
-		sscanf(tmp,"%[0-9.-]",num);
-		tmp += strlen(num);
-		mCouplingRatio = atof(num);
-	}
-	if (*tmp=='+') {
-		tmp++;
-		sscanf(tmp,"%lf",&c);
-	}
+  d = 0.0;
+  tmp = dStr + 1;
+  sscanf(tmp, "%[0-9]", num);
+  DOFnum = atoi(num);
+  tmp += strlen(num);
+  if (DOFnum > owner->getOwner()->getNumDOF()) {
+    pr_error("DOF number is out of range\n");
+    return FAILURE;
+  }
+  if (*tmp == '*') {
+    tmp++;
+    sscanf(tmp, "%[0-9.-]", num);
+    tmp += strlen(num);
+    mCouplingRatio = atof(num);
+  }
+  if (*tmp == '+') {
+    tmp++;
+    sscanf(tmp, "%lf", &c);
+  }
 
-	DH = new DHTransform(theta,d+c,a,alpha);  
-	DH->getTran().toSoTransform(IVTran);
+  DH = new DHTransform(theta, d + c, a, alpha);
+  DH->getTran().toSoTransform(IVTran);
 
-	return SUCCESS;
+  return SUCCESS;
 }
 
 /*!
 Sets the current joint value to \a q.  The \a d value of the DHTransform
-is then set to \a q + the joint offset \a c. 
+is then set to \a q + the joint offset \a c.
 */
 int
 PrismaticJoint::setVal(double q)
 {
-	DH->setD(q+c);
-	DH->getTran().toSoTransform(IVTran);
-	return SUCCESS;  
+  DH->setD(q + c);
+  DH->getTran().toSoTransform(IVTran);
+  return SUCCESS;
 }
 
 /*!
@@ -283,97 +283,98 @@ Applies equal and opposite forces of magnitude \a f along the axis
 void
 PrismaticJoint::applyInternalWrench(double magnitude)
 {
-	dynJoint->getPrevLink()->addForce(-magnitude * worldAxis);
-	dynJoint->getNextLink()->addForce(magnitude * worldAxis);
+  dynJoint->getPrevLink()->addForce(-magnitude * worldAxis);
+  dynJoint->getNextLink()->addForce(magnitude * worldAxis);
 }
 
-/*! Initializes a revolute joint from an XML DOM read from the robot 
-	configuration file. This returns FAILURE if it could not read all 
-	the necessary values from the provided string, otherwise it 
-	returns SUCESS.
+/*! Initializes a revolute joint from an XML DOM read from the robot
+  configuration file. This returns FAILURE if it could not read all
+  the necessary values from the provided string, otherwise it
+  returns SUCESS.
 */
 int
-RevoluteJoint::initJointFromXml(const TiXmlElement* root, int jnum)
+RevoluteJoint::initJointFromXml(const TiXmlElement *root, int jnum)
 {
 
   QString thQStr;
-  char thStr[40],num[40],*tmp;
-  double theta,d,a,alpha;
+  char thStr[40], num[40], *tmp;
+  double theta, d, a, alpha;
   jointNum = jnum;
-  const TiXmlElement* element = findXmlElement(root,"theta");
-  if(element){
+  const TiXmlElement *element = findXmlElement(root, "theta");
+  if (element) {
     thQStr = element->GetText();
     thQStr = thQStr.stripWhiteSpace();
-    strcpy(thStr,thQStr.toStdString().c_str());
+    strcpy(thStr, thQStr.toStdString().c_str());
   }
-  else
+  else {
     return FAILURE;
-  if(!getDouble(root,"d", d)) return FAILURE;
-  if(!getDouble(root,"a", a)) return FAILURE;
-  if(!getDouble(root,"alpha", alpha)) return FAILURE;
-  if(!getDouble(root,"minValue", minVal)) return FAILURE;
-  if(!getDouble(root,"maxValue", maxVal)) return FAILURE;
-  if(!getDouble(root,"viscousFriction", f1)) f1 = 0.0;
-  if(!getDouble(root,"CoulombFriction", f0)) f0 = 0.0;
-  if(!getDouble(root,"springStiffness", mK)) mK = 0.0;
-  if(!getDouble(root,"restValue", mRestVal)) mRestVal = 0.0;
-  
-  DBGP("thStr: " << thStr << " d: " << d << " a: " << a << " alpha: " 
-       << alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: " 
+  }
+  if (!getDouble(root, "d", d)) { return FAILURE; }
+  if (!getDouble(root, "a", a)) { return FAILURE; }
+  if (!getDouble(root, "alpha", alpha)) { return FAILURE; }
+  if (!getDouble(root, "minValue", minVal)) { return FAILURE; }
+  if (!getDouble(root, "maxValue", maxVal)) { return FAILURE; }
+  if (!getDouble(root, "viscousFriction", f1)) { f1 = 0.0; }
+  if (!getDouble(root, "CoulombFriction", f0)) { f0 = 0.0; }
+  if (!getDouble(root, "springStiffness", mK)) { mK = 0.0; }
+  if (!getDouble(root, "restValue", mRestVal)) { mRestVal = 0.0; }
+
+  DBGP("thStr: " << thStr << " d: " << d << " a: " << a << " alpha: "
+       << alpha << " minVal: " << minVal << " maxVal: " << maxVal << " f1: "
        << f1 << " f0:" << f0 << " mK: " << mK << " mRestVal: " << mRestVal);
-  
+
   if (mK < 0) {
     DBGA("Negative spring stiffness");
     return FAILURE;
   }
-  
+
   //convert to graspit units which for now seem to be the
   //rather strange Nmm * 1.0e6
-  mK *= 1.0e6; 
+  mK *= 1.0e6;
 
-  
-  alpha *= M_PI/180.0;
-  minVal *= M_PI/180.0;
-  maxVal *= M_PI/180.0;
-  
+
+  alpha *= M_PI / 180.0;
+  minVal *= M_PI / 180.0;
+  maxVal *= M_PI / 180.0;
+
   theta = 0.0;
-  tmp = thStr+1;
-  sscanf(tmp,"%[0-9]",num);
+  tmp = thStr + 1;
+  sscanf(tmp, "%[0-9]", num);
   DOFnum = atoi(num);
   tmp += strlen(num);
-  
+
   if (DOFnum > owner->getOwner()->getNumDOF()) {
     pr_error("DOF number is out of range\n");
     return FAILURE;
   }
-  
-  if (*tmp=='*') {
+
+  if (*tmp == '*') {
     tmp++;
-    sscanf(tmp,"%[0-9.-]",num);
+    sscanf(tmp, "%[0-9.-]", num);
     tmp += strlen(num);
     mCouplingRatio = atof(num);
   }
-  if (*tmp=='+') {
+  if (*tmp == '+') {
     tmp++;
-    sscanf(tmp,"%lf",&c);
-    c *= M_PI/180.0;
+    sscanf(tmp, "%lf", &c);
+    c *= M_PI / 180.0;
   }
-  
-  DH = new DHTransform(theta+c,d,a,alpha);  
+
+  DH = new DHTransform(theta + c, d, a, alpha);
   DH->getTran().toSoTransform(IVTran);
   return SUCCESS;
 }
 
 /*!
 Sets the current joint value to \a q.  The \a theta value of the DHTransform
-is then set to \a q + the joint offset \a c.  
+is then set to \a q + the joint offset \a c.
 */
 int
 RevoluteJoint::setVal(double q)
 {
-  DH->setTheta(q+c);
+  DH->setTheta(q + c);
   DH->getTran().toSoTransform(IVTran);
-  return SUCCESS;  
+  return SUCCESS;
 }
 
 /*!

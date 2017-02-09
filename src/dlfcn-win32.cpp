@@ -36,43 +36,48 @@ typedef struct global_object {
 static global_object first_object;
 
 /* These functions implement a double linked list for the global objects. */
-static global_object *global_search( HMODULE hModule )
+static global_object *global_search(HMODULE hModule)
 {
   global_object *pobject;
 
-  if( hModule == NULL )
+  if (hModule == NULL) {
     return NULL;
+  }
 
-  for( pobject = &first_object; pobject ; pobject = pobject->next )
-    if( pobject->hModule == hModule )
+  for (pobject = &first_object; pobject ; pobject = pobject->next)
+    if (pobject->hModule == hModule) {
       return pobject;
+    }
 
   return NULL;
 }
 
-static void global_add( HMODULE hModule )
+static void global_add(HMODULE hModule)
 {
   global_object *pobject;
   global_object *nobject;
 
-  if( hModule == NULL )
+  if (hModule == NULL) {
     return;
+  }
 
-  pobject = global_search( hModule );
+  pobject = global_search(hModule);
 
   /* Do not add object again if it's already on the list */
-  if( pobject )
+  if (pobject) {
     return;
+  }
 
-  for( pobject = &first_object; pobject->next ; pobject = pobject->next );
+  for (pobject = &first_object; pobject->next ; pobject = pobject->next);
 
-  nobject = static_cast<global_object *>(malloc( sizeof(global_object) ));
+  nobject = static_cast<global_object *>(malloc(sizeof(global_object)));
 
   /* Should this be enough to fail global_add, and therefore also fail
    * dlopen?
    */
-  if( !nobject )
+  if (!nobject) {
     return;
+  }
 
   pobject->next = nobject;
   nobject->next = NULL;
@@ -80,24 +85,28 @@ static void global_add( HMODULE hModule )
   nobject->hModule = hModule;
 }
 
-static void global_rem( HMODULE hModule )
+static void global_rem(HMODULE hModule)
 {
   global_object *pobject;
 
-  if( hModule == NULL )
+  if (hModule == NULL) {
     return;
+  }
 
-  pobject = global_search( hModule );
+  pobject = global_search(hModule);
 
-  if( !pobject )
+  if (!pobject) {
     return;
+  }
 
-  if( pobject->next )
+  if (pobject->next) {
     pobject->next->previous = pobject->previous;
-  if( pobject->previous )
+  }
+  if (pobject->previous) {
     pobject->previous->next = pobject->next;
+  }
 
-  free( pobject );
+  free(pobject);
 }
 
 /* POSIX says dlerror( ) doesn't have to be thread-safe, so we use one
@@ -108,73 +117,78 @@ static void global_rem( HMODULE hModule )
 static char error_buffer[65535];
 static char *current_error;
 
-static int copy_string( char *dest, int dest_size, const char *src )
+static int copy_string(char *dest, int dest_size, const char *src)
 {
   int i = 0;
 
   /* gcc should optimize this out */
-  if( !src && !dest )
+  if (!src && !dest) {
     return 0;
+  }
 
-  for( i = 0 ; i < dest_size-1 ; i++ )
-    {
-      if( !src[i] )
-	break;
-      else
-	dest[i] = src[i];
+  for (i = 0 ; i < dest_size - 1 ; i++)
+  {
+    if (!src[i]) {
+      break;
     }
+    else {
+      dest[i] = src[i];
+    }
+  }
   dest[i] = '\0';
 
   return i;
 }
 
-static void save_err_str( const char *str )
+static void save_err_str(const char *str)
 {
   DWORD dwMessageId;
   DWORD pos;
 
-  dwMessageId = GetLastError( );
+  dwMessageId = GetLastError();
 
-  if( dwMessageId == 0 )
+  if (dwMessageId == 0) {
     return;
+  }
 
   /* Format error message to:
    * "<argument to function that failed>": <Windows localized error message>
    */
 
-  pos  = copy_string( error_buffer,     sizeof(error_buffer),     "\"" );
-  pos += copy_string( error_buffer+pos, sizeof(error_buffer)-pos, str );
-  pos += copy_string( error_buffer+pos, sizeof(error_buffer)-pos, "\": " );
+  pos  = copy_string(error_buffer,     sizeof(error_buffer),     "\"");
+  pos += copy_string(error_buffer + pos, sizeof(error_buffer) - pos, str);
+  pos += copy_string(error_buffer + pos, sizeof(error_buffer) - pos, "\": ");
 
   size_t size = sizeof(error_buffer) - pos;
-  wchar_t * wErrorBuffer = new wchar_t[size];
-  size_t message_size = FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwMessageId,
-                        MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-                        wErrorBuffer, size, NULL );
-  wcstombs (error_buffer+pos, wErrorBuffer, size);
+  wchar_t *wErrorBuffer = new wchar_t[size];
+  size_t message_size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwMessageId,
+                                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                      wErrorBuffer, size, NULL);
+  wcstombs(error_buffer + pos, wErrorBuffer, size);
   delete [] wErrorBuffer;
   pos += message_size;
 
-  if( pos > 1 )
-    {
-      /* POSIX says the string must not have trailing <newline> */
-      if( error_buffer[pos-2] == '\r' && error_buffer[pos-1] == '\n' )
-	error_buffer[pos-2] = '\0';
+  if (pos > 1)
+  {
+    /* POSIX says the string must not have trailing <newline> */
+    if (error_buffer[pos - 2] == '\r' && error_buffer[pos - 1] == '\n') {
+      error_buffer[pos - 2] = '\0';
     }
+  }
 
   current_error = error_buffer;
 }
 
-static void save_err_ptr_str( const void *ptr )
+static void save_err_ptr_str(const void *ptr)
 {
   char ptr_buf[19]; /* 0x<pointer> up to 64 bits. */
 
-  sprintf( ptr_buf, "0x%p", ptr );
+  sprintf(ptr_buf, "0x%p", ptr);
 
-  save_err_str( ptr_buf );
+  save_err_str(ptr_buf);
 }
 
-void *dlopen( const char *file, int mode )
+void *dlopen(const char *file, int mode)
 {
   HMODULE hModule;
   UINT uMode;
@@ -182,86 +196,94 @@ void *dlopen( const char *file, int mode )
   current_error = NULL;
 
   /* Do not let Windows display the critical-error-handler message box */
-  uMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+  uMode = SetErrorMode(SEM_FAILCRITICALERRORS);
 
-  if( file == 0 )
-    {
-      /* POSIX says that if the value of file is 0, a handle on a global
-       * symbol object must be provided. That object must be able to access
-       * all symbols from the original program file, and any objects loaded
-       * with the RTLD_GLOBAL flag.
-       * The return value from GetModuleHandle( ) allows us to retrieve
-       * symbols only from the original program file. For objects loaded with
-       * the RTLD_GLOBAL flag, we create our own list later on.
-       */
-      hModule = GetModuleHandle( NULL );
+  if (file == 0)
+  {
+    /* POSIX says that if the value of file is 0, a handle on a global
+     * symbol object must be provided. That object must be able to access
+     * all symbols from the original program file, and any objects loaded
+     * with the RTLD_GLOBAL flag.
+     * The return value from GetModuleHandle( ) allows us to retrieve
+     * symbols only from the original program file. For objects loaded with
+     * the RTLD_GLOBAL flag, we create our own list later on.
+     */
+    hModule = GetModuleHandle(NULL);
 
-      if( !hModule )
-	save_err_ptr_str( file );
+    if (!hModule) {
+      save_err_ptr_str(file);
     }
+  }
   else
+  {
+    char lpFileName[MAX_PATH];
+    int i;
+
+    /* MSDN says backslashes *must* be used instead of forward slashes. */
+    for (i = 0 ; i < sizeof(lpFileName) - 1 ; i++)
     {
-      char lpFileName[MAX_PATH];
-      int i;
-
-      /* MSDN says backslashes *must* be used instead of forward slashes. */
-      for( i = 0 ; i < sizeof(lpFileName)-1 ; i++ )
-        {
-	  if( !file[i] )
-	    break;
-	  else if( file[i] == '/' )
-	    lpFileName[i] = '\\';
-	  else
-	    lpFileName[i] = file[i];
-        }
-      lpFileName[i] = '\0';
-
-      /* POSIX says the search path is implementation-defined.
-       * LOAD_WITH_ALTERED_SEARCH_PATH is used to make it behave more closely
-       * to UNIX's search paths (start with system folders instead of current
-       * folder).
-       */
-    size_t newsize = strlen(lpFileName) + 1;
-	  wchar_t * wFileName = new wchar_t[newsize];
-    mbstowcs ( wFileName, lpFileName, newsize );
-    hModule = LoadLibraryEx(wFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
-	  delete [] wFileName;
-
-      /* If the object was loaded with RTLD_GLOBAL, add it to list of global
-       * objects, so that its symbols may be retrieved even if the handle for
-       * the original program file is passed. POSIX says that if the same
-       * file is specified in multiple invocations, and any of them are
-       * RTLD_GLOBAL, even if any further invocations use RTLD_LOCAL, the
-       * symbols will remain global.
-       */
-      if( !hModule )
-	save_err_str( lpFileName );
-      else if( (mode & RTLD_GLOBAL) )
-	global_add( hModule );
+      if (!file[i]) {
+        break;
+      }
+      else if (file[i] == '/') {
+        lpFileName[i] = '\\';
+      }
+      else {
+        lpFileName[i] = file[i];
+      }
     }
+    lpFileName[i] = '\0';
+
+    /* POSIX says the search path is implementation-defined.
+     * LOAD_WITH_ALTERED_SEARCH_PATH is used to make it behave more closely
+     * to UNIX's search paths (start with system folders instead of current
+     * folder).
+     */
+    size_t newsize = strlen(lpFileName) + 1;
+    wchar_t *wFileName = new wchar_t[newsize];
+    mbstowcs(wFileName, lpFileName, newsize);
+    hModule = LoadLibraryEx(wFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    delete [] wFileName;
+
+    /* If the object was loaded with RTLD_GLOBAL, add it to list of global
+     * objects, so that its symbols may be retrieved even if the handle for
+     * the original program file is passed. POSIX says that if the same
+     * file is specified in multiple invocations, and any of them are
+     * RTLD_GLOBAL, even if any further invocations use RTLD_LOCAL, the
+     * symbols will remain global.
+     */
+    if (!hModule) {
+      save_err_str(lpFileName);
+    }
+    else if ((mode & RTLD_GLOBAL)) {
+      global_add(hModule);
+    }
+  }
 
   /* Return to previous state of the error-mode bit flags. */
-  SetErrorMode( uMode );
+  SetErrorMode(uMode);
 
   return (void *) hModule;
 }
 
-int dlclose( void *handle )
+int dlclose(void *handle)
 {
   HMODULE hModule = (HMODULE) handle;
   BOOL ret;
 
   current_error = NULL;
 
-  ret = FreeLibrary( hModule );
+  ret = FreeLibrary(hModule);
 
   /* If the object was loaded with RTLD_GLOBAL, remove it from list of global
    * objects.
    */
-  if( ret )
-    global_rem( hModule );
-  else
-    save_err_ptr_str( handle );
+  if (ret) {
+    global_rem(hModule);
+  }
+  else {
+    save_err_ptr_str(handle);
+  }
 
   /* dlclose's return value in inverted in relation to FreeLibrary's. */
   ret = !ret;
@@ -269,49 +291,51 @@ int dlclose( void *handle )
   return (int) ret;
 }
 
-void *dlsym( void *handle, const char *name )
+void *dlsym(void *handle, const char *name)
 {
   FARPROC symbol;
 
   current_error = NULL;
 
-  symbol = GetProcAddress( static_cast<HMODULE>(handle), name );
+  symbol = GetProcAddress(static_cast<HMODULE>(handle), name);
 
-  if( symbol == NULL )
+  if (symbol == NULL)
+  {
+    HMODULE hModule;
+
+    /* If the handle for the original program file is passed, also search
+     * in all globally loaded objects.
+     */
+
+    hModule = GetModuleHandle(NULL);
+
+    if (hModule == handle)
     {
-      HMODULE hModule;
+      global_object *pobject;
 
-      /* If the handle for the original program file is passed, also search
-       * in all globally loaded objects.
-       */
-
-      hModule = GetModuleHandle( NULL );
-
-      if( hModule == handle )
+      for (pobject = &first_object; pobject ; pobject = pobject->next)
+      {
+        if (pobject->hModule)
         {
-	  global_object *pobject;
-
-	  for( pobject = &first_object; pobject ; pobject = pobject->next )
-            {
-	      if( pobject->hModule )
-                {
-		  symbol = GetProcAddress( pobject->hModule, name );
-		  if( symbol != NULL )
-		    break;
-                }
-            }
+          symbol = GetProcAddress(pobject->hModule, name);
+          if (symbol != NULL) {
+            break;
+          }
         }
-
-      CloseHandle( hModule );
+      }
     }
 
-  if( symbol == NULL )
-    save_err_str( name );
+    CloseHandle(hModule);
+  }
 
-  return (void*) symbol;
+  if (symbol == NULL) {
+    save_err_str(name);
+  }
+
+  return (void *) symbol;
 }
 
-char *dlerror( void )
+char *dlerror(void)
 {
   char *error_pointer = current_error;
 

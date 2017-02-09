@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the interface for dynamics engines used by GraspIt!
  */
 #ifndef DYNAMICSENGINE_HXX
@@ -32,17 +32,25 @@
 #include "world.h"
 
 class DynamicsEngine {
- public:
-  virtual ~DynamicsEngine() {}
-  virtual void addBody(Body *newBody) = 0;
-  virtual void addRobot(Robot *robot) = 0;
+  protected:
+    bool runController;
 
-  virtual void turnOnDynamics() = 0;
-  virtual void turnOffDynamics() = 0;
-  virtual int stepDynamics() = 0;
+  public:
+    DynamicsEngine(): runController(true) {}
+    virtual ~DynamicsEngine() {}
+    virtual void addBody(Body *newBody) = 0;
+    virtual void addRobot(Robot *robot) = 0;
 
-  virtual double moveDynamicBodies(double timeStep) = 0;
-  virtual int computeNewVelocities(double timeStep) = 0;
+    virtual void turnOnDynamics() = 0;
+    virtual void turnOffDynamics() = 0;
+
+    virtual int stepDynamics() = 0;
+
+    virtual double moveDynamicBodies(double timeStep) = 0;
+    virtual int computeNewVelocities(double timeStep) = 0;
+
+    void turnOnController() {runController = true;}
+    void turnOffController() {runController = false;}
 };
 
 #endif

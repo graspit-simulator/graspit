@@ -33,7 +33,7 @@
 class Hand;
 class GraspableBody;
 namespace db_planner {
-  class Grasp;
+class Grasp;
 }
 
 //! Checks if the pre-grasps of the grasps in the database are valid
@@ -42,45 +42,45 @@ namespace db_planner {
   and also if the path from pre-grasp to grasp is valid. Finally, will
   compute the min distance between the hand and the object for the pre-grasp.
 
-  A pre-grasp is defined starting from a grasp as follows: first, open the 
+  A pre-grasp is defined starting from a grasp as follows: first, open the
   gripper a pre-specified amount. Then, back up along the approach direction
   for a pre-specified ammount.
  */
 class PreGraspCheckTask : public Task {
- protected:
-  //! The hand we are planning with
-  Hand *mHand;
-  //! The object we are planning on
-  GraspableBody *mObject;
-  //! The record of the actual planning task
-  db_planner::PlanningTaskRecord mPlanningTask;
+  protected:
+    //! The hand we are planning with
+    Hand *mHand;
+    //! The object we are planning on
+    GraspableBody *mObject;
+    //! The record of the actual planning task
+    db_planner::PlanningTaskRecord mPlanningTask;
 
-  //! Checks and sets the pre-grasp for a given grasp; returns false if an error is encountered
-  bool checkSetGrasp(db_planner::Grasp *grasp);
-  //! Computes the pre-grasp fora given grasp; returns true if pre-grasp is not reachable
-  bool computePreGrasp(db_planner::Grasp *grasp);
+    //! Checks and sets the pre-grasp for a given grasp; returns false if an error is encountered
+    bool checkSetGrasp(db_planner::Grasp *grasp);
+    //! Computes the pre-grasp fora given grasp; returns true if pre-grasp is not reachable
+    bool computePreGrasp(db_planner::Grasp *grasp);
 
-  //! Loads the needed hand in the simulation world, if it's not already there
-  void loadHand();
+    //! Loads the needed hand in the simulation world, if it's not already there
+    void loadHand();
 
-  //! Loads the needed object in the simulation world
-  void loadObject();
+    //! Loads the needed object in the simulation world
+    void loadObject();
 
-  //! Empties a list of grasps; should really use some smart memory management here
-  void emptyGraspList(std::vector<db_planner::Grasp*> &graspList);
+    //! Empties a list of grasps; should really use some smart memory management here
+    void emptyGraspList(std::vector<db_planner::Grasp *> &graspList);
 
- public:
-  //! Just a stub for now
-  PreGraspCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-		    db_planner::TaskRecord rec);
-  //! Removes the object that has been used from the sim world, but not the hand
-  ~PreGraspCheckTask();
+  public:
+    //! Just a stub for now
+    PreGraspCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                      db_planner::TaskRecord rec);
+    //! Removes the object that has been used from the sim world, but not the hand
+    ~PreGraspCheckTask();
 
-  //! Actually does all the work
-  virtual void start();
+    //! Actually does all the work
+    virtual void start();
 
-  //! Checks if the pre-grasp starting from the current hand position is valid
-  static bool preGraspCheck(Hand *hand);
+    //! Checks if the pre-grasp starting from the current hand position is valid
+    static bool preGraspCheck(Hand *hand);
 };
 
 #endif

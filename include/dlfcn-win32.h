@@ -37,9 +37,9 @@
 #define RTLD_DEFAULT    0
 #define RTLD_NEXT       0
 
-void *dlopen ( const char *file, int mode );
-int   dlclose( void *handle );
-void *dlsym  ( void *handle, const char *name );
-char *dlerror( void );
+void *dlopen(const char *file, int mode);
+int   dlclose(void *handle);
+void *dlsym(void *handle, const char *name);
+char *dlerror(void);
 
 #endif /* DLFCN_H */

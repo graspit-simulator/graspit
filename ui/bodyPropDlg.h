@@ -19,7 +19,7 @@
 //
 // Author(s): Andrew T. Miller and Matei T. Ciocarlie
 //
-// $Id: 
+// $Id:
 //
 //######################################################################
 
@@ -31,7 +31,7 @@ class Body;
 class DynamicBody;
 
 /*! \file
-  \brief Implements the BodyPropDlg, the body properites dialog box. 
+  \brief Implements the BodyPropDlg, the body properites dialog box.
 */
 
 /*! \class BodyPropDlg
@@ -39,7 +39,7 @@ class DynamicBody;
 
   This class holds all the body properties dialog box interface components
   created in QT designer and the methods for dealing with user interaction.
-  
+
   The dialog box allows the user to change the body properties of the
   currently selected body or bodies.  The physical material, the
   transparency, and whether or not friction cones should be shown, are all
@@ -51,32 +51,32 @@ class DynamicBody;
 */
 class BodyPropDlg : public QDialog, public Ui::BodyPropDlgUI
 {
-	Q_OBJECT
-private:
-	DynamicBody *dynBod;
-	std::vector<Body *> bodyVec;
-	int numBodies;
-	double origMass;
-	bool origAxesShown;
-	bool origDynContactForcesShown;
-	bool origIsDynamic;
-	std::vector<int> origMaterials;
-	std::vector<bool> origShowFC;
-	std::vector<float> origTransparencies;
+    Q_OBJECT
+  private:
+    DynamicBody *dynBod;
+    std::vector<Body *> bodyVec;
+    int numBodies;
+    double origMass;
+    bool origAxesShown;
+    bool origDynContactForcesShown;
+    bool origIsDynamic;
+    std::vector<int> origMaterials;
+    std::vector<bool> origShowFC;
+    std::vector<float> origTransparencies;
 
-	void init();
-public:
-	BodyPropDlg(QWidget *parent = 0) : QDialog(parent) {
-		setupUi(this);
-		init();
-	}
-public Q_SLOTS:
-	void setTransparency( int val );
-	void setShowAxes( int state);
-	void setShowFC( int state );
-	void setDynamic( int state );
-	void setShowDynContactForces( int state );
-	void setMaterial( int choice );
-	void showBvs();
-	void revertAndClose();
+    void init();
+  public:
+    BodyPropDlg(QWidget *parent = 0) : QDialog(parent) {
+      setupUi(this);
+      init();
+    }
+  public Q_SLOTS:
+    void setTransparency(int val);
+    void setShowAxes(int state);
+    void setShowFC(int state);
+    void setDynamic(int state);
+    void setShowDynContactForces(int state);
+    void setMaterial(int choice);
+    void showBvs();
+    void revertAndClose();
 };

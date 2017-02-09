@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_directions.h,v 1.2 2009/03/25 22:10:23 cmatei Exp $
 //
@@ -37,12 +37,13 @@
 #ifndef __GRASP_DIRECTIONS_H__
 #define __GRASP_DIRECTIONS_H__
 
-enum graspDirectionType{GDT_CYL_SIDES, GDT_CYL_TOP_BOTTOM, 
-			GDT_CUBE_WIDTH, 
-			GDT_CUBE_HEIGHT, 
-			GDT_CUBE_DEPTH, 
-			GDT_SPH, 
-			GDT_CONE_TOP, GDT_CONE_BOTTOM, GDT_CONE_SIDE_PLANE, GDT_CONE_EDGE};
+enum graspDirectionType {GDT_CYL_SIDES, GDT_CYL_TOP_BOTTOM,
+                         GDT_CUBE_WIDTH,
+                         GDT_CUBE_HEIGHT,
+                         GDT_CUBE_DEPTH,
+                         GDT_SPH,
+                         GDT_CONE_TOP, GDT_CONE_BOTTOM, GDT_CONE_SIDE_PLANE, GDT_CONE_EDGE
+                        };
 
 #include "grasp_coordinates.h"
 
@@ -55,90 +56,90 @@ enum graspDirectionType{GDT_CYL_SIDES, GDT_CYL_TOP_BOTTOM,
 */
 class GraspDirection
 {
-protected:
-  //! Palm position
-  coordinates*       point;
+  protected:
+    //! Palm position
+    coordinates       *point;
 
-  //! Palm approach vector
-  coordinates*       dir;
+    //! Palm approach vector
+    coordinates       *dir;
 
-  //! Not used.  (Not sure what Steffen intended this for)
-  bool               empty;
+    //! Not used.  (Not sure what Steffen intended this for)
+    bool               empty;
 
-  //! The rule type that resulted in this grasp direction
-  graspDirectionType gdType;
-  
-public:
-  GraspDirection();
-  virtual ~GraspDirection();
-  
-  /*! Sets the value of the palm position to \a in . */
-  virtual void        set_point(coordinates in) = 0;
-  coordinates         get_point() const;
-  
-  /*! Sets the value of the palm approach vector to \a in .*/
-  virtual void        set_dir(coordinates in) = 0;
-  coordinates         get_dir() const;
-  
-  void                set_empty(bool in);
-  bool                get_empty() const;
-  
-  void                set_gdType(graspDirectionType);
-  graspDirectionType  get_gdType() const; 
-  
-  bool                operator==(const GraspDirection&);
+    //! The rule type that resulted in this grasp direction
+    graspDirectionType gdType;
+
+  public:
+    GraspDirection();
+    virtual ~GraspDirection();
+
+    /*! Sets the value of the palm position to \a in . */
+    virtual void        set_point(coordinates in) = 0;
+    coordinates         get_point() const;
+
+    /*! Sets the value of the palm approach vector to \a in .*/
+    virtual void        set_dir(coordinates in) = 0;
+    coordinates         get_dir() const;
+
+    void                set_empty(bool in);
+    bool                get_empty() const;
+
+    void                set_gdType(graspDirectionType);
+    graspDirectionType  get_gdType() const;
+
+    bool                operator==(const GraspDirection &);
 
 };
 
 //! This class is used when the palm position and direction are expressed in cartesian coordinates
 class cartesianGraspDirection :
-public GraspDirection
+  public GraspDirection
 {
-public:
-  cartesianGraspDirection();
-  cartesianGraspDirection(GraspDirection*);
-  cartesianGraspDirection(cartesianGraspDirection*);
-  cartesianGraspDirection(const cartesianGraspDirection&);
-  
-  ~cartesianGraspDirection();
-  
-  void        set_point(coordinates in);
-  void        set_dir(coordinates in);
-  
-  double distanceTo(cartesianGraspDirection) const;
+  public:
+    cartesianGraspDirection();
+    cartesianGraspDirection(GraspDirection *);
+    cartesianGraspDirection(cartesianGraspDirection *);
+    cartesianGraspDirection(const cartesianGraspDirection &);
+
+    ~cartesianGraspDirection();
+
+    void        set_point(coordinates in);
+    void        set_dir(coordinates in);
+
+    double distanceTo(cartesianGraspDirection) const;
 };
 
 //! This class is used when the palm position and direction are expressed in cylindrical coordinates
 class cylindricalGraspDirection :
-public GraspDirection
+  public GraspDirection
 {
-public:
-  cylindricalGraspDirection();
-  cylindricalGraspDirection(GraspDirection*);
-  cylindricalGraspDirection(cylindricalGraspDirection*);
-  cylindricalGraspDirection(const cylindricalGraspDirection&);
-  
-  ~cylindricalGraspDirection();
-  
-  void        set_point(coordinates in);
-  void        set_dir(coordinates in);
+  public:
+    cylindricalGraspDirection();
+    cylindricalGraspDirection(GraspDirection *);
+    cylindricalGraspDirection(cylindricalGraspDirection *);
+    cylindricalGraspDirection(const cylindricalGraspDirection &);
+
+    ~cylindricalGraspDirection();
+
+    void        set_point(coordinates in);
+    void        set_dir(coordinates in);
 };
 
 
 //! This class is used when the palm position and direction are expressed in spherical coordinates
 class sphericalGraspDirection :
-public GraspDirection
+  public GraspDirection
 {
-public:
-  sphericalGraspDirection();
-  sphericalGraspDirection(GraspDirection*);
-  sphericalGraspDirection(sphericalGraspDirection*);
-  sphericalGraspDirection(const sphericalGraspDirection&);
-  
-  ~sphericalGraspDirection();
-  
-  void        set_point(coordinates in);
-  void        set_dir(coordinates in);
+  public:
+    sphericalGraspDirection();
+    sphericalGraspDirection(GraspDirection *);
+    sphericalGraspDirection(sphericalGraspDirection *);
+    sphericalGraspDirection(const sphericalGraspDirection &);
+
+    ~sphericalGraspDirection();
+
+    void        set_point(coordinates in);
+    void        set_dir(coordinates in);
 };
 
 #endif

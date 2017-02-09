@@ -44,7 +44,7 @@
 #define PROF_ENABLED
 #include "profiling.h"
 
-GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h) 
+GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h)
 {
   setupUi(this);
   statusLabel->setText("Status: optimization off");
@@ -68,7 +68,7 @@ GFODlg::~GFODlg()
   mMainWindow->clearContactsList();
 }
 
-void 
+void
 GFODlg::optimizationOnBoxClicked()
 {
   if (!optimizationOnBox->isChecked()) {
@@ -92,31 +92,31 @@ GFODlg::runOptimization()
 {
   mHand->getGrasp()->update();
   if (mHand->getGrasp()->getObject()) {
-    mHand->getGrasp()->getObject()->resetExtWrenchAcc();	
+    mHand->getGrasp()->getObject()->resetExtWrenchAcc();
   }
-  
-  if (optimizationTypeBox->currentText()=="Grasp force existence") {
+
+  if (optimizationTypeBox->currentText() == "Grasp force existence") {
     graspForceOptimization(Grasp::GRASP_FORCE_EXISTENCE);
-  } else if (optimizationTypeBox->currentText()=="Grasp force optimization") {
+  } else if (optimizationTypeBox->currentText() == "Grasp force optimization") {
     graspForceOptimization(Grasp::GRASP_FORCE_OPTIMIZATION);
-  } else if (optimizationTypeBox->currentText()=="Contact force existence") {
+  } else if (optimizationTypeBox->currentText() == "Contact force existence") {
     graspForceOptimization(Grasp::CONTACT_FORCE_EXISTENCE);
-  } else if (optimizationTypeBox->currentText()=="Contact force optimization") {
+  } else if (optimizationTypeBox->currentText() == "Contact force optimization") {
     graspForceOptimization(Grasp::CONTACT_FORCE_OPTIMIZATION);
-  } else if (optimizationTypeBox->currentText()=="Compliant joint equilibrium") {
+  } else if (optimizationTypeBox->currentText() == "Compliant joint equilibrium") {
     compliantEquilibriumOptimization(false);
-  } else if (optimizationTypeBox->currentText()=="DOF force equilibrium") {
+  } else if (optimizationTypeBox->currentText() == "DOF force equilibrium") {
     compliantEquilibriumOptimization(true);
-  } else if (optimizationTypeBox->currentText()=="McGrip tendon route") {
+  } else if (optimizationTypeBox->currentText() == "McGrip tendon route") {
     tendonRouteOptimization();
-  } else if (optimizationTypeBox->currentText()=="McGrip joint equilibrium") {
+  } else if (optimizationTypeBox->currentText() == "McGrip joint equilibrium") {
     mcgripEquilibrium();
   } else {
     DBGA("Unkown option selected in optimization box");
   }
 }
 
-void 
+void
 GFODlg::displayResults(int result)
 {
   if (result < 0) {
@@ -142,7 +142,7 @@ GFODlg::mcgripEquilibrium()
     DBGA("Hand is not a McGrip!");
     return;
   }
-  int result = static_cast<McGrip*>(mHand)->jointTorqueEquilibrium();
+  int result = static_cast<McGrip *>(mHand)->jointTorqueEquilibrium();
   displayResults(result);
 }
 
@@ -158,14 +158,14 @@ void GFODlg::tendonRouteOptimization()
   int result = static_cast<McGripGrasp*>(mHand->getGrasp())->tendonRouteOptimization(&l);
   DBGA("l matrix:\n" << l);
   */
-  
+
   //tendon and construction optimization with new formulation
-  Matrix p(8,1);
+  Matrix p(8, 1);
   double obj;
-  int result = static_cast<McGripGrasp*>(mHand->getGrasp())->tendonAndHandOptimization(&p, obj);
+  int result = static_cast<McGripGrasp *>(mHand->getGrasp())->tendonAndHandOptimization(&p, obj);
   DBGA("p matrix:\n" << p);
   displayResults(result);
-  
+
   /*
     Matrix *a, *B;
     static_cast<McGrip*>(mHand)->getRoutingMatrices(&B, &a);
@@ -185,7 +185,7 @@ GFODlg::compliantEquilibriumOptimization(bool useDynamicDofForce)
 void
 GFODlg::graspForceOptimization(int computation)
 {
-  Matrix tau(Matrix::ZEROES<Matrix>(mHand->getNumJoints(),1));
+  Matrix tau(Matrix::ZEROES<Matrix>(mHand->getNumJoints(), 1));
   int result = mHand->getGrasp()->computeQuasistaticForcesAndTorques(&tau, computation);
   if (!result) {
     DBGA("Optimal joint torques:\n" << tau);

@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_presenter.cpp,v 1.3 2009/03/25 22:10:05 cmatei Exp $
 //
@@ -63,7 +63,7 @@
 #include <Inventor/nodes/SoDirectionalLight.h>
 
 #ifdef Q_WS_X11
-  #include <unistd.h>
+#include <unistd.h>
 #endif
 
 /* graspit includes */
@@ -93,23 +93,23 @@
 /* externs; defined in main.cc */
 extern IVmgr *ivmgr;
 
-/*! 
+/*!
   Initializes a few variables.
  */
-grasp_presenter::grasp_presenter(){
-    processing = -1;
-    my_hand = NULL;
+grasp_presenter::grasp_presenter() {
+  processing = -1;
+  my_hand = NULL;
 #ifdef GRASPITDBG
-    std::cout << "PL_OUT: Presenter created." << std::endl;
+  std::cout << "PL_OUT: Presenter created." << std::endl;
 #endif
 }
 
 /*!
   Stub destructor.
 */
-grasp_presenter::~grasp_presenter(){
+grasp_presenter::~grasp_presenter() {
 #ifdef GRASPITDBG
-    std::cout << "PL_OUT: Presenter destroyed." << std::endl;
+  std::cout << "PL_OUT: Presenter destroyed." << std::endl;
 #endif
 }
 
@@ -118,20 +118,20 @@ grasp_presenter::~grasp_presenter(){
   Copies some global pointers for easy local use.
 */
 void
-grasp_presenter::updateGlobals(){
-    ivmgr    = graspitCore->getIVmgr();
-    myViewer = ivmgr->getViewer();
-    my_world = graspitCore->getWorld();
-    my_hand  = my_world->getCurrentHand();
+grasp_presenter::updateGlobals() {
+  ivmgr    = graspitCore->getIVmgr();
+  myViewer = ivmgr->getViewer();
+  my_world = graspitCore->getWorld();
+  my_hand  = my_world->getCurrentHand();
 }
 
 /*!
   Sets the list of grasps to be presented to be \a graspList_in .
 */
 void
-grasp_presenter::takeList(std::list<plannedGrasp*> graspList_in){
-    graspList = graspList_in;
-    processing = -1;
+grasp_presenter::takeList(std::list<plannedGrasp *> graspList_in) {
+  graspList = graspList_in;
+  processing = -1;
 }
 
 /*!
@@ -144,47 +144,47 @@ grasp_presenter::takeList(std::list<plannedGrasp*> graspList_in){
   movement of the hand as it grasps the object is shown or not.
 */
 void
-grasp_presenter::showGrasp(int next, bool render){
+grasp_presenter::showGrasp(int next, bool render) {
 
-    if (!graspList.empty()){
-	updateGlobals();
+  if (!graspList.empty()) {
+    updateGlobals();
 
-	/* Here, a separate window should be opened with copies of
-	   the hand, the robot, the object and all obstacles */
+    /* Here, a separate window should be opened with copies of
+       the hand, the robot, the object and all obstacles */
 
 
-	/* Show all grasps beginning with the best */
-	if (processing == -1){
-	    it_gr = graspList.begin();
-	    processing = 0;
-	}
-
-	if (next >=0) {
-#ifdef GRASPITDBG
-	  std::cout << "PL_OUT: Showing next grasp." << std::endl;
-	}
-	else {
-	  std::cout<<"PL_OUT: Previous not implemented. Showing next instead." << std::endl;
-#endif
-	}
-
-	if ((*it_gr)->get_quality() > 0.0){
-	    putHand((*it_gr)->get_finalGraspPosition(), render);
-#ifdef GRASPITDBG
-	    std::cout << "PL_OUT: Grasp Nr " << processing << std::endl;
-	    std::cout << "PL_OUT: Quality: " << (*it_gr)->get_quality() << std::endl;
-#endif
-	    myViewer->render();
-	}
-	it_gr++;
-	processing++;
-	if (it_gr == graspList.end()){
-	    it_gr = graspList.begin();
-	    processing = 0;
-	}
+    /* Show all grasps beginning with the best */
+    if (processing == -1) {
+      it_gr = graspList.begin();
+      processing = 0;
     }
+
+    if (next >= 0) {
 #ifdef GRASPITDBG
-    else std::cout << "PL_OUT: No grasps planned yet. There's nothin to show." << std::endl;
+      std::cout << "PL_OUT: Showing next grasp." << std::endl;
+    }
+    else {
+      std::cout << "PL_OUT: Previous not implemented. Showing next instead." << std::endl;
+#endif
+    }
+
+    if ((*it_gr)->get_quality() > 0.0) {
+      putHand((*it_gr)->get_finalGraspPosition(), render);
+#ifdef GRASPITDBG
+      std::cout << "PL_OUT: Grasp Nr " << processing << std::endl;
+      std::cout << "PL_OUT: Quality: " << (*it_gr)->get_quality() << std::endl;
+#endif
+      myViewer->render();
+    }
+    it_gr++;
+    processing++;
+    if (it_gr == graspList.end()) {
+      it_gr = graspList.begin();
+      processing = 0;
+    }
+  }
+#ifdef GRASPITDBG
+  else { std::cout << "PL_OUT: No grasps planned yet. There's nothin to show." << std::endl; }
 #endif
 }
 
@@ -193,9 +193,9 @@ grasp_presenter::showGrasp(int next, bool render){
   for some operation.  It is not currently used.
 */
 void
-grasp_presenter::chooseGrasp(){
+grasp_presenter::chooseGrasp() {
 #ifdef GRASPITDBG
-    std::cout << "PL_OUT: YEAH, actual grasp chosen. Congratulations!" << std::endl;
+  std::cout << "PL_OUT: YEAH, actual grasp chosen. Congratulations!" << std::endl;
 #endif
 }
 
@@ -203,28 +203,30 @@ grasp_presenter::chooseGrasp(){
   Moves the hand to the final grasp position \a fgp , and \a render controls
   whether the motion is rendered or just the final position of the grasp.
 */
-void 
-grasp_presenter::putHand(finalGraspPosition fgp, bool render){
+void
+grasp_presenter::putHand(finalGraspPosition fgp, bool render) {
 
-    std::list<double> tmp = fgp.get_dof();
-    std::list<double>::iterator it = tmp.begin();
+  std::list<double> tmp = fgp.get_dof();
+  std::list<double>::iterator it = tmp.begin();
 
-    my_hand->setTran(fgp.get_finalTran());
+  my_hand->setTran(fgp.get_finalTran());
 
-    for (int i=0; i<my_hand->getNumDOF(); i++){
-	my_hand->forceDOFVal(i,*it);
-	if ((my_hand->getName() == "Barrett") && i>0)
-	    my_hand->forceDOFVal(i,my_hand->getDOF(i)->getMin());
-	if (it != tmp.end())
-	    it++;
+  for (int i = 0; i < my_hand->getNumDOF(); i++) {
+    my_hand->forceDOFVal(i, *it);
+    if ((my_hand->getName() == "Barrett") && i > 0) {
+      my_hand->forceDOFVal(i, my_hand->getDOF(i)->getMin());
     }
-    if (my_hand->getName() == "Barrett") {
-	my_hand->autoGrasp(render,50);
-    } 
+    if (it != tmp.end()) {
+      it++;
+    }
+  }
+  if (my_hand->getName() == "Barrett") {
+    my_hand->autoGrasp(render, 50);
+  }
 
-    my_world->findAllContacts();
-    my_world->updateGrasps();
-	
+  my_world->findAllContacts();
+  my_world->updateGrasps();
+
 }
 
 

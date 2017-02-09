@@ -61,180 +61,180 @@ const double unbalancedForceThreshold = 1.0e10;
 
 SearchEnergy::SearchEnergy()
 {
-    mHand = NULL;
-    mObject = NULL;
-    mType = ENERGY_CONTACT; //default
-    mContactType = CONTACT_LIVE; //default
-    mVolQual = NULL;
-    mEpsQual = NULL;
-    mDisableRendering = true;
-    mOut = NULL;
-    mThreshold = 0;
-    mAvoidList = NULL;
+  mHand = NULL;
+  mObject = NULL;
+  mType = ENERGY_CONTACT; //default
+  mContactType = CONTACT_LIVE; //default
+  mVolQual = NULL;
+  mEpsQual = NULL;
+  mDisableRendering = true;
+  mOut = NULL;
+  mThreshold = 0;
+  mAvoidList = NULL;
 }
 
 void
 SearchEnergy::createQualityMeasures()
 {
-    if (mVolQual) delete mVolQual;
-    if (mEpsQual) delete mEpsQual;
-    mVolQual = new QualVolume( mHand->getGrasp(), QString("SimAnn_qvol"),"L1 Norm");
-    mEpsQual = new QualEpsilon( mHand->getGrasp(), QString("SimAnn_qeps"), "L1 Norm");
-    DBGP("Qual measures created");
+  if (mVolQual) { delete mVolQual; }
+  if (mEpsQual) { delete mEpsQual; }
+  mVolQual = new QualVolume(mHand->getGrasp(), QString("SimAnn_qvol"), "L1 Norm");
+  mEpsQual = new QualEpsilon(mHand->getGrasp(), QString("SimAnn_qeps"), "L1 Norm");
+  DBGP("Qual measures created");
 }
 
 void
 SearchEnergy::setHandAndObject(Hand *h, Body *o)
 {
-    if (mHand != h) {
-        mHand = h;
-        createQualityMeasures();
-    }
-    mObject = o;
+  if (mHand != h) {
+    mHand = h;
+    createQualityMeasures();
+  }
+  mObject = o;
 }
 
 SearchEnergy::~SearchEnergy()
 {
-    delete mVolQual;
-    delete mEpsQual;
+  if (mVolQual) { delete mVolQual; }
+  if (mEpsQual) { delete mEpsQual; }
 }
 
 bool
 SearchEnergy::legal() const
-{	
-    //hack for iros09
-    //the compliant planners do their own checks
-    if (mType == ENERGY_COMPLIANT || mType == ENERGY_DYNAMIC) return true;
+{
+  //hack for iros09
+  //the compliant planners do their own checks
+  if (mType == ENERGY_COMPLIANT || mType == ENERGY_DYNAMIC) { return true; }
 
-    //no check at all
-    //return true;
+  //no check at all
+  //return true;
 
-    //full collision detection
-    //if the hand is passed as an argument, this should only check for collisions that
-    //actually involve the hand
-    return mHand->getWorld()->noCollision(mHand);
+  //full collision detection
+  //if the hand is passed as an argument, this should only check for collisions that
+  //actually involve the hand
+  return mHand->getWorld()->noCollision(mHand);
 
-    /*
-    //check only palm
-    if ( mHand->getWorld()->getDist( mHand->getPalm(), mObject) <= 0) return false;
-    return true;
-    */
+  /*
+  //check only palm
+  if ( mHand->getWorld()->getDist( mHand->getPalm(), mObject) <= 0) return false;
+  return true;
+  */
 }
 
 void
 SearchEnergy::analyzeCurrentPosture(Hand *h, Body *o, bool &isLegal, double &stateEnergy, bool noChange)
 {
-    setHandAndObject(h,o);
+  setHandAndObject(h, o);
 
-    if (noChange) {
-        h->saveState();
-    }
+  if (noChange) {
+    h->saveState();
+  }
 
-    if ( !legal() ) {
-        isLegal = false;
-        stateEnergy = 0;
-    } else {
-        isLegal = true;
-        stateEnergy = energy();
-    }
+  if (!legal()) {
+    isLegal = false;
+    stateEnergy = 0;
+  } else {
+    isLegal = true;
+    stateEnergy = energy();
+  }
 
-    if (noChange) {
-        h->restoreState();
-    }
+  if (noChange) {
+    h->restoreState();
+  }
 }
 
 void SearchEnergy::analyzeState(bool &isLegal, double &stateEnergy, const GraspPlanningState *state, bool noChange)
 {
-    if (mAvoidList) {
-        std::list<GraspPlanningState*>::const_iterator it; int i=0;
-        for (it = mAvoidList->begin(); it!=mAvoidList->end(); it++){
-            if ( (*it)->distance(state) < mThreshold ) {
-                isLegal = false;
-                stateEnergy = 0.0;
-                DBGP("State rejected; close to state " << i);
-                return;
-            }
-            i++;
-        }
-    }
-
-    Hand *h = state->getHand();
-    setHandAndObject( h, state->getObject() );
-    h->saveState();
-    transf objTran = state->getObject()->getTran();
-
-    bool render = h->getRenderGeometry();
-    if( mDisableRendering) {
-        h->setRenderGeometry(false);
-    }
-
-    if ( !state->execute() || !legal() ) {
+  if (mAvoidList) {
+    std::list<GraspPlanningState *>::const_iterator it; int i = 0;
+    for (it = mAvoidList->begin(); it != mAvoidList->end(); it++) {
+      if ((*it)->distance(state) < mThreshold) {
         isLegal = false;
-        stateEnergy = 0;
-    } else {
-        isLegal = true;
-        stateEnergy = energy();
+        stateEnergy = 0.0;
+        DBGP("State rejected; close to state " << i);
+        return;
+      }
+      i++;
     }
+  }
 
-    if (noChange || !isLegal) {
-        h->restoreState();
-        state->getObject()->setTran(objTran);
-    }
+  Hand *h = state->getHand();
+  setHandAndObject(h, state->getObject());
+  h->saveState();
+  transf objTran = state->getObject()->getTran();
 
-    if (render && mDisableRendering) h->setRenderGeometry(true);
-    return;
+  bool render = h->getRenderGeometry();
+  if (mDisableRendering) {
+    h->setRenderGeometry(false);
+  }
+
+  if (!state->execute() || !legal()) {
+    isLegal = false;
+    stateEnergy = 0;
+  } else {
+    isLegal = true;
+    stateEnergy = energy();
+  }
+
+  if (noChange || !isLegal) {
+    h->restoreState();
+    state->getObject()->setTran(objTran);
+  }
+
+  if (render && mDisableRendering) { h->setRenderGeometry(true); }
+  return;
 }
 
 
-double SearchEnergy::getEpsQual(){
-    mHand->getWorld()->findAllContacts();
-    mHand->getWorld()->updateGrasps();
-    return mEpsQual->evaluate();
+double SearchEnergy::getEpsQual() {
+  mHand->getWorld()->findAllContacts();
+  mHand->getWorld()->updateGrasps();
+  return mEpsQual->evaluate();
 }
 
-double SearchEnergy::getVolQual(){
-    mHand->getWorld()->findAllContacts();
-    mHand->getWorld()->updateGrasps();
-    return mVolQual->evaluate();
+double SearchEnergy::getVolQual() {
+  mHand->getWorld()->findAllContacts();
+  mHand->getWorld()->updateGrasps();
+  return mVolQual->evaluate();
 }
 
-SearchEnergy * SearchEnergy::getSearchEnergy(SearchEnergyType type)
+SearchEnergy *SearchEnergy::getSearchEnergy(SearchEnergyType type)
 {
-    SearchEnergy *se;
+  SearchEnergy *se;
 
-    switch (type)
-    {
+  switch (type)
+  {
     case ENERGY_CONTACT:
-        se = new ContactEnergy();
-        break;
+      se = new ContactEnergy();
+      break;
     case ENERGY_POTENTIAL_QUALITY:
-        se =  new PotentialQualityEnergy();
-        break;
+      se =  new PotentialQualityEnergy();
+      break;
     case ENERGY_AUTOGRASP_QUALITY:
-        se =  new AutoGraspQualityEnergy();
-        break;
+      se =  new AutoGraspQualityEnergy();
+      break;
     case ENERGY_CONTACT_QUALITY:
-        se =  new GuidedPotentialQualityEnergy();
-        break;
+      se =  new GuidedPotentialQualityEnergy();
+      break;
     case ENERGY_GUIDED_AUTOGRASP:
-        se =  new GuidedAutoGraspQualityEnergy();
-        break;
+      se =  new GuidedAutoGraspQualityEnergy();
+      break;
     case ENERGY_STRICT_AUTOGRASP:
-        se =  new StrictAutoGraspEnergy();
-        break;
+      se =  new StrictAutoGraspEnergy();
+      break;
     case ENERGY_COMPLIANT:
-        se =  new CompliantEnergy();
-        break;
+      se =  new CompliantEnergy();
+      break;
     case ENERGY_DYNAMIC:
-        se =  new DynamicAutoGraspEnergy();
-        break;
+      se =  new DynamicAutoGraspEnergy();
+      break;
     default:
-        std::cout << "INVALID SEARCH ENERGY TYPE: " <<  type << std::endl;
-        return NULL;
-    }
+      std::cout << "INVALID SEARCH ENERGY TYPE: " <<  type << std::endl;
+      return NULL;
+  }
 
-    se->setType(type);
-    return se;
+  se->setType(type);
+  return se;
 }
 
 

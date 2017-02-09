@@ -25,7 +25,7 @@ class SoSeparator;
 */
 class SoftContact : public Contact
 {
-protected:
+  protected:
     //! A list of points from body1 that surround the contact in the frame of body1
     vec3 *bodyNghbd;
 
@@ -64,23 +64,23 @@ protected:
     int CalcRprimes();
 
     //! Fits an analytical surface to a local patch on body1 around the contact
-    void FitPoints( );
+    void FitPoints();
 
     //! Calculates friction characteristics using a Mattress model
-    double CalcContact_Mattress( double nForce );
+    double CalcContact_Mattress(double nForce);
 
-public:
+  public:
     //! Also takes a local neighborhood of points around body 1
-    SoftContact( Body *b1, Body *b2, position pos, vec3 norm, Neighborhood *bn );
+    SoftContact(Body *b1, Body *b2, position pos, vec3 norm, Neighborhood *bn);
 
     //! Deletes its local record of the body neighborhood
-    ~SoftContact( );
+    ~SoftContact();
 
     //! Friction model is a 3D friction ellipsoid also containing frictional torque
-    int setUpFrictionEdges(bool dynamicsOn = false );
+    int setUpFrictionEdges(bool dynamicsOn = false);
 
     //! Visual indicator is a small patch of the fit analytical surface on the body
-    SoSeparator* getVisualIndicator();
+    SoSeparator *getVisualIndicator();
 
     //! Also attempt to apply some torques in the contact plane; currently disabled.
     virtual void computeWrenches();

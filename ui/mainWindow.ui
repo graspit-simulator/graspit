@@ -465,10 +465,6 @@
           <string>Misc.</string>
         </property>
         <addaction name="dynamicsArch_BuilderAction" />
-        <addaction name="miscOptimizerAction" />
-        <addaction name="miscEigengridsAction" />
-        <addaction name="actionArizona_Project" />
-        <addaction name="staubliControl" />
       </widget>
       <widget class="QMenu" name="helpMenu" >
         <property name="title" >
@@ -698,39 +694,6 @@
       </property>
       <property name="text" >
         <string>&amp;Planner...</string>
-      </property>
-    </action>
-    <action name="miscOptimizerAction" >
-      <property name="name" >
-        <cstring>miscOptimizerAction</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Optimizer...</string>
-      </property>
-      <property name="text" >
-        <string>Optimizer...</string>
-      </property>
-    </action>
-    <action name="actionArizona_Project" >
-      <property name="name" >
-        <cstring>actionArizona_Project</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Arizona Project...</string>
-      </property>
-      <property name="text" >
-        <string>Arizona Project...</string>
-      </property>
-    </action>
-    <action name="staubliControl" >
-      <property name="name" >
-        <cstring>staubliControl</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Staubli Control Panel...</string>
-      </property>
-      <property name="text" >
-        <string>Staubli Control Panel...</string>
       </property>
     </action>
     <action name="graspGFOAction" >
@@ -1000,17 +963,6 @@
       </property>
       <property name="text" >
         <string>Primitives...</string>
-      </property>
-    </action>
-    <action name="miscEigengridsAction" >
-      <property name="name" >
-        <cstring>miscEigengridsAction</cstring>
-      </property>
-      <property name="iconText" >
-        <string>Eigengrids...</string>
-      </property>
-      <property name="text" >
-        <string>Eigengrids...</string>
       </property>
     </action>
     <action name="dbaseGUIAction" >

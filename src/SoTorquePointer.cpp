@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: SoTorquePointer.cpp,v 1.3 2009/03/25 22:53:49 cmatei Exp $
 //
@@ -55,14 +55,14 @@ SoSeparator *SoTorquePointer::curvedArrow;
 void
 SoTorquePointer::initClass()
 {
-   // Initialize type id variables
-   SO_NODE_INIT_CLASS(SoTorquePointer, SoComplexShape, "SoComplexShape");
+  // Initialize type id variables
+  SO_NODE_INIT_CLASS(SoTorquePointer, SoComplexShape, "SoComplexShape");
 
-   SoInput in;
-   in.setBuffer((void *) curvedArrowData, (size_t) sizeof(curvedArrowData));
-   curvedArrow = SoDB::readAll(&in);
+  SoInput in;
+  in.setBuffer((void *) curvedArrowData, (size_t) sizeof(curvedArrowData));
+  curvedArrow = SoDB::readAll(&in);
 
-   curvedArrow->ref();
+  curvedArrow->ref();
 }
 
 /*!
@@ -72,9 +72,9 @@ SoTorquePointer::SoTorquePointer()
 {
   children = new SoChildList(this);
 
-   SO_NODE_CONSTRUCTOR(SoTorquePointer);
-   SO_NODE_ADD_FIELD(cylRadius, (0.5));
-   SO_NODE_ADD_FIELD(height,    (4.0));
+  SO_NODE_CONSTRUCTOR(SoTorquePointer);
+  SO_NODE_ADD_FIELD(cylRadius, (0.5));
+  SO_NODE_ADD_FIELD(height, (4.0));
 }
 
 /*!
@@ -85,7 +85,7 @@ SoTorquePointer::~SoTorquePointer()
   delete children;
 }
 
-/*! 
+/*!
   This is called once to generate the child nodes that make up this
   complex shape.  The child nodes consist of a cylinder, transforms, and
   cones.  A calculator node caluculates the height of the cylinder from
@@ -96,8 +96,8 @@ SoTorquePointer::generateChildren()
 {
   // This should be called once, that means children
   // doesn not have any children yet.
-  assert (children->getLength() == 0); 
-  
+  assert(children->getLength() == 0);
+
   // Move the curvedArrow close to the end of the shaft
   // Also scale it so that it fits around the shaft
   SoCalculator *calEngine = new SoCalculator;
@@ -112,7 +112,7 @@ SoTorquePointer::generateChildren()
 
   // Compute the scale of the curved arrow
   calEngine->expression.set1Value(2, "oC = vec3f(b/0.5,b/0.5,b/0.5)");
-  
+
   SoCylinder *shaft = new SoCylinder;
   shaft->radius.connectFrom(&cylRadius);
   shaft->height.connectFrom(&height);
@@ -139,9 +139,9 @@ SoTorquePointer::generateChildren()
   children->append(root);
 }
 
-  
 
-   
-  
+
+
+
 
 

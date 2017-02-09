@@ -43,7 +43,7 @@ class SearchEnergy : public QObject
 {
     Q_OBJECT
 
-protected:
+  protected:
 
     Hand *mHand;
     Body *mObject;
@@ -54,7 +54,7 @@ protected:
     SearchEnergyType mType;
     SearchContactType mContactType;
 
-    const std::list<GraspPlanningState*> *mAvoidList;
+    const std::list<GraspPlanningState *> *mAvoidList;
     double mThreshold;
 
     /*! If this flag is set, the hand is disconnected from the scene graph while
@@ -74,25 +74,25 @@ protected:
 
     void createQualityMeasures();
 
-    void setType(SearchEnergyType _mType){mType = _mType;}
+    void setType(SearchEnergyType _mType) {mType = _mType;}
 
     SearchEnergy();
 
-public:
+  public:
 
-    static SearchEnergy * getSearchEnergy(SearchEnergyType t);
+    static SearchEnergy *getSearchEnergy(SearchEnergyType t);
 
-    void setContactType(SearchContactType t){mContactType = t;}
+    void setContactType(SearchContactType t) {mContactType = t;}
     double getEpsQual();
     double getVolQual();
 
-    void setThreshold(double t){mThreshold=t;}
-    void setAvoidList(const std::list<GraspPlanningState*> *l){mAvoidList = l;}
+    void setThreshold(double t) {mThreshold = t;}
+    void setAvoidList(const std::list<GraspPlanningState *> *l) {mAvoidList = l;}
 
     SearchContactType getContactType() const {return mContactType;}
-    void disableRendering(bool dr){mDisableRendering = dr;}
+    void disableRendering(bool dr) {mDisableRendering = dr;}
 
-    bool isType(SearchEnergyType t){return t == mType;}
+    bool isType(SearchEnergyType t) {return t == mType;}
 
     //! Sets the stat file where results are to be written
     void setStatStream(std::ostream *out) const {mOut = out;}

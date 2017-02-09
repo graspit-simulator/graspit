@@ -138,9 +138,8 @@ ListPlanner::mainLoop()
 	PRINT_STAT(mOut, mCurrentStep);
 
 
-//    (*mPlanningIterator)->execute();
-//    mHand->findInitialContact(200);
-
+    (*mPlanningIterator)->execute();
+    mHand->findInitialContact(200);
 
     mEnergyCalculator->analyzeState(legal, energy, *mPlanningIterator, false);
 

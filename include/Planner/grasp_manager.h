@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_manager.h,v 1.2 2009/03/25 22:10:23 cmatei Exp $
 //
@@ -44,12 +44,12 @@
    - compare them to eventually existing ones to
      extract those near to the best ones in the
      last set
-   - test the remaining grasps 
+   - test the remaining grasps
    MAYBE THIS ISNT NEEDED ANY MORE, SHOULD THINK
    ABOUT IT... */
 //#define NR_OF_PLAN_TEST_ITERATIONS 3
 
-/* When doing an iteration step, maybe not all grasps with 
+/* When doing an iteration step, maybe not all grasps with
    quality > 0.0 should be considered as "good" grasps.
    Only grasps with quality >= ITERATION_QUALITY_THRESH
    are taken into account while looking for those in the
@@ -65,7 +65,7 @@
 
 /* When computing new grasps for an iteration step,
    more grasps are genererated than in the step before.
-   This means better accuracy as well as longer testing 
+   This means better accuracy as well as longer testing
    time. These defines fix the step size for each planning
    parameter. */
 /* > 0 */
@@ -93,70 +93,70 @@ class IVmgr;
   The tester returns a sorted list of the force closure grasps which are then
   sent to the presenter to allow the user to view each grasp in succession.
 */
-class grasp_manager{
+class grasp_manager {
 
-  //! A pointer to the grasped object
+    //! A pointer to the grasped object
     GraspableBody *my_body;
 
-  //! A list of candidate grasps, before testing.  After testing, contains a sorted list of force closure grasps.
-    std::list<plannedGrasp*> graspList;
+    //! A list of candidate grasps, before testing.  After testing, contains a sorted list of force closure grasps.
+    std::list<plannedGrasp *> graspList;
 
-  //! if TRUE, the whole testing process is visualized. 
+    //! if TRUE, the whole testing process is visualized.
     bool renderIt;
 
-  //! if TRUE, previously generated grasps (if there are any) are used to pick those out of the current set to be tested that are near to stable grasps.
+    //! if TRUE, previously generated grasps (if there are any) are used to pick those out of the current set to be tested that are near to stable grasps.
     bool doIteration;
 
-  //! TRUE if the graspList has not yet been sent to the presenter.
+    //! TRUE if the graspList has not yet been sent to the presenter.
     int graspsNotShown;
 
-  //! a pointer to the grasp planner
+    //! a pointer to the grasp planner
     grasp_planner *myPlanner;
 
-  //! a pointer to the grasp presenter
-    grasp_presenter* myPresent;
+    //! a pointer to the grasp presenter
+    grasp_presenter *myPresent;
 
-  //! a pointer to the inventor manager
-  IVmgr *ivmgr;
+    //! a pointer to the inventor manager
+    IVmgr *ivmgr;
 
-  //! a pointer to the shape primitive scene graph
-  SoGroup *primitives;
+    //! a pointer to the shape primitive scene graph
+    SoGroup *primitives;
 
-  // a pointer to the grasp tester, now global because of idle Sensor stuff */
-//    grasp_tester  *myTester;
+    // a pointer to the grasp tester, now global because of idle Sensor stuff */
+    //    grasp_tester  *myTester;
 
     /* same as define above */
-//    int nrOfPlanTestIteration;
+    //    int nrOfPlanTestIteration;
 
-  //! a threshold value for deteriming if grasps in a new set are close enough to previously found good grasp
+    //! a threshold value for deteriming if grasps in a new set are close enough to previously found good grasp
     double maxdist;
-    
-  //! a quality threshold value for determining if a grasp in the first set of tested grasps can be considered "good"
+
+    //! a quality threshold value for determining if a grasp in the first set of tested grasps can be considered "good"
     double itQualThresh;
 
-//    struct timeval computingTime;
+    //    struct timeval computingTime;
 
-  //! Counter for keeping statistics
+    //! Counter for keeping statistics
     int nrOfPlannedGrasps;
 
-  //! Counter for keeping statistics
+    //! Counter for keeping statistics
     int nrOfStableGrasps;
 
     /* changes the parameters of the planner according to
        actual iteration step so that planning gets more accurate
        with increasing stepnumber */
-//    void changePlanningParameters(int);
+    //    void changePlanningParameters(int);
 
-  void loadPrimitives();
-  void compareGraspListsByDist(std::list<plannedGrasp*>&, std::list<plannedGrasp*>);
+    void loadPrimitives();
+    void compareGraspListsByDist(std::list<plannedGrasp *> &, std::list<plannedGrasp *>);
 
-public:
+  public:
     grasp_manager();
     ~grasp_manager();
 
-  int readCandidateGraspsFile(const QString& filename);
-  void generateGrasps();
-  void testGrasps();
+    int readCandidateGraspsFile(const QString &filename);
+    void generateGrasps();
+    void testGrasps();
     void showGrasps(int next);
     void chooseGrasp();
 
@@ -166,11 +166,11 @@ public:
     void set_doIteration(bool);
     bool get_doIteration()const;
 
-    bool set_iterationParameters(double,double);
-    void get_iterationParameters(double&,double&)const;
+    bool set_iterationParameters(double, double);
+    void get_iterationParameters(double &, double &)const;
 
-    grasp_planner* get_graspPlanner()const;
-    grasp_tester*  get_graspTester()const;
+    grasp_planner *get_graspPlanner()const;
+    grasp_tester  *get_graspTester()const;
 };
 
 

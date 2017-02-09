@@ -6,10 +6,10 @@
 
 class StrictAutoGraspEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
 
-protected:
+  protected:
     double approachAutograspQualityEnergy() const;
     double autograspQualityEnergy() const;
 };

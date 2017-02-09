@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the %Aligner class
  */
 
@@ -35,19 +35,19 @@
 namespace db_planner {
 
 //! Align a Model with some data.
-/*! A class to align a Model to an Dest which may be a point 
-    cloud, a mesh, depth images, or something else. 
+/*! A class to align a Model to an Dest which may be a point
+    cloud, a mesh, depth images, or something else.
     Transforms are left-multiply and column major. */
 template <class Dest>
 class Aligner {
- public:
-  //!! Align a Model to a Dest (templated on Dest) using a given 4x4 transform.
-  virtual bool Align(const Model& /*source*/, 
-                     const Dest& /*dest*/, 
-                     float /*transform*/[16]) const {
-    return false;
-  }
-  virtual ~Aligner() {}
+  public:
+    //!! Align a Model to a Dest (templated on Dest) using a given 4x4 transform.
+    virtual bool Align(const Model & /*source*/,
+                       const Dest & /*dest*/,
+                       float /*transform*/[16]) const {
+      return false;
+    }
+    virtual ~Aligner() {}
 };
 
 

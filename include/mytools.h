@@ -36,23 +36,24 @@
 #include <QTextStream>
 #include <iostream>
 
+#include "matvec3D.h"
+
 class TiXmlElement;
 class transf;
 class matvecIO;
-class vec3;
 
 #define SUCCESS 0
 #define FAILURE -1
 #define TERMINAL_FAILURE -2
 
-void show_errors(int, char* = NULL);
+void show_errors(int, char * = NULL);
 
 #ifndef MAX
-#define MAX(A,B)	((A) > (B) ? (A) : (B))
+#define MAX(A,B)  ((A) > (B) ? (A) : (B))
 #endif
 
 #ifndef MIN
-#define MIN(A,B)	((A) < (B) ? (A) : (B))
+#define MIN(A,B)  ((A) < (B) ? (A) : (B))
 #endif
 
 #ifndef ROUND
@@ -61,7 +62,7 @@ void show_errors(int, char* = NULL);
 
 //std::ostream& operator<< (std::ostream& os, QString& str)
 //{
-//	return os << str.latin1();
+//  return os << str.latin1();
 //}
 
 inline void printQString(QString q)
@@ -73,7 +74,7 @@ inline void printQString(QString q)
 #ifndef BATCH_PROCESSING
 //! Puts up a QT warning box with the given message
 #define QTWARNING(MSG_) QMessageBox::warning(NULL,"GraspIt!",MSG_,QMessageBox::Ok, \
-											 Qt::NoButton,Qt::NoButton)
+                       Qt::NoButton,Qt::NoButton)
 #else
 //If batch processing is enabled we supress error messages that require user attention
 //alternatively, we could redirect this into a log file
@@ -118,23 +119,23 @@ int findString(QTextStream *stream, QString target);
 QString relativePath(QString absolutePath, QString relativeToDir);
 
 //! Returns the child of the XML node \a root of the type specified in \a defStr
-const TiXmlElement* findXmlElement(const TiXmlElement *root, QString defStr);
+const TiXmlElement *findXmlElement(const TiXmlElement *root, QString defStr);
 
 //! Returns the children of the XML node \a root of the type specified in \a defStr
-std::list<const TiXmlElement*> findAllXmlElements(const TiXmlElement *root, QString defStr);
+std::list<const TiXmlElement *> findAllXmlElements(const TiXmlElement *root, QString defStr);
 
 //! Returns the number of chilren in the XML node \a root of the type specified in \a defStr
 int countXmlElements(const TiXmlElement *root, QString defStr);
 
 //! Returns the double value in the child f the XML node \a root of the type specified in \a defStr
-bool getDouble(const TiXmlElement *root, QString defStr, double& val);
+bool getDouble(const TiXmlElement *root, QString defStr, double &val);
 
 //! Returns the int value in the child f the XML node \a root of the type specified in \a defStr
-bool getInt(const TiXmlElement *root, QString defStr, int& val);
+bool getInt(const TiXmlElement *root, QString defStr, int &val);
 
-//! Returns the position vector specified by the XML node \a root 
+//! Returns the position vector specified by the XML node \a root
 bool getPosition(const TiXmlElement *root, vec3 &pos);
 
-//! Returns the total transformation specified by the XML node \a root 
-bool getTransform(const TiXmlElement *root,transf &totalTran);
+//! Returns the total transformation specified by the XML node \a root
+bool getTransform(const TiXmlElement *root, transf &totalTran);
 #endif

@@ -1,0 +1,74 @@
+#
+## astyle configuration file
+#
+
+# Insert empty lines around unrelated blocks, labels, classes, ...
+#--break-blocks
+
+--keep-one-line-statements
+--keep-one-line-blocks
+--convert-tabs
+--add-brackets
+
+# Insert space padding around operators. Any end of line comments will remain in the original column, if possible. Note that there is no option to unpad. Once padded, they stay padded.
+--pad-oper
+
+# Insert space padding after paren headers only (e.g. 'if', 'for', 'while'...). Any end of line comments will remain in the original column, if possible. This can be used with unpad-paren to remove unwanted spaces.
+--pad-header
+
+# Remove unnecessary space padding around parenthesis. This
+# can be used in combination with the 'pad' options above.
+--unpad-paren
+
+# Remove brackets from a bracketed one line conditional statements.
+#--remove-brackets
+
+# Convert tabs to the appropriate number of spaces.
+--convert-tabs
+
+# Indent preprocessor conditional statements #if/#else/#endif
+# to the same level as the source code.
+#--indent-preproc-cond
+
+# Java style formatting/indenting uses attached brackets.
+#--style=java
+
+--indent=spaces=2
+
+# When used with --style=java, --style=kr, --style=stroustrup, --style=linux, or --style=1tbs, this breaks closing headers (e.g. 'else', 'catch', ...) from their immediately preceding closing brackets. Closing header brackets are always broken with the other styles.
+#--break-closing-brackets
+
+# Indent 'class' and 'struct' blocks so that the entire block is indented. The struct blocks are indented only if an access modifier, 'public:', 'protected:' or 'private:', is declared somewhere in the struct. This option is effective for C++ files only.
+--indent-classes
+
+# Indent 'class' and 'struct' access modifiers, 'public:', 'protected:' and 'private:', one half indent. The rest of the class is not indented. This option is effective for C++ files only. If used with indent‑classes this option will be ignored.
+#--indent-modifiers
+
+# Indent 'switch' blocks so that the 'case X:' statements are indented in the switch block. The entire case block is indented.
+--indent-switches
+
+# Add extra indentation to namespace blocks. This option has no effect on Java files.
+#--indent-namespaces
+
+# Add extra indentation to labels so they appear 1 indent less than the current indentation, rather than being flushed to the left.
+--indent-labels
+
+# Indent C++ comments beginning in column one. By default C++ comments beginning in column one are not indented. This option will allow the comments to be indented with the code.
+--indent-col1-comments
+
+# Set the  maximum of # spaces to indent a continuation line. The # indicates a number of columns and must not be greater than 120. If no # is set, the default value of 40 will be used. A maximum of less than two indent lengths will be ignored. This option will prevent continuation lines from extending too far to the right. Setting a larger value will allow the code to be extended further to the right.
+--max-instatement-indent=120
+
+# Attach a pointer or reference operator (*, &, or ^) to either the variable type (left) or variable name (right), or place it between the type and name (middle). The spacing between the type and name will be preserved, if possible. This option is for C/C++, C++/CLI, and C# files. To format references separately use the following align-reference option.
+--align-pointer=name
+
+# This option will align references separate from pointers. Pointers are not changes by this option. If pointers and references are to be aligned the same, use the previous align-pointer option. The option align-reference=none will not change the reference alignment. The other options are the same as for align-pointer. This option is for C/C++, C++/CLI, and C# files.
+--align-reference=name
+
+# Append the suffix #### instead of '.orig' to original filename (e.g. --suffix=.bak). If this is to be a file extension, the dot '.' must be included. Otherwise the suffix will be appended to the current file extension.
+--suffix=none
+
+# Formatted files display mode. Display only the files that have been formatted. Do not display files that are unchanged.
+--formatted
+
+--recursive

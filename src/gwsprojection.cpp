@@ -17,13 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: gwsprojection.cpp,v 1.9 2009/06/16 22:53:03 cmatei Exp $
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Implements the grasp wrench space projection class.
  */
 
@@ -62,15 +62,15 @@
 /*!
   A GWS projection must be initialized with the a pointer to the mainWindow,
   a pointer to the GWS being projected, a 6x1 projection coordinates vector,
-  \a c, and set specifiying which of these coordinates are fixed. 
+  \a c, and set specifiying which of these coordinates are fixed.
 */
-GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer,GWS *g,double *c,
-			     std::set<int> whichFixed)
+GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer, GWS *g, double *c,
+                             std::set<int> whichFixed)
 {
   gws = g;
   GraspableBody *object = gws->getGrasp()->getObject();
 
-  memcpy(projCoords,c,6*sizeof(double));
+  memcpy(projCoords, c, 6 * sizeof(double));
 
   fixedCoordIndex = whichFixed;
 
@@ -78,9 +78,9 @@ GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer,GWS *g,double *c,
   SoShapeHints *myHints = new SoShapeHints;
   myHints->shapeType = SoShapeHints::SOLID;
   myHints->vertexOrdering = SoShapeHints::COUNTERCLOCKWISE;
-  
-  mat->diffuseColor = SbColor(0,0.8f,0);
-  mat->ambientColor = SbColor(0,0.2f,0);
+
+  mat->diffuseColor = SbColor(0, 0.8f, 0);
+  mat->ambientColor = SbColor(0, 0.2f, 0);
   mat->transparency = 0.4f;
 
   hullCoords = new SoCoordinate3;
@@ -90,15 +90,15 @@ GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer,GWS *g,double *c,
   hullSep->addChild(mat);
   hullSep->addChild(hullCoords);
   hullSep->addChild(hullIFS);
-  
+
   SoInput in;
   in.setBuffer((void *) pointersData, (size_t) sizeof(pointersData));
   SoSeparator *pointers = SoDB::readAll(&in);
   SoSeparator *hullaxes = (SoSeparator *)pointers->getChild(3);
   SoScale *hasf = new SoScale;
   double scale = gws->getGrasp()->getMaxRadius();
-  hasf->scaleFactor=SbVec3f(scale/HULLAXES_SCALE, scale/HULLAXES_SCALE, scale/HULLAXES_SCALE);
-  hullaxes->insertChild(hasf,0);
+  hasf->scaleFactor = SbVec3f(scale / HULLAXES_SCALE, scale / HULLAXES_SCALE, scale / HULLAXES_SCALE);
+  hullaxes->insertChild(hasf, 0);
 
   SoRotation *lightDir = new SoRotation;
   lightDir->rotation.connectFrom(&mainViewer->getCamera()->orientation);
@@ -107,32 +107,34 @@ GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer,GWS *g,double *c,
   lightSep->addChild(mainViewer->getHeadlight());
 
   SoTransform *hullTran = new SoTransform;
-  if (!hullTran) printf("NULL hullTran!\n");
+  if (!hullTran) { printf("NULL hullTran!\n"); }
 
-  if (object!=NULL) {
-	hullTran->translation.connectFrom(&object->getIVTran()->translation);
-	hullTran->rotation.connectFrom(&object->getIVTran()->rotation);
+  if (object != NULL) {
+    hullTran->translation.connectFrom(&object->getIVTran()->translation);
+    hullTran->rotation.connectFrom(&object->getIVTran()->rotation);
   } else {
-	  hullTran->translation = gws->getGrasp()->getCoG().toSbVec3f();
+    hullTran->translation = toSbVec3f(gws->getGrasp()->getCoG());
   }
 
   sg = new SoSeparator;
   // create our own camera so it has better clipping planes
   SoPerspectiveCamera *camera = new SoPerspectiveCamera();
-  if (!camera->position.connectFrom( &mainViewer->getCamera()->position )) 
-	  fprintf(stderr,"Projection camera connection 1 failed!\n");
-  if (!camera->orientation.connectFrom( &mainViewer->getCamera()->orientation ))
-	  fprintf(stderr,"Projection camera connection 2 failed!\n");
+  if (!camera->position.connectFrom(&mainViewer->getCamera()->position)) {
+    fprintf(stderr, "Projection camera connection 1 failed!\n");
+  }
+  if (!camera->orientation.connectFrom(&mainViewer->getCamera()->orientation)) {
+    fprintf(stderr, "Projection camera connection 2 failed!\n");
+  }
   camera->nearDistance = 5;
   camera->farDistance = 1000;
   sg->addChild(camera);
   // original code just re-used main camera
   //sg->addChild( mainViewer->getCamera() );
 
-  sg->addChild(lightSep);   
+  sg->addChild(lightSep);
   sg->addChild(hullTran);
   sg->addChild(hullaxes);
-  sg->addChild(hullSep); 
+  sg->addChild(hullSep);
 
   pointers->ref();
   pointers->unref();
@@ -140,11 +142,11 @@ GWSprojection::GWSprojection(SoQtExaminerViewer *mainViewer,GWS *g,double *c,
 
   projectionViewer = new SoQtRenderArea();
   projectionViewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
-  projectionViewer->setBackgroundColor(SbColor(1,1,1));
+  projectionViewer->setBackgroundColor(SbColor(1, 1, 1));
   projectionViewer->setSceneGraph(sg);
-  if (projectionViewer->isTopLevelShell()) printf("TOP LEVEL SHELL\n");
-  else printf("NOT TOP LEVEL SHELL\n");
-  projectionViewer->setWindowCloseCallback(Grasp::destroyProjection,this);
+  if (projectionViewer->isTopLevelShell()) { printf("TOP LEVEL SHELL\n"); }
+  else { printf("NOT TOP LEVEL SHELL\n"); }
+  projectionViewer->setWindowCloseCallback(Grasp::destroyProjection, this);
 
   projectionViewer->show();
   setWinTitle();
@@ -162,8 +164,8 @@ GWSprojection::~GWSprojection()
 {
   gws->getGrasp()->removeGWS(gws);
   if (projectionViewer->getShellWidget()) {
-	projectionViewer->setWindowCloseCallback(NULL);
-	delete projectionViewer->getShellWidget();
+    projectionViewer->setWindowCloseCallback(NULL);
+    delete projectionViewer->getShellWidget();
   }
   delete projectionViewer;
 }
@@ -179,21 +181,23 @@ void
 GWSprojection::setWinTitle()
 {
   int i;
-  char titleStr[100],element[6];
+  char titleStr[100], element[6];
 
-  sprintf(titleStr,"%s GWS projection (",gws->getType());
-  for (i=0;i<6;i++) {
-    if (fixedCoordIndex.find(i) == fixedCoordIndex.end())
-      strcat(titleStr," * ");
+  sprintf(titleStr, "%s GWS projection (", gws->getType());
+  for (i = 0; i < 6; i++) {
+    if (fixedCoordIndex.find(i) == fixedCoordIndex.end()) {
+      strcat(titleStr, " * ");
+    }
     else {
-      sprintf(element,"%4.1f",projCoords[i]);
-      strcat(titleStr,element);
+      sprintf(element, "%4.1f", projCoords[i]);
+      strcat(titleStr, element);
     }
 
-    if (i<5)
-      strcat(titleStr,",");
+    if (i < 5) {
+      strcat(titleStr, ",");
+    }
   }
-  strcat(titleStr,")");
+  strcat(titleStr, ")");
 
   projectionViewer->setTitle(titleStr);
 }
@@ -209,23 +213,24 @@ GWSprojection::update()
   std::vector<position> coords;
   std::vector<int> indices;
 
-  if (gws->isForceClosure() || gws->hasPositiveVolume() )
-    gws->projectTo3D(projCoords,fixedCoordIndex,coords,indices);
+  if (gws->isForceClosure() || gws->hasPositiveVolume()) {
+    gws->projectTo3D(projCoords, fixedCoordIndex, coords, indices);
+  }
 
   hullCoords->point.deleteValues(0);
   hullIFS->coordIndex.deleteValues(0);
 
   int numCoords = coords.size();
-  for (i=0;i<numCoords;i++) {
-    hullCoords->point.set1Value(i,(float)coords[i].x(),(float)coords[i].y(),
-				(float)coords[i].z());
+  for (i = 0; i < numCoords; i++) {
+    hullCoords->point.set1Value(i, (float)coords[i].x(), (float)coords[i].y(),
+                                (float)coords[i].z());
   }
 
   int numIndices = indices.size();
-  for (i=0;i<numIndices;i++) {
-    hullIFS->coordIndex.set1Value(i,indices[i]);
+  for (i = 0; i < numIndices; i++) {
+    hullIFS->coordIndex.set1Value(i, indices[i]);
   }
-  
+
   coords.clear();
   indices.clear();
 }

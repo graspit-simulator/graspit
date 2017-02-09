@@ -5,9 +5,9 @@
 
 class DynamicAutoGraspEnergy: public SearchEnergy
 {
-public:
+  public:
     double energy() const;
-protected:
+  protected:
     mutable bool mDynamicsError;
 
     //! returns true if any contacts are slipping

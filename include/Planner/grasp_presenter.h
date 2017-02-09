@@ -18,7 +18,7 @@
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Authors: Steffen Knoop
-//          Andrew T. Miller 
+//          Andrew T. Miller
 //
 // $Id: grasp_presenter.h,v 1.3 2009/03/25 22:10:24 cmatei Exp $
 //
@@ -37,7 +37,7 @@
  \brief Defines the grasp_presenter class (part of grasp planner)
 */
 
-//! This class is used to present the final list of planned grasps to the user 
+//! This class is used to present the final list of planned grasps to the user
 /*!
   After the tester has evaluated all of the candidate grasps, the sorted list
   of good grasps is passed to this class.  Then each time the user pushes the
@@ -49,44 +49,44 @@
 */
 class grasp_presenter
 {
- private:
-  
-  //! A pointer to the main viewer
-  SoQtExaminerViewer *myViewer;
+  private:
 
-  //! A pointer to the hand used to present the grasp
-  Hand               *my_hand;
+    //! A pointer to the main viewer
+    SoQtExaminerViewer *myViewer;
 
-  //! A pointer to the world containing the hand
-  World              *my_world;
+    //! A pointer to the hand used to present the grasp
+    Hand               *my_hand;
 
-  //! A pointer the Inventor manager
-  IVmgr              *ivmgr;
+    //! A pointer to the world containing the hand
+    World              *my_world;
 
-  //! A pointer to the render area for this presentation (not used yet)
-  SoQtRenderArea     *graspViewer;
+    //! A pointer the Inventor manager
+    IVmgr              *ivmgr;
 
-  //! A list of the grasps being presented
-  std::list<plannedGrasp*> graspList;
-    
-  //! An iterator for the grasp list
-  std::list<plannedGrasp*>::iterator it_gr;
+    //! A pointer to the render area for this presentation (not used yet)
+    SoQtRenderArea     *graspViewer;
+
+    //! A list of the grasps being presented
+    std::list<plannedGrasp *> graspList;
+
+    //! An iterator for the grasp list
+    std::list<plannedGrasp *>::iterator it_gr;
 
 
-  int processing;
+    int processing;
 
-  void updateGlobals();
-  void breakContacts();
-  void putHand(finalGraspPosition,bool);
-  
-  
- public:
-  grasp_presenter();
-  ~grasp_presenter();
-  
-  void takeList(std::list<plannedGrasp*>);
-  void showGrasp(int, bool);
-  void chooseGrasp();
+    void updateGlobals();
+    void breakContacts();
+    void putHand(finalGraspPosition, bool);
+
+
+  public:
+    grasp_presenter();
+    ~grasp_presenter();
+
+    void takeList(std::list<plannedGrasp *>);
+    void showGrasp(int, bool);
+    void chooseGrasp();
 };
 
 

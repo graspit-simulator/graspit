@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Andrew T. Miller 
+// Author(s): Andrew T. Miller
 //
 // $Id: material.cpp,v 1.3 2009/03/25 22:10:04 cmatei Exp $
 //
@@ -30,75 +30,76 @@
 
 double Cof[NUM_MATERIAL][NUM_MATERIAL];
 double KineticCof[NUM_MATERIAL][NUM_MATERIAL];
-char matNameList[NUM_MATERIAL][30] = {"frictionless","glass","metal","wood",
-				   "plastic","rubber","stone","invalid"};
+char matNameList[NUM_MATERIAL][30] = {"frictionless", "glass", "metal", "wood",
+                                      "plastic", "rubber", "stone", "invalid"
+                                     };
 
 materialT readMaterial(const char *matStr)
 {
-  if (!strcmp(matStr,"frictionless")) return(frictionless);
-  if (!strcmp(matStr,"glass")) return(glass);
-  if (!strcmp(matStr,"metal")) return(metal);
-  if (!strcmp(matStr,"wood")) return(wood);
-  if (!strcmp(matStr,"plastic")) return(plastic);
-  if (!strcmp(matStr,"rubber")) return(rubber);
-  if (!strcmp(matStr,"stone")) return(stone);
-  return(invalid);
+  if (!strcmp(matStr, "frictionless")) { return (frictionless); }
+  if (!strcmp(matStr, "glass")) { return (glass); }
+  if (!strcmp(matStr, "metal")) { return (metal); }
+  if (!strcmp(matStr, "wood")) { return (wood); }
+  if (!strcmp(matStr, "plastic")) { return (plastic); }
+  if (!strcmp(matStr, "rubber")) { return (rubber); }
+  if (!strcmp(matStr, "stone")) { return (stone); }
+  return (invalid);
 }
 
-void getMaterialStr(materialT mat,char *str){
+void getMaterialStr(materialT mat, char *str) {
   switch (mat) {
-  case frictionless:
-    strcpy(str,"frictionless");
-    break;
-  case glass:
-    strcpy(str,"glass");
-    break;
-  case metal:
-    strcpy(str,"metal");
-    break;
-  case wood:
-    strcpy(str,"wood");
-    break;
-  case plastic:
-    strcpy(str,"plastic");
-    break;
-  case rubber:
-    strcpy(str,"rubber");
-    break;
-  case stone:
-    strcpy(str,"stone");
-    break;
-  case invalid:
-    strcpy(str,"invalid");
-    break;
+    case frictionless:
+      strcpy(str, "frictionless");
+      break;
+    case glass:
+      strcpy(str, "glass");
+      break;
+    case metal:
+      strcpy(str, "metal");
+      break;
+    case wood:
+      strcpy(str, "wood");
+      break;
+    case plastic:
+      strcpy(str, "plastic");
+      break;
+    case rubber:
+      strcpy(str, "rubber");
+      break;
+    case stone:
+      strcpy(str, "stone");
+      break;
+    case invalid:
+      strcpy(str, "invalid");
+      break;
   }
 }
 
 const char *
-getMaterialStr(materialT mat){
+getMaterialStr(materialT mat) {
   switch (mat) {
-  case frictionless:
-    return "frictionless";
-  case glass:
-    return "glass";
-  case metal:
-    return "metal";
-  case wood:
-    return "wood";
-  case plastic:
-    return "plastic";
-  case rubber:
-    return "rubber";
-  case stone:
-	  return "stone";
-  case invalid:
-    break;
+    case frictionless:
+      return "frictionless";
+    case glass:
+      return "glass";
+    case metal:
+      return "metal";
+    case wood:
+      return "wood";
+    case plastic:
+      return "plastic";
+    case rubber:
+      return "rubber";
+    case stone:
+      return "stone";
+    case invalid:
+      break;
   }
   return "invalid";
 }
 
-void initCof(){
-  int i,j;
+void initCof() {
+  int i, j;
   for (i = 0; i < NUM_MATERIAL; i++)
     for (j = 0; j < NUM_MATERIAL; j++) {
       Cof[i][j] = 0.0;
@@ -127,7 +128,7 @@ void initCof(){
   KineticCof[plastic][wood] = KineticCof[wood][plastic] = 0.3;
 
   /* Rubber on Solids:  1-4 */
-  KineticCof[rubber][rubber] = 1.9;  
+  KineticCof[rubber][rubber] = 1.9;
   KineticCof[rubber][metal] = KineticCof[metal][rubber] = 0.9;
   KineticCof[rubber][wood] = KineticCof[wood][rubber] = 0.9;
   KineticCof[rubber][plastic] = KineticCof[plastic][rubber] = 0.9;
@@ -166,7 +167,7 @@ void initCof(){
   Cof[plastic][wood] = Cof[wood][plastic] = 0.4;
 
   /* Rubber on Solids:  1-4 */
-  Cof[rubber][rubber] = 2.0;  
+  Cof[rubber][rubber] = 2.0;
   Cof[rubber][metal] = Cof[metal][rubber] = 1.0;
   Cof[rubber][wood] = Cof[wood][rubber] = 1.0;
   Cof[rubber][plastic] = Cof[plastic][rubber] = 1.0;
@@ -186,6 +187,6 @@ void initCof(){
   Cof[stone][plastic] = Cof[plastic][stone] = 0.6;
   Cof[stone][rubber] = Cof[rubber][stone] = 1.5;
 
-}  
-  
+}
+
 

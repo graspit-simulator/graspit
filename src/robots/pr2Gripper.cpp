@@ -19,11 +19,11 @@
 //
 // Author(s): Matei Ciocarlie (cmatei@cs.columbia.edu)
 //
-// $Id: 
+// $Id:
 //
 //######################################################################
 
-/*! \file 
+/*! \file
 \brief Implements the special %Pr2Gripper robot class
 */
 
@@ -47,25 +47,25 @@ using std::string;
 const string Pr2Gripper2010::l_gripper_tip_name = "_chain0_link1";
 const string Pr2Gripper2010::r_gripper_tip_name = "_chain1_link1";
 
-int 
-Pr2Gripper::loadFromXml(const TiXmlElement* root,QString rootPath)
+int
+Pr2Gripper::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-	int result = Robot::loadFromXml(root, rootPath);
-	if (result != SUCCESS) return result;
-	myWorld->toggleCollisions(false, chainVec[0]->getLink(0), chainVec[1]->getLink(0));
+  int result = Robot::loadFromXml(root, rootPath);
+  if (result != SUCCESS) { return result; }
+  myWorld->toggleCollisions(false, chainVec[0]->getLink(0), chainVec[1]->getLink(0));
 
-	return result;
+  return result;
 }
 
-void 
+void
 Pr2Gripper::cloneFrom(Hand *original)
 {
-	Hand::cloneFrom(original);
-	myWorld->toggleCollisions(false, chainVec[0]->getLink(0), chainVec[1]->getLink(0));
+  Hand::cloneFrom(original);
+  myWorld->toggleCollisions(false, chainVec[0]->getLink(0), chainVec[1]->getLink(0));
 }
 
 
-void Pr2Gripper2010::setJointValuesAndUpdate(const double* jointVals)
+void Pr2Gripper2010::setJointValuesAndUpdate(const double *jointVals)
 {
   if (mCompliance == NONE) {
     Robot::setJointValuesAndUpdate(jointVals);
@@ -75,61 +75,61 @@ void Pr2Gripper2010::setJointValuesAndUpdate(const double* jointVals)
   transf initial_fingertip_tran = chainVec[mCompliance]->getLink(1)->getTran();
   Robot::setJointValuesAndUpdate(jointVals);
   transf final_fingertip_tran = chainVec[mCompliance]->getLink(1)->getTran();
-  transf relative_tran = initial_fingertip_tran * final_fingertip_tran.inverse();
-  setTran( relative_tran * getTran() );
+  transf relative_tran = final_fingertip_tran.inverse() % initial_fingertip_tran;
+  setTran( getTran() % relative_tran);
 }
 
 void Pr2Gripper2010::compliantClose()
 {
 
-	DBGP("Reactive grasp started.");
-	PROF_TIMER_FUNC(REACTIVE_GRASP_TIMER);
+  DBGP("Reactive grasp started.");
+  PROF_TIMER_FUNC(REACTIVE_GRASP_TIMER);
 
-	//Check for collisions in the hand first first. If there are collisions, bail out
-	if (!myWorld->noCollision(this)) {
-		DBGA("Compliant Close error: the hand currently has collisions");
-		return;
-	}
+  //Check for collisions in the hand first first. If there are collisions, bail out
+  if (!myWorld->noCollision(this)) {
+    DBGA("Compliant Close error: the hand currently has collisions");
+    return;
+  }
 
-	//Close hand
-	autoGrasp(false, 1.0);
+  //Close hand
+  autoGrasp(false, 1.0);
 
-	//we will close compliantly around the only fingertip that is in contact
-	ComplianceType compliance;
-	if ( chainVec[0]->getLink(1)->getNumContacts()) {
-	  if (chainVec[1]->getLink(1)->getNumContacts()) {
-	    DBGA("Reactive grasp: both fingertips are in contact; aborting");
-	    return;
-	  } else {
-	    DBGA("Setting compliance around FINGER0.");
-	    compliance = FINGER0;
-	  }
-	} else {
-	  if (!chainVec[1]->getLink(1)->getNumContacts()) {
-	    DBGA("Reactive grasp: no fingertips are in contact; aborting");
-	    return;
-	  } else {
-	    DBGA("Setting compliance around FINGER1.");
-	    compliance = FINGER1;
-	  }
-	}
-	setCompliance(compliance);
+  //we will close compliantly around the only fingertip that is in contact
+  ComplianceType compliance;
+  if (chainVec[0]->getLink(1)->getNumContacts()) {
+    if (chainVec[1]->getLink(1)->getNumContacts()) {
+      DBGA("Reactive grasp: both fingertips are in contact; aborting");
+      return;
+    } else {
+      DBGA("Setting compliance around FINGER0.");
+      compliance = FINGER0;
+    }
+  } else {
+    if (!chainVec[1]->getLink(1)->getNumContacts()) {
+      DBGA("Reactive grasp: no fingertips are in contact; aborting");
+      return;
+    } else {
+      DBGA("Setting compliance around FINGER1.");
+      compliance = FINGER1;
+    }
+  }
+  setCompliance(compliance);
 
-	//disable contacts on fingertip that we are being compliant around
-	//as they interfere with the somewhat hacked way in which we do compliance
-	chainVec[compliance]->getLink(1)->breakContacts();
-	myWorld->toggleCollisions(false, chainVec[compliance]->getLink(1) );
+  //disable contacts on fingertip that we are being compliant around
+  //as they interfere with the somewhat hacked way in which we do compliance
+  chainVec[compliance]->getLink(1)->breakContacts();
+  myWorld->toggleCollisions(false, chainVec[compliance]->getLink(1));
 
-	//Close hand again, this time compliantly
-	autoGrasp(false, 1.0);
-	
-	DBGA("Autograsp complete; re-enabling collisions");
-	//re-enable collisions and re-detect contacts
-	myWorld->toggleCollisions(true, chainVec[compliance]->getLink(1) );
-	myWorld->findContacts(chainVec[compliance]->getLink(1));
+  //Close hand again, this time compliantly
+  autoGrasp(false, 1.0);
 
-	//disable compliance
-	setCompliance(NONE);
+  DBGA("Autograsp complete; re-enabling collisions");
+  //re-enable collisions and re-detect contacts
+  myWorld->toggleCollisions(true, chainVec[compliance]->getLink(1));
+  myWorld->findContacts(chainVec[compliance]->getLink(1));
+
+  //disable compliance
+  setCompliance(NONE);
 
 }
 

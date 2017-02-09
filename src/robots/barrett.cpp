@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Implements the %Barrett hand class, a specialized hand subclass
  */
 
@@ -31,6 +31,7 @@
 
 #include "robots/barrett.h"
 #include "world.h"
+#include "flockTransform.h"
 
 #ifdef HARDWARE_LIB
 #include "BarrettHand.h"
@@ -43,51 +44,51 @@
 Barrett::~Barrett()
 {
 #ifdef HARDWARE_LIB
-	if (mRealHand) delete mRealHand;
+  if (mRealHand) { delete mRealHand; }
 #endif
 }
 
 int
-Barrett::loadFromXml(const TiXmlElement* root,QString rootPath)
+Barrett::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
-  if (Robot::loadFromXml(root, rootPath) == FAILURE) return FAILURE;
+  if (Robot::loadFromXml(root, rootPath) == FAILURE) { return FAILURE; }
   mRealHand = NULL;
   return SUCCESS;
 }
 
-/*! For now, the caller can use this interface directly, but in the 
-	future all interaction will have to go through the Barrett class.
+/*! For now, the caller can use this interface directly, but in the
+  future all interaction will have to go through the Barrett class.
 */
-BarrettHand*
+BarrettHand *
 Barrett::getRealHand()
 {
 #ifdef HARDWARE_LIB
-	if (mRealHand) return mRealHand;
-	
-	//single threaded version
-	//mRealHand = new BarrettHand();
-    //mRealHand->SetMode(BarrettHand::MODE_RETURN);
+  if (mRealHand) { return mRealHand; }
 
-	//multi-threaded version
-	mRealHand = new BarrettHandThread();
-	((BarrettHandThread*)mRealHand)->startThread();
+  //single threaded version
+  //mRealHand = new BarrettHand();
+  //mRealHand->SetMode(BarrettHand::MODE_RETURN);
 
-	return mRealHand;
+  //multi-threaded version
+  mRealHand = new BarrettHandThread();
+  ((BarrettHandThread *)mRealHand)->startThread();
+
+  return mRealHand;
 #else
-	assert(0);
-	return NULL;
+  assert(0);
+  return NULL;
 #endif
 }
 
 /*! Returns true if the last motor command sent to the real hand
-	has not finished yet. Attempts to tell when the motors of the real
-	hand are uner current, as this affect things such as Flock of
-	Birds measurements.
+  has not finished yet. Attempts to tell when the motors of the real
+  hand are uner current, as this affect things such as Flock of
+  Birds measurements.
 */
 bool
 Barrett::isBusy() {
 #ifdef HARDWARE_LIB
-	if (mRealHand) return mRealHand->isBusy();
+  if (mRealHand) { return mRealHand->isBusy(); }
 #endif
-	return false;
+  return false;
 }

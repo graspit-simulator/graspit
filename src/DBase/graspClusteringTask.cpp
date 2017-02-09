@@ -40,14 +40,14 @@
 #include "DBPlanner/ros_database_manager.h"
 using namespace db_planner;
 
-GraspClusteringTask::GraspClusteringTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr, 
-					 db_planner::TaskRecord rec) : Task (disp, mgr, rec)
+GraspClusteringTask::GraspClusteringTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
+                                         db_planner::TaskRecord rec) : Task(disp, mgr, rec)
 {
   //nothing so far
 }
 
-/*! Will also load the hand, even though the hand is not explicitly used. It is needed for 
-  the grasp allocator, plus it might be needed for retrieving DOF values, for example if 
+/*! Will also load the hand, even though the hand is not explicitly used. It is needed for
+  the grasp allocator, plus it might be needed for retrieving DOF values, for example if
   the grasp is stored in the database as eigengrasp values.
 */
 void GraspClusteringTask::start()
@@ -61,7 +61,7 @@ void GraspClusteringTask::start()
 
   World *world = graspitCore->getWorld();
   Hand *hand;
- 
+
   //check if the currently selected hand is the same as the one we need
   //if not, load the hand
   if (world->getCurrentHand() && world->getCurrentHand()->getDBName() == QString(mPlanningTask.handName.c_str())) {
@@ -70,9 +70,9 @@ void GraspClusteringTask::start()
   } else {
     QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
-    DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());	      
-    hand = static_cast<Hand*>(world->importRobot(handPath));
-    if ( !hand ) {
+    DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());
+    hand = static_cast<Hand *>(world->importRobot(handPath));
+    if (!hand) {
       DBGA("Failed to load hand");
       mStatus = FAILED;
       return;
@@ -81,8 +81,8 @@ void GraspClusteringTask::start()
   mDBMgr->SetGraspAllocator(new GraspitDBGraspAllocator(hand));
 
   //load all the grasps
-  std::vector<db_planner::Grasp*> graspList;
-  if(!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)){
+  std::vector<db_planner::Grasp *> graspList;
+  if (!mDBMgr->GetGrasps(*(mPlanningTask.model), mPlanningTask.handName, &graspList)) {
     DBGA("Load grasps failed");
     mStatus = FAILED;
     while (!graspList.empty()) {
@@ -102,7 +102,7 @@ void GraspClusteringTask::start()
 
   while (!graspList.empty()) {
     //pop the front (best grasp)
-    db_planner::Grasp* repGrasp = graspList.front();
+    db_planner::Grasp *repGrasp = graspList.front();
     graspList.erase(graspList.begin());
 
     //compliant_copy grasps are ignored by clustering tasks
@@ -121,32 +121,32 @@ void GraspClusteringTask::start()
     clusters++;
 
     //find other grasps in its cluster
-    int cloud=0;
-    std::vector<db_planner::Grasp*>::iterator it = graspList.begin();
-    while(it!=graspList.end()) {
+    int cloud = 0;
+    std::vector<db_planner::Grasp *>::iterator it = graspList.begin();
+    while (it != graspList.end()) {
 
       //compliant_copy grasps are ignored by clustering tasks
-      if ( !(*it)->CompliantCopy() &&  
-           clusterGrasps(static_cast<GraspitDBGrasp*>(repGrasp), static_cast<GraspitDBGrasp*>(*it)) ) {
-	(*it)->SetClusterRep(false);
-	//mark it as non-center in the database
-	if (!mDBMgr->SetGraspClusterRep(*it, false)) {
-	  DBGA("Failed to mark non-cluster rep in database");
-	  mStatus = FAILED;
-	  break;
-	}
-	cloud++;
-	delete *it;
-	it = graspList.erase(it);
+      if (!(*it)->CompliantCopy() &&
+          clusterGrasps(static_cast<GraspitDBGrasp *>(repGrasp), static_cast<GraspitDBGrasp *>(*it))) {
+        (*it)->SetClusterRep(false);
+        //mark it as non-center in the database
+        if (!mDBMgr->SetGraspClusterRep(*it, false)) {
+          DBGA("Failed to mark non-cluster rep in database");
+          mStatus = FAILED;
+          break;
+        }
+        cloud++;
+        delete *it;
+        it = graspList.erase(it);
       } else {
-	it++;
+        it++;
       }
 
     }
     DBGA("  Marked cluster of size " << cloud);
     delete repGrasp;
-    if (mStatus == FAILED) break;
-  }  
+    if (mStatus == FAILED) { break; }
+  }
   while (!graspList.empty()) {
     delete graspList.back();
     graspList.pop_back();
@@ -167,21 +167,24 @@ bool GraspClusteringTask::clusterGrasps(const GraspitDBGrasp *g1, const GraspitD
   double DISTANCE_THRESHOLD = 20;
   //30 degrees angular threshold
   double ANGULAR_THRESHOLD = 0.52;
-  
-  transf t1 = g1->getHand()->getApproachTran() * g1->getFinalGraspPlanningState()->getTotalTran();
-  transf t2 = g2->getHand()->getApproachTran() * g2->getFinalGraspPlanningState()->getTotalTran();
+
+  transf t1 = g1->getFinalGraspPlanningState()->getTotalTran() % g1->getHand()->getApproachTran();
+  transf t2 = g2->getFinalGraspPlanningState()->getTotalTran() % g2->getHand()->getApproachTran();
 
   vec3 dvec = t1.translation() - t2.translation();
-  double d = dvec.len();
-  if (d > DISTANCE_THRESHOLD) return false;
-  
+  double d = dvec.norm();
+  if (d > DISTANCE_THRESHOLD) { return false; }
+
   Quaternion qvec = t1.rotation() * t2.rotation().inverse();
   vec3 axis; double angle;
-  qvec.ToAngleAxis(angle,axis);
-  if (angle >  M_PI) angle -= 2*M_PI;
-  if (angle < -M_PI) angle += 2*M_PI;
-  if (fabs(angle) > ANGULAR_THRESHOLD) return false;
-  
+  Eigen::AngleAxisd aa (qvec);
+  angle = aa.angle();
+  axis = aa.axis();
+
+  if (angle >  M_PI) { angle -= 2 * M_PI; }
+  if (angle < -M_PI) { angle += 2 * M_PI; }
+  if (fabs(angle) > ANGULAR_THRESHOLD) { return false; }
+
   return true;
 }
 

@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-/*! \file 
+/*! \file
   \brief Defines the cpp record of an entry in the task_list table in the dbase
  */
 
