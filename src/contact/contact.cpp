@@ -389,7 +389,7 @@ Contact::localToWorldWrenchBlockMatrix(const std::list<Contact *> &contacts)
 */
 bool Contact::preventsMotion(const transf &motion) const
 {
-  bool result = ((motion * loc) - loc).dot(normal) > MACHINE_ZERO;
+  bool result =  ((motion * loc) - loc).dot(normal) < -MACHINE_ZERO;
   return result;
 }
 
