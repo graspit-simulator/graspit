@@ -200,7 +200,7 @@ The jacobian is returned is in column-major format.
 void
 transf::jacobian(double jac[])
 {
-  mat3 m = affine();
+  mat3 m = affine().transpose();
   vec3 p = translation();
 
   // first 3 columns of jac
