@@ -25,6 +25,13 @@
 
 #include "searchEnergyFactory.h"
 #include "contactEnergy.h"
+#include "potentialQualityEnergy.h"
+#include "autograspQualityEnergy.h"
+#include "guidedPotentialQualityEnergy.h"
+#include "guidedAutoGraspEnergy.h"
+#include "strictAutoGraspEnergy.h"
+#include "compliantEnergy.h"
+#include "dynamicAutograspEnergy.h"
 
 
 SearchEnergyFactory * SearchEnergyFactory::searchEnergyFactory = NULL;
@@ -33,4 +40,12 @@ void
 SearchEnergyFactory::registerBuiltinCreators()
 {
   REGISTER_SEARCH_ENERGY_CREATOR("CONTACT_ENERGY", ContactEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("POTENTIAL_QUALITY_ENERGY", PotentialQualityEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("AUTO_GRASP_QUALITY_ENERGY", AutoGraspQualityEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("GUIDED_POTENTIAL_QUALITY_ENERGY", GuidedPotentialQualityEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("GUIDED_AUTO_GRASP_QUALITY_ENERGY", GuidedAutoGraspQualityEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("STRICT_GRASP_ENERGY", StrictAutoGraspEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("COMPLIANT_ENERGY", CompliantEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("DYNAMIC_GRASP_ENERGY", DynamicAutoGraspEnergy);
+
 }

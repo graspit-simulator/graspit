@@ -26,6 +26,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 class SearchEnergy;
 
@@ -72,6 +73,15 @@ class SearchEnergyFactory
 
     //! Registers creators for the built in element types. Called from the world constructor
     static void registerBuiltinCreators();
+
+    std::vector<std::string> getAllRegisteredEnergy() {
+      std::vector<std::string> registeredEnergies;
+      for(std::map<std::string, SearchEnergyCreator *> ::const_iterator it = mCreators.begin(); it != mCreators.end(); it++)
+      {
+          registeredEnergies.push_back(it->first);
+      }
+      return registeredEnergies;
+    }
 
 private:
     std::map<std::string, SearchEnergyCreator *> mCreators;

@@ -98,7 +98,7 @@ GraspitCore::GraspitCore(int argc, char **argv):
   mainWindow(NULL),
   world(NULL)
 {
-SearchEnergyFactory::registerBuiltinCreators();
+  SearchEnergyFactory::registerBuiltinCreators();
   GraspitParser *graspitParser = new GraspitParser();
   graspitParser->parseArgs(argc, argv);
   cmdline::parser *args = graspitParser->parseArgs(argc, argv);

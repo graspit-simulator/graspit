@@ -52,6 +52,8 @@
 #include "guidedPlanner.h"
 #include "loopPlanner.h"
 
+#include "searchEnergyFactory.h"
+
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -63,11 +65,11 @@ void EigenGraspPlannerDlg::exitButton_clicked()
 
 void EigenGraspPlannerDlg::init()
 {
-  energyBox->insertItem("Hand Contacts");
-  energyBox->insertItem("Potential Quality");
-  energyBox->insertItem("Contacts AND Quality");
-  energyBox->insertItem("Autograsp Quality");
-  energyBox->insertItem("Guided Autograsp");
+  std::vector<std::string> registeredEnergies = SearchEnergyFactory::getInstance()->getAllRegisteredEnergy();
+  for(std::vector<std::string>::const_iterator it = registeredEnergies.begin(); it != registeredEnergies.end(); it++)
+  {
+      energyBox->insertItem(QString::fromStdString(*it));
+  }
   energyBox->setCurrentItem(2);
 
   plannerTypeBox->insertItem("Sim. Ann.");
