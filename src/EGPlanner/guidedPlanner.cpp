@@ -37,7 +37,7 @@ GuidedPlanner::GuidedPlanner(Hand *h)
 {
   mHand = h;
   init();
-  mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
+  mEnergyCalculator = SearchEnergy::getSearchEnergy("GUIDED_POTENTIAL_QUALITY_ENERGY");
   mEnergyCalculator->setAvoidList(&mAvoidList);
   mSimAnn = new SimAnn();
   mChildClones = true;
@@ -50,14 +50,14 @@ GuidedPlanner::GuidedPlanner(Hand *h)
   mChildSeedSize = 20;
   mDistanceThreshold = 0.3f;
   mMinChildEnergy = -0.1f;
-  mChildEnergyType = ENERGY_STRICT_AUTOGRASP;
+  mChildEnergyType = "STRICT_AUTO_GRASP_ENERGY";
   mMaxChildSteps = 200;
 
   mEnergyCalculator->setThreshold(mDistanceThreshold);
 }
 
 void
-GuidedPlanner::setEnergyType(SearchEnergyType s)
+GuidedPlanner::setEnergyType(std::string s)
 {
   assert(mEnergyCalculator);
   if (!mEnergyCalculator->isType(s))
@@ -149,7 +149,7 @@ GuidedPlanner::startChild(const GraspPlanningState *seed)
   }
   DBGA("Child created (and started)");
   child->setEnergyType(mChildEnergyType);
-  if (mChildEnergyType == ENERGY_CONTACT) {
+  if (mChildEnergyType == "CONTACT_ENERGY") {
     child->setContactType(CONTACT_PRESET);
   }
   child->setAnnealingParameters(ANNEAL_STRICT);

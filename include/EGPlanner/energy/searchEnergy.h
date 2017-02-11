@@ -33,6 +33,8 @@
 #include "search.h"
 #include "matvec3D.h"
 
+#include "searchEnergyFactory.h"
+
 class Hand;
 class Body;
 class QualityMeasure;
@@ -51,7 +53,7 @@ class SearchEnergy : public QObject
     QualityMeasure *mVolQual;
     QualityMeasure *mEpsQual;
 
-    SearchEnergyType mType;
+    std::string mType;
     SearchContactType mContactType;
 
     const std::list<GraspPlanningState *> *mAvoidList;
@@ -74,13 +76,13 @@ class SearchEnergy : public QObject
 
     void createQualityMeasures();
 
-    void setType(SearchEnergyType _mType) {mType = _mType;}
+    void setType(std::string _mType) {mType = _mType;}
 
     SearchEnergy();
 
   public:
 
-    static SearchEnergy *getSearchEnergy(SearchEnergyType t);
+    static SearchEnergy *getSearchEnergy(std::string t);
 
     void setContactType(SearchContactType t) {mContactType = t;}
     double getEpsQual();
@@ -92,7 +94,7 @@ class SearchEnergy : public QObject
     SearchContactType getContactType() const {return mContactType;}
     void disableRendering(bool dr) {mDisableRendering = dr;}
 
-    bool isType(SearchEnergyType t) {return t == mType;}
+    bool isType(std::string t) {return t == mType;}
 
     //! Sets the stat file where results are to be written
     void setStatStream(std::ostream *out) const {mOut = out;}

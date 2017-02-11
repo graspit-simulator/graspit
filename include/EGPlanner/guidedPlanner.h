@@ -119,7 +119,7 @@ class GuidedPlanner : public SimAnnPlanner
     //! Min energy for a state to be deemed good enough to be used to seed a child
     float mMinChildEnergy;
     //! Energy computation type used by children
-    SearchEnergyType mChildEnergyType;
+    std::string mChildEnergyType;
     //! Max iterations done by a child
     int mMaxChildSteps;
 
@@ -137,7 +137,7 @@ class GuidedPlanner : public SimAnnPlanner
     bool resetPlanner();
     void setMaxChildren(int c) {mMaxChildren = c;}
 
-    void setEnergyType(SearchEnergyType s);
+    void setEnergyType(std::string s);
 };
 
 #endif

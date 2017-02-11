@@ -98,7 +98,9 @@ GraspitCore::GraspitCore(int argc, char **argv):
   mainWindow(NULL),
   world(NULL)
 {
+  //Register all of the available built in searchEnergy functions for the EG planner
   SearchEnergyFactory::registerBuiltinCreators();
+
   GraspitParser *graspitParser = new GraspitParser();
   graspitParser->parseArgs(argc, argv);
   cmdline::parser *args = graspitParser->parseArgs(argc, argv);

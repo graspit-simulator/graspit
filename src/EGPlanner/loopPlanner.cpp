@@ -39,7 +39,7 @@ LoopPlanner::LoopPlanner(Hand *h)
   mHand = h;
   init();
 
-  mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT_QUALITY);
+  mEnergyCalculator = SearchEnergy::getSearchEnergy("GUIDED_POTENTIAL_QUALITY_ENERGY");
   mEnergyCalculator->setAvoidList(&mAvoidList);
 
   mSimAnn = new SimAnn();
@@ -53,7 +53,7 @@ LoopPlanner::LoopPlanner(Hand *h)
 }
 
 void
-LoopPlanner::setEnergyType(SearchEnergyType s)
+LoopPlanner::setEnergyType(std::string s)
 {
   assert(mEnergyCalculator);
   if (!mEnergyCalculator->isType(s))

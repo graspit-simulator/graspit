@@ -63,7 +63,7 @@ SearchEnergy::SearchEnergy()
 {
   mHand = NULL;
   mObject = NULL;
-  mType = ENERGY_CONTACT; //default
+  mType = "CONTACT_ENERGY"; //default
   mContactType = CONTACT_LIVE; //default
   mVolQual = NULL;
   mEpsQual = NULL;
@@ -104,7 +104,7 @@ SearchEnergy::legal() const
 {
   //hack for iros09
   //the compliant planners do their own checks
-  if (mType == ENERGY_COMPLIANT || mType == ENERGY_DYNAMIC) { return true; }
+  if (mType == "COMPLIANT_ENERGY" || mType == "DYNAMIC_AUTO_GRASP_ENERGY") { return true; }
 
   //no check at all
   //return true;
@@ -198,41 +198,9 @@ double SearchEnergy::getVolQual() {
   return mVolQual->evaluate();
 }
 
-SearchEnergy *SearchEnergy::getSearchEnergy(SearchEnergyType type)
+SearchEnergy *SearchEnergy::getSearchEnergy(std::string type)
 {
-  SearchEnergy *se;
-
-  switch (type)
-  {
-    case ENERGY_CONTACT:
-      se = new ContactEnergy();
-      break;
-    case ENERGY_POTENTIAL_QUALITY:
-      se =  new PotentialQualityEnergy();
-      break;
-    case ENERGY_AUTOGRASP_QUALITY:
-      se =  new AutoGraspQualityEnergy();
-      break;
-    case ENERGY_CONTACT_QUALITY:
-      se =  new GuidedPotentialQualityEnergy();
-      break;
-    case ENERGY_GUIDED_AUTOGRASP:
-      se =  new GuidedAutoGraspQualityEnergy();
-      break;
-    case ENERGY_STRICT_AUTOGRASP:
-      se =  new StrictAutoGraspEnergy();
-      break;
-    case ENERGY_COMPLIANT:
-      se =  new CompliantEnergy();
-      break;
-    case ENERGY_DYNAMIC:
-      se =  new DynamicAutoGraspEnergy();
-      break;
-    default:
-      std::cout << "INVALID SEARCH ENERGY TYPE: " <<  type << std::endl;
-      return NULL;
-  }
-
+  SearchEnergy *se = SearchEnergyFactory::getInstance()->createEnergy(type);
   se->setType(type);
   return se;
 }

@@ -72,7 +72,7 @@ class LoopPlanner : public SimAnnPlanner
     //! Also clears the avoid list
     virtual void clearSolutions();
 
-    void setEnergyType(SearchEnergyType s);
+    void setEnergyType(std::string s);
 
     //! Sets the threshold for saving solutions from each loop
     void setSaveThreshold(float t) {mSaveThreshold = t;}

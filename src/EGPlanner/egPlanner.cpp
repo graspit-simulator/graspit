@@ -55,7 +55,7 @@ EGPlanner::EGPlanner(Hand *h)
 {
   mHand = h;
   init();
-  mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
+  mEnergyCalculator = SearchEnergy::getSearchEnergy("CONTACT_ENERGY");
 }
 
 /*! Also sets the state of the planner to INIT, which is default
@@ -256,13 +256,13 @@ EGPlanner::showClone(bool s)
 }
 
 void
-EGPlanner::setEnergyType(SearchEnergyType s)
+EGPlanner::setEnergyType(std::string s)
 {
   assert(mEnergyCalculator);
   if (!mEnergyCalculator->isType(s))
   {
     delete mEnergyCalculator;
-      mEnergyCalculator = SearchEnergyFactory::getInstance()->createEnergy("CONTACT_ENERGY");
+      mEnergyCalculator = SearchEnergyFactory::getInstance()->createEnergy(s);
 //    mEnergyCalculator = SearchEnergy::getSearchEnergy(s);
   }
 }
