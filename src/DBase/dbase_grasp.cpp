@@ -224,7 +224,7 @@ bool DBaseBatchPlanner::startPlanner()
   } else if (mType == GRIPPER) {
     //simple looping sim ann planner
     mPlanner = new LoopPlanner(mHand);
-    mPlanner->setEnergyType(ENERGY_CONTACT);
+    mPlanner->setEnergyType("CONTACT_ENERGY");
   }
 
   mPlanner->setContactType(CONTACT_PRESET);
@@ -319,10 +319,10 @@ void DBaseBatchPlanner::processSolution(const GraspPlanningState *s)
     //this is the same type used by the loop planner
     switch (mType) {
       case DEXTEROUS:
-        se = SearchEnergy::getSearchEnergy(ENERGY_STRICT_AUTOGRASP);
+        se = SearchEnergy::getSearchEnergy("STRICT_AUTO_GRASP_ENERGY");
         break;
       case GRIPPER:
-        se = SearchEnergy::getSearchEnergy(ENERGY_CONTACT);
+        se = SearchEnergy::getSearchEnergy("CONTACT_ENERGY");
         se->setContactType(CONTACT_PRESET);
         break;
     }

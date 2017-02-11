@@ -37,7 +37,7 @@ GraspTester::GraspTester(Hand *h)
 {
   mHand = h;
   init();
-  mEnergyCalculator = SearchEnergy::getSearchEnergy(ENERGY_STRICT_AUTOGRASP);
+  mEnergyCalculator = SearchEnergy::getSearchEnergy("STRICT_AUTO_GRASP_ENERGY");
   mCurrentStep = 0; mMaxSteps = 1; //run forever
   mMaxCandidates = 20; mNumCandidates = 0;
 }
@@ -48,7 +48,7 @@ GraspTester::~GraspTester()
 }
 
 void
-GraspTester::setEnergyType(SearchEnergyType)
+GraspTester::setEnergyType(std::string)
 {
   DBGA("Grasp tester only uses STRICT AUTPGRASP energy");
 }

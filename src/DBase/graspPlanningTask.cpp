@@ -122,7 +122,7 @@ void GraspPlanningTask::start()
   QObject::connect(mPlanner, SIGNAL(loopUpdate()), this, SLOT(plannerLoopUpdate()));
   QObject::connect(mPlanner, SIGNAL(complete()), this, SLOT(plannerComplete()));
 
-  mPlanner->setEnergyType(ENERGY_CONTACT);
+  mPlanner->setEnergyType("CONTACT_ENERGY");
   mPlanner->setContactType(CONTACT_PRESET);
   mPlanner->setMaxSteps(65000);
   mPlanner->setRepeat(true);

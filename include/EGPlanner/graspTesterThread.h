@@ -81,7 +81,7 @@ class GraspTester : public EGPlanner
     virtual PlannerType getType() {return PLANNER_GT;}
 
     //! Hard-coded to only accept STRICT_AUTOGRASP energy, which is also set in constructor
-    void setEnergyType(SearchEnergyType);
+    void setEnergyType(std::string);
     //! Also clears internal buffers for candidates and solutions
     virtual bool resetPlanner();
 

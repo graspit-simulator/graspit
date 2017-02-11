@@ -3,10 +3,6 @@
 
 //this defines constants and other things used in searches for good grasps
 
-enum SearchEnergyType {ENERGY_CONTACT, ENERGY_POTENTIAL_QUALITY, ENERGY_CONTACT_QUALITY,
-                       ENERGY_AUTOGRASP_QUALITY, ENERGY_GUIDED_AUTOGRASP, ENERGY_STRICT_AUTOGRASP,
-                       ENERGY_COMPLIANT, ENERGY_DYNAMIC
-                      };
 enum StateType {SPACE_COMPLETE, SPACE_AXIS_ANGLE, SPACE_ELLIPSOID, SPACE_APPROACH,
                 POSE_EIGEN, POSE_DOF, ATTRIBUTES
                };

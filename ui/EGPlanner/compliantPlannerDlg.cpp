@@ -56,8 +56,8 @@ void
 CompliantPlannerDlg::init()
 {
   mPlanner = new ListPlanner(mHand);
-  energyTypeBox->insertItem("Quasistatic");
-  energyTypeBox->insertItem("Dynamic");
+  energyTypeBox->insertItem("COMPLIANT_ENERGY");
+  energyTypeBox->insertItem("DYNAMIC_AUTO_GRASP_ENERGY");
   mPlanner->setRenderType(RENDER_ALWAYS);
   mPlanner->setStatStream(&std::cerr);
   mOut = NULL;
@@ -283,13 +283,7 @@ CompliantPlannerDlg::boxSampling(double a, double b, double c, double res)
 void
 CompliantPlannerDlg::testOneButtonClicked()
 {
-  if (energyTypeBox->currentText() == "Quasistatic") {
-    mPlanner->setEnergyType(ENERGY_COMPLIANT);
-  } else if (energyTypeBox->currentText() == "Dynamic") {
-    mPlanner->setEnergyType(ENERGY_DYNAMIC);
-  } else {
-    assert(0);
-  }
+    mPlanner->setEnergyType(energyTypeBox->currentText().toStdString());
   if (mPlanner->isActive()) {
     DBGA("Stop planner first!");
     return;
@@ -317,13 +311,7 @@ CompliantPlannerDlg::startPlanner()
 void
 CompliantPlannerDlg::testButtonClicked()
 {
-  if (energyTypeBox->currentText() == "Quasistatic") {
-    mPlanner->setEnergyType(ENERGY_COMPLIANT);
-  } else if (energyTypeBox->currentText() == "Dynamic") {
-    mPlanner->setEnergyType(ENERGY_DYNAMIC);
-  } else {
-    assert(0);
-  }
+    mPlanner->setEnergyType(energyTypeBox->currentText().toStdString());
 
   if (mPlanner->isActive()) {
     DBGA("Pause:");
@@ -487,7 +475,7 @@ CompliantPlannerDlg::designTestButtonClicked()
   mBatch = true;
   mTR = mTFrom;
   mSR = mSFrom;
-  mPlanner->setEnergyType(ENERGY_COMPLIANT);
+  mPlanner->setEnergyType("COMPLIANT_ENERGY");
   mPlanner->setStatStream(NULL);
   startPlanner();
 }

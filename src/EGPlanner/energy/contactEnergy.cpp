@@ -12,7 +12,7 @@ double ContactEnergy::energy() const
   this is if we don't want to use pre-specified contacts, but rather the closest points between each link
   and the object all iterations. Not necessarily needed for contact energy, but useful for GQ energy
   */
-  if (mContactType == CONTACT_LIVE && mType != ENERGY_AUTOGRASP_QUALITY && mType != ENERGY_STRICT_AUTOGRASP)
+  if (mContactType == CONTACT_LIVE && mType != "AUTO_GRASP_QUALITY_ENERGY" && mType != "STRICT_AUTO_GRASP_ENERGY")
   {
     mHand->getWorld()->findVirtualContacts(mHand, mObject);
     DBGP("Live contacts computation");
