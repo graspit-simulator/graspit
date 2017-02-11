@@ -24,20 +24,20 @@
 //######################################################################
 
 //
-// $Header:
+// $Header: 
 //
 
-/*! \file
-  \brief Implements the UI functions and Q_SLOTS for the main window.
+/*! \file 
+  \brief Implements the UI functions and Q_SLOTS for the main window. 
  */
 
 /*!
   \class MainWindow
-  \brief Main user interface, includes menus, tools, widget for viewer, etc.
-
+  \brief Main user interface, includes menus, tools, widget for viewer, etc. 
+  
   This class is derived from the QT mainWindow widget.  It creates
   the main application window which includes the menu bar, tool bar, main
-  viewer window, quality measure result box, and the contacts list box.
+  viewer window, quality measure result box, and the contacts list box.  
 
 */
 
@@ -54,103 +54,103 @@ class Grasp;
 
 class MainWindow : public QObject
 {
-    Q_OBJECT
-  private:
+	Q_OBJECT
+private:
     World *world;
     QString fileName;
     int selectedContact;
 
-    void init();
-    void destroy();
-    void destroyChildren();
-  public:
-    Ui::MainWindowUI *mUI;
-    Q3MainWindow *mWindow;
+	void init();
+	void destroy();
+	void destroyChildren();
+public:
+	Ui::MainWindowUI *mUI;
+	Q3MainWindow *mWindow;
 
-    MainWindow(QWidget *parent = 0);
-    virtual ~MainWindow() {
-      destroy();
-      delete mWindow;
-      delete mUI;
-    }
-    void setMainWorld(World *w);
-    World *getMainWorld() {return world;}
+	MainWindow(QWidget *parent = 0);
+	virtual ~MainWindow(){
+		destroy();
+		delete mWindow;
+		delete mUI;
+	}
+	void setMainWorld( World *w );
+        World* getMainWorld(){return world;}                                     
 
-  public Q_SLOTS:
-    //-------------
-    void fileNew();
-    void fileOpen();
-    void fileSave();
-    void fileSaveAs();
-    void fileImportRobot();
-    void fileImportObstacle();
-    void fileImportObject();
-    void fileEditSettings();
-    void fileExit();
-    void fileSaveImage();
-    int saveAndContinue(const QString &action);
-    //-------------
-    void helpManual();
-    void helpAbout();
-    void helpAboutQT();
-    //-------------
-    void setTool(QAction *a);
-    void elementTurnOffCollisions();
-    void elementBodyProperties();
-    void elementPrimitives();
-    void updateElementMenu();
-    //-------------
-    void graspAutoGrasp();
-    void graspAutoOpen();
-    void graspQualityMeasures();
-    void graspCreateProjection(Grasp *g = NULL);
-    void graspForceOptimization();
-    void graspPlanner();
-    void updateGraspMenu();
-    //-------------
-    void eigenGraspActivated();
-    void graspContactExaminer_activated();
-    void eigenGraspPlannerActivated();
-    void graspCompliantPlanner();
-    //-------------
-    void dbaseGUIAction_activated();
-    void dbasePlannerAction_activated();
-    void graspCapture();
-    //-------------
-    void sensorsSensor_InputAction_activated();
-    void sensorsBarrettHandAction();
-    //-------------
-    void stereoOn();
-    void stereoOff();
-    void stereoFlip();
-    //-------------
-    void archBuilder();
-    //-------------
-    void updateContactsList();
-    void contactSelected(int newSelection);
-    void clearContactsList();
-    void updateQualityList();
-    //--------------
-    void updateTimeReadout();
-    void toggleDynamics();
-    void showDynamicsError(const char *errMsg);
-    void dynamicsPushState();
-    void dynamicsPopState();
-    //--------------
-    void updateMaterialBoxList();
-    void materialSelected(int whichMat);
-    void updateMaterialBox();
-    void updateGraspBoxes();
-    void handleHandSelectionChange();
-    void selectGraspedBody(int sb);
-    void setCurrentHand(int sh);
-    void updateCollisionAction(bool state);
-    //---------------
-    void updateTendonNamesBox();
-    void handleTendonSelectionArea();
-    void handleTendonDetailsArea();
-    void TendonForceInput_valueChanged(int f);
-    void tendonNamesBoxActivated(int i);
-    void tendonVisibleCheckBox_toggled(bool vis);
-    void forcesVisibleCheckBox_toggled(bool vis);
+public Q_SLOTS:
+	//-------------
+	void fileNew();
+	void fileOpen();
+	void fileSave();
+	void fileSaveAs();
+	void fileImportRobot();
+	void fileImportObstacle();
+	void fileImportObject();
+	void fileEditSettings();
+	void fileExit();
+	void fileSaveImage();
+	int saveAndContinue(const QString & action);
+	//-------------
+	void helpManual();
+	void helpAbout();
+	void helpAboutQT();
+	//-------------
+	void setTool( QAction *a );
+	void elementTurnOffCollisions();
+	void elementBodyProperties();
+	void elementPrimitives();
+	void updateElementMenu();
+	//-------------
+	void graspAutoGrasp();
+	void graspAutoOpen();
+	void graspQualityMeasures();
+	void graspCreateProjection(Grasp* g = NULL);
+	void graspForceOptimization();
+	void graspPlanner();
+	void updateGraspMenu();
+	//-------------
+	void eigenGraspActivated();
+	void graspContactExaminer_activated();
+	void eigenGraspPlannerActivated();
+    void graspListPlannerActivated();
+	//-------------
+	void dbaseGUIAction_activated();
+	void dbasePlannerAction_activated();
+	void graspCapture();
+	//-------------
+	void sensorsSensor_InputAction_activated();
+	void sensorsBarrettHandAction();
+	//-------------
+	void stereoOn();
+	void stereoOff();
+	void stereoFlip();
+	//-------------
+	void archBuilder();
+	//-------------
+	void updateContactsList();
+	void contactSelected(int newSelection);
+	void clearContactsList();
+	void updateQualityList();
+	//--------------
+	void updateTimeReadout();
+	void toggleDynamics();
+	void showDynamicsError( const char *errMsg );
+	void dynamicsPushState();
+	void dynamicsPopState();
+	//--------------
+	void updateMaterialBoxList();
+	void materialSelected( int whichMat );
+	void updateMaterialBox();
+	void updateGraspBoxes();
+	void handleHandSelectionChange();
+	void selectGraspedBody(int sb);
+	void setCurrentHand( int sh );
+	void updateCollisionAction(bool state);
+	//---------------
+	void updateTendonNamesBox();
+	void handleTendonSelectionArea();
+	void handleTendonDetailsArea();
+	void TendonForceInput_valueChanged( int f);
+	void tendonNamesBoxActivated( int i);
+	void tendonVisibleCheckBox_toggled( bool vis);
+	void forcesVisibleCheckBox_toggled( bool vis);
 };

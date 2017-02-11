@@ -60,7 +60,7 @@
 #include "gwsProjDlg.h"
 #include "plannerdlg.h"
 #include "eigenGraspDlg.h"
-#include "compliantPlannerDlg.h"
+#include "listPlannerDlg.h"
 #include "gfoDlg.h"
 #include "contactExaminerDlg.h"
 #include "egPlannerDlg.h"
@@ -109,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent)
                    this, SLOT(updateCollisionAction(bool)));
   QObject::connect(mUI->elementBodyPropertiesAction, SIGNAL(activated()),
                    this, SLOT(elementBodyProperties()));
+
   // -- grasp menu, part I
   QObject::connect(mUI->graspAutoGraspAction, SIGNAL(triggered()), this, SLOT(graspAutoGrasp()));
   QObject::connect(mUI->graspAuto_OpenAction, SIGNAL(triggered()), this, SLOT(graspAutoOpen()));
@@ -123,6 +124,9 @@ MainWindow::MainWindow(QWidget *parent)
                    this, SLOT(graspContactExaminer_activated()));
   QObject::connect(mUI->graspEigenGrasp_PlannerAction, SIGNAL(triggered()),
                    this, SLOT(eigenGraspPlannerActivated()));
+  QObject::connect(mUI->graspListPlannerAction, SIGNAL(triggered()),
+                   this, SLOT(graspListPlannerActivated()));
+
   // -- dbase menu
   QObject::connect(mUI->dbaseGUIAction, SIGNAL(triggered()),
                    this, SLOT(dbaseGUIAction_activated()));
@@ -577,7 +581,8 @@ void MainWindow::updateElementMenu()
 */
 void MainWindow::updateGraspMenu()
 {
-  bool handFound = (world->getCurrentHand() != NULL);
+
+  bool handFound = (world->getCurrentHand() !=NULL);
   bool bodyFound = (world->getNumBodies() != 0);
   mUI->graspAutoGraspAction->setEnabled(handFound);
   mUI->graspAuto_OpenAction->setEnabled(handFound);
@@ -588,7 +593,8 @@ void MainWindow::updateGraspMenu()
   mUI->graspEigenGrasp_InterfaceAction->setEnabled(handFound);
   mUI->graspContact_ExaminerAction->setEnabled(bodyFound);
   mUI->graspEigenGrasp_PlannerAction->setEnabled(handFound);
-  mUI->graspCompliantPlannerAction->setEnabled(handFound);
+  mUI->graspListPlannerAction->setEnabled(handFound);
+
 #ifdef CGDB_ENABLED
   mUI->dbaseGUIAction->setEnabled(handFound);
   mUI->dbasePlannerAction->setEnabled(handFound);
@@ -693,15 +699,17 @@ MainWindow::graspForceOptimization()
   this interface might be redesigned, to use the same frameworks as either the
   regular planner or the eigengrasp planner
 */
-void MainWindow::graspCompliantPlanner()
-{
+
+void MainWindow::graspListPlannerActivated()
+{	
   int gb = mUI->graspedBodyBox->currentItem();
   if (gb < 0 || world->getNumGB() < gb + 1) {
     fprintf(stderr, "No object selected\n");
     return;
   }
-  CompliantPlannerDlg *dlg = new CompliantPlannerDlg(world->getCurrentHand(),
-                                                     world->getGB(gb), mWindow);
+
+  ListPlannerDlg *dlg =new ListPlannerDlg(world->getCurrentHand(),
+                                                    world->getGB(gb), mWindow);
   dlg->setAttribute(Qt::WA_ShowModal, false);
   dlg->setAttribute(Qt::WA_DeleteOnClose, true);
   dlg->show();

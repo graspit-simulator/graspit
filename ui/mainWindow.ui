@@ -434,6 +434,7 @@
         <addaction name="separator" />
         <addaction name="graspEigenGrasp_InterfaceAction" />
         <addaction name="graspEigenGrasp_PlannerAction" />
+        <addaction name="graspListPlannerAction" />
         <addaction name="graspContact_ExaminerAction" />
       </widget>
       <widget class="QMenu" name="dbaseMenu" >
@@ -706,15 +707,15 @@
         <string>Grasp Force Optimization...</string>
       </property>
     </action>
-    <action name="graspCompliantPlannerAction" >
+    <action name="graspListPlannerAction" >
       <property name="name" >
-        <cstring>graspCompliantPlannerAction</cstring>
+        <cstring>graspListPlannerAction</cstring>
       </property>
       <property name="iconText" >
-        <string>Compliant Planner...</string>
+        <string>List Planner...</string>
       </property>
       <property name="text" >
-        <string>Compliant Planner...</string>
+        <string>List Planner...</string>
       </property>
     </action>
     <action name="dynamicsPlayAction" >
