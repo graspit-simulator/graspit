@@ -51,14 +51,14 @@ transf::COORDINATE(const position &o, const vec3 &xaxis, const vec3 &yaxis)
 
 transf transf::RPY(double rx, double ry, double rz)
 {
+  transf r;
+  vec3 x(1, 0, 0), y(0, 1, 0), z(0, 0, 1);
 
-  Eigen::AngleAxisd rollAngle(rx, Eigen::Vector3d::UnitZ());
-  Eigen::AngleAxisd yawAngle(ry, Eigen::Vector3d::UnitY());
-  Eigen::AngleAxisd pitchAngle(rz, Eigen::Vector3d::UnitX());
-
-  Eigen::Quaternion<double> q = rollAngle * yawAngle * pitchAngle;
-
-  transf r = transf(q, vec3(0,0,0));
+  r = transf::AXIS_ANGLE_ROTATION(rx, x);
+  y =  r.inverse().affine() * y;
+  r =  r % transf::AXIS_ANGLE_ROTATION(ry, y);
+  z = r.inverse().affine() * z;
+  r =  r % transf::AXIS_ANGLE_ROTATION(rz, z);
   return r;
 }
 
