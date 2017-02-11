@@ -26,12 +26,12 @@
 #include "searchEnergyFactory.h"
 #include "contactEnergy.h"
 #include "potentialQualityEnergy.h"
-#include "autograspQualityEnergy.h"
+#include "autoGraspQualityEnergy.h"
 #include "guidedPotentialQualityEnergy.h"
 #include "guidedAutoGraspEnergy.h"
 #include "strictAutoGraspEnergy.h"
 #include "compliantEnergy.h"
-#include "dynamicAutograspEnergy.h"
+#include "dynamicAutoGraspEnergy.h"
 
 
 SearchEnergyFactory * SearchEnergyFactory::searchEnergyFactory = NULL;

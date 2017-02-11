@@ -181,10 +181,10 @@ set (GRASPIT_EGPLANNER_HEADERS
 set (GRASPIT_EGPLANNER_ENERGY_HEADERS
     ${GSRC}/include/EGPlanner/energy/searchEnergy.h 
     ${GSRC}/include/EGPlanner/energy/searchEnergyFactory.h
-    ${GSRC}/include/EGPlanner/energy/autograspQualityEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/autoGraspQualityEnergy.h
     ${GSRC}/include/EGPlanner/energy/compliantEnergy.h
     ${GSRC}/include/EGPlanner/energy/contactEnergy.h 
-    ${GSRC}/include/EGPlanner/energy/dynamicAutograspEnergy.h 
+    ${GSRC}/include/EGPlanner/energy/dynamicAutoGraspEnergy.h
     ${GSRC}/include/EGPlanner/energy/guidedAutoGraspEnergy.h 
     ${GSRC}/include/EGPlanner/energy/guidedPotentialQualityEnergy.h 
     ${GSRC}/include/EGPlanner/energy/potentialQualityEnergy.h
@@ -410,10 +410,10 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/graspTesterThread.cpp 
     ${GSRC}/src/EGPlanner/onLineGraspInterface.cpp 
     ${GSRC}/src/EGPlanner/listPlanner.cpp 
-    ${GSRC}/src/EGPlanner/energy/autograspQualityEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/autoGraspQualityEnergy.cpp
     ${GSRC}/src/EGPlanner/energy/compliantEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/contactEnergy.cpp 
-    ${GSRC}/src/EGPlanner/energy/dynamicAutograspEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/dynamicAutoGraspEnergy.cpp
     ${GSRC}/src/EGPlanner/energy/guidedAutoGraspEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/guidedPotentialQualityEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/potentialQualityEnergy.cpp 

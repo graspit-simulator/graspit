@@ -42,9 +42,9 @@
 #include "EGPlanner/energy/contactEnergy.h"
 #include "EGPlanner/energy/potentialQualityEnergy.h"
 #include "EGPlanner/energy/guidedPotentialQualityEnergy.h"
-#include "EGPlanner/energy/autograspQualityEnergy.h"
+#include "EGPlanner/energy/autoGraspQualityEnergy.h"
 #include "EGPlanner/energy/guidedAutoGraspEnergy.h"
-#include "EGPlanner/energy/dynamicAutograspEnergy.h"
+#include "EGPlanner/energy/dynamicAutoGraspEnergy.h"
 #include "EGPlanner/energy/compliantEnergy.h"
 #include "EGPlanner/energy/strictAutoGraspEnergy.h"
 
