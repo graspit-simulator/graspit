@@ -19,8 +19,6 @@
 //
 // Author(s): Iretiayo Akinola, Jake Varley
 //
-// $Id: searchEnergy.cpp,v 1.42 2009/09/13 19:57:38 hao Exp $
-//
 //######################################################################
 
 #include "searchEnergyFactory.h"
