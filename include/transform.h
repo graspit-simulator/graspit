@@ -45,8 +45,7 @@ class transf {
     /*! Sets value of the transform with the rotation \a r and the translation
       \a d */
     void set(const Quaternion &r, const vec3 &d) {
-      rot = r; t = d; R = rot.toRotationMatrix();
-      //R = R.transpose(); //this will do what graspit used to do
+      rot = r.normalized(); t = d; R = rot.toRotationMatrix();
     }
 
     /*! Sets value of the transform with the rotation \a r and the translation
@@ -54,7 +53,7 @@ class transf {
     void set(const mat3 &r, const vec3 &d)
     {
       rot = r;
-      //rot = r.transpose(); //this will do what graspit used to do
+      rot.normalize();
       t = d; R = r;
     }
 
