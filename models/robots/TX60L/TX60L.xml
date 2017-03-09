@@ -6,42 +6,42 @@
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
-        <draggerScale>60</draggerScale>
+        <draggerScale>80</draggerScale>
     </dof>
     <dof type="r">
         <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
-        <draggerScale>60</draggerScale>
+        <draggerScale>80</draggerScale>
     </dof>
     <dof type="r">
         <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
-        <draggerScale>60</draggerScale>
+        <draggerScale>80</draggerScale>
     </dof>
     <dof type="r">
         <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
-        <draggerScale>60</draggerScale>
+        <draggerScale>80</draggerScale>
     </dof>
     <dof type="r">
         <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
-        <draggerScale>60</draggerScale>
+        <draggerScale>80</draggerScale>
     </dof>
     <dof type="r">
         <defaultVelocity>0.0</defaultVelocity>
         <maxEffort>2.5e+9</maxEffort>
         <Kp>1.0e+11</Kp>
         <Kd>1.0e+7</Kd>
-        <draggerScale>60</draggerScale>
+        <draggerScale>80</draggerScale>
     </dof>
     <chain>
         <transform>

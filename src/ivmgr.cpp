@@ -284,7 +284,7 @@ IVmgr::IVmgr(World *w, QWidget *parent, const char *name, Qt::WFlags f) :
   myViewer->show();
   myViewer->setSceneGraph(sceneRoot);
   myViewer->setTransparencyType(SoGLRenderAction::DELAYED_BLEND);
-  myViewer->setBackgroundColor(SbColor(1, 1, 1));
+  myViewer->setBackgroundColor(SbColor(0, 1, 0));
 
   myViewer->viewAll();
 
