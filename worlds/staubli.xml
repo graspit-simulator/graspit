@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<world>
+	<robot>
+		<filename>models/robots/TX60L/TX60L.xml</filename>
+		<dofValues>-0.182404 1.44649 1.64512 0 0 0 </dofValues>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>-761.444 -580.093 +251.701</position>
+		<orientation>+0.510836 -0.275789 -0.395399 +0.711791</orientation>
+		<focalDistance>+990.237</focalDistance>
+	</camera>
+</world>
