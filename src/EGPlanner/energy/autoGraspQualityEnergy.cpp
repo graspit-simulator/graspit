@@ -1,5 +1,5 @@
 
-#include "EGPlanner/energy/autograspQualityEnergy.h"
+#include "EGPlanner/energy/autoGraspQualityEnergy.h"
 #include "quality.h"
 #include "robot.h"
 #include "grasp.h"

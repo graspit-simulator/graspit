@@ -239,9 +239,9 @@ transf PositionStateEllipsoid::getCoreTran() const
   vec3 ydir = normal.cross(xdir.normalized());
   xdir = ydir.cross(normal);
   mat3 r;
-  r.col(0) = xdir;
-  r.col(1) = ydir;
-  r.col(2) = normal;
+  r.col(0) = xdir.normalized();
+  r.col(1) = ydir.normalized();
+  r.col(2) = normal.normalized();
 
   transf handTran = transf(r, vec3(px, py, pz) - distance * normal);
   Eigen::AngleAxisd aa = Eigen::AngleAxisd(tau, vec3(0, 0, 1));

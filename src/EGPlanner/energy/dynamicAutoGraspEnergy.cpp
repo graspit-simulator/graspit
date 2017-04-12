@@ -1,4 +1,4 @@
-#include "EGPlanner/energy/dynamicAutograspEnergy.h"
+#include "EGPlanner/energy/dynamicAutoGraspEnergy.h"
 
 #include "robot.h"
 #include "world.h"

@@ -64,7 +64,7 @@ TimeTester *MTTester::startChild()
 {
   TimeTester *child = new TimeTester(mHand);
   child->startThread();
-  child->setEnergyType(ENERGY_AUTOGRASP_QUALITY);
+  child->setEnergyType("AUTO_GRASP_QUALITY_ENERGY");
   child->setModelState(mCurrentState);
   child->resetPlanner();
   return child;

@@ -52,6 +52,8 @@
 #include "guidedPlanner.h"
 #include "loopPlanner.h"
 
+#include "searchEnergyFactory.h"
+
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -63,12 +65,12 @@ void EigenGraspPlannerDlg::exitButton_clicked()
 
 void EigenGraspPlannerDlg::init()
 {
-  energyBox->insertItem("Hand Contacts");
-  energyBox->insertItem("Potential Quality");
-  energyBox->insertItem("Contacts AND Quality");
-  energyBox->insertItem("Autograsp Quality");
-  energyBox->insertItem("Guided Autograsp");
-  energyBox->setCurrentItem(2);
+  std::vector<std::string> registeredEnergies = SearchEnergyFactory::getInstance()->getAllRegisteredEnergy();
+  for(std::vector<std::string>::const_iterator it = registeredEnergies.begin(); it != registeredEnergies.end(); it++)
+  {
+      energyBox->insertItem(QString::fromStdString(*it));
+  }
+  energyBox->setCurrentItem(5);
 
   plannerTypeBox->insertItem("Sim. Ann.");
   plannerTypeBox->insertItem("Loop");
@@ -538,20 +540,7 @@ void EigenGraspPlannerDlg::readPlannerSettings()
 {
   assert(mPlanner);
   //energy type
-  QString s = energyBox->currentText();
-  if (s == QString("Hand Contacts")) {
-    mPlanner->setEnergyType(ENERGY_CONTACT);
-  } else if (s == QString("Potential Quality")) {
-    mPlanner->setEnergyType(ENERGY_POTENTIAL_QUALITY);
-  } else if (s == QString("Autograsp Quality")) {
-    mPlanner->setEnergyType(ENERGY_AUTOGRASP_QUALITY);
-  } else if (s == QString("Contacts AND Quality")) {
-    mPlanner->setEnergyType(ENERGY_CONTACT_QUALITY);
-  } else if (s == QString("Guided Autograsp")) {
-    mPlanner->setEnergyType(ENERGY_GUIDED_AUTOGRASP);
-  } else {
-    fprintf(stderr, "WRONG ENERGY TYPE IN DROP BOX!\n");
-  }
+  mPlanner->setEnergyType(energyBox->currentText().toStdString());
 
   //contact type
   if (setContactsBox->isChecked()) {
@@ -596,7 +585,7 @@ void EigenGraspPlannerDlg::plannerInit_clicked()
     mPlanner = new OnLinePlanner(mHand);
     ((OnLinePlanner *)mPlanner)->setModelState(mHandObjectState);
     energyBox->setEnabled(TRUE);
-    energyBox->setCurrentItem(2);
+    energyBox->setCurrentItem(5);
     QString n;
     n.setNum(2000);
     annStepsEdit->setText(n);

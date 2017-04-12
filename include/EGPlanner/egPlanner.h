@@ -197,7 +197,7 @@ class EGPlanner : public QThread
     void invalidateReset() {if (isReady()) { setState(INIT); }}
 
     //! Tells the planner what kind of energy calculator to use
-    virtual void setEnergyType(SearchEnergyType s);
+    virtual void setEnergyType(std::string s);
     //! Tells the planner what kind of virtual contact computation to use
     void setContactType(SearchContactType c);
 
