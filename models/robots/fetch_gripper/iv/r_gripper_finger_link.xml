@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<root>
+	<geometryScaling>1000</geometryScaling>
+    <material>plastic</material>
+    <mass>1000</mass>
+    <geometryFile>r_gripper_finger_link.iv</geometryFile>
+</root>
