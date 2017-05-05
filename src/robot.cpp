@@ -387,8 +387,51 @@ Robot::loadEigenData(QString filename)
   return SUCCESS;
 }
 
+int
+Robot::loadContactData(QString filename)
+{
+
+  TiXmlDocument doc(filename);
+  if (doc.LoadFile() == false) {
+    QTWARNING("Could not open " + filename);
+    return FAILURE;
+  }
+
+  const TiXmlElement *root = doc.RootElement();
+  if (root == NULL) {
+    QTWARNING("Empty XML");
+    return FAILURE;
+  }
+
+  const TiXmlElement *child = root->FirstChildElement();
+  QString elementType;
+  while (child != NULL) {
+    elementType = child->Value();
+    if (elementType == "virtual_contact") {
+      VirtualContact *newContact = new VirtualContact();
+      if (newContact->loadFromXml(child) == FAILURE) {
+        QTWARNING("Failed to load virtual contact from file");
+        return FAILURE;
+      }
+
+      int f = newContact->getFingerNum();
+      int l = newContact->getLinkNum();
+      if (f >= 0) {
+        newContact->setBody(getChain(f)->getLink(l));
+        getChain(f)->getLink(l)->addVirtualContact(newContact);
+      }else {
+        newContact->setBody(getBase());
+        getBase()->addVirtualContact(newContact);
+      }
+      newContact->computeWrenches(false, false);
+    }
+    child = child->NextSiblingElement();
+  }
+  
+  return SUCCESS;
+}
+
 /*! Loads all the virtual contacts specified in the file \a filename
-*/
 int
 Robot::loadContactData(QString filename)
 {
@@ -443,6 +486,7 @@ Robot::loadContactData(QString filename)
   inFile.close();
   return SUCCESS;
 }
+*/
 
 /*! This robot becomes a "clone" of another robot, specified in \a original.
 This means that the new robot has its own kinematic structure, DOF's, etc

@@ -220,7 +220,7 @@
         <referenceLocation>-15 5 0</referenceLocation>
         <direction>0 1 0</direction>
     </approachDirection>
-    <!--virtualContacts>virtual/grip_contacts.vgr</virtualContacts-->
+    <!--virtualContacts>virtual/grip_contacts.xml</virtualContacts-->
     <!--flockOfBirds number="1">
         <transform>
             <translation>-15 -6 0</translation>

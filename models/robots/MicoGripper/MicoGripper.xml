@@ -96,5 +96,5 @@
         <direction>0 0 -1</direction>
     </approachDirection>
      <eigenGrasps>eigen/eigen.xml</eigenGrasps>
-    <virtualContacts>virtual/8_contacts.vgr</virtualContacts>
+    <virtualContacts>virtual/8_contacts.xml</virtualContacts>
 </robot>

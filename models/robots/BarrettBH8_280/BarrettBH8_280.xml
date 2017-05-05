@@ -135,5 +135,5 @@
         <direction>0 0 1</direction>
     </approachDirection>
     <eigenGrasps>eigen/barrett_eigen.xml</eigenGrasps>
-    <virtualContacts>virtual/all_16_contacts.vgr</virtualContacts>
+    <virtualContacts>virtual/all_16_contacts.xml</virtualContacts>
 </robot>

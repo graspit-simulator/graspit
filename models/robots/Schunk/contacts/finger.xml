@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<virtual_contacts>
+  <robot_name>Schunk</robot_name>
+  <num_contacts>1</num_contacts>
+  <virtual_contact>
+    <finger_number>2</finger_number>
+    <link_number>0</link_number>
+    <num_friction_edges>20</num_friction_edges>
+    <friction_edges>
+      <friction_edge>0.000000 0.000000 0.000000 0.000000 0.000000 1.757081</friction_edge>
+      <friction_edge>0.869104 0.000000 0.000000 0.000000 0.000000 0.869104</friction_edge>
+      <friction_edge>0.268568 0.826567 0.000000 0.000000 0.000000 0.869104</friction_edge>
+      <friction_edge>-0.703120 0.510847 0.000000 0.000000 0.000000 0.869104</friction_edge>
+      <friction_edge>-0.703120 -0.510847 0.000000 0.000000 0.000000 0.869104</friction_edge>
+      <friction_edge>0.268568 -0.826567 0.000000 0.000000 0.000000 0.869104</friction_edge>
+      <friction_edge>1.000000 0.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.707107 0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.000000 1.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-0.707107 0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-1.000000 0.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-0.707107 -0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.707107 -0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.869104 0.000000 0.000000 0.000000 0.000000 -0.869104</friction_edge>
+      <friction_edge>0.268568 0.826567 0.000000 0.000000 0.000000 -0.869104</friction_edge>
+      <friction_edge>-0.703120 0.510847 0.000000 0.000000 0.000000 -0.869104</friction_edge>
+      <friction_edge>-0.703120 -0.510847 0.000000 0.000000 0.000000 -0.869104</friction_edge>
+      <friction_edge>0.268568 -0.826567 0.000000 0.000000 0.000000 -0.869104</friction_edge>
+      <friction_edge>0.000000 0.000000 0.000000 0.000000 0.000000 -1.757081</friction_edge>
+    </friction_edges>
+    <location>-43.055842 15.290158 -0.724619</location>
+    <!--w, x, y, z -->
+    <rotation>-0.500000 0.500000 0.500000 0.500000</rotation>
+    <!--x, y, z -->
+    <translation>-43.055842 15.290158 -0.724619</translation>
+    <!--x, y, z -->
+    <normal>-0.000004 1.000000 0.000000</normal>
+    <sCof>1.000000</sCof>
+  </virtual_contact>
+  </virtual_contacts>

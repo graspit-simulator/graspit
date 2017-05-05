@@ -15,6 +15,9 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSphere.h>
 
+#include "tinyxml.h"
+#include "mytools.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -364,122 +367,131 @@ VirtualContact::mark(bool m)
 void
 VirtualContact::writeToFile(std::ofstream &outFile)
 {
-  if (!outFile.is_open())
+  outFile << "<virtual_contact>\n";
+  outFile << "\t<finger_number>" << mFingerNum << "</finger_number>\n";
+  outFile << "\t<link_number>" << mLinkNum << "</link_number>\n";
+  outFile <<  "\t<num_friction_edges>" << numFrictionEdges << "</num_friction_edges>\n";
+  outFile << "\t<friction_edges>\n";
+
+  for (int i=0; i<numFrictionEdges; i++)
   {
-    DBGA("VirtualContact::writeToFile: failed to open file");
-    return;
-  }
-
-  //finger and link number
-  outFile << mFingerNum << " " << mLinkNum << std::endl;
-
-  //numFrictionEdges
-  outFile << numFrictionEdges << std::endl;
-
-  //frictionEdges
-  for (int i = 0; i < numFrictionEdges; i++) {
-    for (int j = 0; j < 6; j++) {
-      outFile << frictionEdges[6 * i + j] << " ";
+    outFile << "\t\t<friction_edge>";
+      for (int j=0; j<6; j++)
+    {
+      outFile << frictionEdges[6*i+j] << " ";
     }
-    outFile << std::endl;
+
+    outFile << "</friction_edge>\n";
   }
-
-  //loc
-  outFile << loc.x() << " " << loc.y() << " " << loc.z() << std::endl;
-
-  //frame
+  outFile << "\t</friction_edges>\n";
+  outFile << "\t<location>" <<  loc.x() << " " <<  loc.y()  << " " << loc.z() << "</location>\n";
   Quaternion q = frame.rotation();
+  outFile << "\t<!--w, x, y, z -->\n";
+  outFile << "\t<rotation>" << q.w() << " " << q.x() << " " <<  q.y() << " " << q.z()  << "</rotation>\n";
   vec3 t = frame.translation();
-  outFile << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << std::endl;
-  outFile << t.x() << " " << t.y() << " " << t.z() << std::endl;
-
-  //normal
-  outFile << normal.x() << " " << normal.y() << " " << normal.z() << std::endl;
-
-  //sCof
-  outFile << sCof << std::endl;
+  outFile << "\t<translation>" << t.x() << " " <<  t.y() << " " <<  t.z()  << "</translation>\n";
+  outFile << "\t<normal>" << normal.x() << " " <<  normal.y() << " " <<  normal.z()  << "</normal>\n";
+  outFile << "\t<sCof>" << sCof << "</sCof>\n";
+  outFile << "</virtual_contact>\n";
 }
 
-/*! Loads all the info for this contact from a file previously written
-    by VirtualContact::writeToFile(...)
-*/
-bool
-VirtualContact::readFromFile(std::ifstream &inFile)
+
+int
+VirtualContact::loadFromXml(const TiXmlElement * root)
 {
-  if (!inFile.is_open())
+  const TiXmlElement * xmlElement;
+  const TiXmlElement * frictionEdgesElement;
+  QString elementType;
+  bool ok, ok1, ok2, ok3, ok4;
+  elementType = root->Value();
+
+  if(elementType.isNull()){
+     DBGA("Empty Element Type");
+  }
+
+  if(elementType == "virtual_contact")
   {
-    DBGA("VirtualContact::readFromFile - Failed to read from file");
-    return false;
-  }
+    xmlElement = findXmlElement(root,"finger_number");
+    mFingerNum = QString(xmlElement->GetText()).toDouble(&ok);
 
-  float v, x, y, z;
+    xmlElement = findXmlElement(root,"link_number");
+    mLinkNum = QString(xmlElement->GetText()).toDouble(&ok);
 
-  //finger and link number
-  inFile >> mFingerNum >> mLinkNum;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read fingernumber or link number");
-    return false;
-  }
-  //numFrictionEdges
-  inFile >> numFrictionEdges;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read number of virtual contacts");
-    return false;
-  }
+    xmlElement = findXmlElement(root,"num_friction_edges");
+    numFrictionEdges = QString(xmlElement->GetText()).toDouble(&ok);
 
-  //frictionEdges
-  for (int i = 0; i < numFrictionEdges; i++) {
-    for (int j = 0; j < 6; j++) {
-      inFile >> v;
-      if (inFile.fail()) {
-        DBGA("VirtualContact::readFromFile - Failed to read number of friction edges");
-        return false;
-      };
-      frictionEdges[6 * i + j] = v;
+    frictionEdgesElement = findXmlElement(root, "friction_edges");
+    xmlElement = findXmlElement(frictionEdgesElement, "friction_edge");
+    for (int i=0; i<numFrictionEdges; i++)
+    {
+
+     QString friction_edge = xmlElement->GetText();
+     QStringList l = QStringList::split(' ', friction_edge);
+
+     for (int j=0; j<6; j++)
+     {
+         frictionEdges[6*i+j] = l[j].toDouble(&ok1);
+     }
+     xmlElement = xmlElement->NextSiblingElement();
     }
-  }
 
-  //loc
-  inFile >> x >> y >> z;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read virtual contact location");
-    return false;
-  }
-  loc = position(x, y, z);
+     xmlElement = findXmlElement(root, "location");
+     QString location = xmlElement->GetText();
+     location = location.simplifyWhiteSpace().stripWhiteSpace();
+     QStringList l = QStringList::split(' ', location);
+     if(l.count()!=3){
+       DBGA("Invalid Location");
+       return FAILURE;
+     }
 
-  //frame
-  inFile >> v >> x >> y >> z;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame orientation");
-  }
-  Quaternion q(v, x, y, z);
+     loc = position(l[0].toDouble(&ok1),l[1].toDouble(&ok2),l[2].toDouble(&ok3));
 
-  inFile >> x >> y >> z;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read virtual contact frame location");
-  }
+     xmlElement = findXmlElement(root, "rotation");
+     QString rotation = xmlElement->GetText();
+     rotation = rotation.simplifyWhiteSpace().stripWhiteSpace();
+     l = QStringList::split(' ', rotation);
+     if(l.count()!=4){
+       DBGA("Invalid Rotation");
+       return FAILURE;
+     }
+     Quaternion q;
+     q.w() = l[0].toDouble(&ok1);
+      q.x() = l[1].toDouble(&ok2);
+      q.y() = l[2].toDouble(&ok3);
+      q.z() = l[3].toDouble(&ok4);
 
-  vec3 t(x, y, z);
-  frame.set(q, t);
+     xmlElement = findXmlElement(root, "translation");
+     QString translation = xmlElement->GetText();
+     translation = translation.simplifyWhiteSpace().stripWhiteSpace();
+     l = QStringList::split(' ', translation);
+     if(l.count()!=3){
+       DBGA("Invalid Translation");
+       return FAILURE;
+     }
+     vec3 t;
+     t.x() = l[0].toDouble(&ok1);
+     t.y() = l[1].toDouble(&ok2);
+     t.z() = l[2].toDouble(&ok3);
+     frame.set(q,t);
 
-  //normal
-  inFile >> x >> y >> z;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read virtual contact normal");
-    return false;
-  }
-  normal.x() = x;
-  normal.y() = y;
-  normal.z() = z;
+     xmlElement = findXmlElement(root, "normal");
+     QString normal_str = xmlElement->GetText();
+     normal_str = normal_str.simplifyWhiteSpace().stripWhiteSpace();
+     l = QStringList::split(' ', normal_str);
+     if(l.count()!=3){
+       QTWARNING("Invalid Normal");
+       return FAILURE;
+     }
 
-  //sCof
-  inFile >> v;
-  if (inFile.fail()) {
-    DBGA("VirtualContact::readFromFile - Failed to read virtual contact friction");
-    return false;
+     normal.x() = l[0].toDouble(&ok1);
+     normal.y() = l[1].toDouble(&ok2);
+     normal.z() = l[2].toDouble(&ok3);
+
+    xmlElement = findXmlElement(root,"sCof");
+    sCof = QString(xmlElement->GetText()).toDouble(&ok);
+
   }
-  sCof = v;
-  return true;
+  return SUCCESS;
 }
 
 /*! Sets objDistance to be the vector from the contact to the closest
