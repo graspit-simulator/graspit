@@ -127,7 +127,7 @@ void ContactExaminerDlg::collectObjectContacts()
 void ContactExaminerDlg::loadButton_clicked()
 {
   QString fn = QFileDialog::getOpenFileName(this, "Select virtual contact files to load",
-                                            QString(getenv("GRASPIT")) + QString("/models/virtual"), "Virtual Contacts (*.vgr)");
+                                            QString(getenv("GRASPIT")) + QString("/models/virtual"), "Virtual Contacts (*.xml)");
   QStringList::iterator it;
   if (fn.count() == 0) {
     return;
@@ -146,10 +146,10 @@ void ContactExaminerDlg::loadButton_clicked()
 void ContactExaminerDlg::saveButton_clicked()
 {
   QString fn = QFileDialog::getSaveFileName(this, "Select filename",
-                                            QString(getenv("GRASPIT")) + QString("/models/virtual"), "Virtual Grasp Files (*.vgr)");
+                                            QString(getenv("GRASPIT")) + QString("/models/virtual"), "Virtual Grasp Files (*.xml)");
   if (!fn.isEmpty()) {
     if (fn.section('.', 1).isEmpty()) {
-      fn.append(".vgr");
+      fn.append(".xml");
     }
   } else {
     return;
@@ -165,9 +165,12 @@ void ContactExaminerDlg::saveButton_clicked()
 
   fprintf(stderr, "Writing number of marked contacts: %u", (int)mMarkedContacts.size());
 
+  outFile << "<?xml version=\"1.0\" ?>\n";
+  outFile << "<virtual_contacts>\n";
+  outFile << "<robot_name>" << mHand->getName().latin1() << "</robot_name>" << std::endl;
+  outFile << "<num_contacts>" << (int)mMarkedContacts.size()<< "</num_contacts>" << std::endl;
+
   if (handRadioButton->isChecked()) {
-    outFile << mHand->getName().latin1() << std::endl;
-    outFile << (int)mMarkedContacts.size() << std::endl;
     for (int i = 0; i < (int)mMarkedContacts.size(); i++) {
       ((VirtualContact *)mMarkedContacts[i])->writeToFile(outFile);
     }
@@ -177,6 +180,7 @@ void ContactExaminerDlg::saveButton_clicked()
       ((VirtualContactOnObject *)mMarkedContacts[i])->writeToFile(outFile);
     }
   }
+  outFile << "</virtual_contacts>" << std::endl;
   outFile.close();
 }
 

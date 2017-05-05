@@ -44,5 +44,5 @@
         <referenceLocation>135.0 0.0 0.0</referenceLocation>
         <direction>1.0 0.0 0.0</direction>
     </approachDirection>
-    <virtualContacts>virtual/contacts2.vgr</virtualContacts>
+    <virtualContacts>virtual/contacts2.xml</virtualContacts>
 </robot>

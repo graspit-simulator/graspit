@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<virtual_contacts>
+  <robot_name>Robonaut_13DOF</robot_name>
+  <num_contacts>1</num_contacts>
+  <virtual_contact>
+    <finger_number>-1</finger_number>
+    <link_number>0</link_number>
+    <num_friction_edges>8</num_friction_edges>
+    <friction_edges>
+      <friction_edge>1.000000 0.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.707107 0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.000000 1.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-0.707107 0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-1.000000 0.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-0.707107 -0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>-0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000</friction_edge>
+      <friction_edge>0.707107 -0.707107 0.000000 0.000000 0.000000 0.000000</friction_edge>
+    </friction_edges>
+    <location>44.642788 5.236737 8.223241</location>
+    <!--w, x, y, z -->
+    <rotation>0.635267 -0.310542 0.106810 -0.698993</rotation>
+    <!--x, y, z -->
+    <translation>44.642788 5.236737 8.223241</translation>
+    <!--x, y, z -->
+    <normal>0.569836 0.245236 0.784312</normal>
+    <sCof>0.200000</sCof>
+  </virtual_contact>
+  </virtual_contacts>

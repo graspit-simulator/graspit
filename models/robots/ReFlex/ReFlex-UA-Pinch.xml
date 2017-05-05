@@ -156,10 +156,10 @@
         <direction>0 0 1</direction>
     </approachDirection>
 
-<!--    <virtualContacts>virtual/reflex_virtual_all.vgr</virtualContacts>-->
-<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only.vgr</virtualContacts>-->
-<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only-old.vgr</virtualContacts>-->
-    <virtualContacts>virtual/reflex_pinch_short_virtual.vgr</virtualContacts>
+<!--    <virtualContacts>virtual/reflex_virtual_all.xml</virtualContacts>-->
+<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only.xml</virtualContacts>-->
+<!--    <virtualContacts>virtual/reflex_virtual_fingertips_only-old.xml</virtualContacts>-->
+    <virtualContacts>virtual/reflex_pinch_short_virtual.xml</virtualContacts>
 
     <eigenGrasps>eigen/reflex_ua_pinch_eigen.xml</eigenGrasps>
 

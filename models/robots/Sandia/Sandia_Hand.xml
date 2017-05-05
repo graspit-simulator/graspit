@@ -283,7 +283,7 @@
         <referenceLocation>-10 30 23</referenceLocation>
         <direction>0 0 1</direction>
     </approachDirection>
--   <virtualContacts>virtual/Sandia_virtual.vgr</virtualContacts>
+-   <virtualContacts>virtual/Sandia_virtual.xml</virtualContacts>
     <eigenGrasps>eigen/Sandia_eigen.xml</eigenGrasps>
 
 </robot>

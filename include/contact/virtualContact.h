@@ -7,6 +7,8 @@
 class Body;
 class SoSeparator;
 class SoMaterial;
+class TiXmlElement;
+class QString;
 
 //! A contact that exists even when a hand is not perfectly touching another object
 /*! This class is meant for studing grasp quality when there is really no grasp, as
@@ -80,6 +82,7 @@ class VirtualContact : public Contact
     //! Loads this contact, including friction edges, from a file
     // Returns false if file cannot be opened for reading
     bool readFromFile(std::ifstream &infile);
+    int loadFromXml(const TiXmlElement *root);
 
     //! Wrench computation is done in world coordinates considers the fact that we have no object
     void computeWrenches(bool useObjectData = false, bool simply = false);

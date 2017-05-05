@@ -62,5 +62,5 @@
         <referenceLocation>123.5 0.0 0.0</referenceLocation>
         <direction>1.0 0.0 0.0</direction>
     </approachDirection>
-    <virtualContacts>virtual/pr2_2010_set.vgr</virtualContacts>
+    <virtualContacts>virtual/pr2_2010_set.xml</virtualContacts>
 </robot>

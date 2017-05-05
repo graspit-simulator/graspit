@@ -378,6 +378,6 @@
             <rotation>-90 x</rotation>
         </transform>
     </flockOfBirds>
-    <virtualContacts>virtual/all_18_contacts_20DOF.vgr</virtualContacts>
+    <virtualContacts>virtual/all_18_contacts_20DOF.xml</virtualContacts>
     <cyberGlove>cyberglove/calibration_best_aa.txt</cyberGlove>
 </robot>

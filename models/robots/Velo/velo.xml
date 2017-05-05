@@ -111,6 +111,6 @@
 
     <eigenGrasps>eigen/velo_eigen3.xml</eigenGrasps>
 
-    <virtualContacts>virtual/distal_proximal.vgr</virtualContacts>
+    <virtualContacts>virtual/distal_proximal.xml</virtualContacts>
 
 </robot>

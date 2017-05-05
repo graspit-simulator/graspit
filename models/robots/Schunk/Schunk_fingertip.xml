@@ -163,6 +163,6 @@
 
     <eigenGrasps>eigen/schunk_eigen.xml</eigenGrasps>
 
-    <virtualContacts>contacts/finger_tip_compact.vgr</virtualContacts>
+    <virtualContacts>contacts/finger_tip_compact.xml</virtualContacts>
 
 </robot>
