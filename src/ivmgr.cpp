@@ -1530,30 +1530,7 @@ IVmgr::saveImage(QString filename)
   glRend->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
   
   myRenderer = new SoOffscreenRenderer(glRend);
-  myRenderer->setBackgroundColor(white);
-
-#ifdef GRASPITDBG
-  if (myRenderer->isWriteSupported("jpg"))
-	std::cout << " supports jpg" << std::endl;
-  else
-	std::cout << "no jpg support" << std::endl;
-#endif
-
-  int numtypes = myRenderer->getNumWriteFiletypes();
-  SbList<SbName> extList;
-  SbString fullname;
-  SbString desc;
-  for (int i=0;i<numtypes;i++) {
-    myRenderer ->getWriteFiletypeInfo(i,extList,fullname,desc);
-#ifdef GRASPITDBG
-    std::cout <<std::endl;
-    for (int j=0;j<extList.getLength();j++)
-      std::cout << extList[j].getString() <<" ";
-    std::cout <<std::endl<<fullname.getString()<<std::endl<<desc.getString()<<std::endl;
-
-#endif
-  }
-  
+  myRenderer->setBackgroundColor(white);  
 
   SoSeparator *renderRoot = new SoSeparator;
   renderRoot->ref();

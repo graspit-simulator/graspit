@@ -15,7 +15,10 @@ HEADERS += include/lapack_wrappers.h
 INCLUDEPATH += /usr/include/qhull
 
 #add qhull libraries
-LIBS	+= -lqhull 
+LIBS	+= -lqhull
+
+#add dso for plugins
+LIBS += -ldl
 
 #add openinventor libraries
 LIBS	+= -lSoQt -lCoin
