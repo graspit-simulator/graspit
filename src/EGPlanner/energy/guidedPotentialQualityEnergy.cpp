@@ -26,7 +26,6 @@ GuidedPotentialQualityEnergy::energy() const
 
 double GuidedPotentialQualityEnergy::contactEnergy() const
 {
-  mHand->getGrasp()->collectVirtualContacts();
 
   //DBGP("Contact energy computation")
   //average error per contact
