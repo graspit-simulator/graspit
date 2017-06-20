@@ -24,14 +24,12 @@
 //######################################################################
 
 /*! \file
-	A wrapper for using the Mosek commercial QP solver from within GraspIt!
+  A wrapper for using the Mosek commercial QP solver from within GraspIt!
 */
 class Matrix;
 
-enum MosekObjectiveType{MOSEK_OBJ_QP, MOSEK_OBJ_LP};
-
-int mosekNNSolverWrapper(const Matrix &Q, 
-						 const Matrix &Eq, const Matrix &b,
-						 const Matrix &InEq, const Matrix &ib,
-						 const Matrix &lowerBounds, const Matrix &upperBounds,
-						 Matrix &sol, double *objVal, MosekObjectiveType objType);
+int mosekNNSolverWrapper(const Matrix &Q, const Matrix &cj,
+             const Matrix &Eq, const Matrix &b,
+             const Matrix &InEq, const Matrix &ib,
+             const Matrix &lowerBounds, const Matrix &upperBounds,
+             Matrix &sol, double *objVal);

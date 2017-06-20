@@ -73,10 +73,11 @@ MSKenv_t &getMosekEnv() {
   return mskEnvPtr.env;
 }
 
-int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
+int mosekNNSolverWrapper(const Matrix &Q, const Matrix &cj, 
+                         const Matrix &Eq, const Matrix &b,
                          const Matrix &InEq, const Matrix &ib,
                          const Matrix &lowerBounds, const Matrix &upperBounds,
-                         Matrix &sol, double *objVal, MosekObjectiveType objType)
+                         Matrix &sol, double *objVal)
 {
   DBGP("Mosek QP Wrapper started");
   MSKrescodee  r;
@@ -95,13 +96,14 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   //---------------------------------------
   //start inputing the problem
   //prespecify number of variables to make inputting faster
-  r = MSK_putmaxnumvar(task, sol.cols());
+  r = MSK_putmaxnumvar(task, sol.rows());
   //number of constraints (both equality and inequality)
   if (r == MSK_RES_OK) {
-    r = MSK_putmaxnumcon(task, Eq.cols() + InEq.cols());
+    r = MSK_putmaxnumcon(task, Eq.rows() + InEq.rows());
   }
   //make sure default value is 0 for sparse matrices
   assert(Q.getDefault() == 0.0);
+  assert(cj.getDefault() == 0.0);
   assert(Eq.getDefault() == 0.0);
   assert(InEq.getDefault() == 0.0);
   //number of non-zero entries in A
@@ -130,34 +132,29 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   //insert the actual variables and constraints
 
   //append the variables
-  MSK_append(task, MSK_ACC_VAR, sol.cols());
+  MSK_append(task, MSK_ACC_VAR, sol.rows());
   //append the constraints.
-  MSK_append(task, MSK_ACC_CON, Eq.cols() + InEq.cols());
+  MSK_append(task, MSK_ACC_CON, Eq.rows() + InEq.rows());
 
-  int i, j;
+  int i,j;
   double value;
-  if (objType == MOSEK_OBJ_QP) {
-    //quadratic optimization objective
-    //the quadratic term
-    Q.sequentialReset();
-    while (Q.nextSequentialElement(i, j, value)) {
-      MSK_putqobjij(task, i, j, 2.0 * value);
+  //optimization objective
+  //the quadratic term
+  Q.sequentialReset();
+  while (Q.nextSequentialElement(i, j, value)) {
+    MSK_putqobjij(task, i, j, 2.0*value);
+  }
+  //the linear term
+  for (j=0; j<cj.cols(); j++) {
+    if ( fabs(cj.elem(0,j))>1.0e-5) {
+      MSK_putcj(task, j, cj.elem(0,j));
     }
-  } else if (objType == MOSEK_OBJ_LP) {
-    //linear objective
-    for (j = 0; j < Q.cols(); j++) {
-      if (fabs(Q.elem(0, j)) > 1.0e-5) {
-        MSK_putcj(task, j, Q.elem(0, j));
-      }
-    }
-  } else {
-    assert(0);
   }
 
   //variable bounds
-  assert(sol.cols() == lowerBounds.cols());
-  assert(sol.cols() == upperBounds.cols());
-  for (i = 0; i < sol.cols(); i++) {
+  assert(sol.rows() == lowerBounds.rows());
+  assert(sol.rows() == upperBounds.rows());
+  for (i = 0; i < sol.rows(); i++) {
     if (lowerBounds.elem(i, 0) >= upperBounds.elem(i, 0)) {
       if (lowerBounds.elem(i, 0) > upperBounds.elem(i, 0)) {
         assert(0);
@@ -210,17 +207,17 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
   while (Eq.nextSequentialElement(i, j, value)) {
     MSK_putaij(task, i, j, value);
   }
-  for (i = 0; i < Eq.cols(); i++) {
+  for (i = 0; i < Eq.rows(); i++) {
     MSK_putbound(task, MSK_ACC_CON, i, MSK_BK_FX, b.elem(i, 0) / scale, b.elem(i, 0) / scale);
   }
   //inequality constraints, <=
   InEq.sequentialReset();
   while (InEq.nextSequentialElement(i, j, value)) {
-    int eqi = i + Eq.cols();
+    int eqi = i + Eq.rows();
     MSK_putaij(task, eqi, j, value);
   }
-  for (i = 0; i < InEq.cols(); i++) {
-    int eqi = i + Eq.cols();
+  for (i = 0; i < InEq.rows(); i++) {
+    int eqi = i + Eq.rows();
     MSK_putbound(task, MSK_ACC_CON, eqi, MSK_BK_UP, -MSK_INFINITY, ib.elem(i, 0) / scale);
   }
   //specify objective: minimize
@@ -295,25 +292,28 @@ int mosekNNSolverWrapper(const Matrix &Q, const Matrix &Eq, const Matrix &b,
 
   //retrieve the solutions
   if (!result) {
-    //get the value of the objective function
     MSKrealt obj, foo;
     MSK_getsolutioninf(task, MSK_SOL_ITR, &pst, &sst, &obj,
-                       &foo, &foo, &foo, &foo, &foo, &foo, &foo, &foo);
-    if (objType == MOSEK_OBJ_QP) {
-      *objVal = obj * scale * scale;
-    } else if (objType == MOSEK_OBJ_LP) {
-      *objVal = obj * scale;
-    } else {
-      assert(0);
-    }
-    double *xx = new double[sol.cols()];
+               &foo, &foo, &foo, &foo, &foo, &foo, &foo, &foo);
+    double* xx = new double[sol.rows()];
     MSK_getsolutionslice(task, MSK_SOL_ITR, MSK_SOL_ITEM_XX,
-                         0, sol.cols(), xx);
-    for (i = 0; i < sol.cols(); i++) {
-      sol.elem(i, 0) = scale * xx[i];
+               0, sol.rows(), xx);
+    for (i=0; i<sol.rows(); i++) {
+      sol.elem(i,0) = scale * xx[i];
       DBGP("x" << i << ": " << xx[i]);
     }
-    delete [] xx;
+    delete [] xx;  
+
+    //get the value of the objective function
+    *objVal = 0;
+    //the quadratic term
+    Q.sequentialReset();
+    while (Q.nextSequentialElement(i, j, value))
+      *objVal += sol.elem(i,0) * value * sol.elem(j,0);
+    //the linear term
+    for (j=0; j<cj.cols(); j++) {
+      *objVal += cj.elem(0,j) * sol.elem(j,0);
+    }
   }
   MSK_deletetask(&task);
   return result;

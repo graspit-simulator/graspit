@@ -341,7 +341,7 @@ int underDeterminedSolveQR(Matrix &A, Matrix &B, Matrix &X);
 //! Computes the inverse of a square matrix
 int matrixInverse(const Matrix &A, Matrix &AInv);
 //! Solves a Quadratic Program
-int QPSolver(const Matrix &Q,
+int QPSolver(const Matrix &Q, const Matrix &cj,
              const Matrix &Eq, const Matrix &b,
              const Matrix &InEq, const Matrix &ib,
              const Matrix &lowerBounds, const Matrix &upperBounds,
@@ -355,7 +355,7 @@ int factorizedQPSolver(const Matrix &Qf,
 //! A simple test to check that the QP solver works
 void testQP();
 //! Solves a linear program
-int LPSolver(const Matrix &Q,
+int LPSolver(const Matrix &cj,
              const Matrix &Eq, const Matrix &b,
              const Matrix &InEq, const Matrix &ib,
              const Matrix &lowerBounds, const Matrix &upperBounds,
