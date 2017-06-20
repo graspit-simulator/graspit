@@ -147,7 +147,7 @@ transf::set(const SoTransform *IVt)
   IVt->translation.getValue().getValue(x, y, z);
   rot.w() = (double)qw; rot.x() = (double)qx; rot.y() = (double)qy; rot.z() = (double)qz;
   t[0] = (double)x; t[1] = (double)y; t[2] = (double)z;
-  rot = R;
+  R = rot;
 }
 
 /*! Multiplies two transforms.  */
