@@ -87,6 +87,6 @@ void setCrossProductMatrix(mat3 &mat, const vec3 &v)
 
   mat(6) = v.y();
   mat(7) = -v.x();
-  mat(9) = 0.0;
+  mat(8) = 0.0;
 }
 
