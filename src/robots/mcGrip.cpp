@@ -433,7 +433,7 @@ McGripGrasp::tendonAndHandOptimization(Matrix *parameters, double &objValRet)
   Matrix F(Contact::frictionConstraintsBlockMatrix(contacts));
   Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
   //grasp map that relates contact amplitudes to object wrench G = S*R*D
-  Matrix G(graspMapMatrix(R, D));
+  Matrix G(graspMapMatrixFrictionEdges(R, D));
   //matrix that relates contact forces to joint torques JTD = JTran * D
   Matrix JTran(J.transposed());
   Matrix JTD(JTran.cols(), D.cols());

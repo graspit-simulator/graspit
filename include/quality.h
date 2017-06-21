@@ -173,7 +173,7 @@ class QualVolume : public QualityMeasure {
     /*! Returns the type of this class expressed as a string. */
     static const char *getClassType() {return type;}
 };
-
+z
 /*
 class QualWeighted : public QualityMeasure {
   QualityMeausre *qm1,*qm2;
