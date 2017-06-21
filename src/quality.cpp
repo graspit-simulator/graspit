@@ -41,6 +41,8 @@
 
 #include "grasp.h"
 #include "gws.h"
+#include "matrix.h"
+#include "robot.h"
 
 #include <limits>
 
@@ -51,10 +53,12 @@
 //Static class variables
 
 //! A list of the possible qm types expressed as strings
-const char *QualityMeasure::TYPE_LIST[] = {"Epsilon", "Volume", NULL};
+const char *QualityMeasure::TYPE_LIST[] = {"Epsilon", "Volume", "PCR", "PGR", NULL};
 
 const char *QualEpsilon::type = "Epsilon";
 const char *QualVolume::type = "Volume";
+const char *QualPCR::type = "PCR";
+const char *QualPGR::type = "PGR";
 
 /*!
   Sets the name of this QM to the text contained within the name widget.
@@ -98,6 +102,14 @@ QualityMeasure::buildParamArea(qmDlgDataT *qmData)
   else if (!strcmp(qmData->qmType, QualVolume::getClassType())) {
     QualVolume::buildParamArea(qmData);
   }
+
+  else if (!strcmp(qmData->qmType,QualPCR::getClassType())) {
+    QualPCR::buildParamArea(qmData);
+  }
+
+  else if (!strcmp(qmData->qmType,QualPGR::getClassType())) {
+    QualPGR::buildParamArea(qmData);
+  }
 }
 
 /*!
@@ -113,6 +125,14 @@ QualityMeasure::createInstance(qmDlgDataT *qmData)
 
   else if (!strcmp(qmData->qmType, QualVolume::getClassType())) {
     return new QualVolume(qmData);
+  }
+
+  else if (!strcmp(qmData->qmType,QualPCR::getClassType())) {
+    return new QualPCR(qmData);
+  }
+
+  else if (!strcmp(qmData->qmType,QualPGR::getClassType())) {
+    return new QualPGR(qmData);
   }
 
   return NULL;
@@ -350,6 +370,301 @@ QualVolume::buildParamArea(qmDlgDataT *qmData)
 
   qmData->paramPtr = gwsComboBox;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//                                QualPCR
+//
+///////////////////////////////////////////////////////////////////////////////
+
+//! Structure holding pointers to UI items specific to this quality measure
+struct QualPCRParamT {
+  QLineEdit *wrenchInput;
+  QLineEdit *FxInput;
+  QLineEdit *FyInput;
+  QLineEdit *FzInput;
+  QLineEdit *MxInput;
+  QLineEdit *MyInput;
+  QLineEdit *MzInput;
+
+  QLineEdit *maxForceInput;
+};
+
+/*!
+  Adds the GWS specified by the combo box in the parameter area of the
+  dialog box to the grasp associated with this qm.  The grasp will take care
+  of creating it if it doesn't already exist.
+*/
+QualPCR::QualPCR(qmDlgDataT *data) : QualityMeasure(data)
+{
+  QualPCRParamT *params = (QualPCRParamT *)data->paramPtr;
+
+  mWrenchMultiplier = params->wrenchInput->text().toDouble();
+
+  mWrench.resize(6, 0.0);
+  mWrench[0] = params->FxInput->text().toDouble();
+  mWrench[1] = params->FyInput->text().toDouble();
+  mWrench[2] = params->FzInput->text().toDouble();
+  mWrench[3] = params->MxInput->text().toDouble();
+  mWrench[4] = params->MyInput->text().toDouble();
+  mWrench[5] = params->MzInput->text().toDouble();
+
+  mMaxForce = params->maxForceInput->text().toDouble();
+}
+
+QualPCR::~QualPCR()
+{
+#ifdef GRASPITDBG
+   std::cout << "deleting QualPCR" << std::endl;
+#endif
+}
+
+double
+QualPCR::evaluate()
+{
+  Matrix dw(&mWrench[0], 6, 1, true);
+  double wrenchMultiplier = mWrenchMultiplier;
+  if (mWrenchMultiplier) dw.multiply(wrenchMultiplier);
+
+  return grasp->evaluatePCR(dw, mMaxForce);
+}
+
+double
+QualPCR::evaluate3D()
+{
+  return 0;
+}
+
+/*!
+  Builds a PCR qm parameter area within the quality measure dialog
+  box such that the user can input the applied wrench and the 
+  desired maximum contact force
+*/
+void
+QualPCR::buildParamArea(qmDlgDataT *qmData)
+{
+  static QualPCRParamT params;
+  QualPCR *currQM = (QualPCR*)qmData->currQM;
+
+#ifdef GRASPITDBG
+  std::cout << "building QualPCR" << std::endl;
+#endif
+
+  std::vector<double> wrench(6, 0.0);
+  double wrenchMultiplier = 1.0;
+  double maxForce = 10.0;
+  if (currQM) {
+    wrench = currQM->mWrench;
+    wrenchMultiplier = currQM->mWrenchMultiplier;
+    maxForce = currQM->mMaxForce;
+  } else if (qmData->grasp->isGravitySet()) {
+    wrench = getGravityWrench(qmData->grasp);
+    wrenchMultiplier = qmData->grasp->getObject()->getMass() * 1.0e-3 * 9.80665 * 1.0e6;
+  } 
+
+  QGridLayout *wl = new QGridLayout(qmData->settingsArea,8,2);
+
+  wl->addWidget(new QLabel(QString("Multiplier:")));
+  params.wrenchInput = new QLineEdit();
+  params.wrenchInput->setText(QString::number(wrenchMultiplier));
+  wl->addWidget(params.wrenchInput);
+
+  wl->addWidget(new QLabel(QString("Force X:")));
+  params.FxInput = new QLineEdit();
+  params.FxInput->setText(QString::number(wrench[0]));
+  wl->addWidget(params.FxInput);
+
+  wl->addWidget(new QLabel(QString("Force Y:")));
+  params.FyInput = new QLineEdit();
+  params.FyInput->setText(QString::number(wrench[1]));
+  wl->addWidget(params.FyInput);
+
+  wl->addWidget(new QLabel(QString("Force Z:")));
+  params.FzInput = new QLineEdit();
+  params.FzInput->setText(QString::number(wrench[2]));
+  wl->addWidget(params.FzInput);
+
+  wl->addWidget(new QLabel(QString("Torque X:")));
+  params.MxInput = new QLineEdit();
+  params.MxInput->setText(QString::number(wrench[3]));
+  wl->addWidget(params.MxInput);
+
+  wl->addWidget(new QLabel(QString("Torque Y:")));
+  params.MyInput = new QLineEdit();
+  params.MyInput->setText(QString::number(wrench[4]));
+  wl->addWidget(params.MyInput);
+
+  wl->addWidget(new QLabel(QString("Torque Z:")));
+  params.MzInput = new QLineEdit();
+  params.MzInput->setText(QString::number(wrench[5]));
+  wl->addWidget(params.MzInput);
+
+  wl->addWidget(new QLabel(QString("Maximum Force:")));
+  params.maxForceInput = new QLineEdit();
+  params.maxForceInput->setText(QString::number(maxForce));
+  wl->addWidget(params.maxForceInput);
+
+  qmData->paramPtr = &params;
+}
+
+std::vector<double> QualPCR::getGravityWrench(Grasp *grasp)
+{
+  std::vector<double> wrench(6, 0.0);
+  vec3 hand_z(0,0,1);// * grasp->getHand()->getTran();
+  wrench[0] = hand_z.x();
+  wrench[1] = hand_z.y();
+  wrench[2] = hand_z.z();
+  return wrench;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//                                QualPGR
+//
+///////////////////////////////////////////////////////////////////////////////
+
+//! Structure holding pointers to UI items specific to this quality measure
+struct QualPGRParamT {
+  QLineEdit *wrenchInput;
+  QLineEdit *FxInput;
+  QLineEdit *FyInput;
+  QLineEdit *FzInput;
+  QLineEdit *MxInput;
+  QLineEdit *MyInput;
+  QLineEdit *MzInput;
+
+  QLineEdit *maxForceInput;
+
+  QLineEdit *maxContactsInput;
+};
+
+/*!
+  Adds the GWS specified by the combo box in the parameter area of the
+  dialog box to the grasp associated with this qm.  The grasp will take care
+  of creating it if it doesn't already exist.
+*/
+QualPGR::QualPGR(qmDlgDataT *data) : QualityMeasure(data)
+{
+  QualPGRParamT *params = (QualPGRParamT *)data->paramPtr;
+
+  mWrenchMultiplier = params->wrenchInput->text().toDouble();
+
+  mWrench.resize(6, 0.0);
+  mWrench[0] = params->FxInput->text().toDouble();
+  mWrench[1] = params->FyInput->text().toDouble();
+  mWrench[2] = params->FzInput->text().toDouble();
+  mWrench[3] = params->MxInput->text().toDouble();
+  mWrench[4] = params->MyInput->text().toDouble();
+  mWrench[5] = params->MzInput->text().toDouble();
+
+  mMaxForce = params->maxForceInput->text().toDouble();
+
+  mMaxContacts = params->maxContactsInput->text().toInt();
+}
+
+QualPGR::~QualPGR()
+{
+#ifdef GRASPITDBG
+   std::cout << "deleting QualPGR" << std::endl;
+#endif
+}
+
+double
+QualPGR::evaluate()
+{
+  Matrix dw(&mWrench[0], 6, 1, true);
+  double wrenchMultiplier = mWrenchMultiplier;
+  if (mWrenchMultiplier) dw.multiply(wrenchMultiplier);
+
+  return grasp->evaluatePGR(dw, mMaxForce, mMaxContacts);
+}
+
+double
+QualPGR::evaluate3D()
+{
+  return 0;
+}
+
+/*!
+  Builds a PCR qm parameter area within the quality measure dialog
+  box such that the user can input the applied wrench and the 
+  desired maximum contact force
+*/
+void
+QualPGR::buildParamArea(qmDlgDataT *qmData)
+{
+  static QualPGRParamT params;
+  QualPGR *currQM = (QualPGR*)qmData->currQM;
+
+#ifdef GRASPITDBG
+  std::cout << "building QualPGR" << std::endl;
+#endif
+
+  std::vector<double> wrench(6, 0.0);
+  double wrenchMultiplier = 1.0;
+  double maxForce = 1.0;
+  int maxContacts = 8;
+  if (currQM) {
+    wrench = currQM->mWrench;
+    wrenchMultiplier = currQM->mWrenchMultiplier;
+    maxForce = currQM->mMaxForce;
+    maxContacts = currQM->mMaxContacts;
+  } else if (qmData->grasp->isGravitySet()) {
+    wrench = QualPCR::getGravityWrench(qmData->grasp);
+    wrenchMultiplier = qmData->grasp->getObject()->getMass() * 1.0e-3 * 9.80665 * 1.0e6;
+  } 
+
+  QGridLayout *wl = new QGridLayout(qmData->settingsArea,8,2);
+
+  wl->addWidget(new QLabel(QString("Multiplier:")));
+  params.wrenchInput = new QLineEdit();
+  params.wrenchInput->setText(QString::number(wrenchMultiplier));
+  wl->addWidget(params.wrenchInput);
+
+  wl->addWidget(new QLabel(QString("Force X:")));
+  params.FxInput = new QLineEdit();
+  params.FxInput->setText(QString::number(wrench[0]));
+  wl->addWidget(params.FxInput);
+
+  wl->addWidget(new QLabel(QString("Force Y:")));
+  params.FyInput = new QLineEdit();
+  params.FyInput->setText(QString::number(wrench[1]));
+  wl->addWidget(params.FyInput);
+
+  wl->addWidget(new QLabel(QString("Force Z:")));
+  params.FzInput = new QLineEdit();
+  params.FzInput->setText(QString::number(wrench[2]));
+  wl->addWidget(params.FzInput);
+
+  wl->addWidget(new QLabel(QString("Torque X:")));
+  params.MxInput = new QLineEdit();
+  params.MxInput->setText(QString::number(wrench[3]));
+  wl->addWidget(params.MxInput);
+
+  wl->addWidget(new QLabel(QString("Torque Y:")));
+  params.MyInput = new QLineEdit();
+  params.MyInput->setText(QString::number(wrench[4]));
+  wl->addWidget(params.MyInput);
+
+  wl->addWidget(new QLabel(QString("Torque Z:")));
+  params.MzInput = new QLineEdit();
+  params.MzInput->setText(QString::number(wrench[5]));
+  wl->addWidget(params.MzInput);
+
+  wl->addWidget(new QLabel(QString("Max. Force:")));
+  params.maxForceInput = new QLineEdit();
+  params.maxForceInput->setText(QString::number(maxForce));
+  wl->addWidget(params.maxForceInput);
+
+  wl->addWidget(new QLabel(QString("Max. no. of contacts:")));
+  params.maxContactsInput = new QLineEdit();
+  params.maxContactsInput->setText(QString::number(maxContacts));
+  wl->addWidget(params.maxContactsInput);
+
+  qmData->paramPtr = &params;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //

@@ -31,6 +31,7 @@
 #include <QString>
 #include <string.h>
 #include <list>
+#include <vector>
 
 class Grasp;         // defined in grasp.h
 class GWS;           // defined in gws.h
@@ -173,7 +174,86 @@ class QualVolume : public QualityMeasure {
     /*! Returns the type of this class expressed as a string. */
     static const char *getClassType() {return type;}
 };
-z
+
+//! The Potential Contact Robustness (PCR) quality measure
+/*!
+  The PCR quality measure measures the robustness of the contacts of 
+  a given grasp. It quantifies how far each contact force is from 
+  violating the following three constraints:
+    1. Non-negativity
+    2. Friction cone
+    3. Maximum force
+  This quality metric was introduced and is further explained in 
+  'Contact and Grasp Robustness Measures: Analysis and Experiment' 
+  (1997) by Prattichizzo et al.
+*/
+class QualPCR : public QualityMeasure {
+
+  double mWrenchMultiplier;
+  std::vector<double> mWrench;
+  double mMaxForce;
+
+  //! The string identifying this qm type
+  static const char *type;
+
+ public:
+  QualPCR(qmDlgDataT *data);
+  ~QualPCR();
+
+  /*! Returns the type of this quality measure expressed as a string */
+  const char *getType() const {return type;}
+
+  double evaluate();
+  double evaluate3D();
+
+  static void buildParamArea(qmDlgDataT *qmData);
+
+  /*! Returns the type of this class expressed as a string. */
+  static const char *getClassType() {return type;}
+
+  static std::vector<double> getGravityWrench(Grasp *grasp);
+};
+
+//! The Potential Grasp Robustness (PGR) quality measure
+/*!
+  The PGR quality measure is similar to the PCR metric but considers
+  contacts to be in one of three possible states:
+    1. both non-negativity and friction constraints are satisfied.
+       The force may lie anywhere inside the friction cone
+    2. the contact is sliding and only non-negativity is satisfied.
+       The force may only have a normal component
+    3. the contact has broken. No force may act
+  The PGR quality metric maximizes the PCR metric over all possible
+  contact state combinations. This quality metric was introduced and 
+  is further explained in 'Contact and Grasp Robustness Measures: 
+  Analysis and Experiment' (1997) by Prattichizzo et al.
+*/
+class QualPGR : public QualityMeasure {
+
+  double mWrenchMultiplier;
+  std::vector<double> mWrench;
+  double mMaxForce;
+  int mMaxContacts;
+
+  //! The string identifying this qm type
+  static const char *type;
+
+ public:
+  QualPGR(qmDlgDataT *data);
+  ~QualPGR();
+
+  /*! Returns the type of this quality measure expressed as a string */
+  const char *getType() const {return type;}
+
+  double evaluate();
+  double evaluate3D();
+
+  static void buildParamArea(qmDlgDataT *qmData);
+
+  /*! Returns the type of this class expressed as a string. */
+  static const char *getClassType() {return type;}
+};
+
 /*
 class QualWeighted : public QualityMeasure {
   QualityMeausre *qm1,*qm2;
