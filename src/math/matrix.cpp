@@ -967,8 +967,8 @@ matrixInverse(const Matrix &A, Matrix &AInv)
   > 0 - problem is unfeasible
   < 0 - error in computation
 */
-int QPSolver(const Matrix &Q, const Matrix &Eq, const Matrix &b,
-             const Matrix &InEq, const Matrix &ib,
+int QPSolver(const Matrix &Q, const Matrix &cj, const Matrix &Eq, 
+             const Matrix &b, const Matrix &InEq, const Matrix &ib,
              const Matrix &lowerBounds, const Matrix &upperBounds,
              Matrix &sol, double *objVal)
 {
@@ -980,18 +980,20 @@ int QPSolver(const Matrix &Q, const Matrix &Eq, const Matrix &b,
     assert(InEq.cols() == sol.rows());
     assert(InEq.rows() == ib.rows());
   }
+  assert(sol.cols() == 1);
   assert(Q.rows() == Q.cols());
   assert(Q.rows() == sol.rows());
-  assert(sol.cols() == 1);
+  assert(cj.cols() == sol.rows() || cj.cols() == 0);
+  assert(cj.rows() == 1 || cj.cols() == 0);
   assert(lowerBounds.rows() == sol.rows());
   assert(upperBounds.rows() == sol.rows());
   assert(lowerBounds.cols() == 1);
   assert(upperBounds.cols() == 1);
 
 #ifdef MOSEK_QP
-  int result = mosekNNSolverWrapper(Q, Eq, b, InEq, ib,
+  int result = mosekNNSolverWrapper(Q, cj, Eq, b, InEq, ib,
                                     lowerBounds, upperBounds, sol,
-                                    objVal, MOSEK_OBJ_QP);
+                                    objVal);
 #elif defined OASES_QP
   int result = QPOASESSolverWrapperQP(Q, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
@@ -1058,13 +1060,16 @@ int factorizedQPSolver(const Matrix &Qf,
   SparseMatrix ExtQ(Matrix::ZEROES<SparseMatrix>(numVar, numVar));
   ExtQ.copySubMatrix(sol.rows(), sol.rows(), SparseMatrix::EYE(Qf.rows(), Qf.rows()));
 
+  // Linear component of objective function (zero)
+  Matrix cj(0,0);
+
   //extended bounds. New variables are unbounded
   Matrix extLow(Matrix::MIN_VECTOR(numVar));
   extLow.copySubMatrix(0, 0, lowerBounds);
   Matrix extUp(Matrix::MAX_VECTOR(numVar));
   extUp.copySubMatrix(0, 0, upperBounds);
 
-  int result = QPSolver(ExtQ, ExtEq, extB, ExtInEq, ib, extLow, extUp, xy, objVal);
+  int result = QPSolver(ExtQ, cj, ExtEq, extB, ExtInEq, ib, extLow, extUp, xy, objVal);
   //copy the relevant solution
   sol.copySubBlock(0, 0, sol.rows(), 1, xy, 0, 0);
 
@@ -1102,6 +1107,7 @@ void testQP()
 
   Matrix Q(Matrix::ZEROES<Matrix>(2, 2));
   Q.elem(0, 0) = 1; Q.elem(1, 1) = 4;
+  Matrix cj(0,0);
 
   Matrix sol(2, 1);
   Matrix lowerBounds(Matrix::MIN_VECTOR(2));
@@ -1127,7 +1133,7 @@ void testQP()
   Matrix sol(2,1);
   double objVal;
   */
-  int result = QPSolver(Q, Eq, b, InEq, ib, lowerBounds, upperBounds, sol, &objVal);
+  int result = QPSolver(Q, cj, Eq, b, InEq, ib, lowerBounds, upperBounds, sol, &objVal);
 
   if (result == 0) {
     DBGA("Test QP solved");
@@ -1153,15 +1159,15 @@ void testQP()
   < 0 - error in computation
 */
 int
-LPSolver(const Matrix &Q,
+LPSolver(const Matrix &cj,
          const Matrix &Eq, const Matrix &b,
          const Matrix &InEq, const Matrix &ib,
          const Matrix &lowerBounds, const Matrix &upperBounds,
          Matrix &sol, double *objVal)
 {
   assert(sol.cols() == 1);
-  assert(Q.cols() == sol.rows());
-  assert(Q.rows() == 1);
+  assert(cj.cols() == sol.rows());
+  assert(cj.rows() == 1);
   if (Eq.rows()) {
     assert(Eq.cols() == sol.rows());
     assert(Eq.rows() == b.rows());
@@ -1175,9 +1181,11 @@ LPSolver(const Matrix &Q,
   assert(lowerBounds.cols() == 1);
   assert(upperBounds.cols() == 1);
 
+  Matrix Q(0,0);
+
 #ifdef MOSEK_QP
-  int result = mosekNNSolverWrapper(Q, Eq, b, InEq, ib,
-                                    lowerBounds, upperBounds, sol, objVal, MOSEK_OBJ_LP);
+  int result = mosekNNSolverWrapper(Q, cj, Eq, b, InEq, ib,
+                                    lowerBounds, upperBounds, sol, objVal);
 #elif defined OASES_QP
   int result = QPOASESSolverWrapperLP(Q, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
@@ -1237,7 +1245,7 @@ testLP()
 
 #ifdef MOSEK_QP
   double obj;
-  int result = mosekNNSolverWrapper(Obj, Eq, b, InEq, ib, x, low, high, &obj, MOSEK_OBJ_LP);
+  int result = LPSolver(Obj, Eq, b, InEq, ib, low, high, x, &obj);
   if (result > 0) {
     DBGA("Test failed: program unfeasible");
   } else if (result < 0) {

@@ -773,21 +773,20 @@ Grasp::contactJacobian(const std::list<Joint *> &joints,
 Matrix
 Grasp::graspMapMatrix(const Matrix &R, const Matrix &D)
 {
-  int numContacts = R.cols() / 6;
-  assert(6 * numContacts == R.cols());
+  int numContacts = R.rows() / 6;
+  assert(6 * numContacts == R.rows());
   //summation matrix that adds full 6D object wrenches
   Matrix S(6, 6 * numContacts);
   for (int i = 0; i < numContacts; i++) {
     S.copySubMatrix(0, 6 * i, Matrix::EYE(6, 6));
   }
 
-  Matrix SR(S.cols(), R.cols());
+  Matrix SR(S.rows(), R.cols());
   matrixMultiply(S, R, SR);
-  Matrix G(S.cols(), D.cols());
+  Matrix G(S.rows(), D.cols());
   matrixMultiply(SR, D, G);
   return G;
 }
-
 
 /*! One possible version of the GFO problem.
 
@@ -872,11 +871,11 @@ Grasp::computeQuasistaticForces(const Matrix &robotTau)
 
   //left-hand equality matrix JTD = JTran * D
   Matrix JTran(J.transposed());
-  Matrix JTD(JTran.cols(), D.cols());
+  Matrix JTD(JTran.rows(), D.cols());
   matrixMultiply(JTran, D, JTD);
 
   //matrix of zeroes for right-hand of friction inequality
-  Matrix zeroes(Matrix::ZEROES<Matrix>(F.cols(), 1));
+  Matrix zeroes(Matrix::ZEROES<Matrix>(F.rows(), 1));
 
   //matrix of unknowns
   Matrix c_beta(D.cols(), 1);
@@ -899,12 +898,12 @@ Grasp::computeQuasistaticForces(const Matrix &robotTau)
   }
 
   //retrieve contact wrenchs in local contact coordinate systems
-  Matrix cWrenches(D.cols(), 1);
+  Matrix cWrenches(D.rows(), 1);
   matrixMultiply(D, c_beta, cWrenches);
   DBGP("Contact wrenches:\n" << cWrenches);
 
   //compute wrenches relative to object origin and expressed in world coordinates
-  Matrix objectWrenches(R.cols(), cWrenches.cols());
+  Matrix objectWrenches(R.rows(), cWrenches.cols());
   matrixMultiply(R, cWrenches, objectWrenches);
   DBGP("Object wrenches:\n" << objectWrenches);
 
@@ -913,9 +912,9 @@ Grasp::computeQuasistaticForces(const Matrix &robotTau)
   accumulateAndDisplayObjectWrenches(&contacts, objectWrenches);
 
   //simple sanity check: JT * c = tau
-  Matrix fCheck(tau.cols(), 1);
+  Matrix fCheck(tau.rows(), 1);
   matrixMultiply(JTran, cWrenches, fCheck);
-  for (int j = 0; j < tau.cols(); j++) {
+  for (int j = 0; j < tau.rows(); j++) {
     //I am not sure this works well for universal and ball joints
     double err = fabs(tau.elem(j, 0) - fCheck.elem(j, 0));
     //take error as a percentage of desired force, if force is non-zero
@@ -971,44 +970,44 @@ graspForceExistence(Matrix &JTD, Matrix &D, Matrix &F, Matrix &G,
   // | JTD -I |  | beta |   |0|
   // | 0   sum|  |  tau | = |1|
 
-  int numJoints = tau.cols();
-  Matrix beta_tau(beta.cols() + tau.cols(), 1);
+  int numJoints = tau.rows();
+  Matrix beta_tau(beta.rows() + tau.rows(), 1);
 
   //right-hand side of equality constraint
-  Matrix right_hand(JTD.cols() + 1, 1);
+  Matrix right_hand(JTD.rows() + 1, 1);
   right_hand.setAllElements(0.0);
   //actually, we use 1.0e9 here as units are in N * 1.0e-6 * mm
   //so we want a total joint torque of 1000 N mm
-  right_hand.elem(right_hand.cols() - 1, 0) = 1.0e10;
+  right_hand.elem(right_hand.rows() - 1, 0) = 1.0e10;
 
   //left-hand side of equality constraint
-  Matrix LeftHand(JTD.cols() + 1, D.cols() + numJoints);
+  Matrix LeftHand(JTD.rows() + 1, D.cols() + numJoints);
   LeftHand.setAllElements(0.0);
   LeftHand.copySubMatrix(0, 0, JTD);
   LeftHand.copySubMatrix(0, D.cols(), Matrix::NEGEYE(numJoints, numJoints));
   for (int i = 0; i < numJoints; i++) {
-    LeftHand.elem(JTD.cols(), D.cols() + i) = 1.0;
+    LeftHand.elem(JTD.rows(), D.cols() + i) = 1.0;
   }
 
   //matrix F padded with zeroes for tau
   //left hand side of the inequality matrix
-  Matrix FO(F.cols(), F.cols() + numJoints);
+  Matrix FO(F.rows(), F.cols() + numJoints);
   FO.setAllElements(0.0);
   FO.copySubMatrix(0, 0, F);
 
   //right-hand side of inequality matrix
-  Matrix inEqZeroes(FO.cols(), 1);
+  Matrix inEqZeroes(FO.rows(), 1);
   inEqZeroes.setAllElements(0.0);
 
   //objective matrix: G padded with zeroes
-  Matrix GO(Matrix::ZEROES<Matrix>(G.cols(), G.cols() + numJoints));
+  Matrix GO(Matrix::ZEROES<Matrix>(G.rows(), G.cols() + numJoints));
   GO.copySubMatrix(0, 0, G);
 
   //bounds: all variables greater than 0
   // CHANGE: only beta >= 0, tau is not
-  Matrix lowerBounds(Matrix::MIN_VECTOR(beta_tau.cols()));
-  lowerBounds.copySubMatrix(0, 0, Matrix::ZEROES<Matrix>(beta.cols(), 1));
-  Matrix upperBounds(Matrix::MAX_VECTOR(beta_tau.cols()));
+  Matrix lowerBounds(Matrix::MIN_VECTOR(beta_tau.rows()));
+  lowerBounds.copySubMatrix(0, 0, Matrix::ZEROES<Matrix>(beta.rows(), 1));
+  Matrix upperBounds(Matrix::MAX_VECTOR(beta_tau.rows()));
 
 
   /*
@@ -1032,8 +1031,8 @@ graspForceExistence(Matrix &JTD, Matrix &D, Matrix &F, Matrix &G,
   int result = factorizedQPSolver(GO, LeftHand, right_hand, FO, inEqZeroes,
                                   lowerBounds, upperBounds,
                                   beta_tau, objVal);
-  beta.copySubBlock(0, 0, beta.cols(), 1, beta_tau, 0, 0);
-  tau.copySubBlock(0, 0, tau.cols(), 1, beta_tau, beta.cols(), 0);
+  beta.copySubBlock(0, 0, beta.rows(), 1, beta_tau, 0, 0);
+  tau.copySubBlock(0, 0, tau.rows(), 1, beta_tau, beta.rows(), 0);
   return result;
 }
 
@@ -1059,12 +1058,12 @@ contactForceExistence(Matrix &F, Matrix &N, Matrix &Q, Matrix &beta, double *obj
   right_hand.elem(0, 0) = 1.0e7;
 
   //right-hand side of inequality matrix
-  Matrix inEqZeroes(F.cols(), 1);
+  Matrix inEqZeroes(F.rows(), 1);
   inEqZeroes.setAllElements(0.0);
 
   //bounds: all variables greater than 0
-  Matrix lowerBounds(Matrix::ZEROES<Matrix>(beta.cols(), 1));
-  Matrix upperBounds(Matrix::MAX_VECTOR(beta.cols()));
+  Matrix lowerBounds(Matrix::ZEROES<Matrix>(beta.rows(), 1));
+  Matrix upperBounds(Matrix::MAX_VECTOR(beta.rows()));
 
   /*
   FILE *fp = fopen("gfo.txt","w");
@@ -1108,21 +1107,21 @@ contactForceOptimization(Matrix &F, Matrix &N, Matrix &Q, Matrix &beta, double *
   // | N |        = |1|
 
   //right hand of equality
-  Matrix right_hand(Matrix::ZEROES<Matrix>(Q.cols() + 1, 1));
+  Matrix right_hand(Matrix::ZEROES<Matrix>(Q.rows() + 1, 1));
   //a total of 10N of normal force
-  right_hand.elem(Q.cols(), 0) = 1.0e7;
+  right_hand.elem(Q.rows(), 0) = 1.0e7;
 
   //left hand of equality
-  Matrix LeftHand(Q.cols() + 1, Q.cols());
+  Matrix LeftHand(Q.rows() + 1, Q.cols());
   LeftHand.copySubMatrix(0, 0, Q);
-  LeftHand.copySubMatrix(Q.cols(), 0, N);
+  LeftHand.copySubMatrix(Q.rows(), 0, N);
 
   //bounds: all variables greater than 0
-  Matrix lowerBounds(Matrix::ZEROES<Matrix>(beta.cols(), 1));
-  Matrix upperBounds(Matrix::MAX_VECTOR(beta.cols()));
+  Matrix lowerBounds(Matrix::ZEROES<Matrix>(beta.rows(), 1));
+  Matrix upperBounds(Matrix::MAX_VECTOR(beta.rows()));
 
   //objective: sum of F
-  Matrix FSum(1, F.cols());
+  Matrix FSum(1, F.rows());
   FSum.setAllElements(1.0);
   Matrix FObj(1, F.cols());
   matrixMultiply(FSum, F, FObj);
@@ -1138,7 +1137,7 @@ contactForceOptimization(Matrix &F, Matrix &N, Matrix &Q, Matrix &beta, double *
   Q.print(fp);
   fclose(fp);
   */
-  int result = LPSolver(FObj, LeftHand, right_hand, F, Matrix::ZEROES<Matrix>(F.cols(), 1),
+  int result = LPSolver(FObj, LeftHand, right_hand, F, Matrix::ZEROES<Matrix>(F.rows(), 1),
                         lowerBounds, upperBounds,
                         beta, objVal);
   return result;
@@ -1170,44 +1169,44 @@ graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &G,
   // | G    0 |  | tau  | = |0|
   // | 0   sum|         |1|
 
-  Matrix beta_tau(beta.cols() + tau.cols(), 1);
-  int numJoints = tau.cols();
+  Matrix beta_tau(beta.rows() + tau.rows(), 1);
+  int numJoints = tau.rows();
 
   //right-hand side of equality constraint
-  Matrix right_hand(JTD.cols() + G.cols() + 1, 1);
+  Matrix right_hand(JTD.rows() + G.rows() + 1, 1);
   right_hand.setAllElements(0.0);
   //actually, we use 1.0e8 here as units are in N * 1.0e-6 * mm
   //so we want a total joint torque of 100 N mm
-  right_hand.elem(right_hand.cols() - 1, 0) = 1.0e10;
+  right_hand.elem(right_hand.rows() - 1, 0) = 1.0e10;
 
   //left-hand side of equality constraint
-  Matrix LeftHand(JTD.cols() + G.cols() + 1, D.cols() + numJoints);
+  Matrix LeftHand(JTD.rows() + G.rows() + 1, D.cols() + numJoints);
   LeftHand.setAllElements(0.0);
   LeftHand.copySubMatrix(0, 0, JTD);
   LeftHand.copySubMatrix(0, D.cols(), Matrix::NEGEYE(numJoints, numJoints));
-  LeftHand.copySubMatrix(JTD.cols(), 0, G);
+  LeftHand.copySubMatrix(JTD.rows(), 0, G);
   for (int i = 0; i < numJoints; i++) {
-    LeftHand.elem(JTD.cols() + G.cols(), D.cols() + i) = 1.0;
+    LeftHand.elem(JTD.rows() + G.rows(), D.cols() + i) = 1.0;
   }
 
   //objective matrix
   //matrix F padded with zeroes for tau
   //will also serve as the left hand side of the inequality matrix
-  Matrix FO(F.cols(), F.cols() + numJoints);
+  Matrix FO(F.rows(), F.cols() + numJoints);
   FO.setAllElements(0.0);
   FO.copySubMatrix(0, 0, F);
   //summing matrix and objective matrix
-  Matrix FSum(1, F.cols());
+  Matrix FSum(1, F.rows());
   FSum.setAllElements(1.0);
   Matrix FObj(1, FO.cols());
   matrixMultiply(FSum, FO, FObj);
 
   //bounds: all variables greater than 0
-  Matrix lowerBounds(Matrix::ZEROES<Matrix>(beta_tau.cols(), 1));
-  Matrix upperBounds(Matrix::MAX_VECTOR(beta_tau.cols()));
+  Matrix lowerBounds(Matrix::ZEROES<Matrix>(beta_tau.rows(), 1));
+  Matrix upperBounds(Matrix::MAX_VECTOR(beta_tau.rows()));
 
   //right-hand side of inequality matrix
-  Matrix inEqZeroes(FO.cols(), 1);
+  Matrix inEqZeroes(FO.rows(), 1);
   inEqZeroes.setAllElements(0.0);
 
 
@@ -1231,8 +1230,8 @@ graspForceOptimization(Matrix &JTD, Matrix &D, Matrix &F, Matrix &G,
   int result = LPSolver(FObj, LeftHand, right_hand, FO, inEqZeroes,
                         lowerBounds, upperBounds,
                         beta_tau, objVal);
-  beta.copySubBlock(0, 0, beta.cols(), 1, beta_tau, 0, 0);
-  tau.copySubBlock(0, 0, tau.cols(), 1, beta_tau, beta.cols(), 0);
+  beta.copySubBlock(0, 0, beta.rows(), 1, beta_tau, 0, 0);
+  tau.copySubBlock(0, 0, tau.rows(), 1, beta_tau, beta.rows(), 0);
   return result;
 }
 
@@ -1307,7 +1306,7 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau, int computation)
 
   //matrix that relates contact forces to joint torques JTD = JTran * D
   Matrix JTran(J.transposed());
-  Matrix JTD(JTran.cols(), D.cols());
+  Matrix JTD(JTran.rows(), D.cols());
   matrixMultiply(JTran, D, JTD);
 
   // vectors of unknowns
@@ -1356,17 +1355,17 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau, int computation)
   DBGP("tau:\n" << tau);
   DBGP("Joint forces sum: " << tau.elementSum());
 
-  Matrix Gbeta(G.cols(), beta.cols());
+  Matrix Gbeta(G.rows(), beta.cols());
   matrixMultiply(G, beta, Gbeta);
   DBGP("Total object wrench:\n" << Gbeta);
 
   //retrieve contact wrenches in local contact coordinate systems
-  Matrix cWrenches(D.cols(), 1);
+  Matrix cWrenches(D.rows(), 1);
   matrixMultiply(D, beta, cWrenches);
   DBGP("Contact forces:\n " << cWrenches);
 
   //compute object wrenches relative to object origin and expressed in world coordinates
-  Matrix objectWrenches(R.cols(), cWrenches.cols());
+  Matrix objectWrenches(R.rows(), cWrenches.cols());
   matrixMultiply(R, cWrenches, objectWrenches);
   DBGP("Object wrenches:\n" << objectWrenches);
 
