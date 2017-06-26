@@ -1204,6 +1204,17 @@ int QPSolver(const Matrix &Q, const Matrix &cj, const Matrix &Eq,
   int result = QPOASESSolverWrapperQP(Q, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
                                       objVal);
+#elif defined GUROBI_SOLVER
+  std::list<Matrix> QInEq;
+  std::list<Matrix> iq;
+  std::list<Matrix> qib;
+  std::vector<int> SOS_index;
+  std::vector<int> SOS_len;
+  std::vector<int> SOS_type;
+  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
+  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, 
+                                   SOS_index, SOS_len, SOS_type, lowerBounds,
+                                   upperBounds, sol, types, objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning.
@@ -1396,6 +1407,17 @@ LPSolver(const Matrix &cj,
   int result = QPOASESSolverWrapperLP(Q, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
                                       objVal);
+#elif defined GUROBI_SOLVER
+  std::list<Matrix> QInEq ;
+  std::list<Matrix> iq;
+  std::list<Matrix> qib;
+  std::vector<int> SOS_index;
+  std::vector<int> SOS_len;
+  std::vector<int> SOS_type;
+  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
+  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, 
+                                   SOS_index, SOS_len, SOS_type, lowerBounds,
+                                   upperBounds, sol, types, objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning.
@@ -1486,7 +1508,7 @@ testLP()
   wrapper will complain. 
 */
 int 
-gurobiSolver(const Matrix &Q, const Matrix &c, 
+MIPSolver(const Matrix &Q, const Matrix &c, 
              const Matrix &Eq, const Matrix &b, 
              const Matrix &InEq, const Matrix &ib, 
              std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
@@ -1555,16 +1577,16 @@ gurobiSolver(const Matrix &Q, const Matrix &c,
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning. 
-  DBGA("Gurobi Solver not installed");
+  DBGA("No MIP solver installed");
   return 0;
 #endif
 
   return result;
 }
 
-/*! Test for the Gurobi solver. */
+/*! Test for the MIP solver. */
 void 
-testGurobi()
+testMIP()
 {
   Matrix Q(0,0);
   Matrix c(Matrix::ZEROES<Matrix>(1,3));
@@ -1611,7 +1633,7 @@ testGurobi()
   double obj;
 
 #ifdef GUROBI_SOLVER
-  int result = gurobiSolver(Q, c, Eq, b, InEq, ib, QInEq, iq, 
+  int result = MIPSolver(Q, c, Eq, b, InEq, ib, QInEq, iq, 
                             qib, SOS_index, SOS_len, SOS_type, 
                             lb, ub, sol, types, &obj);
 #else

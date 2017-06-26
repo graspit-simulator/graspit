@@ -1629,20 +1629,9 @@ Grasp::findOptimalContactForces(const Matrix &wrench,
     j += numFrictionEdges + 1;
   }
 
-  Matrix Q(0,0);
-  std::list<Matrix> QInEq ;
-  std::list<Matrix> iq;
-  std::list<Matrix> qib;
-  std::vector<int> SOS_index;
-  std::vector<int> SOS_len;
-  std::vector<int> SOS_type;
-  Matrix types(Matrix::ZEROES<Matrix>(numVars, 1));
-
   Matrix sol(numVars, 1);
   double objVal;
-  //int result = LPSolver(cj, Eq, b, InEq, ib, lowerBounds, upperBounds, sol, &objVal);
-  int result = gurobiSolver(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, SOS_index, SOS_len, 
-                            SOS_type, lowerBounds, upperBounds, sol, types, &objVal);
+  int result = LPSolver(cj, Eq, b, InEq, ib, lowerBounds, upperBounds, sol, &objVal);
   if (result) {
     if( result > 0) {
       DBGA("Grasp: problem unfeasible");

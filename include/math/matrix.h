@@ -432,7 +432,7 @@ int LPSolver(const Matrix &cj,
 //! A simple test to check that the LP solver works
 void testLP();
 //! Gurobi Solver
-int gurobiSolver(const Matrix &Q, const Matrix &c, 
+int MIPSolver(const Matrix &Q, const Matrix &c, 
                  const Matrix &Eq, const Matrix &b, 
                  const Matrix &InEq, const Matrix &ib, 
                  std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
