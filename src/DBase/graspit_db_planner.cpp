@@ -37,6 +37,8 @@
 #include "robot.h"
 #include "grasp.h"
 #include "quality.h"
+#include "qualEpsilon.h"
+#include "qualVolume.h"
 #include "EGPlanner/searchState.h"
 #include "collisionInterface.h"
 #include "DBPlanner/sql_database_manager.h"

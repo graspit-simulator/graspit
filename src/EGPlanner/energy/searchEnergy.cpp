@@ -34,6 +34,8 @@
 #include "contact/contact.h"
 #include "world.h"
 #include "quality.h"
+#include "qualEpsilon.h"
+#include "qualVolume.h"
 #include "searchState.h"
 #include "graspitCore.h"
 #include "ivmgr.h"

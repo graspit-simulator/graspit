@@ -63,19 +63,6 @@ class Joint;
 extern bool saveSetup;
 extern int saveCounter;
 
-class Grasp;
-struct threadArgs {
-  Grasp *g;
-  Matrix *wrench;
-  double maxForce;
-  std::vector<int> states;
-  std::vector<int> finalStates;
-  double maxPCR;
-  bool doneFlag;
-  pthread_mutex_t *statesMutex_pt;
-  pthread_mutex_t *resultMutex_pt;
-};
-
 //! A grasp occurs between a hand and an object and has quality measures associated with it.
 //  It also has methods to optimize grasping forces.
 /*! Each hand object has a grasp associated with it, and the grasp occurs
@@ -320,15 +307,6 @@ class Grasp : public QObject {
                                     const std::list<Joint*> &joints, 
                                     const std::list<Contact*> &contacts,
                                     std::vector<int> states = std::vector<int>());
-
-    double evaluatePCR(const Matrix &wrench, 
-                       double maxForce, 
-                       std::vector<int> states = std::vector<int>(),
-                       bool show = true);
-
-    static void* evaluatePCRThread(void *argv);
-
-    double evaluatePGR(Matrix &wrench, double maxForce, int maxContacts);
 
     //------------------- Useful functions for visualization --------------------------
 

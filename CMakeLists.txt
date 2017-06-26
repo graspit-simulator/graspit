@@ -88,6 +88,7 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/math
     ${GSRC}/include/dynamics
     ${GSRC}/include/contact
+    ${GSRC}/include/quality
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
@@ -127,6 +128,11 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/contact/virtualContact.h 
     ${GSRC}/include/contact/virtualContactOnObject.h
     ${GSRC}/include/contactSetting.h 
+    ${GSRC}/include/quality/quality.h 
+    ${GSRC}/include/quality/qualEpsilon.h 
+    ${GSRC}/include/quality/qualVolume.h 
+    ${GSRC}/include/quality/qualPCR.h 
+    ${GSRC}/include/quality/qualPGR.h 
     ${GSRC}/include/debug.h 
     ${GSRC}/include/dof.h 
     ${GSRC}/include/dynamics/dynamics.h 
@@ -150,7 +156,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/mytools.h 
     ${GSRC}/include/profiling.h 
     ${GSRC}/include/qhull_mutex.h 
-    ${GSRC}/include/quality.h 
     ${GSRC}/include/plugin.h 
     ${GSRC}/include/SoArrow.h 
     ${GSRC}/include/SoComplexShape.h 
@@ -370,6 +375,11 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/contact/virtualContact.cpp 
     ${GSRC}/src/contact/virtualContactOnObject.cpp
     ${GSRC}/src/contactSetting.cpp 
+    ${GSRC}/src/quality/quality.cpp
+    ${GSRC}/src/quality/qualEpsilon.cpp
+    ${GSRC}/src/quality/qualVolume.cpp
+    ${GSRC}/src/quality/qualPCR.cpp
+    ${GSRC}/src/quality/qualPGR.cpp
     ${GSRC}/src/dof.cpp 
     ${GSRC}/src/dynamics/dynamics.cpp 
     ${GSRC}/src/dynamics/dynJoint.cpp 
@@ -394,7 +404,6 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/mytools.cpp 
     ${GSRC}/src/profiling.cpp 
     ${GSRC}/src/plugin.cpp 
-    ${GSRC}/src/quality.cpp 
     ${GSRC}/src/robot.cpp 
     ${GSRC}/src/scanSimulator.cpp 
     ${GSRC}/src/SoArrow.cpp 
