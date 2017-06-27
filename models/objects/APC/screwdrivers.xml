@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>wood</material>
+	<mass>200</mass>
+	<cog>0 0 0</cog>
+	<inertia_matrix>175307 0 0 0 423596 0 0 0 257506</inertia_matrix>
+	<geometryFile type="Inventor">stanley_66_052.wrl</geometryFile>
+</root>
