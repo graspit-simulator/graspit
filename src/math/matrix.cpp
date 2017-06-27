@@ -27,6 +27,7 @@
 
 #include <limits>
 #include <math.h>
+#include <fstream>
 
 #ifdef MKL
 #include "mkl_wrappers.h"
@@ -48,6 +49,11 @@
 #endif
 #ifdef OASES_QP
 #include "qpoases.h"
+#endif
+
+// Gurobi solver
+#ifdef GUROBI_SOLVER
+#include "gurobi.h"
 #endif
 
 const double Matrix::EPS = 1.0e-7;
@@ -74,14 +80,42 @@ void Matrix::initialize(int m, int n)
 
 Matrix::Matrix(int m, int n)
 {
+  initialize(m,n);
+  mBlocksNumRows.clear();
+  mBlocksNumCols.clear();
+}
+Matrix::Matrix(int m, std::vector<int> &block_cols)
+{
+  int n = 0;
+  for (size_t i=0; i<block_cols.size(); i++){n += block_cols[i];}
   initialize(m, n);
+  mBlocksNumCols = block_cols;
+}
+Matrix::Matrix(std::vector<int> &block_rows, int n)
+{
+  int m = 0;
+  for (size_t i=0; i<block_rows.size(); i++){m += block_rows[i];}
+  initialize(m, n);
+  mBlocksNumRows = block_rows;
+}
+Matrix::Matrix(std::vector<int> &block_rows, std::vector<int> &block_cols) 
+{
+  int m = 0;
+  for (size_t i=0; i<block_rows.size(); i++){m += block_rows[i];}
+  int n = 0;
+  for (size_t i=0; i<block_cols.size(); i++){n += block_cols[i];}
+  initialize(m, n);
+  mBlocksNumRows = block_rows;
+  mBlocksNumCols = block_cols;
 }
 Matrix::Matrix(const Matrix &M)
 {
   initialize(M.rows(), M.cols());
   if (mRows) {
-    memcpy(mData, M.mData, mRows * mCols * sizeof(double));
+    memcpy(mData, M.mData, mRows*mCols*sizeof(double));
   }
+  mBlocksNumRows = M.mBlocksNumRows;
+  mBlocksNumCols = M.mBlocksNumCols;
 }
 
 Matrix::Matrix(const double *M, int m, int n, bool colMajor)
@@ -163,7 +197,65 @@ SparseMatrix::elem(int m, int n) const
   else { return it->second; }
 }
 
-std::auto_ptr<double>
+/*! Sum of all elements must match the number of columns of this matrix. */
+void Matrix::setBlocksNumCols(const std::vector<int> &sizes)
+{
+  int sum=0;
+  for (int k=0; k<(int)sizes.size(); k++) sum += sizes[k];
+  assert(sum == cols());
+  mBlocksNumCols = sizes;
+}
+
+void Matrix::setBlocksNumCols(int numBlocks, int sizes[])
+{
+  std::vector<int> sizes_vec;
+  for (int i=0; i<numBlocks; i++) sizes_vec.push_back(sizes[i]);
+  setBlocksNumCols(sizes_vec);
+}
+
+/*! Sum of all elements must match the number of rows of this matrix. */
+void Matrix::setBlocksNumRows(const std::vector<int> &sizes)
+{
+  int sum=0;
+  for (int k=0; k<(int)sizes.size(); k++) sum += sizes[k];
+  assert(sum == rows());
+  mBlocksNumRows = sizes;
+}
+
+void Matrix::setBlocksNumRows(int numBlocks, int sizes[])
+{
+  std::vector<int> sizes_vec;
+  for (int i=0; i<numBlocks; i++) sizes_vec.push_back(sizes[i]);
+  setBlocksNumRows(sizes_vec);
+}
+
+/*! Returns the starting indices and sizes for the (i,j) sub-block. Requires mBlocksNumRows or mBlocksNumCols
+  to be set. If either of those is 0, it is assumed that in that direction the matrix has only a single
+  sub-block whose size is the same as the respective size of the matrix.
+*/
+void Matrix::blockIndicesToRealIndices(int i, int j, int &startRow, int &startCol, int &numRows, int &numCols) const
+{
+  startRow = 0;
+  if (i==0) {
+    if (mBlocksNumRows.empty()) numRows = rows();
+    else numRows = mBlocksNumRows[0];
+  } else {
+    assert( i<(int)mBlocksNumRows.size() );
+    for (int k=0; k<i; k++) startRow += mBlocksNumRows[k];
+    numRows = mBlocksNumRows[i];
+  }    
+  startCol = 0;
+  if (j==0) {
+    if (mBlocksNumCols.empty()) numCols = cols();
+    else numCols = mBlocksNumCols[0];
+  } else {
+    assert( j<(int)mBlocksNumCols.size() );
+    for (int k=0; k<j; k++) startCol += mBlocksNumCols[k];
+    numCols = mBlocksNumCols[j];
+  }    
+}
+
+std::auto_ptr<double> 
 SparseMatrix::getDataCopy() const
 {
   double *data = new double[mRows * mCols];
@@ -301,7 +393,38 @@ Matrix::ROTATION2D(double theta)
   return R;
 }
 
-void
+double
+Matrix::binarySearch(std::tr1::function<int(const Matrix&)> func, const Matrix &input_var, 
+  double upperLimit)
+{
+  double delta = upperLimit;
+  double mult = upperLimit;
+  double max = 0;
+
+  double steps = 20;
+
+  for (int j=0; j<steps; j++) {
+    Matrix var(input_var);
+    var.multiply(mult);
+    delta /= 2;
+    if (func(var)) {
+      DBGA("Magnitude " << mult << " failed.");      
+      mult -= delta;
+    } else {      
+      DBGA("Magnitude " << mult << " passed.");
+      max = mult;
+      mult += delta;
+    }
+
+    // exit loop if upper limit results in valid grasp
+    if (mult >= upperLimit) {
+      break;
+    }
+  }
+  return max;
+}
+
+void 
 Matrix::setFromColMajor(const double *M)
 {
   assert(mRows);
@@ -363,6 +486,27 @@ Matrix::rank() const
   return rank;
 }
 
+void
+Matrix::SVD(Matrix &S, Matrix &U, Matrix &VT) const
+{
+  //use SVD - as in Golub & Van Loan, Matrix Computations, 1st ed., Sec. 6.7
+  int minSize = std::min((*this).rows(), (*this).cols());
+  int maxSize = std::max((*this).rows(), (*this).cols());
+  assert(S.rows()==minSize);
+  assert(S.cols()==1);
+  assert(U.rows()==(*this).rows());
+  assert(U.cols()==(*this).rows());
+  assert(VT.rows()==(*this).cols());
+  assert(VT.cols()==(*this).cols());
+  int lwork = 5 * maxSize;
+  double *work = new double[lwork];
+  int info;
+  dgesvd("A", "A", (*this).rows(), (*this).cols(), (*this).getDataCopy().get(), (*this).rows(), S.getDataPointer(), 
+         U.getDataPointer(), (*this).rows(), VT.getDataPointer(), (*this).cols(), 
+         work, lwork, &info);
+  delete [] work;
+}
+
 double
 Matrix::fnorm() const
 {
@@ -373,6 +517,20 @@ Matrix::fnorm() const
     }
   }
   return sqrt(norm);
+}
+
+double
+Matrix::max() const
+{
+  double max = elem(0,0);
+  double m;
+  for (int r=0; r<mRows; r++) {
+    for(int c=0; c<mCols; c++) {
+      m = elem(r,c);
+      if (m>max) max = m;
+    }
+  }
+  return max;
 }
 
 double
@@ -657,14 +815,46 @@ Matrix::multiply(double s)
   }
 }
 
-Matrix Matrix::transposed() const
+Matrix 
+Matrix::transposed() const
 {
   Matrix t(*this);
   t.transpose();
   return t;
 }
 
-void
+Matrix 
+Matrix::negative() const
+{
+  Matrix t(*this);
+  t.multiply(-1);
+  return t;
+}
+
+Matrix 
+Matrix::normalized() const
+{
+  Matrix t(*this);
+  double norm = fnorm();
+  if (norm > EPS) t.multiply(1.0 / norm);
+  return t;
+}
+
+Matrix
+Matrix::basis() const
+{
+  Matrix S(std::min((*this).rows(), (*this).cols()), 1);
+  Matrix U((*this).rows(), (*this).rows());
+  Matrix VT((*this).cols(), (*this).cols());
+  (*this).SVD(S,U,VT);
+
+  int dim = 0;
+  for (int i=0; i<S.rows(); i++) if (S.elem(i,0) > Matrix::EPS) dim++;
+  if (dim) return U.getSubMatrix(0, 0, U.rows(), dim);
+  else return Matrix::ZEROES<Matrix>((*this).rows(), 1);
+}
+
+void 
 matrixMultiply(const Matrix &L, const Matrix &R, Matrix &M)
 {
   assert(L.cols() == R.rows());
@@ -685,6 +875,14 @@ matrixMultiply(const Matrix &L, const Matrix &R, Matrix &M)
   }
 }
 
+Matrix 
+matrixMultiply(const Matrix &L, const Matrix &R)
+{
+  Matrix M( L.rows(), R.cols() );
+  matrixMultiply(L, R, M);
+  return M;
+}
+
 void
 matrixAdd(const Matrix &L, const Matrix &R, Matrix &M)
 {
@@ -697,15 +895,23 @@ matrixAdd(const Matrix &L, const Matrix &R, Matrix &M)
   }
 }
 
-bool
-matrixEqual(const Matrix &R, const Matrix &L)
+Matrix
+matrixAdd(const Matrix &L, const Matrix &R)
 {
-  assert(R.rows() == L.rows() && R.cols() == L.cols());
+  Matrix M( R.rows(), R.cols() );
+  matrixAdd(L, R, M);
+  return M;
+}
+
+bool 
+matrixEqual(const Matrix &R, const Matrix &L, double tol /* = Matrix::EPS */)
+{
+  assert (R.rows() == L.rows() && R.cols() == L.cols());
   Matrix minL(L);
   minL.multiply(-1.0);
   matrixAdd(R, minL, minL);
   double norm = minL.fnorm();
-  if (norm < Matrix::EPS) {
+  if (norm < tol) {
     return true;
   }
   return false;
@@ -998,6 +1204,17 @@ int QPSolver(const Matrix &Q, const Matrix &cj, const Matrix &Eq,
   int result = QPOASESSolverWrapperQP(Q, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
                                       objVal);
+#elif defined GUROBI_SOLVER
+  std::list<Matrix> QInEq;
+  std::list<Matrix> iq;
+  std::list<Matrix> qib;
+  std::vector<int> SOS_index;
+  std::vector<int> SOS_len;
+  std::vector<int> SOS_type;
+  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
+  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, 
+                                   SOS_index, SOS_len, SOS_type, lowerBounds,
+                                   upperBounds, sol, types, objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning.
@@ -1190,6 +1407,17 @@ LPSolver(const Matrix &cj,
   int result = QPOASESSolverWrapperLP(Q, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
                                       objVal);
+#elif defined GUROBI_SOLVER
+  std::list<Matrix> QInEq ;
+  std::list<Matrix> iq;
+  std::list<Matrix> qib;
+  std::vector<int> SOS_index;
+  std::vector<int> SOS_len;
+  std::vector<int> SOS_type;
+  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
+  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, 
+                                   SOS_index, SOS_len, SOS_type, lowerBounds,
+                                   upperBounds, sol, types, objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning.
@@ -1255,4 +1483,171 @@ testLP()
     DBGA("Solution:\n" << x);
   }
 #endif
+}
+
+/*! Gurobi Solver 
+  Solves a problem of the form 
+
+  minimize: xT*Q*x + c*x
+  such that: Eq*x=b
+         InEq*x<=ib
+  and bounds on the solution: 
+         lowerBounds<=x<=upperBounds
+
+  The type of the solution must be specified for each variable in 'x'.
+  This can be done using vector 'types'. The following types are possible:
+
+  0: Continuous
+  1: Binary
+  2: Integer
+  3: Semi-continuous
+  4: Semi-integer
+
+  WARNING: Badly scaled problems may lead to numerical issues. There is no
+  automatic scaling in the wrapper or the solver. If absMax(b)>1e2 the 
+  wrapper will complain. 
+*/
+int 
+MIPSolver(const Matrix &Q, const Matrix &c, 
+             const Matrix &Eq, const Matrix &b, 
+             const Matrix &InEq, const Matrix &ib, 
+             std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
+             std::vector<int> &SOS_index, std::vector<int> &SOS_len, std::vector<int> &SOS_type, 
+             const Matrix &lowerBounds, const Matrix &upperBounds,
+             Matrix &sol, const Matrix &types, double *objVal)
+{
+  if (Q.rows()) {
+    assert( Q.cols() == sol.rows() );
+    assert( Q.rows() == sol.rows() );
+  }
+  if (c.rows()) {
+    assert( c.rows() == 1 );
+    assert( c.cols() == sol.rows() );
+  }
+  if (Eq.rows()) {
+    assert( Eq.cols() == sol.rows() );
+    assert( Eq.rows() == b.rows() );
+  }
+
+  if (InEq.rows()) {
+    assert( InEq.cols() == sol.rows() );
+    assert( InEq.rows() == ib.rows() );
+  }
+
+  assert(QInEq.size() == iq.size());
+  assert(QInEq.size() == qib.size());
+
+  if (!QInEq.empty()) {
+    std::list<Matrix>::iterator Q_it = QInEq.begin();
+    std::list<Matrix>::iterator q_it = iq.begin(); 
+    std::list<Matrix>::iterator b_it = qib.begin();
+    for( ; Q_it!=QInEq.end(); Q_it++, q_it++, b_it++) {
+      assert( (*Q_it).cols() == sol.rows() );
+      assert( (*Q_it).rows() == sol.rows() );
+      if ((*q_it).rows()) {
+        assert( (*q_it).rows() == 1 );
+        assert( (*q_it).cols() == sol.rows() );
+      }
+      assert( (*b_it).rows() == 1);
+      assert( (*b_it).cols() == 1);
+    }
+  }
+
+  assert( SOS_index.size() == SOS_len.size() );
+  assert( SOS_index.size() == SOS_type.size() );
+  for (int i=0; i<SOS_index.size(); i++) {
+    assert( SOS_index[i] >= 0 );
+    assert( SOS_len[i] > 0 );
+    assert( (SOS_type[i] == 1) || (SOS_type[i] == 2) );
+    assert( SOS_index[i] + SOS_len[i] <= sol.rows() );
+  }
+
+  assert( sol.cols() == 1 );
+  assert( lowerBounds.rows() == sol.rows() );
+  assert( upperBounds.rows() == sol.rows() );
+  assert( lowerBounds.cols() == 1 );
+  assert( upperBounds.cols() == 1 );
+  assert( types.rows() == sol.rows() );
+  assert( types.cols() == 1 );
+
+#ifdef GUROBI_SOLVER
+  int result = gurobiSolverWrapper(Q, c, Eq, b, InEq, ib, QInEq, iq, qib, 
+                                   SOS_index, SOS_len, SOS_type, lowerBounds,
+                                   upperBounds, sol, types, objVal);
+#else
+  int result = 0;
+  objVal = objVal; // Fix for unreferenced formal parameter warning. 
+  DBGA("No MIP solver installed");
+  return 0;
+#endif
+
+  return result;
+}
+
+/*! Test for the MIP solver. */
+void 
+testMIP()
+{
+  Matrix Q(0,0);
+  Matrix c(Matrix::ZEROES<Matrix>(1,3));
+  c.elem(0,0) = -1;
+
+  Matrix Eq(1,3);
+  Eq.elem(0,0) = 1; Eq.elem(0,1) = 1; Eq.elem(0,2) = 1;
+  Matrix b(1,1);
+  b.elem(0,0) = 1;
+
+  Matrix InEq(0,0);
+  Matrix ib(0,0);
+
+  std::list<Matrix> QInEq;
+  std::list<Matrix> iq;
+  std::list<Matrix> qib;
+
+  Matrix QInEq_1(Matrix::ZEROES<Matrix>(3,3));
+  QInEq_1.elem(0,0) = 1; QInEq_1.elem(1,1) = 1; QInEq_1.elem(2,2) = -1;
+  Matrix QInEq_2(Matrix::ZEROES<Matrix>(3,3));
+  QInEq_2.elem(0,0) = 1; QInEq_2.elem(1,2) = -1;
+  QInEq.push_back(QInEq_1);
+  QInEq.push_back(QInEq_2);
+  Matrix iq_1(0,0);
+  Matrix iq_2(0,0);
+  iq.push_back(iq_1);
+  iq.push_back(iq_2);
+  Matrix qib_1(Matrix::ZEROES<Matrix>(1,1));
+  Matrix qib_2(Matrix::ZEROES<Matrix>(1,1));
+  qib.push_back(qib_1);
+  qib.push_back(qib_2);
+
+  // SOS1 constraints
+  std::vector<int> SOS_index;
+  std::vector<int> SOS_len;
+  std::vector<int> SOS_type;
+
+  Matrix lb(3,1);
+  lb.setAllElements(0);
+  Matrix ub(3,1);
+  ub.setAllElements(100);
+  Matrix types(Matrix::ZEROES<Matrix>(3,1));
+  Matrix sol(3,1);
+  double obj;
+
+#ifdef GUROBI_SOLVER
+  int result = MIPSolver(Q, c, Eq, b, InEq, ib, QInEq, iq, 
+                            qib, SOS_index, SOS_len, SOS_type, 
+                            lb, ub, sol, types, &obj);
+#else
+  DBGA("Gurobi Solver not installed");
+  int result = 1;
+  return;
+#endif
+
+  if (result > 0) {
+    DBGA("Test failed: program unfeasible");
+  } else if (result < 0) {
+    DBGA("Test failed: error in computation");
+  } else {
+    DBGA("Test minimum: " << obj);
+    DBGA("Solution:\n" << sol);
+  }
 }

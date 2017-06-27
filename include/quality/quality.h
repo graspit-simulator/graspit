@@ -30,7 +30,7 @@
 
 #include <QString>
 #include <string.h>
-#include <list>
+#include <vector>
 
 class Grasp;         // defined in grasp.h
 class GWS;           // defined in gws.h
@@ -108,84 +108,5 @@ class QualityMeasure {
 
 };
 
-//! The epsilon quality measure
-/*!
-  The epsilon quality measure measures the size of the largest Task Wrench
-  Space (TWS_ that can fit within the unit Grasp Wrench Space (GWS).  In the
-  case of the ball TWS, the measure because simply the euclidean distance from
-  the wrench space origin to the closest point on the  hull bouandary.  This
-  is a worst case grasp quality measure.  The parameters for this quality
-  measure are:
-     The GWS type
-     The TWS type
-*/
-class QualEpsilon : public QualityMeasure {
-    //! A pointer to the GWS that this qm should use for its calculation
-    GWS *gws;
-
-    //! The string identifying this qm type
-    static const char *type;
-
-  public:
-    QualEpsilon(qmDlgDataT *data);
-    QualEpsilon(Grasp *g, QString n, const char *gwsType);
-    ~QualEpsilon();
-
-    /*! Returns the type of this quality measure expressed as a string */
-    const char *getType() const {return type;}
-
-    double evaluate();
-    double evaluate3D();
-
-    static void buildParamArea(qmDlgDataT *qmData);
-
-    /*! Returns the type of this class expressed as a string. */
-    static const char *getClassType() {return type;}
-};
-
-//! The volume quality measure
-/*!
-  The volume quality measure measures the volume of the unit Grasp Wrench
-  Space (GWS). This is an average case grasp quality measure.  The parameter
-  for this quality measure is:
-     The GWS type
-*/
-class QualVolume : public QualityMeasure {
-    //! A pointer to the GWS that this qm should use for its calculation
-    GWS *gws;
-
-    //! The string identifying this qm type
-    static const char *type;
-
-  public:
-    QualVolume(qmDlgDataT *data);
-    QualVolume(Grasp *g, QString n, const char *gwsType);
-    ~QualVolume();
-
-    /*! Returns the type of this quality measure expressed as a string */
-    const char *getType() const {return type;}
-
-    double evaluate();
-    double evaluate3D();
-
-    static void buildParamArea(qmDlgDataT *qmData);
-
-    /*! Returns the type of this class expressed as a string. */
-    static const char *getClassType() {return type;}
-};
-
-/*
-class QualWeighted : public QualityMeasure {
-  QualityMeausre *qm1,*qm2;
-  double weight1,weight2;
-
- public:
-  QualWeighted(Grasp *g, char *n, QualityMeasure *q1, QualityMeasure *q2,
-         double w1, double w2);
-  double evalute() {return weight1*qm1->evaluate() + weight2*qm2->evaluate();}
-
-};
-
-*/
 #define QUALITY_H
 #endif

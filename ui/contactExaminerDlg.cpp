@@ -33,6 +33,7 @@
 #include "contact/contact.h"
 #include "grasp.h"
 #include "quality.h"
+#include "qualEpsilon.h"
 #include "graspitCore.h"
 #include "ivmgr.h"
 #include "body.h"

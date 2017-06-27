@@ -33,6 +33,7 @@
 #include <map>
 #include <memory>
 #include <cstdio>
+#include <tr1/functional> // For binary search
 
 #include "matvec3D.h"
 
@@ -87,6 +88,15 @@ class Matrix {
     mutable int mSequentialI;
     //! Used to keep track of sequential access
     mutable int mSequentialJ;
+
+    //! The number of columns for all sub-blocks defined for this matrix 
+    std::vector<int> mBlocksNumCols;
+    //! The number of rows for all sub-blocks defined for this matrix 
+    std::vector<int> mBlocksNumRows;
+    
+    //! Computes the actual indices into the matrix for the sub-block with block indices i and j
+    void blockIndicesToRealIndices(int i, int j, int &startRow, int &startCol, int &numRows, int &numCols) const;
+
   protected:
     //! The size of this matrix, set at construction time
     int mRows, mCols;
@@ -94,6 +104,10 @@ class Matrix {
     enum Type {DENSE, SPARSE};
     //! A matrix of the given size with unspecified contents
     Matrix(int m, int n);
+    //! A matrix of the given size in terms of block indices
+    Matrix(int m, std::vector<int> &block_cols);
+    Matrix(std::vector<int> &block_rows, int n);
+    Matrix(std::vector<int> &block_rows, std::vector<int> &block_cols);
     //! Copy constructor
     Matrix(const Matrix &M);
     //! A matrix of the given size, with contents initialized from an array in memory
@@ -135,6 +149,31 @@ class Matrix {
     //! Copies the entire matrix \a m to this matrix; sizes must be identical
     void copyMatrix(const Matrix &m) {copySubMatrix(0, 0, m);}
 
+    //! Sets the column sizes of all the sub-blocks for this matrix.  
+    void setBlocksNumCols(const std::vector<int> &sizes);
+    void setBlocksNumCols(int numBlocks, int sizes[]);
+
+    //! Sets the row sizes of all the sub-blocks for this matrix 
+    void setBlocksNumRows(const std::vector<int> &sizes);
+    void setBlocksNumRows(int numBlocks, int sizes[]);
+
+    //! Sets the matrix /m as the (i,j)-th subblock of this matrix 
+    void copySubMatrixBlockIndices(int i, int j, const Matrix &m)
+    {
+      int startRow, startCol, numRows, numCols;
+      blockIndicesToRealIndices(i, j, startRow, startCol, numRows, numCols);
+      assert(numRows == m.rows() && numCols == m.cols());
+      copySubBlock(startRow, startCol, numRows, numCols, m, 0, 0);
+    }
+    
+    //! Returns the (i,j)-th subblock of this matrix
+    Matrix getSubMatrixBlockIndices(int i, int j) const
+    {
+      int startRow, startCol, numRows, numCols;
+      blockIndicesToRealIndices(i, j, startRow, startCol, numRows, numCols);
+      return getSubMatrix(startRow, startCol, numRows, numCols);
+    }
+
     friend std::ostream &operator<<(std::ostream &os, const Matrix &m);
     void print(FILE *fp = stderr, std::string name = "") const;
 
@@ -150,8 +189,12 @@ class Matrix {
     virtual int numElements() const {return mRows * mCols;}
     //! Computes the rank of the matrix using SVD
     int rank() const;
+    //! Computes the SVD decomposition of the matrix
+    void SVD(Matrix &S, Matrix &U, Matrix &VT) const;
     //! Computes the Frobenius norm of the matrix: sqrt(sum_of_all_squared_elems)
     double fnorm() const;
+    //! The largest value of any element in this matrix
+    double max() const;
     //! The largest absolute value of any element in this matrix
     double absMax() const;
     //! The sum of all the elements in the matrix
@@ -167,6 +210,12 @@ class Matrix {
 
     //! Returns the transpose of this matrix; the original is unaffected
     Matrix transposed() const;
+    //! Returns the negative of this matrix; the original is unaffected
+    Matrix negative() const;
+    //! Returns the normalized copy of this matrix; the original is unaffected
+    Matrix normalized() const;
+    //! Computes the basis of the matrix
+    Matrix basis() const;
 
     //! An identity matrix of the given size
     static Matrix EYE(int m, int n);
@@ -189,6 +238,12 @@ class Matrix {
     //! A mtrix of the given size filled with zeroes
     template <class MatrixType>
     static MatrixType ZEROES(int m, int n);
+    template <class MatrixType>
+    static MatrixType ZEROES(int m, std::vector<int> &block_cols);
+    template <class MatrixType>
+    static MatrixType ZEROES(std::vector<int> &block_rows, int n);
+    template <class MatrixType>
+    static MatrixType ZEROES(std::vector<int> &block_rows, std::vector<int> &block_cols);
 
     //! Builds a block diagonal matrix from the two given matrices
     template <class MatrixType>
@@ -209,6 +264,16 @@ class Matrix {
     //! Builds a block row matrix from the row matrices in the list
     template <class MatrixType>
     static MatrixType BLOCKROW(std::list<Matrix *> *blocks);
+
+    //! Builds a block diagonal matrix from the two given matrices
+    template <class MatrixType>
+    static MatrixType BLOCKDIAG(std::list<Matrix> &blocks);
+    //! Builds a block column matrix from the column matrices in the list
+    template <class MatrixType>
+    static MatrixType BLOCKCOLUMN(std::list<Matrix> &blocks);
+
+    // Binary search routine that takes a function pointer to perform the search
+    static double binarySearch(std::tr1::function<int(const Matrix&)> func, const Matrix &input_var, double upperLimit);
 
     //! Used for zero comparisons in all computations
     static const double EPS;
@@ -326,11 +391,15 @@ class SparseMatrix : public Matrix
 
 //! Performs M = L * R
 void matrixMultiply(const Matrix &L, const Matrix &R, Matrix &M);
+//! Performs M = L * R and returns M
+Matrix matrixMultiply(const Matrix &L, const Matrix &R);
 //! Performs M = L + R
 void matrixAdd(const Matrix &L, const Matrix &R, Matrix &M);
+//! Performs M = L + R and returns M
+Matrix matrixAdd(const Matrix &L, const Matrix &R);
 //! Checks if two matrices are identical
-bool matrixEqual(const Matrix &R, const Matrix &L);
-//! Solves the system A*X=B with square A. X is overwritten on B.
+bool matrixEqual(const Matrix &R, const Matrix &L, double tol = Matrix::EPS);
+//! Solves the system A*X=B with square A. X is overwritten on B. 
 int triangularSolve(Matrix &A, Matrix &B);
 //! Computes a solution of a non-square system A*X = B using Moore-Penrose pseudo-inverse
 int linearSolveMPInv(Matrix &A, Matrix &B, Matrix &X);
@@ -362,12 +431,47 @@ int LPSolver(const Matrix &cj,
              Matrix &sol, double *objVal);
 //! A simple test to check that the LP solver works
 void testLP();
+//! Gurobi Solver
+int MIPSolver(const Matrix &Q, const Matrix &c, 
+                 const Matrix &Eq, const Matrix &b, 
+                 const Matrix &InEq, const Matrix &ib, 
+                 std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
+                 std::vector<int> &SOS_index, std::vector<int> &SOS_len, std::vector<int> &SOS_type, 
+                 const Matrix &lowerBounds, const Matrix &upperBounds,
+                 Matrix &sol, const Matrix &types, double *objVal);
+
+//! A simple test to check the Gurobi solver works
+void testGurobi();
 
 template <class MatrixType>
 MatrixType Matrix::ZEROES(int m, int n)
 {
   assert(m > 0 && n > 0);
   MatrixType Z(m, n);
+  Z.setAllElements(0.0);
+  return Z;
+}
+template <class MatrixType>
+MatrixType Matrix::ZEROES(int m, std::vector<int> &block_cols)
+{
+  assert( m>0 && !block_cols.empty() );
+  MatrixType Z(m,block_cols);
+  Z.setAllElements(0.0);
+  return Z;
+}
+template <class MatrixType>
+MatrixType Matrix::ZEROES(std::vector<int> &block_rows, int n)
+{
+  assert( !block_rows.empty() && n>0 );
+  MatrixType Z(block_rows,n);
+  Z.setAllElements(0.0);
+  return Z;
+}
+template <class MatrixType>
+MatrixType Matrix::ZEROES(std::vector<int> &block_rows, std::vector<int> &block_cols)
+{
+  assert( !block_rows.empty() && !block_cols.empty() );
+  MatrixType Z(block_rows,block_cols);
   Z.setAllElements(0.0);
   return Z;
 }
@@ -423,6 +527,16 @@ MatrixType Matrix::BLOCKDIAG(std::list<Matrix *> *blocks)
 }
 
 template <class MatrixType>
+MatrixType Matrix::BLOCKDIAG(std::list<Matrix> &blocks)
+{
+  std::list<Matrix*> block_pts;
+  std::list<Matrix>::iterator it;
+  for (it=blocks.begin(); it!=blocks.end(); it++)
+    block_pts.push_back(&(*it));
+  return BLOCKDIAG<Matrix>(&block_pts);
+}
+
+template <class MatrixType>
 MatrixType Matrix::BLOCKCOLUMN(std::list<Matrix *> *blocks)
 {
   int numRows = 0;
@@ -447,6 +561,16 @@ MatrixType Matrix::BLOCKCOLUMN(std::list<Matrix *> *blocks)
     numRows += (*it)->rows();
   }
   return C;
+}
+
+template <class MatrixType>
+MatrixType Matrix::BLOCKCOLUMN(std::list<Matrix> &blocks)
+{
+  std::list<Matrix*> block_pts;
+  std::list<Matrix>::iterator it;
+  for (it=blocks.begin(); it!=blocks.end(); it++)
+    block_pts.push_back(&(*it));
+  return BLOCKCOLUMN<Matrix>(&block_pts);
 }
 
 template <class MatrixType>

@@ -5,7 +5,7 @@ project(graspit)
 ## Define build type ###############
 ####################################
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
         "Choose the type of build, options are: Debug Release"
      FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
@@ -21,18 +21,19 @@ set(COLLISION_ENGINE GRASPIT_COLLISION CACHE PATH "back end for GraspIt! Collisi
 set(CGDB true CACHE PATH "compile CGDB sources as well")
 set(PLY true CACHE PATH "compile PLY sources as well")
 set(DYNAMICS_ENGINE GRASPIT_DYNAMICS CACHE PATH "back end for GraspIt! Dynamics, current options are GRASPIT_DYNAMICS, BULLET_DYNAMICS")
+set(OPTIMIZATION_SOLVER NONE CACHE PATH "back end for GraspIt! optimization solver, current options are NONE, MOSEK, OASES, GUROBI")
 set(BUILD_TESTS false CACHE PATH "build tests as well")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set (GRASPIT_DEFINES 
-	    -DGRASPIT_RELEASE  
-	    -DGRASPIT_EXPORTS)
+    set (GRASPIT_DEFINES 
+        -DGRASPIT_RELEASE  
+        -DGRASPIT_EXPORTS)
 endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set (GRASPIT_DEFINES  
-	    -DGRASPIT_DEBUG
-	    -DGRASPIT_EXPORTS)
+    set (GRASPIT_DEFINES  
+        -DGRASPIT_DEBUG
+        -DGRASPIT_EXPORTS)
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 
@@ -46,12 +47,32 @@ find_package(Eigen3)
 
 if (DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
 
-	set(BULLET_ROOT $ENV{BULLET_ROOT})
-	message(USING BULLET_ROOT=${BULLET_ROOT} from env variable BULLET_ROOT.)
-	find_package(BULLET)
+    set(BULLET_ROOT $ENV{BULLET_ROOT})
+    message(USING BULLET_ROOT=${BULLET_ROOT} from env variable BULLET_ROOT.)
+    find_package(BULLET)
 
 endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
 
+if (OPTIMIZATION_SOLVER STREQUAL MOSEK)
+
+    set(MOSEK_ROOT $ENV{MOSEK6_0_INSTALLDIR})
+    message(USING MOSEK_ROOT=${MOSEK_ROOT} from env variable MOSEK6_0_INSTALLDIR.)
+
+endif (OPTIMIZATION_SOLVER STREQUAL MOSEK)
+
+if (OPTIMIZATION_SOLVER STREQUAL OASES)
+
+    set(OASES_ROOT $ENV{QPOASES_DIR})
+    message(USING OASES_ROOT=${OASES_ROOT} from env variable QPOASES_DIR.)
+
+endif (OPTIMIZATION_SOLVER STREQUAL OASES)
+
+if (OPTIMIZATION_SOLVER STREQUAL GUROBI)
+
+    set(GUROBI_ROOT $ENV{GUROBI_HOME})
+    message(USING GUROBI_ROOT=${GUROBI_ROOT} from env variable GUROBI_HOME.)
+
+endif (OPTIMIZATION_SOLVER STREQUAL GUROBI)
 
 SET( QT_USE_QT3SUPPORT TRUE )
 find_package(Qt4 COMPONENTS QtCore QtSql REQUIRED)
@@ -67,6 +88,7 @@ set (GRASPIT_INCLUDES
     ${GSRC}/include/math
     ${GSRC}/include/dynamics
     ${GSRC}/include/contact
+    ${GSRC}/include/quality
     ${GSRC}/include/EGPlanner
     ${GSRC}/include/EGPlanner/energy
     ${GSRC}/include/Planner
@@ -106,6 +128,11 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/contact/virtualContact.h 
     ${GSRC}/include/contact/virtualContactOnObject.h
     ${GSRC}/include/contactSetting.h 
+    ${GSRC}/include/quality/quality.h 
+    ${GSRC}/include/quality/qualEpsilon.h 
+    ${GSRC}/include/quality/qualVolume.h 
+    ${GSRC}/include/quality/qualPCR.h 
+    ${GSRC}/include/quality/qualPGR.h 
     ${GSRC}/include/debug.h 
     ${GSRC}/include/dof.h 
     ${GSRC}/include/dynamics/dynamics.h 
@@ -129,7 +156,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/mytools.h 
     ${GSRC}/include/profiling.h 
     ${GSRC}/include/qhull_mutex.h 
-    ${GSRC}/include/quality.h 
     ${GSRC}/include/plugin.h 
     ${GSRC}/include/SoArrow.h 
     ${GSRC}/include/SoComplexShape.h 
@@ -198,7 +224,7 @@ set (GRASPIT_EGPLANNER_ENERGY_HEADERS
 set (GRASPIT_CMDLINE_HEADERS
     ${GSRC}/cmdline/cmdline.h 
 )
-	
+
 # all headers which are in the src/Collision 
 # directory and should be included
 # in the installation should be listed in the
@@ -349,6 +375,11 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/contact/virtualContact.cpp 
     ${GSRC}/src/contact/virtualContactOnObject.cpp
     ${GSRC}/src/contactSetting.cpp 
+    ${GSRC}/src/quality/quality.cpp
+    ${GSRC}/src/quality/qualEpsilon.cpp
+    ${GSRC}/src/quality/qualVolume.cpp
+    ${GSRC}/src/quality/qualPCR.cpp
+    ${GSRC}/src/quality/qualPGR.cpp
     ${GSRC}/src/dof.cpp 
     ${GSRC}/src/dynamics/dynamics.cpp 
     ${GSRC}/src/dynamics/dynJoint.cpp 
@@ -373,12 +404,11 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/mytools.cpp 
     ${GSRC}/src/profiling.cpp 
     ${GSRC}/src/plugin.cpp 
-    ${GSRC}/src/quality.cpp 
     ${GSRC}/src/robot.cpp 
     ${GSRC}/src/scanSimulator.cpp 
     ${GSRC}/src/SoArrow.cpp 
     ${GSRC}/src/SoComplexShape.cpp 
-    ${GSRC}/src/SoTorquePointer.cpp 	
+    ${GSRC}/src/SoTorquePointer.cpp 
     ${GSRC}/src/triangle.cpp 
     ${GSRC}/src/world.cpp 
     ${GSRC}/src/worldElement.cpp 
@@ -430,7 +460,7 @@ if (COLLISION_ENGINE STREQUAL PQP_COLLISION)
          -DPQP_COLLISION)
     set (GRASPIT_INCLUDES
         ${GRASPIT_INCLUDES}
-    	${GSRC}/PQP-VCOLLIDE/include 
+        ${GSRC}/PQP-VCOLLIDE/include 
         ${GSRC}/PQP-VCOLLIDE/PQP_v1.1/src 
         ${GSRC}/PQP-VCOLLIDE/ivcollide)
     set (COLLISION_PQP_HEADERS
@@ -470,7 +500,7 @@ endif (COLLISION_ENGINE STREQUAL PQP_COLLISION)
 
 #--------------------------------------- Dynamics Engine ---------------------------------
 if(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
-	set (GRASPIT_DEFINES
+    set (GRASPIT_DEFINES
         ${GRASPIT_DEFINES}
         -DGRASPIT_DYNAMICS)
     set (GRASPIT_DYNAMICS_INCLUDES
@@ -481,19 +511,67 @@ if(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
         )
 endif(DYNAMICS_ENGINE STREQUAL GRASPIT_DYNAMICS)
 
-if(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
-	set (GRASPIT_DEFINES
+#------------------------------------ Optimization Solver --------------------------------
+if(OPTIMIZATION_SOLVER STREQUAL MOSEK)
+    set (GRASPIT_DEFINES
         ${GRASPIT_DEFINES}
-        -DBULLET_DYNAMICS)
-    set (GRASPIT_DYNAMICS_INCLUDES
-        ${GSRC}/include/dynamics/bulletDynamics.h  
+        -DMOSEK_QP)
+    set (GRASPIT_INCLUDES
+        ${GRASPIT_INCLUDES}
+        ${MOSEK_ROOT}/tools/platform/linux64x86/h)
+    set (GRASPIT_OPTIMIZATION_HEADERS
+        ${GSRC}/src/math/mosek_qp.h 
         )
-    set (GRASPIT_DYNAMICS_SOURCES
-        ${GSRC}/src/dynamics/bulletDynamics.cpp
+    set (GRASPIT_OPTIMIZATION_SOURCES
+        ${GSRC}/src/math/mosek_qp.cpp
         )
+    find_library(QP_LIBRARIES
+        NAMES moseknoomp64
+        PATHS ${MOSEK_ROOT}/tools/platform/linux64x86/bin/
+    )
+endif(OPTIMIZATION_SOLVER STREQUAL MOSEK)
 
-endif(DYNAMICS_ENGINE STREQUAL BULLET_DYNAMICS)
+if(OPTIMIZATION_SOLVER STREQUAL OASES)
+    set (GRASPIT_DEFINES
+        ${GRASPIT_DEFINES}
+        -DOASES_QP)
+    set (GRASPIT_INCLUDES
+        ${GRASPIT_INCLUDES}
+        ${OASES_ROOT}/INCLUDE)
+    set (GRASPIT_OPTIMIZATION_HEADERS
+        ${GSRC}/src/math/qpoases.h  
+        )
+    set (GRASPIT_OPTIMIZATION_SOURCES
+        ${GSRC}/src/math/qpoases.cpp  
+        )
+    find_library(QP_LIBRARIES
+        NAMES qpOASES
+        PATHS ${OASES_ROOT}/SRC/
+    )
+endif(OPTIMIZATION_SOLVER STREQUAL OASES)
 
+if(OPTIMIZATION_SOLVER STREQUAL GUROBI)
+    set (GRASPIT_DEFINES
+        ${GRASPIT_DEFINES}
+        -DGUROBI_SOLVER)
+    set (GRASPIT_INCLUDES
+        ${GRASPIT_INCLUDES}
+        ${GUROBI_ROOT}/include)
+    set (GRASPIT_OPTIMIZATION_HEADERS
+        ${GSRC}/src/math/gurobi.h 
+        )
+    set (GRASPIT_OPTIMIZATION_SOURCES
+        ${GSRC}/src/math/gurobi.cpp
+        )
+    find_library(GUROBI_CPP_LIBRARIES
+        NAMES gurobi_c++
+        PATHS ${GUROBI_ROOT}/lib/
+    )
+    find_library(GUROBI_LIBRARIES
+        NAMES gurobi65
+        PATHS ${GUROBI_ROOT}/lib/
+    )
+endif(OPTIMIZATION_SOLVER STREQUAL GUROBI)
 
 #--------------------------------------- User interface: main window and dialogs ---------------------------------
 
@@ -714,6 +792,7 @@ set (GRASPIT_LIBRARY_SOURCES
     ${PLY_SOURCES}
     ${GRASPIT_COLLISION_SOURCES}
     ${GRASPIT_DYNAMICS_SOURCES}
+    ${GRASPIT_OPTIMIZATION_SOURCES}
     ${GRASPIT_FORM_SOURCES}
     ${GRASPIT_IMAGE_SOURCES}
     ${UI_OUTFILES}
@@ -747,6 +826,9 @@ set(GRASPIT_LINK_LIBRARIES
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
    ${BULLET_LIBRARIES}
+   ${QP_LIBRARIES}
+   ${GUROBI_LIBRARIES}
+   ${GUROBI_CPP_LIBRARIES}
 )
 
 ## ---
@@ -831,6 +913,13 @@ install(FILES
     ${GRASPIT_INCLUDE_MATH_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/math
 )
+
+if (NOT OPTIMIZATION_SOLVER STREQUAL NONE)
+    install(FILES
+        ${GRASPIT_OPTIMIZATION_HEADERS}
+        DESTINATION ${INCLUDE_DESTINATION}/math
+    )
+endif (NOT OPTIMIZATION_SOLVER STREQUAL NONE)
 
 install(FILES
     ${UI_OUTFILES}

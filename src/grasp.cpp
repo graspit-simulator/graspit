@@ -771,7 +771,7 @@ Grasp::contactJacobian(const std::list<Joint *> &joints,
   object wrench.
 */
 Matrix
-Grasp::graspMapMatrix(const Matrix &R, const Matrix &D)
+Grasp::graspMapMatrixFrictionEdges(const Matrix &R, const Matrix &D)
 {
   int numContacts = R.rows() / 6;
   assert(6 * numContacts == R.rows());
@@ -867,7 +867,7 @@ Grasp::computeQuasistaticForces(const Matrix &robotTau)
   Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
 
   //grasp map G = S*R*D
-  Matrix G(graspMapMatrix(R, D));
+  Matrix G(graspMapMatrixFrictionEdges(R, D));
 
   //left-hand equality matrix JTD = JTran * D
   Matrix JTran(J.transposed());
@@ -1302,7 +1302,7 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau, int computation)
   Matrix N(Contact::normalForceSumMatrix(contacts));
 
   //grasp map that relates contact amplitudes to object wrench G = S*R*D
-  Matrix G(graspMapMatrix(R, D));
+  Matrix G(graspMapMatrixFrictionEdges(R, D));
 
   //matrix that relates contact forces to joint torques JTD = JTran * D
   Matrix JTran(J.transposed());
@@ -1385,6 +1385,263 @@ Grasp::computeQuasistaticForcesAndTorques(Matrix *robotTau, int computation)
   //sanity check: resultant object wrench is 0
 
   return 0;
+}
+
+/*! Computes the grasp map G
+*/
+Matrix 
+Grasp::graspMapMatrix(const Matrix &R)
+{
+  int numContacts = R.rows()/6;
+  Matrix S(6, 6*numContacts);
+  for (int i=0; i<numContacts; i++) S.copySubMatrix(0, 6*i, Matrix::EYE(6,6));
+  return matrixMultiply(S, R);
+}
+
+/*! Computes the stiffness matrix of the grasp K mapping relative contact 
+    displacements to contact forces given a linear stiffness in both joints 
+    and contacts. The details can be found in 'Computing and Controlling 
+    the Compliance of a Robotic Hand' (1989) by Mark Cutkosky and Imin Kao. 
+    This takes into account the contact model by use of Matrix H.
+*/
+Matrix
+Grasp::stiffnessMatrix(const std::list<Joint*> &joints, 
+                       const std::list<Contact*> &contacts,
+                       std::vector<int> states /*=empty*/)
+{
+  int numContacts = contacts.size();
+  int numJoints = joints.size();
+  Matrix H(contactModelMatrix(numContacts, states));
+
+  // Finger tip compliance
+  Matrix Cs(Matrix::EYE(6*numContacts, 6*numContacts));
+  for (int i=0; i<numContacts; i++) Cs.elem(6*i+2, 6*i+2) = 0.2;  
+  // Joint compliance
+  Matrix Cq(Matrix::ZEROES<Matrix>(numJoints, numJoints));
+  Matrix J(contactJacobian(joints, contacts));
+  Matrix JCq(matrixMultiply(J, Cq));
+  Matrix Cj(matrixMultiply(JCq, J.transposed()));
+  Matrix Cf(matrixAdd(Cs, Cj));
+  Matrix HCf(matrixMultiply(H, Cf));
+  Matrix HCfHT(matrixMultiply(HCf, H.transposed()));
+  Matrix K(H.rows(), H.rows());
+  matrixInverse(HCfHT, K);
+
+  return K;
+}
+
+/*! Contact model selection matrix H selects only contact forces relevant to 
+    given contact model
+*/
+Matrix
+Grasp::contactModelMatrix(int numContacts, std::vector<int> states /*=empty*/)
+{
+  // If there are specific contact states, find the number of rows required
+  int numRows=0;
+  if (states.size()) {
+    assert(numContacts == states.size());
+    for (int i=0; i<states.size(); i++) {
+      switch (states[i]) {
+        case 0 : 
+          numRows += 3;
+          break ;
+        case 1 : 
+          numRows += 1;
+          break;
+        case 2 :
+          break;
+        default : 
+          DBGA("contact has undefined state"); 
+          exit(0);
+      }
+    }
+  } 
+  // else use default contact model (point contact with friction)
+  else { (numRows = 3*numContacts); }
+
+  Matrix H(Matrix::ZEROES<Matrix>(numRows, 6*numContacts));
+  if (states.size()) {
+    int i=0; 
+    int j=0;
+    for (int k=0; k<states.size(); k++) {
+      switch (states[k]) {
+        case 0 : 
+          H.copySubMatrix(i, j, Matrix::EYE(3,3));
+          i += 3;
+          break ;
+        case 1 : 
+          H.elem(i, j+2) = 1.0;
+          i += 1;
+          break;
+        case 2 :
+          break;
+      }
+      j += 6;
+    }    
+  } else { for (int i=0; i<numContacts; i++) H.copySubMatrix(3*i, 6*i, Matrix::EYE(3,3)); }
+
+  return H;
+}
+
+/*! Grasp stiffness matrix (G*K*GT)^-1 mapping applied external wrenches to 
+    object movement as described in 'On the problem of decomposing grasp and
+    manipulation forces in multiple whole-limb manipulation' (1994) by Bicchi
+*/
+Matrix
+Grasp::graspStiffness(const std::list<Joint*> &joints, 
+                      const std::list<Contact*> &contacts,
+                      std::vector<int> states /*=empty*/) 
+{
+  Matrix K(stiffnessMatrix(joints, contacts, states));
+  Matrix H(contactModelMatrix(contacts.size(), states));
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix G(matrixMultiply(graspMapMatrix(R), H.transposed()));
+  Matrix KGT(matrixMultiply(K, G.transposed()));
+  Matrix GKGT(matrixMultiply(G, KGT));
+  Matrix GKGTInv(GKGT);
+  matrixInverse(GKGT, GKGTInv);
+  GKGTInv.multiply(-1);
+
+  return GKGTInv;
+}
+
+/*! K-weighted pseudoinverse of the grasp map matrix G accounting for contact
+    model constraints as described in 'On the problem of decomposing grasp and
+    manipulation forces in multiple whole-limb manipulation' (1994) by Bicchi.
+    This matrix is given by GRK = K*GT*(G*K*GT)^-1
+*/
+Matrix
+Grasp::KweightedGinverse(const std::list<Joint*> &joints, 
+                         const std::list<Contact*> &contacts,
+                         std::vector<int> states /*=empty*/)
+{
+  Matrix K(stiffnessMatrix(joints, contacts, states));
+  Matrix H(contactModelMatrix(contacts.size(), states));
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix G(matrixMultiply(graspMapMatrix(R), H.transposed()));
+  Matrix KGT(matrixMultiply(K, G.transposed()));
+  Matrix GKGT(matrixMultiply(G, KGT));
+  Matrix GKGTInv(GKGT);
+  matrixInverse(GKGT, GKGTInv);
+  Matrix GRK(matrixMultiply(KGT, GKGTInv));
+
+  return GRK;
+} 
+
+/*! Matrix (I - GRK*G)*K*J that relates the change in set-point of a 
+    joint position to contact forces as described in Bicchi 1994. This 
+    matrix also corresponds to the subspace of controllable internal 
+    forces. 
+*/
+Matrix
+Grasp::controllableInternalForces(const std::list<Joint*> &joints, 
+                                  const std::list<Contact*> &contacts,
+                                  std::vector<int> states /*=empty*/)
+{
+  Matrix GRK(KweightedGinverse(joints, contacts, states));
+  Matrix K(stiffnessMatrix(joints, contacts, states));
+  Matrix H(contactModelMatrix(contacts.size(), states));
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix G(matrixMultiply(graspMapMatrix(R), H.transposed()));
+  Matrix J(matrixMultiply(H, contactJacobian(joints, contacts)));
+
+  Matrix GRKG(matrixMultiply(GRK, G));
+  GRKG.multiply(-1);
+  Matrix KJ(matrixMultiply(K, J));
+  Matrix I(Matrix::EYE(GRKG.rows(), GRKG.rows()));
+
+  return matrixMultiply(matrixAdd(I, GRKG), KJ);
+}
+
+/*! Compute the optimal contact forces with respect to distance from the 
+    following three constrains:
+      1. Non-negativity
+      2. Friction cone
+      3. Maximum force
+    Including the 'states' argument allows for a combination of contact
+    states as described in 'Contact and Grasp Robustness Measures: 
+    Analysis and Experiment' (1997) by Prattichizzo et al. and hence
+    this can be used to compute the PCR and PGR quality metrics as 
+    described in the same paper.
+*/
+double 
+Grasp::findOptimalContactForces(const Matrix &wrench,
+                                double maxForce,
+                                Matrix &contactWrenches,
+                                const std::list<Joint*> &joints, 
+                                const std::list<Contact*> &contacts,
+                                std::vector<int> states /*=empty*/)
+{
+  int numContacts = contacts.size();
+  Matrix D(Contact::frictionForceBlockMatrix(contacts));
+  Matrix H(contactModelMatrix(numContacts, states));
+  Matrix GRK = KweightedGinverse(joints, contacts, states);
+  Matrix E = controllableInternalForces(joints, contacts, states).basis();
+  int numVars = 1 + D.cols() + E.cols();
+
+  // Objective
+  Matrix cj( Matrix::ZEROES<Matrix>(1, 1 + D.cols() + E.cols()) );
+  cj.elem(0,0) = -1.0;
+
+  // Equality constraint
+  Matrix Eq( Matrix::ZEROES<Matrix>(D.rows(), numVars) );
+  Eq.copySubMatrix(0, 1, D);
+  Eq.copySubMatrix(0, 1 + D.cols(), matrixMultiply(H.transposed(), E));
+  Matrix b(matrixMultiply(H.transposed(), matrixMultiply(GRK, wrench)));
+
+  // Linear inequality constraint
+  Matrix InEq( Matrix::ZEROES<Matrix>(3*numContacts, numVars) );
+  Matrix ib( Matrix::ZEROES<Matrix>(3*numContacts, 1) );
+
+  // Solution bounds
+  Matrix lowerBounds( Matrix::MIN_VECTOR(numVars) );
+  Matrix upperBounds( Matrix::MAX_VECTOR(numVars) );
+
+  std::list<Contact*>::const_iterator it = contacts.begin();
+  for (int i=0, j=0; it!=contacts.end(); it++, i++) {
+    int numFrictionEdges = (*it)->numFrictionEdges;
+
+    if (!states.size() || states[i] != 2) {
+      // non-negativity
+      InEq.elem(3*i, 0) = 1.0; 
+      InEq.elem(3*i, 1+j) = -1.0;
+
+      // max force
+      InEq.elem(3*i+2, 0) = 1.0;
+      InEq.elem(3*i+2, 1+j) = 1.0;
+      ib.elem(3*i+2, 0) = maxForce;
+    }
+
+    // friction
+    if (!states.size() || states[i] == 0) {
+      double cof = (*it)->getCof();
+      InEq.elem(3*i+1, 0) = 1.0;
+      InEq.elem(3*i+1, 1+j) = - cof / sqrt(pow(cof,2) + 1);
+      for (int k=1; k<=numFrictionEdges; k++)
+        InEq.elem(3*i+1, 1+j+k) = 1 / sqrt(pow(cof,2) + 1);
+    }
+
+    // lower bound
+    Matrix Z( Matrix::ZEROES<Matrix>(numFrictionEdges, 1) );
+    lowerBounds.copySubMatrix(j+2, 0, Z);
+
+    j += numFrictionEdges + 1;
+  }
+
+  Matrix sol(numVars, 1);
+  double objVal;
+  int result = LPSolver(cj, Eq, b, InEq, ib, lowerBounds, upperBounds, sol, &objVal);
+  if (result) {
+    if( result > 0) {
+      DBGA("Grasp: problem unfeasible");
+    } else {
+      DBGA("Grasp: solver error");
+    }
+    return std::numeric_limits<double>::signaling_NaN();
+  }
+  contactWrenches.copyMatrix(matrixMultiply(D, sol.getSubMatrix(1, 0, D.cols(), 1)));
+
+  return -objVal;
 }
 
 /*! This is a helper function for grasp force optimization routines. Given a

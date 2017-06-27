@@ -269,7 +269,46 @@ class Grasp : public QObject {
                          vec3 gravityWorldDirection);
 
     //! Computes the grasp map matrix G from friction and normal force matrices R and D
-    static Matrix graspMapMatrix(const Matrix &R, const Matrix &D);
+    static Matrix graspMapMatrixFrictionEdges(const Matrix &R, const Matrix &D);
+
+    //------------------- Grasp compliance analysis routines --------------------------
+
+    //! Computes the grasp map matrix G
+    static Matrix graspMapMatrix(const Matrix &R);
+
+    //! Computes the grasp stiffness matrix 
+    Matrix stiffnessMatrix(const std::list<Joint*> &joints, 
+                           const std::list<Contact*> &contacts,
+                           std::vector<int> states = std::vector<int>());
+
+    //! Computes the contact model selection matrix H
+    Matrix contactModelMatrix(int numContacts,
+                              std::vector<int> states = std::vector<int>());
+
+    // Grasp stiffness matrix mapping applied external wrenches to object movement
+    Matrix graspStiffness(const std::list<Joint*> &joints, 
+                          const std::list<Contact*> &contacts,
+                          std::vector<int> states = std::vector<int>());
+
+    //! Computes the K-weighted pseudoinverse of the grasp map matrix G
+    Matrix KweightedGinverse(const std::list<Joint*> &joints, 
+               const std::list<Contact*> &contacts,
+               std::vector<int> states = std::vector<int>());
+
+    //! Computes basis of subspace of controllable internal forces E
+    Matrix controllableInternalForces(const std::list<Joint*> &joints, 
+                                      const std::list<Contact*> &contacts,
+                                      std::vector<int> states = std::vector<int>());
+
+    //! Compute optimal contact forces for PCR or PGR metrics
+    double findOptimalContactForces(const Matrix &wrench,
+                                    double maxForce,
+                                    Matrix &contactWrenches,
+                                    const std::list<Joint*> &joints, 
+                                    const std::list<Contact*> &contacts,
+                                    std::vector<int> states = std::vector<int>());
+
+    //------------------- Useful functions for visualization --------------------------
 
     //! Sets local contact wrenches into the contact wrench Q_SLOTS so they can be rendered
     void displayContactWrenches(std::list<Contact *> *contacts, const Matrix &contactWrenches);
