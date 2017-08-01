@@ -27,13 +27,13 @@
   \brief Implements GraspItApp, a subclass of QApplication.
 */
 
-#include "graspitApp.h"
+#include "graspit/graspitApp.h"
 #include <QSettings>
 #include <QLabel>
 #include <QFrame>
 #include <QDesktopWidget>
 
-#include "mytools.h"
+#include "graspit/mytools.h"
 
 /*! A pointer to the splash screen, implemented as a QLabel. */
 static QLabel *splash = 0;

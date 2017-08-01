@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "arch.h"
+#include "graspit/arch.h"
 
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoCoordinate3.h>
@@ -33,10 +33,10 @@
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/nodes/SoTranslation.h>
 
-#include "body.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "world.h"
+#include "graspit/body.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
 
 DynamicBody *rightBase;
 

@@ -30,21 +30,21 @@
 #include "dbasePlannerDlg.h"
 #include <algorithm>
 
-#include "body.h"
-#include "robot.h"
-#include "world.h"
-#include "graspit_db_model.h"
-#include "graspit_db_grasp.h"
-#include "searchState.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/DBase/graspit_db_model.h"
+#include "graspit/DBase/graspit_db_grasp.h"
+#include "graspit/EGPlanner/searchState.h"
 
-#include "graspitCore.h"
+#include "graspit/graspitCore.h"
 #include "mainWindow.h"
 
-#include "DBPlanner/caching_neighbor_finder.h"
-#include "DBPlanner/caching_aligner.h"
-#include "graspit_db_planner.h"
+#include "graspit/DBase/DBPlanner/caching_neighbor_finder.h"
+#include "graspit/DBase/DBPlanner/caching_aligner.h"
+#include "graspit/DBase/graspit_db_planner.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 using std::string;
 

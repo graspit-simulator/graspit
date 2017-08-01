@@ -23,14 +23,14 @@
 //
 //######################################################################
 
-#include "qualVolume.h"
+#include "graspit/quality/qualVolume.h"
 
 #include <QGridLayout>
 #include <QLabel>
 #include <QComboBox>
 
-#include "grasp.h"
-#include "gws.h"
+#include "graspit/grasp.h"
+#include "graspit/gws.h"
 
 const char *QualVolume::type = "Volume";
 

@@ -27,10 +27,10 @@
   \brief Implements the QTextStream input and output operators for various matrices and vectors.
 */
 
-#include "matvecIO.h"
+#include "graspit/matvecIO.h"
 #include <qstringlist.h>
 #include <QTextStream>
-#include "mytools.h"
+#include "graspit/mytools.h"
 
 /*! Reads the values of a vector \a v from stream \a is formatted as
   "[#, #, #]"

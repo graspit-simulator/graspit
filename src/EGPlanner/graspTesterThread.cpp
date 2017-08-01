@@ -23,15 +23,15 @@
 //
 //######################################################################
 
-#include "world.h"
-#include "body.h"
-#include "robot.h"
-#include "graspTesterThread.h"
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
+#include "graspit/world.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/EGPlanner/graspTesterThread.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 GraspTester::GraspTester(Hand *h)
 {

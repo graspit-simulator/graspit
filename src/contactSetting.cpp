@@ -23,19 +23,19 @@
 //
 //######################################################################
 
-#include "contactSetting.h"
-#include "contact/contact.h"
-#include "contact/softContact.h"
-#include "contact/virtualContact.h"
-#include "contact/pointContact.h"
-#include "matvec3D.h"
-#include "world.h"
-#include "body.h"
-#include "mytools.h"
-#include "FitParabola.h"
+#include "graspit/contactSetting.h"
+#include "graspit/contact/contact.h"
+#include "graspit/contact/softContact.h"
+#include "graspit/contact/virtualContact.h"
+#include "graspit/contact/pointContact.h"
+#include "graspit/matvec3D.h"
+#include "graspit/world.h"
+#include "graspit/body.h"
+#include "graspit/mytools.h"
+#include "graspit/FitParabola.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 double
 contactDistance(Body *body1, Body *body2, ContactData &cp)

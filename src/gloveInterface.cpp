@@ -23,27 +23,27 @@
 //
 //######################################################################
 
-#include "gloveInterface.h"
+#include "graspit/gloveInterface.h"
 
-#include "robot.h"
+#include "graspit/robot.h"
 
 #ifdef HARDWARE_LIB
-#include "CyberGlove.h"
+#include "graspit/CyberGlove.h"
 #else
 #define N_SENSOR_VALUES 24
 #endif
 
-#include "world.h"
-#include "matvec3D.h"
-#include "jacobian.h"
+#include "graspit/world.h"
+#include "graspit/matvec3D.h"
+#include "graspit/jacobian.h"
 
 #ifdef MKL
-#include "mkl_wrappers.h"
+#include "graspit/mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 //--------------CalibrationPose------------
 void CalibrationPose::init(int size)

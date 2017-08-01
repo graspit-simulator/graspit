@@ -1,7 +1,7 @@
 
-#include "contact/pointContact.h"
-#include "contact/contact.h"
-#include "body.h"
+#include "graspit/contact/pointContact.h"
+#include "graspit/contact/contact.h"
+#include "graspit/body.h"
 
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoCoordinate3.h>

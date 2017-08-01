@@ -26,21 +26,21 @@
   \brief Defines the %DBaseBatchPlanner class
  */
 
-#include "dbase_grasp.h"
-#include "ivmgr.h"
-#include "graspitCore.h"
-#include "world.h"
-#include "EGPlanner/searchState.h"
-#include "egPlanner.h"
-#include "guidedPlanner.h"
-#include "body.h"
-#include "robot.h"
-#include "searchEnergy.h"
-#include "loopPlanner.h"
+#include "graspit/DBase/dbase_grasp.h"
+#include "graspit/ivmgr.h"
+#include "graspit/graspitCore.h"
+#include "graspit/world.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/egPlanner.h"
+#include "graspit/EGPlanner/guidedPlanner.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/EGPlanner/loopPlanner.h"
 
-#include "scanSimulator.h"
+#include "graspit/scanSimulator.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 #include <Inventor/sensors/SoTimerSensor.h>
 
 DBaseBatchPlanner::DBaseBatchPlanner(IVmgr *mgr, GraspitCore *gui)

@@ -23,12 +23,12 @@
 //
 //######################################################################
 
-#include "collisionInterface.h"
+#include "graspit/Collision/collisionInterface.h"
 
 #include <list>
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 extern "C" {
 #include <qhull_a.h>

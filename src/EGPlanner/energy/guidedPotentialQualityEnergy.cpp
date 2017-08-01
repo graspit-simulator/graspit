@@ -1,10 +1,10 @@
-#include "EGPlanner/energy/guidedPotentialQualityEnergy.h"
-#include "robot.h"
-#include "grasp.h"
-#include "debug.h"
-#include "world.h"
-#include "quality.h"
-#include "contact/virtualContact.h"
+#include "graspit/EGPlanner/energy/guidedPotentialQualityEnergy.h"
+#include "graspit/robot.h"
+#include "graspit/grasp.h"
+#include "graspit/debug.h"
+#include "graspit/world.h"
+#include "graspit/quality/quality.h"
+#include "graspit/contact/virtualContact.h"
 
 
 double

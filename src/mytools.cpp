@@ -32,11 +32,11 @@
 #include <q3dragobject.h>
 #include <QPixmap>
 
-#include "debug.h"
-#include "mytools.h"
+#include "graspit/debug.h"
+#include "graspit/mytools.h"
 #include "tinyxml.h"
-#include "matvec3D.h"
-#include "matvecIO.h"
+#include "graspit/matvec3D.h"
+#include "graspit/matvecIO.h"
 
 /*!
   Read, decode, and return the pixmap of the given name from the

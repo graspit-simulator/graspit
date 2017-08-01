@@ -32,7 +32,7 @@
 
 #include "ui_compliantPlannerDlg.h"
 
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 
 class ListPlanner;
 class Hand;

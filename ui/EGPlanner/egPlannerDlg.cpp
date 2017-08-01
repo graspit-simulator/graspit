@@ -36,27 +36,27 @@
 #include <QValidator>
 #include <QFileDialog>
 
-#include "search.h"
-#include "searchState.h"
-#include "body.h"
-#include "robot.h"
-#include "egPlanner.h"
-#include "eigenGrasp.h"
-#include "grasp.h"
-#include "world.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
+#include "graspit/EGPlanner/search.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/EGPlanner/egPlanner.h"
+#include "graspit/eigenGrasp.h"
+#include "graspit/grasp.h"
+#include "graspit/world.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
 #include "contactExaminerDlg.h"
-#include "onLinePlanner.h"
-#include "timeTest.h"
-#include "guidedPlanner.h"
-#include "loopPlanner.h"
+#include "graspit/EGPlanner/onLinePlanner.h"
+#include "graspit/EGPlanner/timeTest.h"
+#include "graspit/EGPlanner/guidedPlanner.h"
+#include "graspit/EGPlanner/loopPlanner.h"
 
-#include "searchEnergyFactory.h"
+#include "graspit/EGPlanner/energy/searchEnergyFactory.h"
 
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 void EigenGraspPlannerDlg::exitButton_clicked()
 {

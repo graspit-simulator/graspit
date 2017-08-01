@@ -32,25 +32,25 @@
 #include <QIntValidator>
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 PROF_DECLARE(QS_TOTAL);
 
 //for the bounding box and drawing forces
-#include "graspitCore.h"
-#include "ivmgr.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
 
 //for debug
-#include "world.h"
+#include "graspit/world.h"
 
-#include "robot.h"
-#include "body.h"
-#include "grasp.h"
-#include "listPlanner.h"
-#include "searchState.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
+#include "graspit/grasp.h"
+#include "graspit/EGPlanner/listPlanner.h"
+#include "graspit/EGPlanner/searchState.h"
 
 void
 CompliantPlannerDlg::init()

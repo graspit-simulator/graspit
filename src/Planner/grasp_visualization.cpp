@@ -45,9 +45,9 @@
 #include <Inventor/nodes/SoCube.h>
 #include <Inventor/nodes/SoSphere.h>
 #include <Inventor/SoLists.h>
-#include "SoArrow.h"
-#include "SoTorquePointer.h"
-#include "SoComplexShape.h"
+#include "graspit/SoArrow.h"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/SoComplexShape.h"
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
 #include <Inventor/SbLinear.h>
@@ -60,7 +60,7 @@
 #include <Inventor/SbColor.h>
 #include <Inventor/nodes/SoTransform.h>
 
-#include "grasp_visualization.h"
+#include "graspit/Planner/grasp_visualization.h"
 
 /*!
   Creates a visual representation of a candidate grasp.  The representations

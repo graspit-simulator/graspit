@@ -23,15 +23,15 @@
 //
 //######################################################################
 
-#include "collisionAlgorithms.h"
-#include "collisionModel.h"
+#include "graspit/Collision/Graspit/collisionAlgorithms.h"
+#include "graspit/Collision/Graspit/collisionModel.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //for now, these are always here, as they are virtual fctns and therefore
 //can not be inlined
-#include "collisionAlgorithms_inl.h"
+#include "graspit/Collision/Graspit/collisionAlgorithms_inl.h"
 
 namespace Collision {
 

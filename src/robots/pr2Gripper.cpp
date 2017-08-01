@@ -27,18 +27,18 @@
 \brief Implements the special %Pr2Gripper robot class
 */
 
-#include "robots/pr2Gripper.h"
-#include "world.h"
-#include "Collision/collisionInterface.h"
-#include "graspitCore.h"
+#include "graspit/robots/pr2Gripper.h"
+#include "graspit/world.h"
+#include "graspit/Collision/collisionInterface.h"
+#include "graspit/graspitCore.h"
 #include "mainWindow.h"
-#include "contact/contact.h"
+#include "graspit/contact/contact.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 PROF_DECLARE(REACTIVE_GRASP_TIMER);
 

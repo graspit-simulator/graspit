@@ -29,13 +29,13 @@
 
 #include <math.h>
 
-#include "dynamics/dynJoint.h"
-#include "joint.h"
-#include "body.h"
-#include "matrix.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/joint.h"
+#include "graspit/body.h"
+#include "graspit/math/matrix.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*!
   Fills in the constraint columns in the joint constraint matrix \a Nu .  It also

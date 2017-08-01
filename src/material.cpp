@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "material.h"
+#include "graspit/material.h"
 
 double Cof[NUM_MATERIAL][NUM_MATERIAL];
 double KineticCof[NUM_MATERIAL][NUM_MATERIAL];

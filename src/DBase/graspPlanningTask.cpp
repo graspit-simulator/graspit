@@ -23,26 +23,26 @@
 //
 //######################################################################
 
-#include "graspPlanningTask.h"
+#include "graspit/DBase/graspPlanningTask.h"
 
 #include <QString>
 
-#include "mytools.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "robot.h"
-#include "body.h"
+#include "graspit/mytools.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
 #include "EGPlanner/searchState.h"
-#include "loopPlanner.h"
-#include "DBPlanner/db_manager.h"
+#include "graspit/EGPlanner/loopPlanner.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
 
-#include "graspit_db_grasp.h"
-#include "graspit_db_model.h"
-#include "DBPlanner/ros_database_manager.h"
+#include "graspit/DBase/graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_model.h"
+#include "graspit/DBase/DBPlanner/ros_database_manager.h"
 using namespace db_planner;
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 GraspPlanningTask::GraspPlanningTask(TaskDispatcher *disp,
                                      db_planner::DatabaseManager *mgr,

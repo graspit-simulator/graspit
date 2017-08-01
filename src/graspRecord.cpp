@@ -23,9 +23,9 @@
 //
 //######################################################################
 
-#include "graspRecord.h"
-#include "gloveInterface.h"
-#include "debug.h"
+#include "graspit/graspRecord.h"
+#include "graspit/gloveInterface.h"
+#include "graspit/debug.h"
 
 GraspRecord::GraspRecord(int size)
 {

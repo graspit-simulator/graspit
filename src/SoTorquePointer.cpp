@@ -38,8 +38,8 @@
 #include <assert.h>
 #include <math.h>
 
-#include "SoTorquePointer.h"
-#include "curvedArrow.dat"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/curvedArrow.dat"
 
 SO_NODE_SOURCE(SoTorquePointer);
 

@@ -8,12 +8,12 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSphere.h>
 
-#include "ivmgr.h"
+#include "graspit/ivmgr.h"
 
-#include "body.h"
-#include "world.h"
-#include "bodySensor.h"
-#include "matvec3D.h"
+#include "graspit/body.h"
+#include "graspit/world.h"
+#include "graspit/bodySensor.h"
+#include "graspit/matvec3D.h"
 #include "qstring.h"
 #include "qstringlist.h"
 

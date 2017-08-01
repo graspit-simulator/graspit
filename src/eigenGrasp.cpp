@@ -23,8 +23,8 @@
 //
 //######################################################################
 
-#include "eigenGrasp.h"
-#include "robot.h"
+#include "graspit/eigenGrasp.h"
+#include "graspit/robot.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -34,9 +34,9 @@
 #include <QTextStream>
 #include "tinyxml.h"
 
-#include "math/matrix.h"
+#include "graspit/math/matrix.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*! The eigengrasp is initialized to all 0s*/
 EigenGrasp::EigenGrasp(int size, double e)

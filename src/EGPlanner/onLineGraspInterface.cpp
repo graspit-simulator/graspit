@@ -23,17 +23,17 @@
 //
 //######################################################################
 
-#include "robot.h"
-#include "matvec3D.h"
-#include "robots/barrett.h"
-#include "EGPlanner/onLineGraspInterface.h"
-#include "EGPlanner/searchState.h"
+#include "graspit/robot.h"
+#include "graspit/matvec3D.h"
+#include "graspit/robots/barrett.h"
+#include "graspit/EGPlanner/onLineGraspInterface.h"
+#include "graspit/EGPlanner/searchState.h"
 
 #ifdef HARDWARE_LIB
 #include "BarrettHand.h"
 #endif
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 OnLineGraspInterface::OnLineGraspInterface(Hand *h)
 {

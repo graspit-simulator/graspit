@@ -35,32 +35,32 @@
 #include <QDir>
 #include <QComboBox>
 
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "robot.h"
-#include "world.h"
-#include "searchState.h"
-#include "grasp.h"
-#include "graspitCore.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/grasp.h"
+#include "graspit/graspitCore.h"
 #include "mainWindow.h"
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 
 
-#include "DBPlanner/sql_database_manager.h"
+#include "graspit/DBase/DBPlanner/sql_database_manager.h"
 #ifdef ROS_DATABASE_MANAGER
-#include "DBPlanner/ros_database_manager.h"
+#include "graspit/DBPlanner/ros_database_manager.h"
 #endif
 
-#include "graspit_db_model.h"
-#include "graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_model.h"
+#include "graspit/DBase/graspit_db_grasp.h"
 #include "dbasePlannerDlg.h"
 #include "graspCaptureDlg.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 /*! Initializes the dialog and also gets the one and only manager from the
   GraspitGUI. If this manager is already set, it also loads the model

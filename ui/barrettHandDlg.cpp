@@ -27,8 +27,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 
-#include "world.h"
-#include "barrett.h"
+#include "graspit/world.h"
+#include "graspit/robots/barrett.h"
 #include "barrettHandDlg.h"
 
 #ifdef HARDWARE_LIB

@@ -23,23 +23,23 @@
 //
 //######################################################################
 
-#include "EGPlanner/onLinePlanner.h"
+#include "graspit/EGPlanner/onLinePlanner.h"
 
 #include <Inventor/nodes/SoSeparator.h>
 
-#include "world.h"
-#include "robot.h"
-#include "simAnn.h"
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
-#include "EGPlanner/graspTesterThread.h"
-#include "EGPlanner/onLineGraspInterface.h"
-#include "grasp.h"
-#include "eigenGrasp.h"
-#include "matvec3D.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/EGPlanner/simAnn.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/EGPlanner/graspTesterThread.h"
+#include "graspit/EGPlanner/onLineGraspInterface.h"
+#include "graspit/grasp.h"
+#include "graspit/eigenGrasp.h"
+#include "graspit/matvec3D.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #define SHOW_RECENT_SOLUTION 1
 #define CANDIDATE_BUFFER_SIZE 20

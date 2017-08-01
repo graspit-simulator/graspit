@@ -45,9 +45,9 @@
 #include <Inventor/nodes/SoCube.h>
 #include <Inventor/nodes/SoSphere.h>
 #include <Inventor/SoLists.h>
-#include "SoArrow.h"
-#include "SoTorquePointer.h"
-#include "SoComplexShape.h"
+#include "graspit/SoArrow.h"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/SoComplexShape.h"
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
 #include <Inventor/SbLinear.h>
@@ -67,22 +67,22 @@
 
 #include <list>
 
-#include "ivmgr.h"
-#include "world.h"
-#include "robot.h"
-#include "body.h"
-#include "matvec3D.h"
-#include "grasp.h"
-#include "quality.h"
-#include "graspitCore.h"
-#include "grasp_visualization.h"
-#include "grasp_tester.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
+#include "graspit/matvec3D.h"
+#include "graspit/grasp.h"
+#include "graspit/quality/quality.h"
+#include "graspit/graspitCore.h"
+#include "graspit/Planner/grasp_visualization.h"
+#include "graspit/Planner/grasp_tester.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 PROF_DECLARE(TOTAL_PLANNER);
 
 /* externs; defined in main.cc */

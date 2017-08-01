@@ -47,12 +47,12 @@
  */
 
 #include <iostream>
-#include <graspitApp.h>
-#include "graspitCore.h"
-#include "graspitServer.h"
+#include <graspit/graspitApp.h>
+#include "graspit/graspitCore.h"
+#include "graspit/graspitServer.h"
 #include "mainWindow.h"
 #include "cmdline.h"
-#include "graspitParser.h"
+#include "graspit/graspitParser.h"
 
 #ifdef Q_WS_WIN
 #include <windows.h>
