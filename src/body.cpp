@@ -55,7 +55,7 @@
 #include "tinyxml.h"
 
 #ifdef PLY_READER
-#include "mesh_loader.h"
+#include "graspit/ply/mesh_loader.h"
 #endif
 
 extern "C" {

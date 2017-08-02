@@ -44,7 +44,7 @@
 #include <unistd.h>
 #endif
 
-#include "cmdline.h"
+#include "graspit/cmdline/cmdline.h"
 #include "graspit/graspitCore.h"
 #include "mainWindow.h"
 #include "graspit/ivmgr.h"

@@ -39,9 +39,9 @@
 #include <vector>
 #include <string>
 
-#include <ply.h>
+#include <graspit/ply/ply.h>
 
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 
 using namespace std;
 

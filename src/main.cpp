@@ -51,7 +51,7 @@
 #include "graspit/graspitCore.h"
 #include "graspit/graspitServer.h"
 #include "mainWindow.h"
-#include "cmdline.h"
+#include "graspit/cmdline/cmdline.h"
 #include "graspit/graspitParser.h"
 
 #ifdef Q_WS_WIN

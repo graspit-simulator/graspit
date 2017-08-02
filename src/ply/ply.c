@@ -36,7 +36,7 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <ply.h>
+#include <graspit/ply/ply.h>
 //Before this was using a truncating cast with potentially unsafe types. 
 //This is probably better -jw
 #define ROUND(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))

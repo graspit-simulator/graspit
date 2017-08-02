@@ -35,7 +35,7 @@ set(GRASPIT_DATA_DIR /home/$ENV{USER}/.graspit CACHE PATH "location to save gras
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR CMake)
 else()
-  set(DEF_INSTALL_CMAKE_DIR lib/CMake/Graspit)
+  set(DEF_INSTALL_CMAKE_DIR lib/cmake/graspit)
 endif()
 set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
   "Installation directory for CMake files")
@@ -113,16 +113,6 @@ include (${QT_USE_FILE})
 set (GRASPIT_INCLUDES
     ${GSRC}
     ${GSRC}/include/
-#    ${GSRC}/include/graspit/
-#    ${GSRC}/include/graspit/robots
-#    ${GSRC}/include/graspit/math
-#    ${GSRC}/include/graspit/dynamics
-#    ${GSRC}/include/graspit/Contact
-#    ${GSRC}/include/graspit/quality
-#    ${GSRC}/include/graspit/EGPlanner
-#    ${GSRC}/include/graspit/EGPlanner/energy
-#    ${GSRC}/include/graspit/Planner
-#    ${GSRC}/include/graspit/Collision
     ${GSRC}/cmdline
     ${GSRC}/ui
     # following needs to be included because basic
@@ -132,6 +122,9 @@ set (GRASPIT_INCLUDES
 )
 
 
+set (GRASPIT_INCLUDEDIR
+    ${GSRC}/include/graspit/
+)
 # all headers which are directly under the 
 # include directory and should be included
 # in the installation should be listed in the
@@ -230,8 +223,7 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/graspit/EGPlanner/timeTest.h
     ${GSRC}/include/graspit/EGPlanner/graspTesterThread.h
     ${GSRC}/include/graspit/EGPlanner/onLineGraspInterface.h
-    ${GSRC}/include/graspit/EGPlanner/listPlanner.h
- 
+    ${GSRC}/include/graspit/EGPlanner/listPlanner.h 
 )
 
 set (GRASPIT_EGPLANNER_ENERGY_HEADERS
@@ -269,7 +261,7 @@ set (GRASPIT_QUALITY_HEADERS
 # in the installation should be listed in the
 # variable GRASPIT_CMDLINE_HEADERS
 set (GRASPIT_CMDLINE_HEADERS
-    ${GSRC}/cmdline/cmdline.h 
+    ${GSRC}/include/graspit/cmdline/cmdline.h 
 )
 
 # all headers which are in the src/Collision 
@@ -358,12 +350,12 @@ endif (CGDB)
 
 if (PLY)
     set (PLY_HEADERS
-        ply/ply.h
-        ply/mesh_loader.h
+        ${GSRC}/include/graspit/ply/ply.h
+        ${GSRC}/include/graspit/ply/mesh_loader.h
     )
     set (PLY_SOURCES
-        ply/ply.c
-        ply/mesh_loader.cpp
+        ${GSRC}/src/ply/ply.c
+        ${GSRC}/src/ply/mesh_loader.cpp
     )
     set (GRASPIT_DEFINES 
         ${GRASPIT_DEFINES}
@@ -848,16 +840,6 @@ set (GRASPIT_LIBRARY_SOURCES
 
 add_library(graspit SHARED ${GRASPIT_LIBRARY_SOURCES})
 
-## ---
-## comment for future reference: This is required to build a static library
-# add_library(graspit_static STATIC ${GRASPIT_LIBRARY_SOURCES})
-# if ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
-#     target_compile_options(graspit_static PRIVATE -fPIC)  # does not work for bloom-release on saucy. Could 
-# else ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
-#     set_target_properties(graspit_static PROPERTIES COMPILE_FLAGS -fPIC)
-# endif ((CMAKE_VERSION VERSION_GREATER 2.8.12) OR (CMAKE_VERSION VERSION_EQUAL 2.8.12))
-## ---
-
 ## Make simulator executable
 
 # sources for executable graspit_simulator
@@ -878,19 +860,6 @@ set(GRASPIT_LINK_LIBRARIES
    ${GUROBI_CPP_LIBRARIES}
 )
 
-## ---
-## comment for future reference: This is required to build a static library
-# The graspit_simulator executable can still not be linked
-# with a static library, the problem being the QPixmap resources
-# (see also: https://wiki.qt.io/QtResources)
-# With a static library they can't be found, and Q_INIT_RESOURCE can only be done
-# with a .qrt file (which I tried to use but QT4_ADD_RESOURCES doesn't work).
-# So for now, compile all sources into the graspit_simulator directly.
-# set(SIMULATOR_SRC ${GRASPIT_LIBRARY_SOURCES} ${SIMULATOR_SRC})
-# target_link_libraries(graspit_static ${GRASPIT_LINK_LIBRARIES})
-# target_link_libraries(graspit_simulator ${GRASPIT_LINK_LIBRARIES})
-## ---
-
 ## Link the shared library and the executable
 target_link_libraries(graspit ${GRASPIT_LINK_LIBRARIES})
 target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES})
@@ -910,8 +879,9 @@ install(TARGETS ${INSTALL_BINS}
    RUNTIME DESTINATION ${BIN_DESTINATION}
 )
 
-install(FILES
-    ${GRASPIT_INCLUDEDIR_HEADERS}
+
+install(DIRECTORY
+    ${GRASPIT_INCLUDEDIR}
     DESTINATION ${INCLUDE_DESTINATION}
 )
 
@@ -919,42 +889,6 @@ install(FILES
     ${GRASPIT_CMDLINE_HEADERS}
     DESTINATION ${INCLUDE_DESTINATION}/cmdline
 )
-
-install(FILES
-    ${GRASPIT_CONTACT_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/contact
-)
-
-install(FILES
-    ${GRASPIT_QUALITY_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/quality
-)
-
-install(DIRECTORY
-    ${GSRC}/include/graspit/robots
-    DESTINATION ${INCLUDE_DESTINATION}/robots
-)
-
-install(FILES
-     ${GRASPIT_DYNAMICS_INCLUDES}
-    DESTINATION ${INCLUDE_DESTINATION}/dynamics
-)
-
-install(FILES
-    ${GRASPIT_PLANNER_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/Planner
-)
-
-install(FILES
-    ${GRASPIT_EGPLANNER_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/EGPlanner
-)
-
-install(FILES
-    ${GRASPIT_EGPLANNER_ENERGY_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/EGPlanner/energy
-)
-
 
 
 if (PQP_COLLISION)
@@ -965,16 +899,6 @@ if (PQP_COLLISION)
     )
 endif (PQP_COLLISION)
 
-
-install(FILES
-    ${GRASPIT_SRC_COLLISION_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/Collision
-)
-
-install(FILES
-    ${GRASPIT_INCLUDE_MATH_HEADERS}
-    DESTINATION ${INCLUDE_DESTINATION}/math
-)
 
 if (NOT OPTIMIZATION_SOLVER STREQUAL NONE)
     install(FILES
@@ -987,17 +911,6 @@ install(FILES
     ${UI_OUTFILES}
     DESTINATION ${INCLUDE_DESTINATION}/${GRASPIT_UI_INCLUDE_DIRNAME}
 )
-
-if (CGDB)
-    install(FILES
-        ${CGDB_HEADERS}
-        DESTINATION ${INCLUDE_DESTINATION}/DBase/
-    )
-    install(FILES
-        ${CGDB_PLANNER_HEADERS}
-        DESTINATION ${INCLUDE_DESTINATION}/DBase/DBPlanner/
-    )
-endif (CGDB)
 
 if (PLY)
     install(FILES
@@ -1013,35 +926,20 @@ endif (PLY)
 install(TARGETS
     graspit 
     PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
-    EXPORT graspit-targets
+    EXPORT graspitTargets
     DESTINATION ${LIB_DESTINATION})
 
-#install(EXPORT graspit-targets
-#    DESTINATION ${LIB_DESTINATION})
+install(EXPORT graspitTargets
+   DESTINATION ${INSTALL_CMAKE_DIR})
 
-# For future reference: install graspitConfig.cmake as well as soon
-# as it is added to the repository.
-# set (GRASPIT_CONFIG_CMAKE graspitConfig.cmake)
-#install(FILES
-##    cmake/${GRASPIT_CONFIG_CMAKE}
-#    CMakeMacros/FindBULLET.cmake
-#    CMakeMacros/FindSoQt4.cmake
-#    CMakeMacros/FindQhull.cmake
-#    DESTINATION ${LIB_DESTINATION}/${PROJECT_NAME}
-#)
-
-# Install the GraspitConfig.cmake and GraspitConfigVersion.cmake
+# Install the graspitConfig.cmake and graspitConfigVersion.cmake
 install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/GraspitConfig.cmake"
-  "${PROJECT_BINARY_DIR}/GraspitConfigVersion.cmake"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/graspitConfig.cmake"
+  "${PROJECT_BINARY_DIR}/graspitConfigVersion.cmake"
     CMakeMacros/FindBULLET.cmake
     CMakeMacros/FindSoQt4.cmake
     CMakeMacros/FindQhull.cmake
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-# Install the export set for use with the install-tree
-install(EXPORT graspit-targets DESTINATION
-  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
 install(DIRECTORY
     worlds
@@ -1049,41 +947,29 @@ install(DIRECTORY
     images
     DESTINATION ${GRASPIT_DATA_DIR}
 )
-## ---
-## comment for future reference: This is required to build a static library
-# install(TARGETS
-#     graspit_static 
-#     EXPORT graspit-static-targets
-#     DESTINATION ${LIB_DESTINATION})
-# install(EXPORT graspit-static-targets
-#     DESTINATION ${LIB_DESTINATION})
-## ---
 
-# The interesting stuff goes here
-# ===============================
-
-# Add all targets to the build-tree export set
-export(TARGETS graspit_simulator graspit
-  FILE "${PROJECT_BINARY_DIR}/GraspitTargets.cmake")
+# # Add all targets to the build-tree export set
+# export(TARGETS graspit_simulator graspit
+#   FILE "${PROJECT_BINARY_DIR}/graspitTargets.cmake")
 
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE GRASPIT)
 
-# Create the GraspitConfig.cmake and GraspitConfigVersion files
+# Create the graspitConfig.cmake and GraspitConfigVersion files
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
    "${INSTALL_INCLUDE_DIR}")
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
-configure_file(GraspitConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/GraspitConfig.cmake" @ONLY)
+configure_file(graspitConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/graspitConfig.cmake" @ONLY)
 # ... for the install tree
 set(CONF_INCLUDE_DIRS "\${GRASPIT_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_file(GraspitConfig.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/GraspitConfig.cmake" @ONLY)
+configure_file(graspitConfig.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/graspitConfig.cmake" @ONLY)
 # ... for both
-configure_file(GraspitConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/GraspitConfigVersion.cmake" @ONLY)
+configure_file(graspitConfigVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/graspitConfigVersion.cmake" @ONLY)
 
 
 

@@ -1,5 +1,5 @@
 
-#include "cmdline/cmdline.h"
+#include "graspit/cmdline/cmdline.h"
 
 class GraspitParser
 

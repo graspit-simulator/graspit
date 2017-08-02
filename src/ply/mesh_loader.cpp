@@ -32,9 +32,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "mesh_loader.h"
+#include "graspit/ply/mesh_loader.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 const char *elem_names[] = { /* list of the kinds of elements in the user's object */
   "vertex", "face"
