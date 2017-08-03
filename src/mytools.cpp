@@ -355,7 +355,7 @@ bool getTransform(const TiXmlElement *root, transf &totalTran)
           return false;
         }
       }
-      newTran.set(Quaternion(mat3(R).transpose()), vec3(0, 0, 0));
+      newTran.set(Quaternion(mat3(R)), vec3(0, 0, 0));
     }
     else if (defString == "fullTransform") {
       QTextStream lineStream(&valueStr, QIODevice::ReadOnly);
