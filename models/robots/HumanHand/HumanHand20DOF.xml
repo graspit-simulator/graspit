@@ -324,7 +324,7 @@
     <chain>
         <transform>
             <translation>-50.6241 -11.5082 18.9317</translation>
-	    <rotationMatrix>-0.1486 0.2665 -0.9522 -0.9003 0.3618 0.2418 0.4089 0.8933 0.1862</rotationMatrix>
+            <rotationMatrix>-0.1486 -0.9003 0.4089 0.2665 0.3618 0.8933 -0.9522 0.2418 0.1862</rotationMatrix>
         </transform>
         <joint type="Revolute">
             <theta>d16</theta>
