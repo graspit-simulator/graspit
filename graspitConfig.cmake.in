@@ -6,7 +6,7 @@
  
 # Compute paths
 get_filename_component(GRASPIT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-set(GRASPIT_INCLUDE_DIRS "@GRASPIT_INCLUDES@")
+set(GRASPIT_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
  
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET graspit_simulator AND NOT GRASPIT_BINARY_DIR)
