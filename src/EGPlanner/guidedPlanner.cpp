@@ -23,15 +23,15 @@
 //
 //######################################################################
 
-#include "robot.h"
-#include "world.h"
-#include "EGPlanner/guidedPlanner.h"
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
-#include "EGPlanner/simAnn.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/EGPlanner/guidedPlanner.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/EGPlanner/simAnn.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 GuidedPlanner::GuidedPlanner(Hand *h)
 {

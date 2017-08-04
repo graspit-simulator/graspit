@@ -28,9 +28,9 @@
 */
 
 #include "settingsDlg.h"
-#include "world.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
 
 #include <QValidator>
 #include <QMessageBox>

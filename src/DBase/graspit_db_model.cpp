@@ -27,20 +27,20 @@
   \brief Defines the special %GraspitDBModel class
  */
 
-#include "graspit_db_model.h"
+#include "graspit/DBase/graspit_db_model.h"
 
 #include <Inventor/nodes/SoScale.h>
 
 #include <string>
 
-#include "mytools.h"
-#include "body.h"
-#include "world.h"
+#include "graspit/mytools.h"
+#include "graspit/body.h"
+#include "graspit/world.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 // for loading geometry directly from the database
-#include "DBPlanner/db_manager.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
 
 GraspitDBModel::~GraspitDBModel()
 {

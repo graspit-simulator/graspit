@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "triangle.h"
+#include "graspit/triangle.h"
 
 #ifndef GRASPIT_RELEASE
 #include "triangle_inl.h"

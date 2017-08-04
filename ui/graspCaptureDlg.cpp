@@ -27,26 +27,25 @@
 
 #include <QFileDialog>
 
-#include "world.h"
-#include "robot.h"
-#include "grasp.h"
-#include "quality.h"
-#include "qualEpsilon.h"
-#include "qualVolume.h"
-#include "EGPlanner/searchState.h"
-#include "contact/contact.h"
-#include "quality.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "mytools.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/grasp.h"
+#include "graspit/quality/quality.h"
+#include "graspit/quality/qualEpsilon.h"
+#include "graspit/quality/qualVolume.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/contact/contact.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/mytools.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 #ifdef CGDB_ENABLED
-#include "DBase/DBPlanner/grasp.h"
-#include "DBase/graspit_db_grasp.h"
-#include "DBase/graspit_db_model.h"
-#include "DBase/DBPlanner/sql_database_manager.h"
+#include "graspit/DBase/DBPlanner/grasp.h"
+#include "graspit/DBase/graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_model.h"
+#include "graspit/DBase/DBPlanner/sql_database_manager.h"
 #endif
 
 void

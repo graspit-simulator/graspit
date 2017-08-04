@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "robots/humanHand.h"
+#include "graspit/robots/humanHand.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -34,18 +34,18 @@
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoDrawStyle.h>
 
-#include "SoArrow.h"
+#include "graspit/SoArrow.h"
 
-#include "grasp.h"
-#include "matrix.h"
+#include "graspit/grasp.h"
+#include "graspit/math/matrix.h"
 #include "tinyxml.h"
-#include "debug.h"
-#include "world.h"
+#include "graspit/debug.h"
+#include "graspit/world.h"
 
 #define WRAPPER_TOLERANCE 0.995
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 //const double TendonInsertionPoint::INSERTION_POINT_RADIUS = 1.5;
 //const double TendonInsertionPoint::CONNECTOR_RADIUS = 0.8;

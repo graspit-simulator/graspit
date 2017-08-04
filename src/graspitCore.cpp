@@ -44,26 +44,26 @@
 #include <unistd.h>
 #endif
 
-#include "cmdline.h"
-#include "graspitCore.h"
+#include "graspit/cmdline/cmdline.h"
+#include "graspit/graspitCore.h"
 #include "mainWindow.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "mytools.h"
-#include "SoComplexShape.h"
-#include "SoArrow.h"
-#include "SoTorquePointer.h"
-#include "plugin.h"
-#include "debug.h"
-#include "world.h"
-#include "graspitParser.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/mytools.h"
+#include "graspit/SoComplexShape.h"
+#include "graspit/SoArrow.h"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/plugin.h"
+#include "graspit/debug.h"
+#include "graspit/world.h"
+#include "graspit/graspitParser.h"
 
 #ifdef CGDB_ENABLED
-#include "dbase_grasp.h"
-#include "taskDispatcher.h"
+#include "graspit/DBase/dbase_grasp.h"
+#include "graspit/DBase/taskDispatcher.h"
 #endif
 
-#include "searchEnergyFactory.h"
+#include "graspit/EGPlanner/energy/searchEnergyFactory.h"
 int GraspitCore::initResult = SUCCESS;
 
 //! This is the system wide pointer to the graspit user interface.

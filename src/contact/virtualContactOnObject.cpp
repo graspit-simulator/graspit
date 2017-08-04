@@ -1,9 +1,9 @@
-#include "virtualContactOnObject.h"
+#include "graspit/contact/virtualContactOnObject.h"
 
-#include "contact/contact.h"
-#include "debug.h"
-#include "body.h"
-#include "world.h"
+#include "graspit/contact/contact.h"
+#include "graspit/debug.h"
+#include "graspit/body.h"
+#include "graspit/world.h"
 
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoCoordinate3.h>

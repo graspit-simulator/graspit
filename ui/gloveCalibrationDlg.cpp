@@ -27,11 +27,11 @@
 
 #include <QFileDialog>
 
-#include "world.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "robot.h"
-#include "gloveInterface.h"
+#include "graspit/world.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/robot.h"
+#include "graspit/gloveInterface.h"
 
 void GloveCalibrationDlg::init()
 {

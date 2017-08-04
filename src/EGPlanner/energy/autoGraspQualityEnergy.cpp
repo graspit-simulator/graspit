@@ -1,10 +1,10 @@
 
-#include "EGPlanner/energy/autoGraspQualityEnergy.h"
-#include "quality.h"
-#include "robot.h"
-#include "grasp.h"
-#include "debug.h"
-#include "world.h"
+#include "graspit/EGPlanner/energy/autoGraspQualityEnergy.h"
+#include "graspit/quality/quality.h"
+#include "graspit/robot.h"
+#include "graspit/grasp.h"
+#include "graspit/debug.h"
+#include "graspit/world.h"
 
 double AutoGraspQualityEnergy::energy() const
 {

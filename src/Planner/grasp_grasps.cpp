@@ -42,9 +42,9 @@
 #include <Inventor/nodes/SoCube.h>
 #include <Inventor/nodes/SoSphere.h>
 #include <Inventor/SoLists.h>
-#include "SoArrow.h"
-#include "SoTorquePointer.h"
-#include "SoComplexShape.h"
+#include "graspit/SoArrow.h"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/SoComplexShape.h"
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
 #include <Inventor/SbLinear.h>
@@ -58,13 +58,13 @@
 #include <Inventor/nodes/SoTransform.h>
 
 
-#include "body.h"
-#include "matvec3D.h"
-#include "grasp_coordinates.h"
-#include "grasp_directions.h"
-#include "grasp_preshape.h"
-#include "grasp_visualization.h"
-#include "grasp_grasps.h"
+#include "graspit/body.h"
+#include "graspit/matvec3D.h"
+#include "graspit/Planner/grasp_coordinates.h"
+#include "graspit/Planner/grasp_directions.h"
+#include "graspit/Planner/grasp_preshape.h"
+#include "graspit/Planner/grasp_visualization.h"
+#include "graspit/Planner/grasp_grasps.h"
 
 
 

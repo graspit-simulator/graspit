@@ -28,7 +28,7 @@
  */
 
 
-#include "sql_database_manager.h"
+#include "graspit/DBase/DBPlanner/sql_database_manager.h"
 
 #include <sstream>
 #include <vector>

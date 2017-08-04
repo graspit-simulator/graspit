@@ -23,38 +23,38 @@
 //
 //######################################################################
 
-#include "searchEnergy.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
 
 #include <time.h>
 
-#include "robot.h"
-#include "barrett.h"
-#include "body.h"
-#include "grasp.h"
-#include "contact/contact.h"
-#include "world.h"
-#include "quality.h"
-#include "qualEpsilon.h"
-#include "qualVolume.h"
-#include "searchState.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "matrix.h"
+#include "graspit/robot.h"
+#include "graspit/robots/barrett.h"
+#include "graspit/body.h"
+#include "graspit/grasp.h"
+#include "graspit/contact/contact.h"
+#include "graspit/world.h"
+#include "graspit/quality/quality.h"
+#include "graspit/quality/qualEpsilon.h"
+#include "graspit/quality/qualVolume.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/math/matrix.h"
 
-#include "EGPlanner/energy/contactEnergy.h"
-#include "EGPlanner/energy/potentialQualityEnergy.h"
-#include "EGPlanner/energy/guidedPotentialQualityEnergy.h"
-#include "EGPlanner/energy/autoGraspQualityEnergy.h"
-#include "EGPlanner/energy/guidedAutoGraspEnergy.h"
-#include "EGPlanner/energy/dynamicAutoGraspEnergy.h"
-#include "EGPlanner/energy/compliantEnergy.h"
-#include "EGPlanner/energy/strictAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/contactEnergy.h"
+#include "graspit/EGPlanner/energy/potentialQualityEnergy.h"
+#include "graspit/EGPlanner/energy/guidedPotentialQualityEnergy.h"
+#include "graspit/EGPlanner/energy/autoGraspQualityEnergy.h"
+#include "graspit/EGPlanner/energy/guidedAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/dynamicAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/compliantEnergy.h"
+#include "graspit/EGPlanner/energy/strictAutoGraspEnergy.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 PROF_DECLARE(QS);
 

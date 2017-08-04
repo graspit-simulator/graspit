@@ -31,7 +31,7 @@
 #include <Inventor/nodes/SoShape.h>
 #include <Inventor/nodekits/SoShapeKit.h>
 
-#include "SoComplexShape.h"
+#include "graspit/SoComplexShape.h"
 
 #include <Inventor/actions/SoCallbackAction.h>
 #include <Inventor/actions/SoGetBoundingBoxAction.h>

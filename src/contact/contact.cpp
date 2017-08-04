@@ -45,15 +45,15 @@
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSphere.h>
 
-#include "matvec3D.h"
-#include "contact/contact.h"
-#include "world.h"
-#include "body.h"
-#include "mytools.h"
-#include "matrix.h"
+#include "graspit/matvec3D.h"
+#include "graspit/contact/contact.h"
+#include "graspit/world.h"
+#include "graspit/body.h"
+#include "graspit/mytools.h"
+#include "graspit/math/matrix.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 const double Contact::THRESHOLD = 0.2;
 const double Contact::INHERITANCE_THRESHOLD = 1;

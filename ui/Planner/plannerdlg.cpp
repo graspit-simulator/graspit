@@ -30,17 +30,17 @@
 #include <QFileDialog>
 #include <QValidator>
 
-#include "robot.h"
+#include "graspit/robot.h"
 #include "mainWindow.h"
-#include "graspitCore.h"
-#include "grasp_manager.h"
-#include "grasp_tester.h"
-#include "grasp_planner.h"
-#include "grasp.h"
-#include "world.h"
-#include "ivmgr.h"
-#include "quality.h"
-#include "mytools.h"
+#include "graspit/graspitCore.h"
+#include "graspit/Planner/grasp_manager.h"
+#include "graspit/Planner/grasp_tester.h"
+#include "graspit/Planner/grasp_planner.h"
+#include "graspit/grasp.h"
+#include "graspit/world.h"
+#include "graspit/ivmgr.h"
+#include "graspit/quality/quality.h"
+#include "graspit/mytools.h"
 
 /*!
   First this creates a new grasp_manager and gets the default planning and

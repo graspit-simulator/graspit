@@ -37,7 +37,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "SoArrow.h"
+#include "graspit/SoArrow.h"
 
 // Shorthand macro for testing whether the current parts field
 // value (parts) includes a given part (part)

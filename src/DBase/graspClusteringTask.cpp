@@ -23,21 +23,21 @@
 //
 //######################################################################
 
-#include "graspClusteringTask.h"
+#include "graspit/DBase/graspClusteringTask.h"
 
 #include <algorithm>
 
-#include "world.h"
-#include "robot.h"
-#include "graspitCore.h"
-#include "matvec3D.h"
-#include "EGPlanner/searchState.h"
-#include "DBPlanner/db_manager.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/graspitCore.h"
+#include "graspit/matvec3D.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
 
-#include "graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_grasp.h"
 
-#include "debug.h"
-#include "DBPlanner/ros_database_manager.h"
+#include "graspit/debug.h"
+#include "graspit/DBase/DBPlanner/ros_database_manager.h"
 using namespace db_planner;
 
 GraspClusteringTask::GraspClusteringTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,

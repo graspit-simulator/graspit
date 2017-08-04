@@ -26,10 +26,10 @@
 /*! \file
   \brief Implements the classes: vec3, position , mat3 , Quaternion , and transf
  */
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"

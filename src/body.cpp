@@ -37,31 +37,31 @@
 #include <QString>
 #include <QTextStream>
 
-#include "body.h"
-#include "collisionInterface.h"
-#include "bodySensor.h"
-#include "bBox.h"
-#include "triangle.h"
-#include "world.h"
-#include "robot.h"
-#include "joint.h"
-#include "dynJoint.h"
-#include "ivmgr.h"
-#include "contact/contact.h"
-#include "contact/virtualContact.h"
-#include "contact/virtualContactOnObject.h"
-#include "graspitCore.h"
+#include "graspit/body.h"
+#include "graspit/Collision/collisionInterface.h"
+#include "graspit/bodySensor.h"
+#include "graspit/bBox.h"
+#include "graspit/triangle.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/joint.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/ivmgr.h"
+#include "graspit/contact/contact.h"
+#include "graspit/contact/virtualContact.h"
+#include "graspit/contact/virtualContactOnObject.h"
+#include "graspit/graspitCore.h"
 
 #include "tinyxml.h"
 
 #ifdef PLY_READER
-#include "mesh_loader.h"
+#include "graspit/ply/mesh_loader.h"
 #endif
 
 extern "C" {
-#include "maxdet.h"
+#include "graspit/maxdet.h"
 }
-#include "mytools.h"
+#include "graspit/mytools.h"
 
 #include <Inventor/SoDB.h>
 #include <Inventor/SoInput.h>

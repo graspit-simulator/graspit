@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "jacobian.h"
+#include "graspit/jacobian.h"
 #include <math.h>
 
 void jacobian(double t1, double t2, double t3, double t4, double px, double py, double pz, double *J)

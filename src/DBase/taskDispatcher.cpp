@@ -23,26 +23,26 @@
 //
 //######################################################################
 
-#include "taskDispatcher.h"
+#include "graspit/DBase/taskDispatcher.h"
 
 #include <Inventor/sensors/SoTimerSensor.h>
 
 #ifdef ROS_DATABASE_MANAGER
-#include "DBPlanner/ros_database_manager.h"
+#include "graspit/DBase/DBPlanner/ros_database_manager.h"
 #endif
-#include "DBPlanner/sql_database_manager.h"
+#include "graspit/DBase/DBPlanner/sql_database_manager.h"
 
-#include "graspitCore.h"
-#include "graspit_db_model.h"
+#include "graspit/graspitCore.h"
+#include "graspit/DBase/graspit_db_model.h"
 
-#include "graspPlanningTask.h"
-#include "preGraspCheckTask.h"
-#include "graspTransferCheckTask.h"
-#include "graspClusteringTask.h"
-#include "tableCheckTask.h"
-#include "compliantGraspCopyTask.h"
+#include "graspit/DBase/graspPlanningTask.h"
+#include "graspit/DBase/preGraspCheckTask.h"
+#include "graspit/DBase/graspTransferCheckTask.h"
+#include "graspit/DBase/graspClusteringTask.h"
+#include "graspit/DBase/tableCheckTask.h"
+#include "graspit/DBase/compliantGraspCopyTask.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 TaskDispatcher::TaskDispatcher() : mDBMgr(NULL) , mCurrentTask(NULL), mStatus(READY)
 {

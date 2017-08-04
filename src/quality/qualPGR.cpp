@@ -21,8 +21,8 @@
 //
 //######################################################################
 
-#include "qualPCR.h"
-#include "qualPGR.h"
+#include "graspit/quality/qualPCR.h"
+#include "graspit/quality/qualPGR.h"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -31,10 +31,10 @@
 
 #include <pthread.h>
 
-#include "grasp.h"
-#include "matrix.h"
-#include "robot.h"
-#include "debug.h"
+#include "graspit/grasp.h"
+#include "graspit/math/matrix.h"
+#include "graspit/robot.h"
+#include "graspit/debug.h"
 
 const char *QualPGR::type = "PGR";
 

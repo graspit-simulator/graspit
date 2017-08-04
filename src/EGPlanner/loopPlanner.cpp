@@ -23,16 +23,16 @@
 //
 //######################################################################
 
-#include "EGPlanner/loopPlanner.h"
+#include "graspit/EGPlanner/loopPlanner.h"
 
-#include "robot.h"
-#include "world.h"
-#include "EGPlanner/simAnn.h"
-#include "EGPlanner/energy/searchEnergy.h"
-#include "EGPlanner/searchState.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/EGPlanner/simAnn.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/EGPlanner/searchState.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 LoopPlanner::LoopPlanner(Hand *h)
 {

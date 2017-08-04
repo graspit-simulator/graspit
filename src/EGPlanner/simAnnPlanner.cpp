@@ -23,14 +23,14 @@
 //
 //######################################################################
 
-#include "EGPlanner/simAnnPlanner.h"
+#include "graspit/EGPlanner/simAnnPlanner.h"
 
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
-#include "EGPlanner/simAnn.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/EGPlanner/simAnn.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //! How many of the best states are buffered. Should be a parameter
 #define BEST_LIST_SIZE 20

@@ -1,9 +1,9 @@
-#include "contact/softContact.h"
-#include "contact/contact.h"
-#include "debug.h"
-#include "body.h"
-#include "FitParabola.h"
-#include "mytools.h"
+#include "graspit/contact/softContact.h"
+#include "graspit/contact/contact.h"
+#include "graspit/debug.h"
+#include "graspit/body.h"
+#include "graspit/FitParabola.h"
+#include "graspit/mytools.h"
 
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoCoordinate3.h>

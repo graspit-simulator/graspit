@@ -30,18 +30,18 @@
 #include <math.h>
 #include <string.h>
 
-#include "gws.h"
-#include "grasp.h"
-#include "mytools.h"
-#include "body.h"
+#include "graspit/gws.h"
+#include "graspit/grasp.h"
+#include "graspit/mytools.h"
+#include "graspit/body.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 extern "C" {
 #include "qhull_a.h"
 }
-#include "qhull_mutex.h"
+#include "graspit/qhull_mutex.h"
 
 //! A global mutex used for synchronizing access to QHull, which is not thread-safe
 QMutex qhull_mutex;

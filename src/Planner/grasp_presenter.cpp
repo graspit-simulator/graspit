@@ -50,9 +50,9 @@
 #include <Inventor/nodes/SoCube.h>
 #include <Inventor/nodes/SoSphere.h>
 #include <Inventor/SoLists.h>
-#include "SoArrow.h"
-#include "SoTorquePointer.h"
-#include "SoComplexShape.h"
+#include "graspit/SoArrow.h"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/SoComplexShape.h"
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
 #include <Inventor/SbLinear.h>
@@ -67,28 +67,28 @@
 #endif
 
 /* graspit includes */
-#include "graspitCore.h"
-#include "contact/contact.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "body.h"
-#include "robot.h"
-#include "matvec3D.h"
-#include "grasp.h"
+#include "graspit/graspitCore.h"
+#include "graspit/contact/contact.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/matvec3D.h"
+#include "graspit/grasp.h"
 
 /* STL includes */
 #include <list>
 
 /* include grasp planner class */
-#include "grasp_coordinates.h"
-#include "grasp_directions.h"
-#include "grasp_preshape.h"
-#include "grasp_visualization.h"
-#include "grasp_grasps.h"
-#include "grasp_planner.h"
+#include "graspit/Planner/grasp_coordinates.h"
+#include "graspit/Planner/grasp_directions.h"
+#include "graspit/Planner/grasp_preshape.h"
+#include "graspit/Planner/grasp_visualization.h"
+#include "graspit/Planner/grasp_grasps.h"
+#include "graspit/Planner/grasp_planner.h"
 
 
-#include "grasp_presenter.h"
+#include "graspit/Planner/grasp_presenter.h"
 
 /* externs; defined in main.cc */
 extern IVmgr *ivmgr;

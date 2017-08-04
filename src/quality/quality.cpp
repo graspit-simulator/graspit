@@ -27,12 +27,12 @@
   \brief Implements base QualityMeasure class and specifc qm classes.
 */
 
-#include "quality.h"
+#include "graspit/quality/quality.h"
 
-#include "qualEpsilon.h"
-#include "qualVolume.h"
-#include "qualPCR.h"
-#include "qualPGR.h"
+#include "graspit/quality/qualEpsilon.h"
+#include "graspit/quality/qualVolume.h"
+#include "graspit/quality/qualPCR.h"
+#include "graspit/quality/qualPGR.h"
 
 #include <QGridLayout>
 #include <QBoxLayout>
@@ -44,10 +44,10 @@
 #include <QLineEdit>
 #include <QComboBox>
 
-#include "grasp.h"
-#include "gws.h"
-#include "matrix.h"
-#include "robot.h"
+#include "graspit/grasp.h"
+#include "graspit/gws.h"
+#include "graspit/math/matrix.h"
+#include "graspit/robot.h"
 
 #include <limits>
 

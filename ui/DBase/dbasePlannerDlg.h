@@ -35,10 +35,10 @@
 #include <utility>
 #include <QDialog>
 
-#include "DBPlanner/neighbor_finder.h"
-#include "DBPlanner/aligner.h"
-#include "DBPlanner/grasp_ranker.h"
-#include "DBPlanner/db_manager.h"
+#include "graspit/DBase/DBPlanner/neighbor_finder.h"
+#include "graspit/DBase/DBPlanner/aligner.h"
+#include "graspit/DBase/DBPlanner/grasp_ranker.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
 
 namespace db_planner {
 class DatabaseManager;

@@ -23,19 +23,19 @@
 //
 //######################################################################
 
-#include "compliantGraspCopyTask.h"
+#include "graspit/DBase/compliantGraspCopyTask.h"
 
 #include <memory>
 
-#include "world.h"
-#include "robot.h"
-#include "matvec3D.h"
-#include "EGPlanner/searchState.h"
-#include "robots/pr2Gripper.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/matvec3D.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/robots/pr2Gripper.h"
 
-#include "DBPlanner/db_manager.h"
-#include "graspit_db_grasp.h"
-#include "debug.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
+#include "graspit/DBase/graspit_db_grasp.h"
+#include "graspit/debug.h"
 
 CompliantGraspCopyTask::CompliantGraspCopyTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
                                                db_planner::TaskRecord rec) : PreGraspCheckTask(disp, mgr, rec)

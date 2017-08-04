@@ -25,15 +25,15 @@
 
 #include <QHBoxLayout>
 #include "qmDlg.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "grasp.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/grasp.h"
 #include "list"
-#include "world.h"
-#include "robot.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*!
   This populates the quality measure list with the currently defined quality

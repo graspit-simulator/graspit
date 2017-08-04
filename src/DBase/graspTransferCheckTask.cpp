@@ -23,23 +23,23 @@
 //
 //######################################################################
 
-#include "graspTransferCheckTask.h"
+#include "graspit/DBase/graspTransferCheckTask.h"
 
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "robot.h"
-#include "body.h"
-#include "EGPlanner/searchState.h"
-#include "DBPlanner/db_manager.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
 
-#include "preGraspCheckTask.h"
+#include "graspit/DBase/preGraspCheckTask.h"
 
-#include "graspit_db_grasp.h"
-#include "graspit_db_model.h"
+#include "graspit/DBase/graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_model.h"
 
-#include "debug.h"
-#include "DBPlanner/ros_database_manager.h"
+#include "graspit/debug.h"
+#include "graspit/DBase/DBPlanner/ros_database_manager.h"
 using namespace db_planner;
 
 GraspTransferCheckTask::GraspTransferCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,

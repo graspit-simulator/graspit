@@ -23,19 +23,19 @@
 //
 //######################################################################
 
-#include "graspitCollision.h"
+#include "graspit/Collision/Graspit/graspitCollision.h"
 
 #include <algorithm>
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
-#include "body.h"
-#include "collisionModel.h"
-#include "collisionAlgorithms.h"
+#include "graspit/body.h"
+#include "graspit/Collision/Graspit/collisionModel.h"
+#include "graspit/Collision/Graspit/collisionAlgorithms.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 using namespace Collision;
 

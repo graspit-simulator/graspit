@@ -29,10 +29,10 @@
 #ifdef MKL
 #include "mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
-#include "maxdet.h"
+#include "graspit/maxdet.h"
 
 void mydlascl(double from, double to, int m, int n, double *A)
 {

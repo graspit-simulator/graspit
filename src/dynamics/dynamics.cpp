@@ -35,22 +35,22 @@
 #ifdef Q_WS_X11
 #include <unistd.h>
 #endif
-#include "mytools.h"
-#include "dynamics/dynamics.h"
-#include "dynamics/dynJoint.h"
-#include "body.h"
-#include "robot.h"
-#include "contact/contact.h"
-#include "world.h"
-#include "ivmgr.h"
+#include "graspit/mytools.h"
+#include "graspit/dynamics/dynamics.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/contact/contact.h"
+#include "graspit/world.h"
+#include "graspit/ivmgr.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
-#include "maxdet.h"
+#include "graspit/maxdet.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -58,7 +58,7 @@
 
 //#define GRASPITDBG
 //#define LEMKE_DBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 extern FILE *debugfile;
 extern IVmgr *ivmgr;

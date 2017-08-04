@@ -23,8 +23,8 @@
 //
 //######################################################################
 
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/searchStateImpl.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/searchStateImpl.h"
 
 #include <QString>
 //for the visual marker
@@ -34,16 +34,16 @@
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoGroup.h>
-#include "SoArrow.h"
+#include "graspit/SoArrow.h"
 
-#include "graspitCore.h"
-#include "robot.h"
-#include "body.h"
-#include "world.h"
-#include "eigenGrasp.h"
+#include "graspit/graspitCore.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
+#include "graspit/world.h"
+#include "graspit/eigenGrasp.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 SearchVariable::SearchVariable(QString name, double min, double max, double maxJump, bool circular)
 {

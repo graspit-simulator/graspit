@@ -23,18 +23,18 @@
 //
 //######################################################################
 
-#include "dof.h"
+#include "graspit/dof.h"
 
 #include <QTextStream>
 
-#include "robot.h"
-#include "joint.h"
-#include "dynJoint.h"
-#include "body.h"
-#include "world.h"
+#include "graspit/robot.h"
+#include "graspit/joint.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/body.h"
+#include "graspit/world.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*! Initializes everything to zero. */
 DOF::DOF() : owner(NULL), q(0.0), desiredq(0.0), desiredVelocity(0.0), defaultVelocity(0.0), defaultValue(0.0),

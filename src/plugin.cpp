@@ -25,9 +25,9 @@
 
 #include <QFile>
 
-#include "plugin.h"
-#include "mytools.h"
-#include "debug.h"
+#include "graspit/plugin.h"
+#include "graspit/mytools.h"
+#include "graspit/debug.h"
 #include "string.h"
 
 
