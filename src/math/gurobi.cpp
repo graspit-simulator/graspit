@@ -29,7 +29,6 @@
 */
 
 #include "gurobi.h"
-#include "gurobi_c++.h"
 
 #include <math.h>
 #include <limits>
