@@ -37,7 +37,7 @@
 
 #include <math.h>
 
-#include "grasp_coordinates.h"
+#include "graspit/Planner/grasp_coordinates.h"
 #include <iostream>
 
 #include <QtGlobal>

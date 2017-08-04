@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "math/matrix.h"
+#include "graspit/math/matrix.h"
 
 #include <limits>
 #include <math.h>
@@ -32,16 +32,16 @@
 #ifdef MKL
 #include "mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
 //for printing
-#include "maxdet.h"
+#include "graspit/maxdet.h"
 
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //Quadratic Program solvers
 #ifdef MOSEK_QP

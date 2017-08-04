@@ -91,26 +91,26 @@
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/Qt/SoQt.h>
 
-#include "pointers.dat"
-#include "ivmgr.h"
-#include "SoArrow.h"
-#include "SoTorquePointer.h"
-#include "SoComplexShape.h"
-#include "robot.h"
-#include "joint.h"
-#include "humanHand.h"
-#include "body.h"
-#include "contact/contact.h"
-#include "grasp.h"
-#include "world.h"
+#include "graspit/pointers.dat"
+#include "graspit/ivmgr.h"
+#include "graspit/SoArrow.h"
+#include "graspit/SoTorquePointer.h"
+#include "graspit/SoComplexShape.h"
+#include "graspit/robot.h"
+#include "graspit/joint.h"
+#include "graspit/robots/humanHand.h"
+#include "graspit/body.h"
+#include "graspit/contact/contact.h"
+#include "graspit/grasp.h"
+#include "graspit/world.h"
 #include "mainWindow.h"
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 //hmmm not sure this is right
-#include "graspitCore.h"
+#include "graspit/graspitCore.h"
 
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #ifdef USE_DMALLOC
 include "dmalloc.h"

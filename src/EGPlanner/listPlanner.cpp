@@ -23,14 +23,14 @@
 //
 //######################################################################
 
-#include "EGPlanner/listPlanner.h"
+#include "graspit/EGPlanner/listPlanner.h"
 
-#include "robot.h"
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
+#include "graspit/robot.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //this should be a parameter of the EGPlanner
 //iros09

@@ -27,11 +27,11 @@
 #include <Inventor/actions/SoRayPickAction.h>
 #include <Inventor/SoPickedPoint.h>
 
-#include "scanSimulator.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "matvec3D.h"
+#include "graspit/scanSimulator.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/matvec3D.h"
 
 ScanSimulator::ScanSimulator()
 {

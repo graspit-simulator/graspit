@@ -29,14 +29,14 @@
 
 #include <QTextStream>
 #include <iostream>
-#include "graspitServer.h"
-#include "graspitCore.h"
-#include "dynamicsEngine.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "robot.h"
-#include "grasp.h"
-#include "contact/contact.h"
+#include "graspit/graspitServer.h"
+#include "graspit/graspitCore.h"
+#include "graspit/dynamics/dynamicsEngine.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/grasp.h"
+#include "graspit/contact/contact.h"
 
 /*!
   Stub destructor.

@@ -32,36 +32,36 @@
 #include <fstream>
 
 //needed just for the image of the Flock of Birds sensor and the approach direction
-#include "SoArrow.h"
+#include "graspit/SoArrow.h"
 #include <Inventor/nodes/SoCube.h>
 
-#include "bBox.h"
-#include "mytools.h"
-#include "matvecIO.h"
-#include "robot.h"
-#include "joint.h"
-#include "dynJoint.h"
-#include "world.h"
-#include "grasp.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "dynamics.h"
-#include "gloveInterface.h"
-#include "eigenGrasp.h"
-#include "matrix.h"
+#include "graspit/bBox.h"
+#include "graspit/mytools.h"
+#include "graspit/matvecIO.h"
+#include "graspit/robot.h"
+#include "graspit/joint.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/world.h"
+#include "graspit/grasp.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/dynamics/dynamics.h"
+#include "graspit/gloveInterface.h"
+#include "graspit/eigenGrasp.h"
+#include "graspit/math/matrix.h"
 #include "tinyxml.h"
-#include "bodySensor.h"
-#include "contact/virtualContact.h"
+#include "graspit/bodySensor.h"
+#include "graspit/contact/virtualContact.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
 #endif
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 PROF_DECLARE(MOVE_DOF);
 

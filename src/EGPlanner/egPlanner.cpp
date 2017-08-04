@@ -25,27 +25,27 @@
 
 #include <Inventor/sensors/SoIdleSensor.h>
 
-#include "EGPlanner/egPlanner.h"
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
-#include "robot.h"
-#include "robots/barrett.h"
-#include "robots/robotiq.h"
-#include "robots/pr2Gripper.h"
-#include "body.h"
-#include "EGPlanner/simAnn.h"
-#include "world.h"
-#include "gloveInterface.h" //for glove input
-#include "eigenGrasp.h" //for glove input
-#include "Collision/collisionInterface.h"
+#include "graspit/EGPlanner/egPlanner.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/robot.h"
+#include "graspit/robots/barrett.h"
+#include "graspit/robots/robotiq.h"
+#include "graspit/robots/pr2Gripper.h"
+#include "graspit/body.h"
+#include "graspit/EGPlanner/simAnn.h"
+#include "graspit/world.h"
+#include "graspit/gloveInterface.h" //for glove input
+#include "graspit/eigenGrasp.h" //for glove input
+#include "graspit/Collision/collisionInterface.h"
 
-#include "searchEnergyFactory.h"
+#include "graspit/EGPlanner/energy/searchEnergyFactory.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 PROF_DECLARE(EG_PLANNER);
 

@@ -23,20 +23,20 @@
 //
 //######################################################################
 
-#include "collisionModel.h"
+#include "graspit/Collision/Graspit/collisionModel.h"
 
 #include <algorithm>
 #include <limits>
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 #ifdef MKL
 #include "mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
-#include "collisionStructures.h"
+#include "graspit/Collision/collisionStructures.h"
 
 namespace Collision {
 

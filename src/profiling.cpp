@@ -23,7 +23,7 @@
 //
 //######################################################################
 
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 namespace Profiling {
 

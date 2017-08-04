@@ -41,45 +41,45 @@
 #include <Inventor/SbBox.h>
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
 
-#include "matvecIO.h"
-#include "world.h"
-#include "worldElement.h"
-#include "mytools.h"
-#include "body.h"
-#include "robot.h"
-#include "humanHand.h"
-#include "contact/contact.h"
-#include "contactSetting.h"
-#include "ivmgr.h"
-#include "grasp.h"
-#include "ivmgr.h"
-#include "barrett.h"
-#include "matvec3D.h"
-#include "bBox.h"
-#include "collisionInterface.h"
+#include "graspit/matvecIO.h"
+#include "graspit/world.h"
+#include "graspit/worldElement.h"
+#include "graspit/mytools.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/robots/humanHand.h"
+#include "graspit/contact/contact.h"
+#include "graspit/contactSetting.h"
+#include "graspit/ivmgr.h"
+#include "graspit/grasp.h"
+#include "graspit/ivmgr.h"
+#include "graspit/robots/barrett.h"
+#include "graspit/matvec3D.h"
+#include "graspit/bBox.h"
+#include "graspit/Collision/collisionInterface.h"
 #include "tinyxml.h"
-#include "worldElementFactory.h"
+#include "graspit/worldElementFactory.h"
 
-#include "dynamics/dynamics.h"
-#include "dynamics/dynJoint.h"
-#include "dynamics/dynamicsEngine.h"
+#include "graspit/dynamics/dynamics.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/dynamics/dynamicsEngine.h"
 
 #ifdef PQP_COLLISION
-#include "PQPCollision.h"
+#include "graspit/PQPCollision.h"
 #endif
 #ifdef GRASPIT_COLLISION
-#include "Graspit/graspitCollision.h"
+#include "graspit/Collision/Graspit/graspitCollision.h"
 #endif
 
 #ifdef GRASPIT_DYNAMICS
-#include "dynamics/graspitDynamics.h"
+#include "graspit/dynamics/graspitDynamics.h"
 #endif
 #ifdef BULLET_DYNAMICS
-#include "dynamics/bulletDynamics.h"
+#include "graspit/dynamics/bulletDynamics.h"
 #endif
 
 //simulations of arches with John Ochsendorf
-#include "arch.h"
+#include "graspit/arch.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
@@ -87,10 +87,10 @@
 
 FILE *errFP = NULL;
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 PROF_DECLARE(WORLD_FIND_CONTACTS);
 PROF_DECLARE(WORLD_COLLISION_REPORT);
 PROF_DECLARE(WORLD_NO_COLLISION);

@@ -36,13 +36,13 @@
 
 
 #include <math.h>
-#include "matvec3D.h"
+#include "graspit/matvec3D.h"
 
 /* STL */
 #include "list"
 
-#include "grasp_coordinates.h"
-#include "grasp_directions.h"
+#include "graspit/Planner/grasp_coordinates.h"
+#include "graspit/Planner/grasp_directions.h"
 
 /*!
   Sets empty to false.

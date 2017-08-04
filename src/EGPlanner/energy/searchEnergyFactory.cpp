@@ -21,15 +21,15 @@
 //
 //######################################################################
 
-#include "searchEnergyFactory.h"
-#include "contactEnergy.h"
-#include "potentialQualityEnergy.h"
-#include "autoGraspQualityEnergy.h"
-#include "guidedPotentialQualityEnergy.h"
-#include "guidedAutoGraspEnergy.h"
-#include "strictAutoGraspEnergy.h"
-#include "compliantEnergy.h"
-#include "dynamicAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/searchEnergyFactory.h"
+#include "graspit/EGPlanner/energy/contactEnergy.h"
+#include "graspit/EGPlanner/energy/potentialQualityEnergy.h"
+#include "graspit/EGPlanner/energy/autoGraspQualityEnergy.h"
+#include "graspit/EGPlanner/energy/guidedPotentialQualityEnergy.h"
+#include "graspit/EGPlanner/energy/guidedAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/strictAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/compliantEnergy.h"
+#include "graspit/EGPlanner/energy/dynamicAutoGraspEnergy.h"
 
 
 SearchEnergyFactory * SearchEnergyFactory::searchEnergyFactory = NULL;

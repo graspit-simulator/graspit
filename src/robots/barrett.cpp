@@ -29,9 +29,9 @@
 
 #include <QTextStream>
 
-#include "robots/barrett.h"
-#include "world.h"
-#include "flockTransform.h"
+#include "graspit/robots/barrett.h"
+#include "graspit/world.h"
+#include "graspit/flockTransform.h"
 
 #ifdef HARDWARE_LIB
 #include "BarrettHand.h"
@@ -39,7 +39,7 @@
 #endif
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 Barrett::~Barrett()
 {

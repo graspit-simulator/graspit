@@ -27,20 +27,20 @@
 /*! \file
   \brief Implements the world element base class
  */
-#include "worldElement.h"
-#include "matvec3D.h"
-#include "world.h"
-#include "mytools.h"
-#include "contact/contact.h"
-#include "body.h"
-#include "Collision/collisionInterface.h"
+#include "graspit/worldElement.h"
+#include "graspit/matvec3D.h"
+#include "graspit/world.h"
+#include "graspit/mytools.h"
+#include "graspit/contact/contact.h"
+#include "graspit/body.h"
+#include "graspit/Collision/collisionInterface.h"
 
 #ifdef USE_DMALLOC
 #include "dmalloc.h"
 #endif
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 //Added by qt3to4:
 #include <QTextStream>
 

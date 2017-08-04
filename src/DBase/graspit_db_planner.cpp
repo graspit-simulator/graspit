@@ -27,24 +27,24 @@
   \brief Defines the special %GraspitDBPlanner class
  */
 
-#include "graspit_db_planner.h"
+#include "graspit/DBase/graspit_db_planner.h"
 
 #include <algorithm>
 
 
-#include "debug.h"
-#include "world.h"
-#include "robot.h"
-#include "grasp.h"
-#include "quality.h"
-#include "qualEpsilon.h"
-#include "qualVolume.h"
-#include "EGPlanner/searchState.h"
-#include "collisionInterface.h"
-#include "DBPlanner/sql_database_manager.h"
-#include "graspit_db_grasp.h"
-#include "graspit_db_model.h"
-#include "DBPlanner/database.h"
+#include "graspit/debug.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/grasp.h"
+#include "graspit/quality/quality.h"
+#include "graspit/quality/qualEpsilon.h"
+#include "graspit/quality/qualVolume.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/Collision/collisionInterface.h"
+#include "graspit/DBase/DBPlanner/sql_database_manager.h"
+#include "graspit/DBase/graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_model.h"
+#include "graspit/DBase/DBPlanner/database.h"
 
 GraspitDBPlanner::~GraspitDBPlanner() {
   for (int i = 0; i < (int)mTestedGrasps.size(); ++i) {

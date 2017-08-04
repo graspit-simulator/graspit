@@ -43,12 +43,12 @@
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/draggers/SoRotateDiscDragger.h>
 
-#include "joint.h"
-#include "robot.h"
-#include "mytools.h"
-#include "body.h"
-#include "dynJoint.h"
-#include "math/matrix.h"
+#include "graspit/joint.h"
+#include "graspit/robot.h"
+#include "graspit/mytools.h"
+#include "graspit/body.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/math/matrix.h"
 #include "tinyxml.h"
 
 #ifdef USE_DMALLOC
@@ -56,7 +56,7 @@
 #endif
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*! Initializes the DHTransform with the 4 DH parameters. */
 DHTransform::DHTransform(double thval, double dval, double aval, double alval) :

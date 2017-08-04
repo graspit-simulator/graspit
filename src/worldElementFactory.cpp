@@ -23,25 +23,25 @@
 //
 //######################################################################
 
-#include "worldElementFactory.h"
+#include "graspit/worldElementFactory.h"
 
 /* Since we are using a class down here to register all the built in types
    at runtime, we have to include all relevant headers here. Maybe we can
    find a better solution at some point.
 */
-#include "robot.h"
-#include "body.h"
-#include "robot.h"
-#include "humanHand.h"
-#include "robonaut.h"
-#include "pr2Gripper.h"
-#include "m7.h"
-#include "m7tool.h"
-#include "barrett.h"
-#include "shadow.h"
-#include "puma560.h"
-#include "mcGrip.h"
-#include "robotiq.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/robots/humanHand.h"
+#include "graspit/robots/robonaut.h"
+#include "graspit/robots/pr2Gripper.h"
+#include "graspit/robots/m7.h"
+#include "graspit/robots/m7tool.h"
+#include "graspit/robots/barrett.h"
+#include "graspit/robots/shadow.h"
+#include "graspit/robots/puma560.h"
+#include "graspit/robots/mcGrip.h"
+#include "graspit/robots/robotiq.h"
 
 WorldElementFactory::~WorldElementFactory()
 {

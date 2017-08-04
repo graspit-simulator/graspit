@@ -1,4 +1,4 @@
-#include "graspitParser.h"
+#include "graspit/graspitParser.h"
 
 const std::string GraspitParser::version =
   "GraspIt!\n"

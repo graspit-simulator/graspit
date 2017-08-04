@@ -31,12 +31,12 @@
 #include <utility>
 #include <QSqlQuery>
 #include <QVariant>
-#include "database.h"
+#include "graspit/DBase/DBPlanner/database.h"
 using std::cerr;
 using std::make_pair;
 
 //#define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 PROF_DECLARE(TABLE_POPULATE);
 

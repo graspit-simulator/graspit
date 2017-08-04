@@ -39,23 +39,23 @@
 #include <q3listbox.h>
 
 //#include "mainWindow.h"
-#include "grasp.h"
-#include "world.h"
-#include "robot.h"
-#include "joint.h"
-#include "body.h"
-#include "contact/contact.h"
-#include "contact/virtualContact.h"
-#include "gws.h"
-#include "quality.h"
-#include "gwsprojection.h"
-#include "matrix.h"
-#include "matvec3D.h"
+#include "graspit/grasp.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/joint.h"
+#include "graspit/body.h"
+#include "graspit/contact/contact.h"
+#include "graspit/contact/virtualContact.h"
+#include "graspit/gws.h"
+#include "graspit/quality/quality.h"
+#include "graspit/gwsprojection.h"
+#include "graspit/math/matrix.h"
+#include "graspit/matvec3D.h"
 
 #ifdef MKL
-#include "mkl_wrappers.h"
+#include "graspit/mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
 #include <Inventor/Qt/SoQtComponent.h>

@@ -1,9 +1,9 @@
-#include "EGPlanner/energy/strictAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/strictAutoGraspEnergy.h"
 
-#include "robot.h"
-#include "debug.h"
-#include "grasp.h"
-#include "quality.h"
+#include "graspit/robot.h"
+#include "graspit/debug.h"
+#include "graspit/grasp.h"
+#include "graspit/quality/quality.h"
 
 double StrictAutoGraspEnergy::energy() const
 {

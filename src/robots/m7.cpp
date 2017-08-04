@@ -27,8 +27,8 @@
   \brief Defines the special %M7 class
  */
 
-#include "robots/m7.h"
-#include "world.h"
+#include "graspit/robots/m7.h"
+#include "graspit/world.h"
 
 int
 M7::loadFromXml(const TiXmlElement *root, QString rootPath)

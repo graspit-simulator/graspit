@@ -27,22 +27,22 @@
 
 #include <QInputDialog>
 
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "robot.h"
-#include "grasp.h"
-#include "body.h"
-#include "matrix.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/robot.h"
+#include "graspit/grasp.h"
+#include "graspit/body.h"
+#include "graspit/math/matrix.h"
 #include "mainWindow.h"
 
 // for hand-specific optimizations, might be temporary
-#include "mcGrip.h"
-#include "humanHand.h"
+#include "graspit/robots/mcGrip.h"
+#include "graspit/robots/humanHand.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 #define PROF_ENABLED
-#include "profiling.h"
+#include "graspit/profiling.h"
 
 GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h)
 {

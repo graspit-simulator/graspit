@@ -31,9 +31,9 @@
 #include <QCheckBox>
 #include <QFileDialog>
 
-#include "world.h"
-#include "eigenGrasp.h"
-#include "robot.h"
+#include "graspit/world.h"
+#include "graspit/eigenGrasp.h"
+#include "graspit/robot.h"
 
 void EigenGraspDlg::init()
 {

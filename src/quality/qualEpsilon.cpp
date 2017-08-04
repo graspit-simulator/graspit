@@ -23,14 +23,14 @@
 //
 //######################################################################
 
-#include "qualEpsilon.h"
+#include "graspit/quality/qualEpsilon.h"
 
 #include <QGridLayout>
 #include <QLabel>
 #include <QComboBox>
 
-#include "grasp.h"
-#include "gws.h"
+#include "graspit/grasp.h"
+#include "graspit/gws.h"
 
 const char *QualEpsilon::type = "Epsilon";
 

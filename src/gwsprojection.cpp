@@ -27,12 +27,12 @@
   \brief Implements the grasp wrench space projection class.
  */
 
-#include "pointers.dat"
-#include "gwsprojection.h"
-#include "body.h"
-#include "grasp.h"
-#include "gws.h"
-#include "matvec3D.h"
+#include "graspit/pointers.dat"
+#include "graspit/gwsprojection.h"
+#include "graspit/body.h"
+#include "graspit/grasp.h"
+#include "graspit/gws.h"
+#include "graspit/matvec3D.h"
 #include <set>
 #include <qwidget.h>
 

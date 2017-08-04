@@ -23,15 +23,15 @@
 //
 //######################################################################
 
-#include "EGPlanner/simAnn.h"
+#include "graspit/EGPlanner/simAnn.h"
 
 #include <time.h>
 
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #define TINY 1.0e-7
 

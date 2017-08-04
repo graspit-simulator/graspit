@@ -23,14 +23,14 @@
 //
 //######################################################################
 
-#include "EGPlanner/timeTest.h"
+#include "graspit/EGPlanner/timeTest.h"
 
-#include "EGPlanner/searchState.h"
-#include "EGPlanner/energy/searchEnergy.h"
-#include "robot.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/energy/searchEnergy.h"
+#include "graspit/robot.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 void
 TimeTester::startPlanner()

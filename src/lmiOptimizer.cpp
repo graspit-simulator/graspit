@@ -23,20 +23,20 @@
 //
 //######################################################################
 
-#include "lmiOptimizer.h"
+#include "graspit/lmiOptimizer.h"
 
-#include "grasp.h"
-#include "matvec3D.h"
-#include "robot.h"
-#include "contact/contact.h"
+#include "graspit/grasp.h"
+#include "graspit/matvec3D.h"
+#include "graspit/robot.h"
+#include "graspit/contact/contact.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
-#include "maxdet.h"
+#include "graspit/maxdet.h"
 
 bool errorOccurred = false;
 

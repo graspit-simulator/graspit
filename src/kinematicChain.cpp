@@ -23,32 +23,32 @@
 //
 //######################################################################
 
-#include "kinematicChain.h"
+#include "graspit/kinematicChain.h"
 
-#include "matvec3D.h"
-#include "body.h"
-#include "robot.h"
-#include "dof.h"
-#include "joint.h"
-#include "world.h"
-#include "matvecIO.h"
-#include "dynJoint.h"
-#include "humanHand.h"
-#include "math/matrix.h"
+#include "graspit/matvec3D.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
+#include "graspit/dof.h"
+#include "graspit/joint.h"
+#include "graspit/world.h"
+#include "graspit/matvecIO.h"
+#include "graspit/dynamics/dynJoint.h"
+#include "graspit/robots/humanHand.h"
+#include "graspit/math/matrix.h"
 #include "tinyxml.h"
-#include "bodySensor.h"
+#include "graspit/bodySensor.h"
 
 #ifdef MKL
 #include "mkl_wrappers.h"
 #else
-#include "lapack_wrappers.h"
+#include "graspit/lapack_wrappers.h"
 #endif
 
 //for disp_mat, who needs a new home
-#include "maxdet.h"
+#include "graspit/maxdet.h"
 
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 KinematicChain::KinematicChain(Robot *r, int chainNumber, int jointNum) : owner(r), chainNum(chainNumber), firstJointNum(jointNum),
   numJoints(0), numLinks(0), lastJoint(NULL), IVRoot(NULL), numChildren(0)

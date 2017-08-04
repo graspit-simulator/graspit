@@ -1,10 +1,10 @@
-#include "EGPlanner/energy/dynamicAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/dynamicAutoGraspEnergy.h"
 
-#include "robot.h"
-#include "world.h"
-#include "grasp.h"
-#include "debug.h"
-#include "quality.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/grasp.h"
+#include "graspit/debug.h"
+#include "graspit/quality/quality.h"
 
 double
 DynamicAutoGraspEnergy::energy() const

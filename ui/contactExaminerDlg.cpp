@@ -28,20 +28,20 @@
 #include <QFileDialog>
 #include <fstream>
 
-#include "world.h"
-#include "robot.h"
-#include "contact/contact.h"
-#include "grasp.h"
-#include "quality.h"
-#include "qualEpsilon.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "body.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/contact/contact.h"
+#include "graspit/grasp.h"
+#include "graspit/quality/quality.h"
+#include "graspit/quality/qualEpsilon.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/body.h"
 #include "mainWindow.h"
-#include "contact/virtualContact.h"
-#include "contact/virtualContactOnObject.h"
+#include "graspit/contact/virtualContact.h"
+#include "graspit/contact/virtualContactOnObject.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 void ContactExaminerDlg::init()
 {

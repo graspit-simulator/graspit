@@ -23,18 +23,18 @@
 //
 //######################################################################
 
-#include "tableCheckTask.h"
+#include "graspit/DBase/tableCheckTask.h"
 
-#include "graspitCore.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "robot.h"
-#include "body.h"
-#include "debug.h"
-#include "EGPlanner/searchState.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/robot.h"
+#include "graspit/body.h"
+#include "graspit/debug.h"
+#include "graspit/EGPlanner/searchState.h"
 
-#include "DBPlanner/db_manager.h"
-#include "graspit_db_grasp.h"
+#include "graspit/DBase/DBPlanner/db_manager.h"
+#include "graspit/DBase/graspit_db_grasp.h"
 
 TableCheckTask::TableCheckTask(TaskDispatcher *disp, db_planner::DatabaseManager *mgr,
                                db_planner::TaskRecord rec) : PreGraspCheckTask(disp, mgr, rec)

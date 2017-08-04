@@ -26,15 +26,15 @@
 #include <vector>
 
 #include "bodyPropDlg.h"
-#include "body.h"
+#include "graspit/body.h"
 
-#include "robot.h"
-#include "world.h"
-#include "graspitCore.h"
-#include "ivmgr.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
 #include "qvalidator.h"
-#include "collisionStructures.h"
-#include "bBox.h"
+#include "graspit/Collision/collisionStructures.h"
+#include "graspit/bBox.h"
 
 /*!
   Initializes the interface elements in the dialog box.

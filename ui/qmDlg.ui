@@ -220,9 +220,9 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local" >graspitCore.h</include>
-  <include location="local" >ivmgr.h</include>
-  <include location="local" >quality.h</include>
+  <include location="local" >graspit/graspitCore.h</include>
+  <include location="local" >graspit/ivmgr.h</include>
+  <include location="local" >graspit/quality/quality.h</include>
  </includes>
  <resources/>
  <connections>

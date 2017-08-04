@@ -38,20 +38,20 @@
 
 #include <list>
 
-#include "defines.h"
-#include "mytools.h"
-#include "robot.h"
-#include "ivmgr.h"
-#include "world.h"
-#include "body.h"
-#include "grasp.h"
-#include "gwsprojection.h"
-#include "quality.h"
-#include "graspitCore.h"
-#include "humanHand.h"
-#include "arch.h"
+#include "graspit/defines.h"
+#include "graspit/mytools.h"
+#include "graspit/robot.h"
+#include "graspit/ivmgr.h"
+#include "graspit/world.h"
+#include "graspit/body.h"
+#include "graspit/grasp.h"
+#include "graspit/gwsprojection.h"
+#include "graspit/quality/quality.h"
+#include "graspit/graspitCore.h"
+#include "graspit/robots/humanHand.h"
+#include "graspit/arch.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 #include "settingsDlg.h"
 #include "ui_about.h"

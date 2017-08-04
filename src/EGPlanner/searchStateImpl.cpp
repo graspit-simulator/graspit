@@ -23,11 +23,11 @@
 //
 //######################################################################
 
-#include "EGPlanner/searchStateImpl.h"
-#include "robot.h"
-#include "eigenGrasp.h"
+#include "graspit/EGPlanner/searchStateImpl.h"
+#include "graspit/robot.h"
+#include "graspit/eigenGrasp.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 void PostureStateDOF::createVariables()
 {

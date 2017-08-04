@@ -27,17 +27,17 @@
   \brief Defines the special %GraspitDBGrasp class
  */
 
-#include "graspit_db_grasp.h"
+#include "graspit/DBase/graspit_db_grasp.h"
 #include <QSqlQuery>
 #include <QtSql>
 #include <list>
 
-#include "EGPlanner/searchState.h"
-#include "matvec3D.h"
-#include "body.h"
-#include "robot.h"
+#include "graspit/EGPlanner/searchState.h"
+#include "graspit/matvec3D.h"
+#include "graspit/body.h"
+#include "graspit/robot.h"
 
-#include "debug.h"
+#include "graspit/debug.h"
 
 //! Create a HandObjectState from data
 bool initializeHandObjectState(const std::vector<double> &joints, const std::vector<double> &position,

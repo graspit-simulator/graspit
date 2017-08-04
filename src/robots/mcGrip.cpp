@@ -23,12 +23,12 @@
 //
 //######################################################################
 
-#include "robots/mcGrip.h"
+#include "graspit/robots/mcGrip.h"
 
 #include <limits>
 
-#include "matrix.h"
-#include "debug.h"
+#include "graspit/math/matrix.h"
+#include "graspit/debug.h"
 
 /*! Also sets the construction parameters which for now are fixed
   and hard-coded in.

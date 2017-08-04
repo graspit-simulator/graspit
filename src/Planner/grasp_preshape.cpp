@@ -37,7 +37,7 @@
 #include <math.h>
 #include <iostream>
 
-#include "grasp_preshape.h"
+#include "graspit/Planner/grasp_preshape.h"
 
 /*!
   Sets the preshape to PR_None and sets the initial angle values.

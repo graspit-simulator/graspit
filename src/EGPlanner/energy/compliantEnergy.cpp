@@ -1,11 +1,11 @@
-#include "EGPlanner/energy/compliantEnergy.h"
-#include "profiling.h"
-#include "debug.h"
-#include "robot.h"
-#include "world.h"
-#include "matrix.h"
-#include "grasp.h"
-#include "quality.h"
+#include "graspit/EGPlanner/energy/compliantEnergy.h"
+#include "graspit/profiling.h"
+#include "graspit/debug.h"
+#include "graspit/robot.h"
+#include "graspit/world.h"
+#include "graspit/math/matrix.h"
+#include "graspit/grasp.h"
+#include "graspit/quality/quality.h"
 
 const double unbalancedForceThreshold = 1.0e10;
 

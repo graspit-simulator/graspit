@@ -1,4 +1,4 @@
-#include "flockTransform.h"
+#include "graspit/flockTransform.h"
 
 
 void FlockTransf::identity()

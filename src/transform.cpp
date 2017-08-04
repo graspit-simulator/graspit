@@ -1,4 +1,4 @@
-#include "transform.h"
+#include "graspit/transform.h"
 
 const transf transf::IDENTITY(Quaternion::Identity(), vec3::Zero());
 

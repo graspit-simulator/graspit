@@ -27,8 +27,8 @@
 \brief Implements the special %Robonaut robot class
 */
 
-#include "robots/robonaut.h"
-#include "world.h"
+#include "graspit/robots/robonaut.h"
+#include "graspit/world.h"
 
 int
 Robonaut::loadFromXml(const TiXmlElement *root, QString rootPath)

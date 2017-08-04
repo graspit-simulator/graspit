@@ -28,7 +28,7 @@
 */
 
 #include "ui_qmDlg.h"
-#include <quality.h>
+#include "graspit/quality/quality.h"
 
 /*! \class QMDlg
   \brief Creates and controls the quality measure dialog box.

@@ -27,9 +27,9 @@
 \brief Implements the special %RobotIQ robot class
 */
 
-#include "robots/robotiq.h"
-#include "world.h"
-#include "debug.h"
+#include "graspit/robots/robotiq.h"
+#include "graspit/world.h"
+#include "graspit/debug.h"
 
 int RobotIQ::loadFromXml(const TiXmlElement *root, QString rootPath)
 {
