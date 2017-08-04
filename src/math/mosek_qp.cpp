@@ -32,9 +32,9 @@
 #include <limits>
 #include <math.h>
 
-#include "matrix.h"
+#include "graspit/math/matrix.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #include "mosek.h"
 

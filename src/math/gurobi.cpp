@@ -34,9 +34,9 @@
 #include <math.h>
 #include <limits>
 
-#include "matrix.h"
+#include "graspit/math/matrix.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #include <fstream>
 
