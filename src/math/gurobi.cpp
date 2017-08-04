@@ -33,12 +33,13 @@
 
 #include <math.h>
 #include <limits>
+#include <fstream>
 
 #include "graspit/math/matrix.h"
 //#define GRASPITDBG
 #include "graspit/debug.h"
 
-#include <fstream>
+#include "gurobi_c++.h"
 
 using namespace std;
 

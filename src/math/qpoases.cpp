@@ -34,9 +34,9 @@
 #include <limits>
 #include <math.h>
 
-#include "matrix.h"
+#include "graspit/math/matrix.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*! Populates an OASES style matrix (dense, row-major) from a GraspIt matrix
   (potentially sparse, column-major).
