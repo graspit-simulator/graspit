@@ -1575,8 +1575,8 @@ Grasp::findOptimalContactForces(const Matrix &wrench,
   int numContacts = contacts.size();
   Matrix D(Contact::frictionForceBlockMatrix(contacts));
   Matrix H(contactModelMatrix(numContacts, states));
-  Matrix GRK = KweightedGinverse(joints, contacts, states);
-  Matrix E = controllableInternalForces(joints, contacts, states).basis();
+  Matrix GRK(KweightedGinverse(joints, contacts, states));
+  Matrix E(controllableInternalForces(joints, contacts, states).basis());
   int numVars = 1 + D.cols() + E.cols();
 
   // Objective
