@@ -27,14 +27,14 @@
   A wrapper for using the Mosek commercial QP solver from within GraspIt!
 */
 
-#include "mosek_qp.h"
+#include "graspit/math/mosek_qp.h"
 
 #include <limits>
 #include <math.h>
 
-#include "matrix.h"
+#include "graspit/math/matrix.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 #include "mosek.h"
 

@@ -27,16 +27,16 @@
   A wrapper for using the QPOASES solver from within GraspIt!
 */
 
-#include "qpoases.h"
+#include "graspit/math/qpoases.h"
 
 #include <QProblem.hpp>
 
 #include <limits>
 #include <math.h>
 
-#include "matrix.h"
+#include "graspit/math/matrix.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 /*! Populates an OASES style matrix (dense, row-major) from a GraspIt matrix
   (potentially sparse, column-major).

@@ -28,17 +28,17 @@
     only implemented for a specific type of binary optimization problem.
 */
 
-#include "gurobi.h"
-#include "gurobi_c++.h"
+#include "graspit/math/gurobi.h"
 
 #include <math.h>
 #include <limits>
-
-#include "matrix.h"
-//#define GRASPITDBG
-#include "debug.h"
-
 #include <fstream>
+
+#include "graspit/math/matrix.h"
+//#define GRASPITDBG
+#include "graspit/debug.h"
+
+#include "gurobi_c++.h"
 
 using namespace std;
 
