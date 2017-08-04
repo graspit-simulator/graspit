@@ -27,7 +27,7 @@
   A wrapper for using the QPOASES solver from within GraspIt!
 */
 
-#include "qpoases.h"
+#include "graspit/math/qpoases.h"
 
 #include <QProblem.hpp>
 

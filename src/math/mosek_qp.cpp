@@ -27,7 +27,7 @@
   A wrapper for using the Mosek commercial QP solver from within GraspIt!
 */
 
-#include "mosek_qp.h"
+#include "graspit/math/mosek_qp.h"
 
 #include <limits>
 #include <math.h>

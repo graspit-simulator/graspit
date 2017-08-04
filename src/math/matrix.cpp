@@ -45,15 +45,15 @@
 
 //Quadratic Program solvers
 #ifdef MOSEK_QP
-#include "mosek_qp.h"
+#include "graspit/math/mosek_qp.h"
 #endif
 #ifdef OASES_QP
-#include "qpoases.h"
+#include "graspit/math/qpoases.h"
 #endif
 
 // Gurobi solver
 #ifdef GUROBI_SOLVER
-#include "gurobi.h"
+#include "graspit/math/gurobi.h"
 #endif
 
 const double Matrix::EPS = 1.0e-7;

@@ -28,7 +28,7 @@
     only implemented for a specific type of binary optimization problem.
 */
 
-#include "gurobi.h"
+#include "graspit/math/gurobi.h"
 
 #include <math.h>
 #include <limits>

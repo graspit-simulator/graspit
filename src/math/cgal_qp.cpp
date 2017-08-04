@@ -1,8 +1,8 @@
-#include "cgal_qp.h"
+#include "graspit/math/cgal_qp.h"
 
-#include "math/matrix.h"
+#include "graspit/math/matrix.h"
 //#define GRASPITDBG
-#include "debug.h"
+#include "graspit/debug.h"
 
 //CGAL includes
 #include <iostream>
