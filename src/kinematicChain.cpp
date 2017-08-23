@@ -324,6 +324,7 @@ KinematicChain::initChainFromXml(const TiXmlElement *root, QString &linkDir)
     QString params = (*p)->Attribute("params");
     TactileSensor *bd = new TactileSensor(linkVec[linkVecIndex]);
     bd->setFilterParams(&params);
+    owner->addSensor(bd);
 
   }
 
