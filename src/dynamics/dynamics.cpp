@@ -623,7 +623,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
                              (Contact::THRESHOLD / 2.0 - (cf.translation() - cf2.translation()).norm()));
       }
       DBGP(" EPS: " << contactEps[cn]);
-      vec3 normal(cf.affine()(2, 0), cf.affine()(2, 1), cf.affine()(2, 2));
+      vec3 normal(cf.affine()(0, 2), cf.affine()(1,2), cf.affine()(2, 2));
 
       // find which body is this contact from
       for (bn = 0; bn < numBodies; bn++)
