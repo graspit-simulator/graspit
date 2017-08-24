@@ -136,6 +136,7 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       QString params = (*p)->Attribute("params");
       TactileSensor *bd = new TactileSensor(base);
       bd->setFilterParams(&params);
+      addSensor(bd);
     }
   }
   else {

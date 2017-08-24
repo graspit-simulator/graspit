@@ -210,8 +210,6 @@ class Robot : public WorldElement {
     virtual void setJointValues(const double *jointVals);
     //! Asks all chains to set the given joint values, then update the position of all links
     virtual void setJointValuesAndUpdate(const double *jointVals);
-    //! Gets the current joint values from the chains
-    inline void getJointValues(double *jointVals) const;
     //! Informs the dof's that certain values have been set.
     inline void updateDofVals(double *dofVals);
     //! Main function for obtaining joint values from the dofs given desired dof values
@@ -331,6 +329,9 @@ class Robot : public WorldElement {
 
     //! Returns the values of the DOFs that can be used to save the current state
     inline void storeDOFVals(double *dofVals) const;
+
+    //! Gets the current joint values from the chains
+    inline void getJointValues(double *jointVals) const;
 
     //------------------------- static checks and range of motion
 
