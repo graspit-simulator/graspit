@@ -30,6 +30,7 @@
 #include <QLineEdit>
 
 #include <pthread.h>
+#include <unistd.h>
 
 #include "graspit/grasp.h"
 #include "graspit/math/matrix.h"
