@@ -45,12 +45,12 @@
 //#define GRASPITDBG
 #include "graspit/debug.h"
 
-SearchVariable::SearchVariable(QString name, double min, double max, double maxJump, bool circular)
+SearchVariable::SearchVariable(QString name, double min, double max, double defaultValue, double maxJump, bool circular)
 {
   mName = name;
-  mMinVal = min; mMaxVal = max;
+  mMinVal = min; mMaxVal = max; mDefaultValue = defaultValue;
   mMaxJump = maxJump;
-  mValue = 0;
+  mValue = defaultValue;
   mFixed = false;
   mCircular = circular;
 }

@@ -53,6 +53,8 @@ class SearchVariable
 {
   private:
     double mValue;
+    //! The value assigned when being reset
+    double mDefaultValue;
     //! The confidence that we have in the stored value
     /*! Mainly used when this variable is used as "input" to guide a search,
       rather than a variable that is being searched. */
@@ -68,11 +70,12 @@ class SearchVariable
   public:
     double mMinVal, mMaxVal, mMaxJump;
 
-    SearchVariable(QString name, double min, double max, double maxJump, bool circular = false);
+    SearchVariable(QString name, double min, double max, double defaultValue, double maxJump, bool circular = false);
     SearchVariable(const SearchVariable *v);
 
     void setValue(double v) {mValue = v;}
     double getValue() const {return mValue;}
+    void resetValue() {mValue = mDefaultValue;}
     void setFixed(bool f) {mFixed = f;}
     bool isFixed() const {return mFixed;}
     void setCircular(bool c) {mCircular = c;}
@@ -427,7 +430,7 @@ void VariableSet::copyValuesFrom(const VariableSet *s)
 void VariableSet::reset()
 {
   for (int i = 0; i < (int)mVariables.size(); i++) {
-    mVariables[i]->setValue(0);
+    mVariables[i]->resetValue();
     mVariables[i]->setFixed(false);
     mVariables[i]->setConfidence(0.0);
   }
