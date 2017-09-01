@@ -36,7 +36,7 @@ void PostureStateDOF::createVariables()
   for (int i = 0; i < mHand->getNumDOF(); i++) {
     num.setNum(i);
     mVariables.push_back(new SearchVariable(name + num,
-                                            mHand->getDOF(i)->getMin(), mHand->getDOF(i)->getMax(),
+                                            mHand->getDOF(i)->getMin(), mHand->getDOF(i)->getMax(), mHand->getDOF(i)->getMin(),
                                             0.5 * (mHand->getDOF(i)->getMax()
                                                    - mHand->getDOF(i)->getMin())));
   }
@@ -77,7 +77,7 @@ void PostureStateEigen::createVariables()
       max = 4.0f;
     }
     float jump  = (max - min) / 4.0;
-    mVariables.push_back(new SearchVariable(name + num, min, max, jump));
+    mVariables.push_back(new SearchVariable(name + num, min, max, min, jump));
   }
 }
 void PostureStateEigen::getHandDOF(double *dof) const
@@ -107,13 +107,13 @@ void PostureStateEigen::storeHandDOF(const double *dof)
 
 void PositionStateComplete::createVariables()
 {
-  mVariables.push_back(new SearchVariable("Tx", -250, 250, 100));
-  mVariables.push_back(new SearchVariable("Ty", -250, 250, 100));
-  mVariables.push_back(new SearchVariable("Tz", -250, 250, 100));
-  mVariables.push_back(new SearchVariable("Qw", -5, 5, 1));
-  mVariables.push_back(new SearchVariable("Qx", -5, 5, 1));
-  mVariables.push_back(new SearchVariable("Qy", -5, 5, 1));
-  mVariables.push_back(new SearchVariable("Qz", -5, 5, 1));
+  mVariables.push_back(new SearchVariable("Tx", -250, 250, 0, 100));
+  mVariables.push_back(new SearchVariable("Ty", -250, 250, 0, 100));
+  mVariables.push_back(new SearchVariable("Tz", -250, 250, 250, 100));
+  mVariables.push_back(new SearchVariable("Qw", -5, 5, .7071, 1));
+  mVariables.push_back(new SearchVariable("Qx", -5, 5, 0, 1));
+  mVariables.push_back(new SearchVariable("Qy", -5, 5, 0.7071, 1));
+  mVariables.push_back(new SearchVariable("Qz", -5, 5, 0, 1));
 }
 
 /*! This is a redundant way of saving the transform (since the Q
@@ -146,13 +146,12 @@ void PositionStateComplete::setTran(const transf &t)
 
 void PositionStateAA::createVariables()
 {
-  mVariables.push_back(new SearchVariable("Tx", -250, 250, 150));
-  mVariables.push_back(new SearchVariable("Ty", -250, 250, 150));
-  //variable limit hacked for search with Pr2Gripper2010 for tall objects
-  mVariables.push_back(new SearchVariable("Tz", -250, 350, 150));
-  mVariables.push_back(new SearchVariable("theta", 0, M_PI, M_PI / 5));
-  mVariables.push_back(new SearchVariable("phi", -M_PI, M_PI, M_PI / 2, true));
-  mVariables.push_back(new SearchVariable("alpha", 0, M_PI, M_PI / 2));
+  mVariables.push_back(new SearchVariable("Tx", -250, 250, 0, 150));
+  mVariables.push_back(new SearchVariable("Ty", -250, 250, 0, 150));
+  mVariables.push_back(new SearchVariable("Tz", -250, 350, 350, 150));
+  mVariables.push_back(new SearchVariable("theta", 0, M_PI, 0, M_PI / 5));
+  mVariables.push_back(new SearchVariable("phi", -M_PI, M_PI, 0, M_PI / 2, true));
+  mVariables.push_back(new SearchVariable("alpha", 0, M_PI, M_PI / 2, M_PI / 2));
 }
 transf PositionStateAA::getCoreTran() const
 {
@@ -206,10 +205,10 @@ void PositionStateAA::setTran(const transf &t)
 
 void PositionStateEllipsoid::createVariables()
 {
-  mVariables.push_back(new SearchVariable("beta", -M_PI / 2.0, M_PI / 2.0, M_PI / 2.0));
-  mVariables.push_back(new SearchVariable("gamma", -M_PI, M_PI, M_PI, true));
-  mVariables.push_back(new SearchVariable("tau", -M_PI, M_PI, M_PI, true));
-  mVariables.push_back(new SearchVariable("dist", -50, 100, 50));
+  mVariables.push_back(new SearchVariable("beta", -M_PI / 2.0, M_PI / 2.0, 0, M_PI / 2.0));
+  mVariables.push_back(new SearchVariable("gamma", -M_PI, M_PI, 0, M_PI, true));
+  mVariables.push_back(new SearchVariable("tau", -M_PI, M_PI, 0, M_PI, true));
+  mVariables.push_back(new SearchVariable("dist", -50, 100, 0, 50));
 
   //ellipsoid scaling parameters
   mParameters.push_back(SearchParameter("a", 80));
@@ -260,9 +259,9 @@ void PositionStateEllipsoid::setTran(const transf &t)
 
 void PositionStateApproach::createVariables()
 {
-  mVariables.push_back(new SearchVariable("dist", -30, 200, 100));
-  mVariables.push_back(new SearchVariable("wrist 1", -M_PI / 3.0, M_PI / 3.0, M_PI / 6.0));
-  mVariables.push_back(new SearchVariable("wrist 2", -M_PI / 3.0, M_PI / 3.0, M_PI / 6.0));
+  mVariables.push_back(new SearchVariable("dist", -30, 200, 0, 100));
+  mVariables.push_back(new SearchVariable("wrist 1", -M_PI / 3.0, M_PI / 3.0, 0, M_PI / 6.0));
+  mVariables.push_back(new SearchVariable("wrist 2", -M_PI / 3.0, M_PI / 3.0, 0, M_PI / 6.0));
 }
 transf PositionStateApproach::getCoreTran() const
 {
