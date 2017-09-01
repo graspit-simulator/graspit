@@ -50,7 +50,7 @@ SearchVariable::SearchVariable(QString name, double min, double max, double defa
   mName = name;
   mMinVal = min; mMaxVal = max; mDefaultValue = defaultValue;
   mMaxJump = maxJump;
-  mValue = 0;
+  mValue = defaultValue;
   mFixed = false;
   mCircular = circular;
 }
