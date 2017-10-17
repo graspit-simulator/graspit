@@ -291,17 +291,24 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
 
   //scaling of the geometry
   IVScaleTran = new SoTransform;
-  IVScaleTran->scaleFactor.setValue(1.0, 1.0, 1.0);
+  double scale_x = 1.0, scale_y = 1.0, scale_z = 1.0;
   element = findXmlElement(root, "geometryScaling");
   if (element) {
-    valueStr = element->GetText();
-    double scale = valueStr.toDouble();
-    if (scale <= 0) {
-      DBGA("Scale geometry: negative scale found");
-      return FAILURE;
-    }
-    IVScaleTran->scaleFactor.setValue(scale, scale, scale);
+    double scale = ((QString)element->GetText()).toDouble();
+    scale_x = scale_y = scale_z = scale;
+  } else {
+    element = findXmlElement(root, "geometryScalingX");
+    if (element) scale_x = ((QString)element->GetText()).toDouble();
+    element = findXmlElement(root, "geometryScalingY");
+    if (element) scale_y = ((QString)element->GetText()).toDouble();
+    element = findXmlElement(root, "geometryScalingZ");
+    if (element) scale_z = ((QString)element->GetText()).toDouble();
   }
+  if (scale_x <= 0 || scale_y <= 0 || scale_z <= 0) {
+    DBGA("Scale geometry: negative or zero scale found");
+    return FAILURE;
+  }
+  IVScaleTran->scaleFactor.setValue(scale_x, scale_y, scale_z);
   IVGeomRoot->insertChild(IVScaleTran, 0);
 
   //any offset to the geometry, inserted inside the geometry itself
