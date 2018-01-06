@@ -457,7 +457,7 @@ World::destroyElement(WorldElement *e, bool deleteElement)
       if (*bp == e) {
         mCollisionInterface->removeBody( (Body*) e);
         bodyVec.erase(bp); numBodies--;
-        DBGP("removed body " << ((Body *)e)->getName().toStdString().c_str() <<" from world");
+        DBGP("removed body " << ((Body *)e)->getName().toStdString().c_str() << " from world");
         break;
       }
     }
