@@ -60,6 +60,7 @@ class SimAnnPlanner : public EGPlanner
     SimAnnPlanner(Hand *h);
     ~SimAnnPlanner();
     virtual PlannerType getType() {return PLANNER_SIM_ANN;}
+    virtual int getStartingStep();
     void setAnnealingParameters(AnnealingType y);
 
     //! Checks if a model state has been set

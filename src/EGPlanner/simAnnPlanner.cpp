@@ -76,6 +76,12 @@ SimAnnPlanner::initialized()
   return true;
 }
 
+int
+SimAnnPlanner::getStartingStep()
+{
+    return mSimAnn->getStartingStep();
+}
+
 void
 SimAnnPlanner::setModelState(const GraspPlanningState *modelState)
 {

@@ -108,6 +108,7 @@ class SimAnn : public QObject
 
     void reset();
     int getCurrentStep() {return mCurrentStep;}
+    int getStartingStep() {return DEF_K0;}
     void setParameters(AnnealingType type);
     void writeResults(bool w);
 };
