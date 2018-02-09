@@ -39,6 +39,7 @@ class GraspPlanningState;
 class SoSensor;
 class SearchEnergy;
 class SimAnn;
+class SimAnnParams;
 
 /*! This is the simplest implementation of the EGPlanner. It also has a
   SimAnn class for doing simulated annealing over all variables. This
@@ -60,7 +61,7 @@ class SimAnnPlanner : public EGPlanner
     SimAnnPlanner(Hand *h);
     ~SimAnnPlanner();
     virtual PlannerType getType() {return PLANNER_SIM_ANN;}
-    void setAnnealingParameters(AnnealingType y);
+    void setAnnealingParameters(SimAnnParams params);
 
     //! Checks if a model state has been set
     virtual bool initialized();

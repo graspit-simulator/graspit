@@ -169,6 +169,7 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/EGPlanner/onLinePlanner.h 
     ${GSRC}/include/EGPlanner/egPlanner.h 
     ${GSRC}/include/EGPlanner/simAnnPlanner.h 
+    ${GSRC}/include/EGPlanner/simAnnParams.h
     ${GSRC}/include/EGPlanner/guidedPlanner.h 
     ${GSRC}/include/EGPlanner/loopPlanner.h 
     ${GSRC}/include/EGPlanner/timeTest.h 
@@ -404,6 +405,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/onLinePlanner.cpp 
     ${GSRC}/src/EGPlanner/egPlanner.cpp 
     ${GSRC}/src/EGPlanner/simAnnPlanner.cpp 
+    ${GSRC}/src/EGPlanner/simAnnParams.cpp
     ${GSRC}/src/EGPlanner/guidedPlanner.cpp 
     ${GSRC}/src/EGPlanner/loopPlanner.cpp 
     ${GSRC}/src/EGPlanner/timeTest.cpp 

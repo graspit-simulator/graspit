@@ -152,7 +152,7 @@ GuidedPlanner::startChild(const GraspPlanningState *seed)
   if (mChildEnergyType == "CONTACT_ENERGY") {
     child->setContactType(CONTACT_PRESET);
   }
-  child->setAnnealingParameters(ANNEAL_STRICT);
+  child->setAnnealingParameters(SimAnnParams::ANNEAL_STRICT());
   child->setMaxSteps(mMaxChildSteps);
 
   child->setModelState(seed);

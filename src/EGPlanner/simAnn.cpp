@@ -29,6 +29,7 @@
 
 #include "EGPlanner/searchState.h"
 #include "EGPlanner/energy/searchEnergy.h"
+#include "EGPlanner/simAnnParams.h"
 
 //#define GRASPITDBG
 #include "debug.h"
@@ -37,7 +38,7 @@
 
 SimAnn::SimAnn()
 {
-  setParameters(ANNEAL_DEFAULT);
+  setParameters(SimAnnParams::ANNEAL_DEFAULT());
   mWriteResults = false;
   mFile = NULL;
 
@@ -74,81 +75,16 @@ SimAnn::writeResults(bool w)
   }
 }
 
-void SimAnn::setParameters(AnnealingType type)
+void SimAnn::setParameters(SimAnnParams params)
 {
-  switch (type) {
-    case ANNEAL_DEFAULT:
-      //these are the default parameters that experimentation shows work best over 8 dimensions
-      //identical schedule for error and neighbors
-      //error is supposed to be distance between fingers and object, so raw order of 1-100 mm
-      YC = 7.0;
-      HC = 7.0;
-      YDIMS = 8;
-      HDIMS = 8;
-      NBR_ADJ = 1.0;
-      ERR_ADJ = 1.0e-6;
-      DEF_T0 = 1.0e6;
-      DEF_K0 = 30000;
-      break;
-    case ANNEAL_LOOP:
-      //for looping we use a slightly shorter interval
-      YC = 7.0;
-      HC = 7.0;
-      YDIMS = 8;
-      HDIMS = 8;
-      NBR_ADJ = 1.0;
-      ERR_ADJ = 1.0e-6;
-      DEF_T0 = 1.0e6;
-      DEF_K0 = 35000;
-      break;
-    case ANNEAL_MODIFIED:
-      //different version which doesn't really work better than default
-      YC = 2.38;
-      YDIMS = 8;
-      HC = 2.38;
-      HDIMS = 8;
-      NBR_ADJ = 1.0e-3;
-      ERR_ADJ = 1.0e-1;
-      DEF_T0 = 1.0e3;
-      DEF_K0 = 0;
-      break;
-    case ANNEAL_STRICT:
-      DBGP("Strict Sim Ann parameters!");
-      //this are for searches that ONLY look at grasp quality measure
-      YC = 0.72;
-      HC = 0.22;
-      YDIMS = 2;
-      HDIMS = 2;
-      NBR_ADJ = 1.0;
-      ERR_ADJ = 1.0; //meant to work with ENERGY_STRICT_AUTOGRASP which multiplies eps. gq by 1.0e2
-      DEF_T0 = 10.0;
-      DEF_K0 = 0;
-      break;
-    case ANNEAL_ONLINE:
-      //parameters for on-line search. Supposed to work really fast and in fewer dimensions
-      //YC = 0.54;
-      YC = 0.24;
-      HC = 0.54;
-      //YDIMS = 3;
-      YDIMS = 2;
-      HDIMS = 3;
-      NBR_ADJ = 1.0;
-      ERR_ADJ = 1.0e-2;
-      DEF_T0 = 1.0e1;
-      DEF_K0 = 100;
-      break;
-    default:
-      fprintf(stderr, "Unknown Annealing params requested, using default!\n");
-      setParameters(ANNEAL_DEFAULT);
-      break;
-  }
+    mParams = params;
 }
 
 void SimAnn::reset()
 {
   srand((unsigned)time(NULL));
-  mCurrentStep = DEF_K0;
-  mT0 = DEF_T0;
+  mCurrentStep = mParams.DEF_K0;
+  mT0 = mParams.DEF_T0;
 }
 
 /*! The caller passes it a HandObjectState and a calculator that can be used
@@ -161,7 +97,7 @@ SimAnn::Result
 SimAnn::iterate(GraspPlanningState *currentState, SearchEnergy *energyCalculator, GraspPlanningState *targetState)
 {
   //using different cooling constants for probs and neighbors
-  double T = cooling(mT0, YC, mCurrentStep, YDIMS);
+  double T = cooling(mT0, mParams.YC, mCurrentStep, mParams.YDIMS);
 
   //attempt to compute a neighbor of the current state
   GraspPlanningState *newState;
@@ -169,7 +105,7 @@ SimAnn::iterate(GraspPlanningState *currentState, SearchEnergy *energyCalculator
   int attempts = 0; int maxAttempts = 10;
   DBGP("Ngbr gen loop");
   while (!legal && attempts <= maxAttempts) {
-    newState = stateNeighbor(currentState, T * NBR_ADJ, targetState);
+    newState = stateNeighbor(currentState, T * mParams.NBR_ADJ, targetState);
     DBGP("Analyze state...");
     energyCalculator->analyzeState(legal, energy, newState);
     DBGP("Analysis done.");
@@ -193,9 +129,9 @@ SimAnn::iterate(GraspPlanningState *currentState, SearchEnergy *energyCalculator
   newState->setItNumber(mCurrentStep);
 
   //using different cooling constants for probs and neighbors
-  T = cooling(mT0, HC, mCurrentStep, HDIMS);
+  T = cooling(mT0, mParams.HC, mCurrentStep, mParams.HDIMS);
 
-  double P = prob(ERR_ADJ * currentState->getEnergy(), ERR_ADJ * newState->getEnergy(), T);
+  double P = prob(mParams.ERR_ADJ * currentState->getEnergy(), mParams.ERR_ADJ * newState->getEnergy(), T);
   double U = ((double)rand()) / RAND_MAX;
   Result r = KEEP;
   if (P > U) {

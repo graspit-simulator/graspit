@@ -31,6 +31,7 @@
 #include "robot.h"
 #include "simAnn.h"
 #include "EGPlanner/searchState.h"
+#include "EGPlanner/simAnnParams.h"
 #include "EGPlanner/energy/searchEnergy.h"
 #include "EGPlanner/graspTesterThread.h"
 #include "EGPlanner/onLineGraspInterface.h"
@@ -50,7 +51,7 @@ OnLinePlanner::OnLinePlanner(Hand *h) : SimAnnPlanner(h)
   mSolutionClone = NULL;
   mMarkSolutions = true;
   mCurrentBest = NULL;
-  mSimAnn->setParameters(ANNEAL_ONLINE);
+  mSimAnn->setParameters(SimAnnParams::ANNEAL_ONLINE());
   setRenderType(RENDER_LEGAL);
   mRepeat = true;
 
