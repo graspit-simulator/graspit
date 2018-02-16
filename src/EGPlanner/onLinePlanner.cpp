@@ -31,6 +31,7 @@
 #include "graspit/robot.h"
 #include "graspit/EGPlanner/simAnn.h"
 #include "graspit/EGPlanner/searchState.h"
+#include "graspit/EGPlanner/simAnnParams.h"
 #include "graspit/EGPlanner/energy/searchEnergy.h"
 #include "graspit/EGPlanner/graspTesterThread.h"
 #include "graspit/EGPlanner/onLineGraspInterface.h"
@@ -50,7 +51,7 @@ OnLinePlanner::OnLinePlanner(Hand *h) : SimAnnPlanner(h)
   mSolutionClone = NULL;
   mMarkSolutions = true;
   mCurrentBest = NULL;
-  mSimAnn->setParameters(ANNEAL_ONLINE);
+  mSimAnn->setParameters(SimAnnParams::ANNEAL_ONLINE());
   setRenderType(RENDER_LEGAL);
   mRepeat = true;
 

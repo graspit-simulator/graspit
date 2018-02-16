@@ -218,12 +218,13 @@ set (GRASPIT_EGPLANNER_HEADERS
     ${GSRC}/include/graspit/EGPlanner/onLinePlanner.h
     ${GSRC}/include/graspit/EGPlanner/egPlanner.h
     ${GSRC}/include/graspit/EGPlanner/simAnnPlanner.h
+    ${GSRC}/include/graspit/EGPlanner/simAnnParams.h
     ${GSRC}/include/graspit/EGPlanner/guidedPlanner.h
     ${GSRC}/include/graspit/EGPlanner/loopPlanner.h
     ${GSRC}/include/graspit/EGPlanner/timeTest.h
     ${GSRC}/include/graspit/EGPlanner/graspTesterThread.h
     ${GSRC}/include/graspit/EGPlanner/onLineGraspInterface.h
-    ${GSRC}/include/graspit/EGPlanner/listPlanner.h 
+    ${GSRC}/include/graspit/EGPlanner/listPlanner.h
 )
 
 set (GRASPIT_EGPLANNER_ENERGY_HEADERS
@@ -473,6 +474,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/onLinePlanner.cpp 
     ${GSRC}/src/EGPlanner/egPlanner.cpp 
     ${GSRC}/src/EGPlanner/simAnnPlanner.cpp 
+    ${GSRC}/src/EGPlanner/simAnnParams.cpp
     ${GSRC}/src/EGPlanner/guidedPlanner.cpp 
     ${GSRC}/src/EGPlanner/loopPlanner.cpp 
     ${GSRC}/src/EGPlanner/timeTest.cpp 
