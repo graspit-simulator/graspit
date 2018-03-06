@@ -1415,7 +1415,8 @@ Grasp::stiffnessMatrix(const std::list<Joint*> &joints,
 
   // Finger tip compliance
   Matrix Cs(Matrix::EYE(6*numContacts, 6*numContacts));
-  for (int i=0; i<numContacts; i++) Cs.elem(6*i+2, 6*i+2) = 0.2;  
+  // for (int i=0; i<numContacts; i++) Cs.elem(6*i+2, 6*i+2) = 0.2;  
+  Cs.multiply(0.5);
   // Joint compliance
   Matrix Cq(Matrix::ZEROES<Matrix>(numJoints, numJoints));
   Matrix J(contactJacobian(joints, contacts));
