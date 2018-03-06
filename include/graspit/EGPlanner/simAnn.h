@@ -37,6 +37,7 @@ class SoSensor;
 #include <stdio.h>
 #include "graspit/matvec3D.h"
 #include <vector>
+#include "graspit/EGPlanner/simAnnParams.h"
 
 /*! This class performs simulated annealing on a collection of variables
   (a GraspPlanningState*). It has no idea of grasps, hands, etc. The cooling
@@ -58,23 +59,7 @@ class SimAnn : public QObject
     enum Result {FAIL = 0, JUMP = 1, KEEP = 2};
   private:
 
-    //Annealing parameters
-    //! Annealing constant for neighbor generation schedule
-    double YC;
-    //! Annealing constant for error acceptance schedule
-    double HC;
-    //! Number of dimensions for neighbor generation schedule
-    double YDIMS;
-    //! Number of dimensions for error acceptance schedule
-    double HDIMS;
-    //! Adjust factor for neighbor generation schedule
-    double NBR_ADJ;
-    //! Adjust raw errors reported by states to be in the relevant range of the annealing schedule
-    double ERR_ADJ;
-    //! Starting temperatue
-    double DEF_T0;
-    //! Starting step
-    double DEF_K0;
+    SimAnnParams mParams;
 
     //! The current step index, used by annealing schedule
     long int mCurrentStep;
@@ -108,6 +93,7 @@ class SimAnn : public QObject
 
     void reset();
     int getCurrentStep() {return mCurrentStep;}
-    void setParameters(AnnealingType type);
+    int getStartingStep() {return mParams.DEF_K0;}
+    void setParameters(SimAnnParams params);
     void writeResults(bool w);
 };

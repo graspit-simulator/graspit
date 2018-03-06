@@ -52,12 +52,12 @@ SimAnnPlanner::~SimAnnPlanner()
 }
 
 void
-SimAnnPlanner::setAnnealingParameters(AnnealingType y) {
+SimAnnPlanner::setAnnealingParameters(SimAnnParams params) {
   if (isActive()) {
     DBGA("Stop planner before setting ann parameters");
     return;
   }
-  mSimAnn->setParameters(y);
+  mSimAnn->setParameters(params);
 }
 
 void
@@ -74,6 +74,12 @@ SimAnnPlanner::initialized()
 {
   if (!mCurrentState) { return false; }
   return true;
+}
+
+int
+SimAnnPlanner::getStartingStep()
+{
+    return mSimAnn->getStartingStep();
 }
 
 void

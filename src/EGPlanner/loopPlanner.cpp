@@ -43,7 +43,7 @@ LoopPlanner::LoopPlanner(Hand *h)
   mEnergyCalculator->setAvoidList(&mAvoidList);
 
   mSimAnn = new SimAnn();
-  mSimAnn->setParameters(ANNEAL_LOOP);
+  mSimAnn->setParameters(SimAnnParams::ANNEAL_LOOP());
   mRepeat = true;
 
   mDistanceThreshold = 0.1f;
