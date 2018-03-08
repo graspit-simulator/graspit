@@ -1432,7 +1432,6 @@ Grasp::stiffnessMatrix(const std::list<Joint*> &joints,
       Cs.elem(6*i+1, 6*i+1) = 1.0;
     }
   }
-  DBGA(Cs);
 
   // Joint compliance
   Matrix Cq(Matrix::ZEROES<Matrix>(numJoints, numJoints));
