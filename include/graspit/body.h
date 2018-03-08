@@ -92,6 +92,12 @@ class Body : public WorldElement {
     //! The Young's Modulus of the material, it describes its elasticity
     double youngMod;
 
+    //! The normal compliance of the link contact material for grasp compliance analysis
+    double normalCompl;
+
+    //! The shear compliance of the link contact material for grasp compliance analysis
+    double shearCompl;
+
     //! The file that geometry was loaded from, if any
     QString mGeometryFilename;
 
@@ -273,6 +279,12 @@ class Body : public WorldElement {
 
     //! Returns the Young's modulus for this body
     double getYoungs() { return youngMod; }
+
+    //! Returns the normal compliance of the link contact material
+    double getNormalCompl() { return normalCompl; }
+
+    //! Returns the shear compliance of the link contact material
+    double getShearCompl() { return shearCompl; }
 
     /*! Returns a pointer to the root of the Inventor geometry that was loaded.*/
     SoSeparator *getIVGeomRoot() const {return IVGeomRoot;}

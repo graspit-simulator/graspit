@@ -112,6 +112,8 @@ Body::Body(World *w, const char *name) : WorldElement(w, name)
   //defaults:
   mIsElastic = false;
   youngMod = -1;
+  normalCompl = -1;
+  shearCompl = -1;
 
   material = -1;
   numContacts = 0;
@@ -140,6 +142,8 @@ Body::Body(const Body &b) : WorldElement(b)
   mIsElastic = b.mIsElastic;
   material = b.material;
   youngMod = b.youngMod;
+  normalCompl = b.normalCompl;
+  shearCompl = b.shearCompl;
   showFC = b.showFC;
   mUsesFlock = b.mUsesFlock;
   mRenderGeometry = true;
@@ -183,6 +187,8 @@ Body::cloneFrom(const Body *original)
 {
   mIsElastic = original->mIsElastic;
   youngMod = original->youngMod;
+  normalCompl = original->normalCompl;
+  shearCompl = original->shearCompl;
   material = original->material;
 
   //add virtual contacts
@@ -249,6 +255,30 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
       return FAILURE;
     }
     mIsElastic = true;
+  }
+
+  //Contact compliance of link material
+  element = findXmlElement(root, "normalCompliance");
+  if (element) {
+    valueStr = element->GetText();
+    normalCompl = valueStr.toDouble();
+    if (normalCompl <= 0) {
+      QTWARNING("invalid normal compliance in body file");
+      return FAILURE;
+    }
+  }
+  element = findXmlElement(root, "shearCompliance");
+  if (element) {
+    valueStr = element->GetText();
+    shearCompl = valueStr.toDouble();
+    if (normalCompl <= 0) {
+      QTWARNING("invalid shear compliance in body file");
+      return FAILURE;
+    }
+  }
+  if (!((normalCompl > 0) == (shearCompl > 0))) {
+    QTWARNING("invalid compliance in body file. Must set both normal and shear compliance (or neither)");
+    return FAILURE;
   }
 
   //Use Flock of Birds
@@ -340,6 +370,12 @@ Body::saveToXml(QTextStream &xml) {
   xml << "\t\t\t<material>" << myWorld->getMaterialName(material).latin1() << "</material>" << endl;
   if (youngMod > 0) {
     xml << "\t\t\t<youngs>" << youngMod << "</youngs>" << endl;
+  }
+  if (normalCompl > 0) {
+    xml << "\t\t\t<normalCompliance>" << normalCompl << "</normalCompliance>" << endl;
+  }
+  if (shearCompl > 0) {
+    xml << "\t\t\t<shearCompliance>" << shearCompl << "</shearCompliance>" << endl;
   }
   if (mUsesFlock) {
     xml << "\t\t\t<useFlockOfBirds>" << mBirdNumber << "</useFlockOfBirds>" << endl;
