@@ -51,7 +51,7 @@ bool Table::Populate(QSqlQuery query) {
   if (query.next()) {
     QSqlRecord first_record = query.record();
     num_columns_ = first_record.count();
-    data_.resize(num_columns_, vector<QVariant>(query.numRowsAffected()));
+    data_.resize(num_columns_);
     for (int i = 0; i < num_columns_; ++i) {
       column_names_.insert(make_pair(first_record.fieldName(i).toStdString(), i));
       //cerr << "Column name: " << first_record.fieldName(i).toStdString() << "\n";
