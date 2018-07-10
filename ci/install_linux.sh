@@ -11,4 +11,4 @@ libqhull-dev
 libeigen3-dev
 '
 
-sudo apt-get -qq --yes --force-yes install $APT
+sudo apt-get -qq --yes install $APT
