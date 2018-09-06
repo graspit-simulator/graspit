@@ -610,11 +610,11 @@ if(OPTIMIZATION_SOLVER STREQUAL GUROBI)
         ${GSRC}/src/math/gurobi.cpp
         )
     find_library(GUROBI_CPP_LIBRARIES
-        NAMES gurobi_c++
+        NAMES gurobi_g++5.2
         PATHS ${GUROBI_ROOT}/lib/
     )
     find_library(GUROBI_LIBRARIES
-        NAMES gurobi65
+        NAMES gurobi80
         PATHS ${GUROBI_ROOT}/lib/
     )
 endif(OPTIMIZATION_SOLVER STREQUAL GUROBI)

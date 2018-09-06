@@ -655,6 +655,18 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
 
 //  -----------  Routines constructing non-iterative problems  ----------------  //
 
+//! The non-iterative formulation for direct drive hands
+/*!
+  Variables: contact motion amplitude (alpha)
+             contact force amplitude (beta)
+             object motion (x)
+             joint motion (q)
+             contact breaking decision variable (y1)
+             joint backdriving decision variable (y2)
+             contact sliding decision variable (y3)
+             SOS2 variables for contact forces and motions (z)
+             relative closeness of variables to virtual limits (v)
+*/
 void
 GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload, 
   const Matrix &wrench /*=ZEROES*/, const Matrix &beta /*=Matrix(0,0)*/, 
@@ -669,7 +681,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   P.var["y2"]    = 5; P.block_cols.push_back(numJoints);     P.varNames.push_back("y2");
   P.var["y3"]    = 6; P.block_cols.push_back(numContacts);   P.varNames.push_back("y3");
   P.var["z"]     = 7; P.block_cols.push_back(9*numContacts); P.varNames.push_back("z");
-  P.var["v"]     = 8; P.block_cols.push_back(1);             P.varNames.push_back("v");
+  // P.var["v"]     = 8; P.block_cols.push_back(1);             P.varNames.push_back("v");
 
   // Set virtual limits for MIP representation of linear complementarities
   setVirtualLimits(preload, wrench);
@@ -679,8 +691,8 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   if (beta.rows()) beta_p.copyMatrix(beta);
 
   // Objective 
-  //springDeformationObjective(P);
-  virtualLimitsObjective(P);
+  springDeformationObjective(P);
+  //virtualLimitsObjective(P);
 
   // equality constraints
   objectWrenchConstraint(P, wrench);
@@ -694,10 +706,10 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   frictionConeEdgeConstraint(P, beta_p);
   contactMovementConstraint(P);
   amplitudesSOS2Constraint(P, beta_p);
-  virtualLimitLBConstraint(P);
+  //virtualLimitLBConstraint(P);
 
   // quadratic inequality constraints
-  objectMotionLimit(P);
+  //objectMotionLimit(P);
 
   // solution bounds and types
   variableBoundsAndTypes(P, beta_p);

@@ -48,7 +48,7 @@ struct GraspStruct {
     delete cj;
   }
 
-  // Pointers to objective Matrices and solution bounds
+  // Pointers to objective Matrices
   Matrix *Q = NULL;
   Matrix *cj = NULL;
 
@@ -154,11 +154,11 @@ private:
   int numContacts;
   int numJoints;
 
-  int BetaMax;
-  int TauMax;
-  int AlphaMax;
-  int QMax;
-  int KMax;
+  double BetaMax;
+  double TauMax;
+  double AlphaMax;
+  double QMax;
+  double KMax;
 
   // contacts and joints in the grasp
   std::list<Contact*> contacts;
