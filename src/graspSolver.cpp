@@ -27,6 +27,8 @@
 
 #include "graspit/graspSolver.h"
 #include "graspit/debug.h"
+#include "graspit/graspitCore.h"
+#include "graspit/ivmgr.h"
 #include <sstream>
 
 const double GraspSolver::kBetaMaxBase = 50;
@@ -174,6 +176,17 @@ GraspSolver::rigidJointsConstraint(GraspStruct &P)
   Eq.copySubMatrixBlockIndices(0, P.var["q"], Matrix::EYE(numJoints, numJoints));
   P.Eq_list.push_back(Eq);
   P.b_list.push_back(Matrix::ZEROES<Matrix>(numJoints, 1));
+}
+
+void
+GraspSolver::objectMotionConstraint(GraspStruct &P, const Matrix &wrench)
+{
+  Matrix Eq( Matrix::ZEROES<Matrix>(6, P.block_cols) );
+
+  Eq.copySubMatrixBlockIndices(0, P.var["x"], Matrix::EYE(6,6));
+  P.Eq_list.push_back(Eq);
+
+  P.b_list.push_back(wrench);
 }
 
 //  -------------------------  Inequality Constraints  ------------------------------  //
@@ -1350,7 +1363,13 @@ GraspSolver::drawContactWrenches(const Matrix &beta)
 {
   Matrix D(Contact::frictionForceBlockMatrix(contacts));  
   Matrix cWrenches(matrixMultiply(D, beta));
+  double scale = 2.0e7 / cWrenches.getSubMatrix(0,0,6,1).fnorm();
+  for (int i=1; i<cWrenches.rows()/6; i++) {
+    scale = std::min(scale, 2.0e7 / cWrenches.getSubMatrix(6*i,0,6,1).fnorm());
+  }
+  cWrenches.multiply(scale);
   g->displayContactWrenches(&contacts, cWrenches);
+  graspitCore->getIVmgr()->drawDynamicForces();
 }
 
 void

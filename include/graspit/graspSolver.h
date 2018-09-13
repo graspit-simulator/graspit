@@ -185,6 +185,8 @@ private:
   void movementAmplitudesConstraint(GraspStruct &P);
   // constraint that makes the joints rigid
   void rigidJointsConstraint(GraspStruct &P);
+  // constraint that forces the object to move a certain way (for debug)
+  void objectMotionConstraint(GraspStruct &P, const Matrix &wrench);
   // normal forces at contacts are determined by the deformation of virtual springs
   void virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p);
   // joints may only move at their prescribed preload torque

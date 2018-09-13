@@ -1675,16 +1675,18 @@ Grasp::displayContactWrenches(std::list<Contact *> *contacts,
   for (it = contacts->begin(); it != contacts->end(); it++, count++) {
     Contact *contact = *it;
     if (contact->getBody2()->isDynamic()) {
+      Matrix linkFrame(contact->localToWorldWrenchMatrix());
+      Matrix bodyFrame(contact->getMate()->localToWorldWrenchMatrix());
+      Matrix bodyInv(bodyFrame);
+      matrixInverse(bodyFrame, bodyInv);
+      Matrix transform(matrixMultiply(bodyInv, linkFrame));
+      Matrix linkWrench(contactWrenches.getSubMatrix(6*count, 0, 6, 1));
+      Matrix bodyWrench(matrixMultiply(transform, linkWrench));
       //wrench is also scaled down for now for rendering and output purposes
-      //we also transform the wrench to the mate's coordinate system, which
-      //usually involves negating the x and z axes
       double dynWrench[6];
       for (int i = 0; i < 6; i++) {
-        dynWrench[i] = -1.0 * 1.0e-6 * contactWrenches.elem(6 * count + i, 0);
+        dynWrench[i] = 1.0e-6 * bodyWrench.elem(i, 0);
       }
-      //the y axis is not negated
-      dynWrench[1] = -1.0 * dynWrench[1];
-      dynWrench[4] = -1.0 * dynWrench[4];
       contact->getMate()->setDynamicContactWrench(dynWrench);
     }
   }
