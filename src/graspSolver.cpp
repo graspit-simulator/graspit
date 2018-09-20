@@ -694,7 +694,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   P.var["y2"]    = 5; P.block_cols.push_back(numJoints);     P.varNames.push_back("y2");
   P.var["y3"]    = 6; P.block_cols.push_back(numContacts);   P.varNames.push_back("y3");
   P.var["z"]     = 7; P.block_cols.push_back(9*numContacts); P.varNames.push_back("z");
-  // P.var["v"]     = 8; P.block_cols.push_back(1);             P.varNames.push_back("v");
+  P.var["v"]     = 8; P.block_cols.push_back(1);             P.varNames.push_back("v");
 
   // Set virtual limits for MIP representation of linear complementarities
   setVirtualLimits(preload, wrench);
@@ -704,8 +704,8 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   if (beta.rows()) beta_p.copyMatrix(beta);
 
   // Objective 
-  springDeformationObjective(P);
-  //virtualLimitsObjective(P);
+  //springDeformationObjective(P);
+  virtualLimitsObjective(P);
 
   // equality constraints
   objectWrenchConstraint(P, wrench);
@@ -719,7 +719,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   frictionConeEdgeConstraint(P, beta_p);
   contactMovementConstraint(P);
   amplitudesSOS2Constraint(P, beta_p);
-  //virtualLimitLBConstraint(P);
+  virtualLimitLBConstraint(P);
 
   // quadratic inequality constraints
   //objectMotionLimit(P);
@@ -1148,7 +1148,7 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
   bool cone_movement, bool rigid)
 {
   std::ofstream output;
-  output.open("log/2Dmap.txt");
+  output.open("./log/2Dmap.txt");
   output << "d1, d2\n";
 
   // Directions defining the plane in which to create the 2D map. If there
@@ -1157,8 +1157,8 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
   // the vector defining that direction
   Matrix direction1(Matrix::ZEROES<Matrix>(6,1));
   Matrix direction2(Matrix::ZEROES<Matrix>(6,1));
-  direction1.elem(1,0) = 1;
-  direction2.elem(0,0) = 10;
+  direction1.elem(0,0) = 1;
+  direction2.elem(2,0) = 10;
 
   int directionSteps = 100;
   for (int i=0; i<directionSteps; i++) {
