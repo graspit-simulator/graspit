@@ -33,7 +33,7 @@
 
 const double GraspSolver::kBetaMaxBase = 50;
 const double GraspSolver::kTauMaxBase = 2500;
-const double GraspSolver::kAlphaMaxBase = 125;
+const double GraspSolver::kAlphaMaxBase = 600;
 const double GraspSolver::kQMaxBase = 50;
 const double GraspSolver::kKMaxBase = 250;
 const double GraspSolver::kMaxMotion = 5.0;
