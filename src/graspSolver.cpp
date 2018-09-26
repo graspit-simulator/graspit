@@ -1158,9 +1158,9 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
   Matrix direction1(Matrix::ZEROES<Matrix>(6,1));
   Matrix direction2(Matrix::ZEROES<Matrix>(6,1));
   direction1.elem(0,0) = 1;
-  direction2.elem(2,0) = 10;
+  direction2.elem(2,0) = 1;
 
-  int directionSteps = 100;
+  int directionSteps = 500;
   for (int i=0; i<directionSteps; i++) {
 
     Matrix xcomponent(direction1);
@@ -1178,7 +1178,7 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
     w_max.elem(0,0) = sin(2*M_PI*i/directionSteps) * direction1.fnorm();
     w_max.elem(1,0) = cos(2*M_PI*i/directionSteps) * direction2.fnorm();
     w_max.multiply(max/w_max.fnorm());
-    output << w_max.elem(0,0) << ", " << w_max.elem(1,0) << "\n";
+    output << -w_max.elem(0,0) << ", " << -w_max.elem(1,0) << "\n";
 
     DBGA("---------------- Iteration " << i << "/" << directionSteps);
   }
@@ -1376,7 +1376,12 @@ void
 GraspSolver::drawObjectMovement(SolutionStruct &S) 
 {
   Matrix x( S.sol->getSubMatrixBlockIndices(S.var["x"], 0) );
-  //g->drawObjectMovement(x);
+  double minWrench[6];
+  for (int i=0; i<6; i++) {
+    minWrench[i] = -x.elem(i,0);
+  }
+  g->setMinWrench(minWrench);
+  graspitCore->getIVmgr()->drawWorstCaseWrenches();
 }
 
 //  --------------------------  Useful Matrices  -------------------------------  //
