@@ -33,9 +33,9 @@
 
 const double GraspSolver::kBetaMaxBase = 50;
 const double GraspSolver::kTauMaxBase = 2500;
-const double GraspSolver::kAlphaMaxBase = 600;
+const double GraspSolver::kAlphaMaxBase = 1000;
 const double GraspSolver::kQMaxBase = 50;
-const double GraspSolver::kKMaxBase = 250;
+const double GraspSolver::kKMaxBase = 500;
 const double GraspSolver::kMaxMotion = 5.0;
 
 #define BIN_ULIMIT 1
