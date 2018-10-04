@@ -31,12 +31,18 @@
 #include "graspit/ivmgr.h"
 #include <sstream>
 
+const double GraspSolver::kSpringStiffness = 1.0;
+const double GraspSolver::kNormalUncertainty = 1.0*M_PI/180.0;
+
 const double GraspSolver::kBetaMaxBase = 50;
 const double GraspSolver::kTauMaxBase = 2500;
 const double GraspSolver::kAlphaMaxBase = 5000;
 const double GraspSolver::kQMaxBase = 50;
 const double GraspSolver::kKMaxBase = 500;
+
 const double GraspSolver::kMaxMotion = 5.0;
+
+const double GraspSolver::kVirtualLimitTolerance = 0.25;
 
 #define BIN_ULIMIT 1
 
@@ -194,11 +200,6 @@ GraspSolver::objectMotionConstraint(GraspStruct &P, const Matrix &wrench)
 void
 GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p) 
 {
-  // uncertainty in contact normal in radians
-  double uncertainty = 1.0*M_PI/180.0;
-  // stiffness
-  double k = 1.0;
-
   std::vector<int> block_rows(4, numContacts);
   Matrix InEq( Matrix::ZEROES<Matrix>(block_rows, P.block_cols) );
 
@@ -211,15 +212,15 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   Matrix RT(Grasp::graspMapMatrix(R).transposed());
   Matrix K(matrixMultiply(N, RT));
   Matrix NJ(matrixMultiply(N, J));
+  Matrix E(tangentialDisplacementSummationMatrix(contacts));
 
   Matrix S_k(S);
-  S_k.multiply(1/k);
+  S_k.multiply(1/kSpringStiffness);
 
   // we assume the worst case such that normal force is diminished
-  K.multiply(cos(uncertainty));
-  NJ.multiply(cos(uncertainty));
-  Matrix E(tangentialDisplacementSummationMatrix(contacts));
-  E.multiply(sin(uncertainty));
+  K.multiply(cos(kNormalUncertainty));
+  NJ.multiply(cos(kNormalUncertainty));
+  E.multiply(sin(kNormalUncertainty));
 
   // vector of normal forces at contacts
   Matrix c(matrixMultiply(S, beta_p));
@@ -1214,38 +1215,38 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
   // Check if solution is close to virtual bounds. If so issue a warning
   if (S.var.find("beta") != S.var.end()) {
     Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
-    if (beta.max() > 0.25 * BetaMax) {
+    if (beta.max() > kVirtualLimitTolerance * BetaMax) {
       DBGA("beta (" << beta.max() 
-        << ") is larger than 1/4 of the virtual limit (" << BetaMax 
-        << "). Consider increasing BetaMax");      
+        << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
+        << BetaMax << "). Consider increasing BetaMax");      
       exit(0);
     }
     Matrix J(g->contactJacobian(joints, contacts));
     Matrix D(Contact::frictionForceBlockMatrix(contacts));
     Matrix JTD(matrixMultiply(J.transposed(), D));
     Matrix tau(matrixMultiply(JTD, beta));
-    if (tau.max() > 0.25 * TauMax) {
+    if (tau.max() > kVirtualLimitTolerance * TauMax) {
       DBGA("tau (" << tau.max() 
-        << ") is larger than 1/4 of the virtual limit (" << TauMax 
-        << "). Consider increasing TauMax");
+        << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
+        << TauMax << "). Consider increasing TauMax");
       exit(0);
     }
   }
   if (S.var.find("q") != S.var.end()) {
     Matrix q(S.sol->getSubMatrixBlockIndices(S.var["q"], 0));
-    if (q.max() > 0.25 * QMax && q.max() != QMax) {
+    if (q.max() > kVirtualLimitTolerance * QMax) {
       DBGA("q (" << q.max() 
-        << ") is larger than 1/4 of the virtual limit (" << QMax 
-        << "). Consider increasing QMax");      
+        << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
+        << QMax << "). Consider increasing QMax");      
       exit(0);
     }
   }
   if (S.var.find("f") != S.var.end()) {
     Matrix f(S.sol->getSubMatrixBlockIndices(S.var["f"], 0));
-    if (f.max() > 0.25 * TauMax) {
+    if (f.max() > kVirtualLimitTolerance * TauMax) {
       DBGA("f (" << f.max() 
-        << ") is larger than 1/4 of the virtual limit (" << TauMax 
-        << "). Consider increasing TauMax");      
+        << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
+        << TauMax << "). Consider increasing TauMax");      
       exit(0);
     }
   }
@@ -1256,10 +1257,10 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     // as it may without breaking the constraint on alpha. In this case the 
     // greatest alpha will be exactly equal to the virtual limit. Hence, an
     // additional test for this case had to be added to the below check. 
-    if (alpha.max() > 0.25 * AlphaMax && alpha.max() != AlphaMax) {
+    if (alpha.max() > kVirtualLimitTolerance * AlphaMax/* && alpha.max() != AlphaMax*/) {
       DBGA("alpha (" << alpha.max() 
-        << ") is larger than 1/4 of the virtual limit (" << AlphaMax 
-        << "). Consider increasing AlphaMax");
+        << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
+        << AlphaMax << "). Consider increasing AlphaMax");
       exit(0);
     }
   }
@@ -1270,14 +1271,24 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     Matrix RT(Grasp::graspMapMatrix(R).transposed());
     Matrix K(matrixMultiply(N, RT));
     Matrix NJ(matrixMultiply(N, J));
+    Matrix E(tangentialDisplacementSummationMatrix(contacts));
+
+    K.multiply(cos(kNormalUncertainty));
+    NJ.multiply(cos(kNormalUncertainty));
+    E.multiply(sin(kNormalUncertainty));
 
     Matrix q(S.sol->getSubMatrixBlockIndices(S.var["q"], 0));
     Matrix x(S.sol->getSubMatrixBlockIndices(S.var["x"], 0));
-    Matrix k(matrixAdd(matrixMultiply(NJ, q), matrixMultiply(K, x).negative()));
-    if (k.max() > 0.25 * KMax  && (KMax - k.max()) > 1) {
+    Matrix alpha(S.sol->getSubMatrixBlockIndices(S.var["alpha"], 0));
+    Matrix Kx(matrixMultiply(K, x));
+    Matrix NJq(matrixMultiply(NJ, q));
+    Matrix Ealpha(matrixMultiply(E, alpha));
+    Matrix springs(matrixAdd(matrixMultiply(NJ, q), matrixMultiply(K, x).negative()));
+    Matrix k(matrixAdd(springs, matrixMultiply(E, alpha)));
+    if (k.max() > kVirtualLimitTolerance * KMax) {
       DBGA("k (" << k.max() 
-        << ") is larger than 1/4 of the virtual limit (" << KMax 
-        << "). Consider increasing KMax");      
+        << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
+        << KMax << "). Consider increasing KMax");      
       exit(0);
     }
   }

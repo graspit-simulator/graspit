@@ -140,6 +140,9 @@ public:
                   bool cone_movement,
                   bool rigid);
 
+  static const double kSpringStiffness;
+  static const double kNormalUncertainty;
+
   static const double kBetaMaxBase;
   static const double kTauMaxBase;
   static const double kAlphaMaxBase;
@@ -147,6 +150,8 @@ public:
   static const double kKMaxBase;
 
   static const double kMaxMotion;
+
+  static const double kVirtualLimitTolerance;
 
 private:
   Grasp *g;
