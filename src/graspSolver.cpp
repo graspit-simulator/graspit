@@ -194,8 +194,10 @@ GraspSolver::objectMotionConstraint(GraspStruct &P, const Matrix &wrench)
 void
 GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p) 
 {
+  // uncertainty in contact normal in radians
+  double uncertainty = 1.0*M_PI/180.0;
   // stiffness
-  double k = 1;
+  double k = 1.0;
 
   std::vector<int> block_rows(4, numContacts);
   Matrix InEq( Matrix::ZEROES<Matrix>(block_rows, P.block_cols) );
@@ -212,6 +214,12 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
 
   Matrix S_k(S);
   S_k.multiply(1/k);
+
+  // we assume the worst case such that normal force is diminished
+  K.multiply(cos(uncertainty));
+  NJ.multiply(cos(uncertainty));
+  Matrix E(tangentialDisplacementSummationMatrix(contacts));
+  E.multiply(sin(uncertainty));
 
   // vector of normal forces at contacts
   Matrix c(matrixMultiply(S, beta_p));
@@ -230,6 +238,7 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   InEq.copySubMatrixBlockIndices(1, P.var["beta"], S_k.negative());
   InEq.copySubMatrixBlockIndices(1, P.var["x"],    K);
   InEq.copySubMatrixBlockIndices(1, P.var["q"],    NJ.negative());
+  InEq.copySubMatrixBlockIndices(1, P.var["alpha"],E.negative());
 
   InEq.copySubMatrixBlockIndices(2, P.var["beta"], S);
   InEq.copySubMatrixBlockIndices(2, P.var["y1"],   k1);
@@ -237,6 +246,7 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   InEq.copySubMatrixBlockIndices(3, P.var["beta"], S_k);
   InEq.copySubMatrixBlockIndices(3, P.var["x"],    K.negative());
   InEq.copySubMatrixBlockIndices(3, P.var["q"],    NJ);
+  InEq.copySubMatrixBlockIndices(3, P.var["alpha"],E);
   InEq.copySubMatrixBlockIndices(3, P.var["y1"],   k2);
   P.InEq_list.push_back(InEq);
 
@@ -405,16 +415,7 @@ GraspSolver::frictionConeEdgeConstraint(GraspStruct &P, const Matrix &beta_p)
 void
 GraspSolver::contactMovementConstraint(GraspStruct &P)
 {
-  std::list<Matrix> sigma_list;
-  std::list<Contact*>::iterator it;
-  for (it=contacts.begin(); it!=contacts.end(); it++) {
-    Matrix sigma(1, (*it)->numFrictionEdges+1);
-    sigma.setAllElements(1.0);
-    sigma.elem(0,0) = 0;
-    sigma_list.push_back(sigma);
-  }
-
-  Matrix sigmaDiag( Matrix::BLOCKDIAG<Matrix>(sigma_list) );
+  Matrix sigmaDiag(tangentialDisplacementSummationMatrix(contacts));
 
   Matrix k8( Matrix::EYE(numContacts, numContacts) );
   k8.multiply(2*AlphaMax);
@@ -1423,4 +1424,20 @@ tangentialDisplacementSelectionMatrix(int numContacts)
     M.elem(2*i+1, 6*i+1) = 1.0;
   }
   return M;
+}
+
+//  Summation matrix for tangential contact displacements
+Matrix
+tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts)
+{
+  std::list<Matrix> sigma_list;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    Matrix sigma(1, (*it)->numFrictionEdges+1);
+    sigma.setAllElements(1.0);
+    sigma.elem(0,0) = 0;
+    sigma_list.push_back(sigma);
+  }
+
+  return Matrix::BLOCKDIAG<Matrix>(sigma_list);
 }

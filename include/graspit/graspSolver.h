@@ -254,6 +254,7 @@ private:
 Matrix normalForceSelectionMatrix(std::list<Contact*> &contacts);
 Matrix normalDisplacementSelectionMatrix(int numContacts);
 Matrix tangentialDisplacementSelectionMatrix(int numContacts);
+Matrix tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts);
 Matrix graspMapMatrix(const Matrix &R);
 
 #define GRASP_SOLVER_H
