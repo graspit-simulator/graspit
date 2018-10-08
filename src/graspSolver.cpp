@@ -435,35 +435,47 @@ GraspSolver::contactMovementConstraint(GraspStruct &P)
 void
 GraspSolver::amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p)
 {
-  Matrix alphaSelector( Matrix::ZEROES<Matrix>(8,9) );
-  alphaSelector.copySubMatrix(0, 1, Matrix::EYE(8,8));
-  Matrix betaSelector( Matrix::ZEROES<Matrix>(8,9) );
-  betaSelector.copySubMatrix(0, 1, Matrix::EYE(8,8));
-  Matrix zSelector( Matrix::ZEROES<Matrix>(8,9) );
-  zSelector.copySubMatrix(0, 0, Matrix::EYE(8,8));
-  zSelector.elem(0,8) = 1.0;
-
-  std::list<Matrix*> alpha_list;
-  std::list<Matrix*> beta_list;
-  std::list<Matrix*> z_list;
-
   int z_index = 0;
   for (int i=0; i<P.var["z"]; i++) z_index += P.block_cols[i];
 
-  for (int i=0; i<numContacts; i++) {
-    alpha_list.push_back(&alphaSelector);
-    beta_list.push_back(&betaSelector);
-    z_list.push_back(&zSelector);
+  std::list<Matrix *> alpha_blocks;
+  std::list<Matrix *> beta_blocks;
+  std::list<Matrix *> z_blocks;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    int numFrictionEdges = (*it)->numFrictionEdges;
 
-    P.SOS_index.push_back(z_index + 9*i);
-    P.SOS_len.push_back(9);
+    Matrix *block = new Matrix(Matrix::ZEROES<Matrix>(numFrictionEdges, numFrictionEdges+1));
+    block->copySubMatrix(0, 1, Matrix::EYE(numFrictionEdges, numFrictionEdges));
+    
+    Matrix *z_block = new Matrix(Matrix::ZEROES<Matrix>(numFrictionEdges, numFrictionEdges+1));
+    z_block->copySubMatrix(0, 0, Matrix::EYE(numFrictionEdges, numFrictionEdges));
+    z_block->elem(0, numFrictionEdges) = 1.0;
+
+    alpha_blocks.push_back(block);
+    beta_blocks.push_back(block);
+    z_blocks.push_back(z_block);
+
+    P.SOS_index.push_back(z_index);
+    z_index += numFrictionEdges+1;
+    P.SOS_len.push_back(numFrictionEdges+1);
     P.SOS_type.push_back(2);
   }
-  Matrix alphaDiag( Matrix::BLOCKDIAG<Matrix>(&alpha_list) );
-  Matrix betaDiag( Matrix::BLOCKDIAG<Matrix>(&beta_list) );
-  Matrix zDiag( Matrix::BLOCKDIAG<Matrix>(&z_list) );
 
-  std::vector<int> block_rows(2, 8*numContacts);
+  Matrix alphaDiag( Matrix::BLOCKDIAG<Matrix>(&alpha_blocks) );
+  Matrix betaDiag( Matrix::BLOCKDIAG<Matrix>(&beta_blocks) );
+  Matrix zDiag( Matrix::BLOCKDIAG<Matrix>(&z_blocks) );
+
+  while (!alpha_blocks.empty()) {
+    delete alpha_blocks.back();
+    alpha_blocks.pop_back();
+  }
+  while (!z_blocks.empty()) {
+    delete z_blocks.back();
+    z_blocks.pop_back();
+  }
+
+  std::vector<int> block_rows(2, alphaDiag.rows());
   Matrix InEq( Matrix::ZEROES<Matrix>(block_rows, P.block_cols) );
 
   InEq.copySubMatrixBlockIndices(0, P.var["alpha"], alphaDiag);
@@ -562,8 +574,12 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
     if (!key.compare("alpha")) {
       Matrix alpha_lb(size, 1);
       alpha_lb.setAllElements(0.0);
-      for (int j=0; j<numContacts; j++)
-        alpha_lb.elem(9*j,0) = -AlphaMax;
+      int pos = 0;
+      std::list<Contact*>::iterator it;
+      for (it=contacts.begin(); it!=contacts.end(); it++) {
+        alpha_lb.elem(pos,0) = -AlphaMax;
+        pos += (*it)->numFrictionEdges+1;
+      }
       P.lb_list.push_back(alpha_lb);
 
       Matrix alpha_ub(size, 1);
@@ -687,22 +703,27 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   const Matrix &wrench /*=ZEROES*/, const Matrix &beta /*=Matrix(0,0)*/, 
   bool rigid /*=false*/) 
 {
+  int totalFrictionEdges = 0;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    totalFrictionEdges += (*it)->numFrictionEdges+1;
+  }
   // unknowns
-  P.var["alpha"] = 0; P.block_cols.push_back(9*numContacts); P.varNames.push_back("alpha");
-  P.var["beta"]  = 1; P.block_cols.push_back(9*numContacts); P.varNames.push_back("beta");
-  P.var["x"]     = 2; P.block_cols.push_back(6);             P.varNames.push_back("x");
-  P.var["q"]     = 3; P.block_cols.push_back(numJoints);     P.varNames.push_back("q");
-  P.var["y1"]    = 4; P.block_cols.push_back(numContacts);   P.varNames.push_back("y1");
-  P.var["y2"]    = 5; P.block_cols.push_back(numJoints);     P.varNames.push_back("y2");
-  P.var["y3"]    = 6; P.block_cols.push_back(numContacts);   P.varNames.push_back("y3");
-  P.var["z"]     = 7; P.block_cols.push_back(9*numContacts); P.varNames.push_back("z");
-  P.var["v"]     = 8; P.block_cols.push_back(1);             P.varNames.push_back("v");
+  P.var["alpha"] = 0; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("alpha");
+  P.var["beta"]  = 1; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("beta");
+  P.var["x"]     = 2; P.block_cols.push_back(6);                  P.varNames.push_back("x");
+  P.var["q"]     = 3; P.block_cols.push_back(numJoints);          P.varNames.push_back("q");
+  P.var["y1"]    = 4; P.block_cols.push_back(numContacts);        P.varNames.push_back("y1");
+  P.var["y2"]    = 5; P.block_cols.push_back(numJoints);          P.varNames.push_back("y2");
+  P.var["y3"]    = 6; P.block_cols.push_back(numContacts);        P.varNames.push_back("y3");
+  P.var["z"]     = 7; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("z");
+  P.var["v"]     = 8; P.block_cols.push_back(1);                  P.varNames.push_back("v");
 
   // Set virtual limits for MIP representation of linear complementarities
   setVirtualLimits(preload, wrench);
 
   // Preload contact forces (if present)
-  Matrix beta_p( Matrix::ZEROES<Matrix>(9*numContacts, 1) );
+  Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges, 1) );
   if (beta.rows()) beta_p.copyMatrix(beta);
 
   // Objective 
@@ -938,10 +959,15 @@ GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench,
     }
   numJoints = joints.size();
 
+  int totalFrictionEdges = 0;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++)
+    totalFrictionEdges += (*it)->numFrictionEdges+1;
+  Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges, 1) );
+
   int result;
   GraspStruct P;
   SolutionStruct S;
-  Matrix beta_p( Matrix::ZEROES<Matrix>(9*numContacts, 1) );
   if (single_step) {
     if (tendon) nonIterativeTendonFormulation(P, preload, wrench);
     else nonIterativeFormulation(P, preload, wrench);
