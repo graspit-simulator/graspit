@@ -55,6 +55,8 @@ GraspSolver::GraspSolver(Grasp *grasp)
 
   numContacts = contacts.size();
   numJoints = joints.size();
+
+  modifyFrictionEdges();
 }
 
 //  ------------------------  Optimization Objectives  ------------------------------  //
@@ -1351,6 +1353,29 @@ GraspSolver::setVirtualLimits(const Matrix &preload, const Matrix &wrench /*=ZER
   AlphaMax = kAlphaMaxBase*scale;
   QMax = kQMaxBase*scale;
   KMax = kKMaxBase*scale;
+}
+
+void
+GraspSolver::modifyFrictionEdges()
+{
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    double mult = 0.0;
+    for (int i=0; i<(*it)->numFrictionEdges; i++) {
+      int j = (i<(*it)->numFrictionEdges-1) ? i+1 : 0;
+      double num  = (*it)->frictionEdges[6*i]   * (*it)->frictionEdges[6*j];
+             num += (*it)->frictionEdges[6*i+1] * (*it)->frictionEdges[6*j+1];
+      double len1 = sqrt(pow((*it)->frictionEdges[6*i], 2) + pow((*it)->frictionEdges[6*i+1], 2));
+      double len2 = sqrt(pow((*it)->frictionEdges[6*j], 2) + pow((*it)->frictionEdges[6*j+1], 2));
+      double angle = acos(num/(len1*len2));
+      if (angle > Matrix::EPS) mult = len1 * cos(angle / 2.0);
+      (*it)->frictionEdges[6*i]   /= mult;
+      (*it)->frictionEdges[6*i+1] /= mult;
+      (*it)->getMate()->frictionEdges[6*i]   /= mult;
+      (*it)->getMate()->frictionEdges[6*i+1] /= mult;
+    }
+  }
+  g->getObject()->redrawFrictionCones();
 }
 
 bool 

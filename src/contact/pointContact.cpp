@@ -48,7 +48,7 @@ int PointContact::setUpFrictionEdges(bool dynamicsOn)
     return 0;
   }
   double eccen[3] = {1, 1, 1};
-  int numDirs[1] = {8};
+  int numDirs[1] = {4};
   double phi[1] = {0.0};
   return setUpFrictionEllipsoid(1, numDirs, phi, eccen);
 }
@@ -98,16 +98,14 @@ PointContact::getVisualIndicator()
   ifs = new SoIndexedFaceSet;
   tran = new SoTransform;
 
-  alpha = 0.0;
   for (i = 0; i < numFrictionEdges; i++) {
-    points[i + 1].setValue(cos(alpha)*cof, sin(alpha)*cof, 1.0);
+    points[i + 1].setValue(frictionEdges[6*i]*cof, frictionEdges[6*i+1]*cof, 1.0);
     points[i + 1] *= height;
     cIndex[4 * i] = 0;
     cIndex[4 * i + 1] = (i + 2 <= numFrictionEdges ? i + 2 : 1);
     cIndex[4 * i + 2] =  i + 1;
     cIndex[4 * i + 3] = -1;
     cIndex[4 * numFrictionEdges + i] = i + 1;
-    alpha += 2.0 * M_PI / numFrictionEdges;
   }
   cIndex[5 * numFrictionEdges] = -1;
 
