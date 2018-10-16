@@ -2,10 +2,12 @@
 #include "graspit/contact/pointContact.h"
 #include "graspit/contact/contact.h"
 #include "graspit/body.h"
+#include "graspit/math/matrix.h"
 
 #include <Inventor/nodes/SoCone.h>
 #include <Inventor/nodes/SoCoordinate3.h>
 #include <Inventor/nodes/SoCylinder.h>
+#include <Inventor/nodes/SoShapeHints.h>
 #include <Inventor/nodes/SoIndexedFaceSet.h>
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoTransform.h>
@@ -60,6 +62,7 @@ PointContact::getVisualIndicator()
   double height, alpha, cof;
   SoSeparator *cne;
   SoTransform *tran;
+  SoShapeHints *shh;
   SoIndexedFaceSet *ifs;
   SoCoordinate3 *coords;
 
@@ -95,11 +98,25 @@ PointContact::getVisualIndicator()
   height = Body::CONE_HEIGHT;
   cne = new SoSeparator;
   coords = new SoCoordinate3;
+  shh = new SoShapeHints;
   ifs = new SoIndexedFaceSet;
   tran = new SoTransform;
 
   for (i = 0; i < numFrictionEdges; i++) {
-    points[i + 1].setValue(frictionEdges[6*i]*cof, frictionEdges[6*i+1]*cof, 1.0);
+    // Contact forces built with these friction edges are expressed in
+    // link-contact frame. Therefore we must first transform them to
+    // object-contact frame
+    Matrix point(Matrix::ZEROES<Matrix>(6,1));
+    point.elem(0,0) = -frictionEdges[6*i]*cof;
+    point.elem(1,0) = -frictionEdges[6*i+1]*cof;
+    point.elem(2,0) = -1.0;
+    Matrix linkFrame(getMate()->localToWorldWrenchMatrix());
+    Matrix bodyFrame(localToWorldWrenchMatrix());
+    Matrix bodyInv(bodyFrame);
+    matrixInverse(bodyFrame, bodyInv);
+    Matrix transform(matrixMultiply(bodyInv, linkFrame));
+    Matrix p(matrixMultiply(transform, point));
+    points[i + 1].setValue(p.elem(0,0), p.elem(1,0), p.elem(2,0));
     points[i + 1] *= height;
     cIndex[4 * i] = 0;
     cIndex[4 * i + 1] = (i + 2 <= numFrictionEdges ? i + 2 : 1);
@@ -113,6 +130,9 @@ PointContact::getVisualIndicator()
   ifs->coordIndex.setValues(0, 5 * numFrictionEdges + 1, cIndex);
   delete [] points;
   delete [] cIndex;
+
+  // Needed in case friction cone is not convex
+  shh->faceType = SoShapeHints::UNKNOWN_FACE_TYPE;
 
   getContactFrame().toSoTransform(tran);
 
@@ -133,6 +153,7 @@ PointContact::getVisualIndicator()
   cne->addChild(zaxisSep);
   cne->addChild(coneMat);
   cne->addChild(coords);
+  cne->addChild(shh);
   cne->addChild(ifs);
   return cne;
 }

@@ -142,6 +142,7 @@ public:
 
   static const double kSpringStiffness;
   static const double kNormalUncertainty;
+  static const double kFrictionConeTolerance;
 
   static const double kBetaMaxBase;
   static const double kTauMaxBase;
@@ -228,6 +229,8 @@ private:
   void iterativeTendonFormulation(GraspStruct &P, const Matrix &preload, const Matrix &startingX, const Matrix &movement_directions, 
     const Matrix &wrench, const Matrix &beta);
 
+  // Solver for non-iterative formulations
+  int frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench);
   // Solver for iterative formulations
   int iterativeSolver(SolutionStruct &S, bool cone_movement, 
     std::tr1::function<void(GraspStruct&,const Matrix&,const Matrix&)> formulation);
@@ -262,6 +265,10 @@ Matrix normalDisplacementSelectionMatrix(int numContacts);
 Matrix tangentialDisplacementSelectionMatrix(int numContacts);
 Matrix tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts);
 Matrix graspMapMatrix(const Matrix &R);
+
+//  --------------------------  Useful Functions  ------------------------------  //
+
+double angleBetweenEdges(Matrix edge1, Matrix edge2);
 
 #define GRASP_SOLVER_H
 #endif

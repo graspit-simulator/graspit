@@ -33,6 +33,7 @@
 
 const double GraspSolver::kSpringStiffness = 1.0;
 const double GraspSolver::kNormalUncertainty = 1.0*M_PI/180.0;
+const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
 const double GraspSolver::kBetaMaxBase = 50;
 const double GraspSolver::kTauMaxBase = 2500;
@@ -55,8 +56,6 @@ GraspSolver::GraspSolver(Grasp *grasp)
 
   numContacts = contacts.size();
   numJoints = joints.size();
-
-  modifyFrictionEdges();
 }
 
 //  ------------------------  Optimization Objectives  ------------------------------  //
@@ -503,6 +502,11 @@ GraspSolver::virtualLimitLBConstraint(GraspStruct &P, bool iterative /*= false*/
   Matrix RT(Grasp::graspMapMatrix(R).transposed());
   Matrix K(matrixMultiply(N, RT));
   Matrix NJ(matrixMultiply(N, J));
+  Matrix E(tangentialDisplacementSummationMatrix(contacts));
+
+  K.multiply(cos(kNormalUncertainty));
+  NJ.multiply(cos(kNormalUncertainty));
+  E.multiply(sin(kNormalUncertainty));
 
   int numBetas = P.block_cols[P.var["beta"]];
   int numQs = P.block_cols[P.var["q"]];
@@ -537,6 +541,7 @@ GraspSolver::virtualLimitLBConstraint(GraspStruct &P, bool iterative /*= false*/
   InEq.copySubMatrixBlockIndices(3, P.var["q"], NJ);
   InEq.copySubMatrixBlockIndices(3, P.var["v"], S_k);
   if (!iterative) {
+    InEq.copySubMatrixBlockIndices(3, P.var["alpha"], E);
     InEq.copySubMatrixBlockIndices(4, P.var["alpha"], Matrix::EYE(numAlphas, numAlphas));
     InEq.copySubMatrixBlockIndices(4, P.var["v"], S_alpha);
   }
@@ -880,6 +885,201 @@ GraspSolver::iterativeTendonFormulation(GraspStruct &P, const Matrix &preload, c
 }
 
 int
+GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench)
+{
+  int counter = 0;
+  while (true) {
+
+    DBGA("Iteration " << ++counter);
+
+    /*std::list<Contact*>::iterator c_it;
+    for (c_it=contacts.begin(); c_it!=contacts.end(); c_it++) {
+      DBGA("Friction edges: " << (*c_it)->numFrictionEdges);
+      for (int i=0; i<2; i++) {
+        for (int j=0; j<(*c_it)->numFrictionEdges; j++) {
+          double val = (*c_it)->frictionEdges[6*j + i];
+          std::cout << std::setprecision(4) << (sqrt(pow(val,2)) > Matrix::EPS ? val : 0.0) << "\t\t";
+        }
+        std::cout << std::endl;
+      }
+    }*/
+
+    // Solve problem and exit if infeasible
+    GraspStruct P;
+    nonIterativeFormulation(P, preload, wrench);
+    int result = solveProblem(P, S);
+    if (result) return result;
+
+    // get active friction and motion edges as well as friction edge amplitudes
+    Matrix z(S.sol->getSubMatrixBlockIndices(S.var["z"], 0));
+    Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+
+    // Step through all contacts
+    int contact_index = 0;
+    bool complete = true;
+    std::list<Contact*>::iterator it;
+    for (it=contacts.begin(); it!=contacts.end(); it++) {
+
+      // If this contact is inactive, we are done with it
+      if (beta.elem(contact_index, 0) < Matrix::EPS) continue;
+
+      // Unpack friction edges for simplicity
+      int numFrictionEdges = (*it)->numFrictionEdges;
+      int container_size = sizeof((*it)->frictionEdges) / sizeof((*it)->frictionEdges[0]);
+      double frictionEdges[container_size];
+      memcpy(frictionEdges, (*it)->frictionEdges, sizeof(frictionEdges));
+
+      // Find the two active friction edges
+      int edge1 = -1;
+      int edge2;
+      for (int i=0; i<numFrictionEdges+1; i++) {
+        if (z.elem(contact_index + i, 0) > Matrix::EPS) {
+          edge1 = (i       < numFrictionEdges) ?       i : 0;
+          edge2 = (edge1+1 < numFrictionEdges) ? edge1+1 : 0;
+          break;
+        }
+      }
+      contact_index += numFrictionEdges+1;
+
+      // If no friction edges are active, we are done with this contact
+      if (edge1 == -1) continue;
+
+      // Find angle between and length of active friction edges
+      double angle;
+      double len1;
+      double len2;
+      int check_counter = 0;
+      while (true) {
+        double num  = frictionEdges[6*edge1]   * frictionEdges[6*edge2];
+               num += frictionEdges[6*edge1+1] * frictionEdges[6*edge2+1];
+        len1 = sqrt(pow(frictionEdges[6*edge1], 2) + pow(frictionEdges[6*edge1+1], 2));
+        len2 = sqrt(pow(frictionEdges[6*edge2], 2) + pow(frictionEdges[6*edge2+1], 2));
+        angle = acos(num/(len1*len2));
+        if (angle > Matrix::EPS) break;
+
+        // If the angle is zero, work on adjacent pair of friction edges
+        // with least refinement instead
+        if (len1 > len2) {
+          edge1 = (edge1-1 < 0) ? numFrictionEdges-1 : edge1-1;
+          edge2 = (edge2-1 < 0) ? numFrictionEdges-1 : edge2-1;
+        } else if (len1 < len2) {
+          edge1 = (edge1+1 < numFrictionEdges) ? edge1+1 : 0;
+          edge2 = (edge2+1 < numFrictionEdges) ? edge2+1 : 0;
+        } else {
+          DBGA("Edges with zero angle between them and same length");
+          exit(0);
+        }
+
+        // Just a check to make sure we do not have incorrect friction
+        // edges for any reason
+        if (check_counter++) {
+          DBGA("Three coincident friction edges");
+          exit(0);
+        }
+      }
+
+      // If the angle is already below the required tolerance we are done
+      // with this contact. Otherwise work is required and we know there
+      // will be at least another iteration so we can set the no-exit flag
+      if (angle <= kFrictionConeTolerance) continue;
+      complete = false;
+
+      // Check if adding new friction edges would exceed container size
+      if (numFrictionEdges + 3 > container_size/6) {
+        DBGA("FrictionEdge container size exceeded. Cannot add any more friction edges.");
+        exit(0);
+      }
+
+      // Put friction edges into a vector of matrices to make modifying them easier
+      std::vector<Matrix> fe_vec;
+      fe_vec.reserve(numFrictionEdges);
+      for (int i=0; i<numFrictionEdges; i++) {
+        Matrix fe(6,1);
+        for (int j=0; j<6; j++) {
+          fe.elem(j,0) = frictionEdges[6*i+j];
+        }
+        fe_vec.push_back(fe);
+      }
+
+      // Vector of new friction edges
+      std::vector<Matrix> new_fe_vec;
+      new_fe_vec.reserve(3);
+      Matrix new_fe(Matrix::ZEROES<Matrix>(6,1));
+
+      double mult = len1 * cos(angle / 4.0);
+      new_fe.elem(0,0) = frictionEdges[6*edge1] / mult;
+      new_fe.elem(1,0) = frictionEdges[6*edge1+1] / mult;
+      new_fe_vec.push_back(new_fe);
+
+      new_fe.setAllElements(0.0);
+      new_fe.elem(0,0) = frictionEdges[6*edge1] + frictionEdges[6*edge2];
+      new_fe.elem(1,0) = frictionEdges[6*edge1+1] + frictionEdges[6*edge2+1];
+      mult = sqrt(pow(new_fe.elem(0,0), 2) + pow(new_fe.elem(1,0), 2)) * cos(angle / 4.0);
+      new_fe.multiply(1/mult);
+      new_fe_vec.push_back(new_fe);
+
+      new_fe.setAllElements(0.0);
+      mult = len2 * cos(angle / 4.0);
+      new_fe.elem(0,0) = frictionEdges[6*edge2] / mult;
+      new_fe.elem(1,0) = frictionEdges[6*edge2+1] / mult;
+      new_fe_vec.push_back(new_fe);
+
+      // Populate list of final friction edges
+      std::list<Matrix> final_fe;
+
+      for (int i=0; i<edge1; i++) final_fe.push_back(fe_vec[i]);
+
+      int edge0 = (edge1-1 < 0) ? numFrictionEdges-1 : edge1-1;
+      if (angleBetweenEdges(fe_vec[edge0], fe_vec[edge1]) < Matrix::EPS) {
+        double difference = matrixAdd(fe_vec[edge0], new_fe_vec[0].negative()).fnorm();
+        if (difference > Matrix::EPS) {
+          final_fe.push_back(new_fe_vec[0]);
+        }
+      } else {
+        final_fe.push_back(fe_vec[edge1]);
+        final_fe.push_back(new_fe_vec[0]);
+      }
+
+      final_fe.push_back(new_fe_vec[1]);
+
+      int edge3 = (edge2+1 < numFrictionEdges) ? edge2+1 : 0;
+      if (angleBetweenEdges(fe_vec[edge2], fe_vec[edge3]) < Matrix::EPS) {
+        double difference = matrixAdd(fe_vec[edge3], new_fe_vec[2].negative()).fnorm();
+        if (difference > Matrix::EPS) {
+          final_fe.push_back(new_fe_vec[2]);
+          if (edge3) {
+            for (int i=edge3; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
+          }
+        } else {
+          if (edge2) {
+            for (int i=edge3; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
+          } else {
+            final_fe.pop_front();
+          }
+        }
+      } else {
+        final_fe.push_back(new_fe_vec[2]);
+        if (edge2)
+          for (int i=edge2; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
+      }
+
+      // Update friction edges
+      std::list<Matrix>::iterator fe_it = final_fe.begin();
+      for (int i=0; fe_it!=final_fe.end(); i++, fe_it++) {
+        for (int j=0; j<6; j++) {
+          (*it)->frictionEdges[6*i+j] = fe_it->elem(j,0);
+          (*it)->getMate()->frictionEdges[6*i+j] = fe_it->elem(j,0);
+        }
+      }
+      (*it)->numFrictionEdges = final_fe.size();
+      (*it)->getMate()->numFrictionEdges = final_fe.size();
+    }
+    g->getObject()->redrawFrictionCones();
+    if (complete) return result;
+  }
+}
+
+int
 GraspSolver::iterativeSolver(SolutionStruct &S, bool cone_movement,
   std::tr1::function<void(GraspStruct&,const Matrix&,const Matrix&)> formulation)
 {
@@ -888,7 +1088,7 @@ GraspSolver::iterativeSolver(SolutionStruct &S, bool cone_movement,
   int iterations = 0;
   Matrix startingX( Matrix::ZEROES<Matrix>(6,1) );
   Matrix movement_directions( Matrix::ZEROES<Matrix>(6,1) );
-  while (1) {
+  while (true) {
     iterations++;
     
     GraspStruct P;
@@ -959,21 +1159,22 @@ GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench,
       DBGA("Removed joint beyond contact. For underactuated hands this is not allowed");
       exit(0);
     }
-  numJoints = joints.size();
 
   int totalFrictionEdges = 0;
   std::list<Contact*>::iterator it;
-  for (it=contacts.begin(); it!=contacts.end(); it++)
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    (*it)->setUpFrictionEdges();
+    (*it)->getMate()->setUpFrictionEdges();
     totalFrictionEdges += (*it)->numFrictionEdges+1;
+  }
   Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges, 1) );
 
   int result;
   GraspStruct P;
   SolutionStruct S;
   if (single_step) {
-    if (tendon) nonIterativeTendonFormulation(P, preload, wrench);
-    else nonIterativeFormulation(P, preload, wrench);
-    result = solveProblem(P, S);
+    modifyFrictionEdges();
+    result = frictionRefinementSolver(S, preload, wrench);
   } else {
     GraspStruct P_p;
     SolutionStruct S_p;
@@ -990,7 +1191,9 @@ GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench,
     result = solveProblem(P, S);  
   }
   if (result) return result;
-  Matrix beta_t(matrixAdd(beta_p, S.sol->getSubMatrixBlockIndices(S.var["beta"], 0)));
+  Matrix beta_t(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+  if (beta_p.rows() == beta_t.rows())
+    Matrix beta_t(matrixAdd(beta_t, beta_p));
   drawContactWrenches(beta_t);
   drawObjectMovement(S);
   return result;
@@ -1092,7 +1295,6 @@ GraspSolver::findMaximumWrenchNonIterative(Matrix &preload, const Matrix &direct
       DBGA("Removed joint beyond contact. For underactuated hands this is not allowed");
       exit(0);
     }
-  numJoints = joints.size();
 
   std::tr1::function<int(const Matrix&)> func;
   if (single_step) {
@@ -1360,7 +1562,7 @@ GraspSolver::modifyFrictionEdges()
 {
   std::list<Contact*>::iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
-    double mult = 0.0;
+    double mult = 1.0;
     for (int i=0; i<(*it)->numFrictionEdges; i++) {
       int j = (i<(*it)->numFrictionEdges-1) ? i+1 : 0;
       double num  = (*it)->frictionEdges[6*i]   * (*it)->frictionEdges[6*j];
@@ -1453,15 +1655,15 @@ GraspSolver::drawObjectMovement(SolutionStruct &S)
 Matrix
 normalForceSelectionMatrix(std::list<Contact*> &contacts)
 {
+  std::list<Matrix> S_list;
   std::list<Contact*>::iterator it;
-  it=contacts.begin();
-  Matrix S(contacts.size(), contacts.size() * ((*it)->numFrictionEdges + 1));
-  S.setAllElements(0.0);
-  for (int i=0, j=0; it!=contacts.end(); i++, it++) {
-    S.elem(i, j) = 1.0;
-    j += ((*it)->numFrictionEdges + 1);
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    Matrix S(Matrix::ZEROES<Matrix>(1, (*it)->numFrictionEdges+1));
+    S.elem(0,0) = 1.0;
+    S_list.push_back(S);
   }
-  return S;
+
+  return Matrix::BLOCKDIAG<Matrix>(S_list);
 }
 
 //  Selection matrix for normal contact displacements
@@ -1503,3 +1705,15 @@ tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts)
 
   return Matrix::BLOCKDIAG<Matrix>(sigma_list);
 }
+
+double
+angleBetweenEdges(Matrix edge1, Matrix edge2) {
+  double num  = edge1.elem(0,0) * edge2.elem(0,0) + edge1.elem(1,0) * edge2.elem(1,0);
+  double len1 = sqrt(pow(edge1.elem(0,0), 2) + pow(edge1.elem(1,0), 2));
+  double len2 = sqrt(pow(edge2.elem(0,0), 2) + pow(edge2.elem(1,0), 2));
+  double val = num/(len1*len2);
+  val = (val >  1.0) ?  1.0 : val;
+  val = (val < -1.0) ? -1.0 : val;
+  return acos(val);
+}
+
