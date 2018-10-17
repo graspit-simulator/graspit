@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>2000</mass>
+	<cog>0.019 -0.347 28.892</cog>
+	<inertia_matrix>0.002 0 0 0  0.001 0 0  0 0.002</inertia_matrix>
+	<geometryFile>pg70_base_link.iv</geometryFile>
+</root>

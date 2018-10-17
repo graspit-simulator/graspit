@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!-- d0: pg70_finger1_joint, min=-0.001, max=0.04 -->
+<!-- d1: pg70_finger2_joint, min=-0.001, max=0.04 -->
+<EigenGrasps dimensions="2">
+	<EG>
+		<EigenValue value="0.5"/> <!--EigenValue is not used in the code at this stage -->
+		<!--Limits min="0" max="0"/-->
+		<DimVals d0="0.0195" d1="0.0195"/>
+	</EG>
+	<ORIGIN>
+		<EigenValue value="0.5"/> 
+		<DimVals d0="19.5" d1="19.5"/>
+	</ORIGIN>
+</EigenGrasps>
