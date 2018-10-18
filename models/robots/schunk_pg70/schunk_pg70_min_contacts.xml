@@ -19,7 +19,7 @@
 
     <chain> 
         <transform> 
-            <translation>0 76.5 40</translation>
+            <translation>0 47.5 40</translation>
             <rotationMatrix>1 0 0 0 -1 0 0 0 -1 </rotationMatrix> 
         </transform>
         <joint type='Prismatic'>
@@ -35,7 +35,7 @@
     </chain>
     <chain> 
         <transform> 
-            <translation>0 76.5 -40</translation>
+            <translation>0 47.5 -40</translation>
             <rotationMatrix>1 0 0 0 1 0 0 0 1 </rotationMatrix> 
         </transform>
         <joint type='Prismatic'>
