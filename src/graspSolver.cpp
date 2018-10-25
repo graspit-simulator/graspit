@@ -32,14 +32,14 @@
 #include <sstream>
 
 const double GraspSolver::kSpringStiffness = 1.0;
-const double GraspSolver::kNormalUncertainty = 1.0*M_PI/180.0;
+const double GraspSolver::kNormalUncertainty = 0.0*M_PI/180.0;
 const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
 const double GraspSolver::kBetaMaxBase = 50;
 const double GraspSolver::kTauMaxBase = 2500;
-const double GraspSolver::kAlphaMaxBase = 5000;
+const double GraspSolver::kAlphaMaxBase = 50000;
 const double GraspSolver::kQMaxBase = 50;
-const double GraspSolver::kKMaxBase = 500;
+const double GraspSolver::kKMaxBase = 2000;
 
 const double GraspSolver::kMaxMotion = 5.0;
 
@@ -920,11 +920,16 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     std::list<Contact*>::iterator it;
     for (it=contacts.begin(); it!=contacts.end(); it++) {
 
+      // Number of friction edges for this contact
+      int numFrictionEdges = (*it)->numFrictionEdges;
+
       // If this contact is inactive, we are done with it
-      if (beta.elem(contact_index, 0) < Matrix::EPS) continue;
+      if (beta.elem(contact_index, 0) < Matrix::EPS) {
+        contact_index += numFrictionEdges+1;
+        continue;
+      }
 
       // Unpack friction edges for simplicity
-      int numFrictionEdges = (*it)->numFrictionEdges;
       int container_size = sizeof((*it)->frictionEdges) / sizeof((*it)->frictionEdges[0]);
       double frictionEdges[container_size];
       memcpy(frictionEdges, (*it)->frictionEdges, sizeof(frictionEdges));
@@ -945,9 +950,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
       if (edge1 == -1) continue;
 
       // Find angle between and length of active friction edges
-      double angle;
-      double len1;
-      double len2;
+      double angle, len1, len2;
       int check_counter = 0;
       while (true) {
         double num  = frictionEdges[6*edge1]   * frictionEdges[6*edge2];
@@ -1074,7 +1077,6 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
       (*it)->numFrictionEdges = final_fe.size();
       (*it)->getMate()->numFrictionEdges = final_fe.size();
     }
-    g->getObject()->redrawFrictionCones();
     if (complete) return result;
   }
 }
@@ -1175,6 +1177,7 @@ GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench,
   if (single_step) {
     modifyFrictionEdges();
     result = frictionRefinementSolver(S, preload, wrench);
+    g->getObject()->redrawFrictionCones();
   } else {
     GraspStruct P_p;
     SolutionStruct S_p;

@@ -181,7 +181,9 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
 
         // SOS constraints
         for (int i=0; i<SOS_index.size(); i++) {
-            std::vector<double> weights(SOS_len[i], 0.0);
+            std::vector<double> weights(SOS_len[i]);
+            // Weights for SOS variables should be unique
+            for (int j=0; j<weights.size(); j++) weights[j] = j;
             if (SOS_type[i] == 1)
                 model.addSOS(vars+SOS_index[i], &weights[0], SOS_len[i], GRB_SOS_TYPE1);
             else if (SOS_type[i] == 2)
