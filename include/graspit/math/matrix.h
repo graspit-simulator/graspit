@@ -174,6 +174,8 @@ class Matrix {
       return getSubMatrix(startRow, startCol, numRows, numCols);
     }
 
+    Matrix &operator=(const Matrix &M);
+
     friend std::ostream &operator<<(std::ostream &os, const Matrix &m);
     void print(FILE *fp = stderr, std::string name = "") const;
 

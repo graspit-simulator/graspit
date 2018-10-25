@@ -740,6 +740,18 @@ SparseMatrix::transpose()
   }
 }
 
+Matrix &
+Matrix::operator=(const Matrix &M)
+{
+  resize(M.rows(), M.cols());
+  if (mRows) {
+    memcpy(mData, M.mData, mRows*mCols*sizeof(double));
+  }
+  mBlocksNumRows = M.mBlocksNumRows;
+  mBlocksNumCols = M.mBlocksNumCols;
+  return *this; 
+}
+
 std::ostream &
 operator<<(std::ostream &os, const Matrix &m)
 {

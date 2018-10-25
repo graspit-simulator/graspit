@@ -43,7 +43,7 @@ class Matrix;
 class VirtualContact;
 
 #define DISPLAY_CONE_SCALE 20.0
-#define MAX_FRICTION_EDGES 100
+#define MAX_FRICTION_EDGES 520
 
 
 //! Friction type: Frictionless, Point contact with friction, Soft finger contact with elliptic approximation, Soft finger contact with linearized elliptic approximation

@@ -43,14 +43,9 @@
 // grasp problem
 struct GraspStruct {
 
-  ~GraspStruct() {
-    delete Q;
-    delete cj;
-  }
-
   // Pointers to objective Matrices
-  Matrix *Q = NULL;
-  Matrix *cj = NULL;
+  Matrix Q = Matrix(0,0);
+  Matrix cj = Matrix(0,0);
 
   // lists that contain matrices defining the constraints
   // Linear Equality
@@ -84,12 +79,8 @@ struct GraspStruct {
 
 // struct that stores the solution of an optimization problem
 struct SolutionStruct {
-  ~SolutionStruct() {
-    delete sol;
-  }
-
   // pointer to matrix containing the solution
-  Matrix *sol = NULL;
+  Matrix sol = Matrix(0,0);
   // block indices for unknowns
   std::vector<int> block_cols;
   // map that allows translating variable names to matrix block indices

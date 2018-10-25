@@ -37,7 +37,7 @@ const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
 const double GraspSolver::kBetaMaxBase = 50;
 const double GraspSolver::kTauMaxBase = 2500;
-const double GraspSolver::kAlphaMaxBase = 50000;
+const double GraspSolver::kAlphaMaxBase = 100000;
 const double GraspSolver::kQMaxBase = 50;
 const double GraspSolver::kKMaxBase = 2000;
 
@@ -63,38 +63,38 @@ GraspSolver::GraspSolver(Grasp *grasp)
 void
 GraspSolver::springDeformationObjective(GraspStruct &P)
 {
-  P.Q = new Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
-  P.cj = new Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
+  P.Q = Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
+  P.cj = Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
   // Selection matrix for normal forces
   Matrix S(normalForceSelectionMatrix(contacts));
   Matrix STS(matrixMultiply(S.transposed(), S));
-  P.Q->copySubMatrixBlockIndices(P.var["beta"], P.var["beta"], STS);
+  P.Q.copySubMatrixBlockIndices(P.var["beta"], P.var["beta"], STS);
 }
 
 void
 GraspSolver::resultantWrenchObjective(GraspStruct &P)
 {
-  P.Q = new Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
-  P.cj = new Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
-  P.Q->copySubMatrixBlockIndices(P.var["r"], P.var["r"], Matrix::EYE(6, 6));
+  P.Q = Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
+  P.cj = Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
+  P.Q.copySubMatrixBlockIndices(P.var["r"], P.var["r"], Matrix::EYE(6, 6));
 }
 
 void
 GraspSolver::virtualLimitsObjective(GraspStruct &P)
 {
-  P.Q = new Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
-  P.cj = new Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
-  P.cj->copySubMatrixBlockIndices(0, P.var["v"], Matrix::EYE(1,1));
+  P.Q = Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
+  P.cj = Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
+  P.cj.copySubMatrixBlockIndices(0, P.var["v"], Matrix::EYE(1,1));
 }
 
 void
 GraspSolver::resultantAndVLObjective(GraspStruct &P)
 {
-  P.Q = new Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
-  P.cj = new Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
-  P.Q->copySubMatrixBlockIndices(P.var["r"], P.var["r"], Matrix::EYE(6, 6));
-  P.cj->copySubMatrixBlockIndices(0, P.var["v"], Matrix::EYE(1,1));
-  P.cj->multiply(1.0e-6);
+  P.Q = Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
+  P.cj = Matrix(Matrix::ZEROES<Matrix>(1, P.block_cols));
+  P.Q.copySubMatrixBlockIndices(P.var["r"], P.var["r"], Matrix::EYE(6, 6));
+  P.cj.copySubMatrixBlockIndices(0, P.var["v"], Matrix::EYE(1,1));
+  P.cj.multiply(1.0e-6);
 }
 
 //  --------------------------  Equality Constraints  -------------------------------  //
@@ -911,8 +911,8 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     if (result) return result;
 
     // get active friction and motion edges as well as friction edge amplitudes
-    Matrix z(S.sol->getSubMatrixBlockIndices(S.var["z"], 0));
-    Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+    Matrix z(S.sol.getSubMatrixBlockIndices(S.var["z"], 0));
+    Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
 
     // Step through all contacts
     int contact_index = 0;
@@ -1103,8 +1103,8 @@ GraspSolver::iterativeSolver(SolutionStruct &S, bool cone_movement,
       break;
     }
 
-    Matrix x(S.sol->getSubMatrixBlockIndices(S.var["x"], 0));
-    Matrix r(S.sol->getSubMatrixBlockIndices(S.var["r"], 0));
+    Matrix x(S.sol.getSubMatrixBlockIndices(S.var["x"], 0));
+    Matrix r(S.sol.getSubMatrixBlockIndices(S.var["r"], 0));
 
     // Check for convergence to nonzero resultant
     if (previous_best) {
@@ -1188,13 +1188,13 @@ GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench,
       DBGA("Preload creation failed");
       return preload_result;
     }
-    beta_p.copyMatrix(S_p.sol->getSubMatrixBlockIndices(S_p.var["beta"], 0));
+    beta_p.copyMatrix(S_p.sol.getSubMatrixBlockIndices(S_p.var["beta"], 0));
     if (tendon) nonIterativeTendonFormulation(P, preload, wrench, beta_p);
     else nonIterativeFormulation(P, preload, wrench, beta_p, rigid);
     result = solveProblem(P, S);  
   }
   if (result) return result;
-  Matrix beta_t(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+  Matrix beta_t(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
   if (beta_p.rows() == beta_t.rows())
     Matrix beta_t(matrixAdd(beta_t, beta_p));
   drawContactWrenches(beta_t);
@@ -1252,7 +1252,7 @@ GraspSolver::checkWrenchIterative(Matrix &preload, const Matrix &wrench,
       DBGA("Preload creation failed");
       return preload_result;
     } 
-    Matrix beta_p(S_p.sol->getSubMatrixBlockIndices(S_p.var["beta"], 0));
+    Matrix beta_p(S_p.sol.getSubMatrixBlockIndices(S_p.var["beta"], 0));
     if (tendon)
       formulation = std::tr1::bind(
         &GraspSolver::iterativeTendonFormulation, this, std::tr1::placeholders::_1, preload, 
@@ -1262,12 +1262,12 @@ GraspSolver::checkWrenchIterative(Matrix &preload, const Matrix &wrench,
         &GraspSolver::iterativeFormulation, this, std::tr1::placeholders::_1, preload, 
         std::tr1::placeholders::_2, std::tr1::placeholders::_3, wrench, beta_p, rigid);
     result = iterativeSolver(S, cone_movement, formulation);
-    Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+    Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
     matrixAdd(beta, beta_p, beta);
-    S.sol->copySubMatrixBlockIndices(S.var["beta"], 0, beta);
+    S.sol.copySubMatrixBlockIndices(S.var["beta"], 0, beta);
   }
   if (result) return result;
-  Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+  Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
   drawContactWrenches(beta);
   drawObjectMovement(S);
   return result;
@@ -1313,7 +1313,7 @@ GraspSolver::findMaximumWrenchNonIterative(Matrix &preload, const Matrix &direct
       DBGA("Preload creation failed");
       return preload_result;
     }
-    Matrix beta_p(S_p.sol->getSubMatrixBlockIndices(S_p.var["beta"], 0));
+    Matrix beta_p(S_p.sol.getSubMatrixBlockIndices(S_p.var["beta"], 0));
     func = std::tr1::bind((int(GraspSolver::*)(Matrix&,const Matrix&,const Matrix&,bool,bool))&GraspSolver::checkWrenchNonIterative, 
       this, preload, std::tr1::placeholders::_1, beta_p, tendon, rigid); 
   }
@@ -1359,7 +1359,7 @@ GraspSolver::findMaximumWrenchIterative(Matrix &preload, const Matrix &direction
       DBGA("Preload creation failed");
       return preload_result;
     } 
-    Matrix beta_p(S_p.sol->getSubMatrixBlockIndices(S_p.var["beta"], 0));
+    Matrix beta_p(S_p.sol.getSubMatrixBlockIndices(S_p.var["beta"], 0));
     func = std::tr1::bind((int(GraspSolver::*)(Matrix&,const Matrix&,const Matrix&,bool,bool,bool))&GraspSolver::checkWrenchIterative, 
       this, preload, std::tr1::placeholders::_1, beta_p, cone_movement, tendon, rigid); 
   }
@@ -1436,18 +1436,17 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
 
   double objVal = 0;
   Matrix sol(P.block_cols, 1);
-  int result = MIPSolver(*(P.Q), *(P.cj), Eq, b, InEq, ib, P.QInEq, P.iq, P.qib, P.SOS_index, 
+  int result = MIPSolver(P.Q, P.cj, Eq, b, InEq, ib, P.QInEq, P.iq, P.qib, P.SOS_index, 
                 P.SOS_len, P.SOS_type, lb, ub, sol, types, &objVal);
-  delete S.sol; S.sol = NULL;
   S.block_cols = P.block_cols;
   S.var = P.var;
-  S.sol = new Matrix(sol);
+  S.sol = sol;
 
   if (result) return result;
 
   // Check if solution is close to virtual bounds. If so issue a warning
   if (S.var.find("beta") != S.var.end()) {
-    Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+    Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
     if (beta.max() > kVirtualLimitTolerance * BetaMax) {
       DBGA("beta (" << beta.max() 
         << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
@@ -1466,7 +1465,7 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     }
   }
   if (S.var.find("q") != S.var.end()) {
-    Matrix q(S.sol->getSubMatrixBlockIndices(S.var["q"], 0));
+    Matrix q(S.sol.getSubMatrixBlockIndices(S.var["q"], 0));
     if (q.max() > kVirtualLimitTolerance * QMax) {
       DBGA("q (" << q.max() 
         << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
@@ -1475,7 +1474,7 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     }
   }
   if (S.var.find("f") != S.var.end()) {
-    Matrix f(S.sol->getSubMatrixBlockIndices(S.var["f"], 0));
+    Matrix f(S.sol.getSubMatrixBlockIndices(S.var["f"], 0));
     if (f.max() > kVirtualLimitTolerance * TauMax) {
       DBGA("f (" << f.max() 
         << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
@@ -1484,7 +1483,7 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     }
   }
   if (S.var.find("alpha") != S.var.end()) {
-    Matrix alpha(S.sol->getSubMatrixBlockIndices(S.var["alpha"], 0));
+    Matrix alpha(S.sol.getSubMatrixBlockIndices(S.var["alpha"], 0));
     // In special cases where object movement does not compress any virtual 
     // springs, the solver has the annoying habit of moving the object as far 
     // as it may without breaking the constraint on alpha. In this case the 
@@ -1510,9 +1509,9 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     NJ.multiply(cos(kNormalUncertainty));
     E.multiply(sin(kNormalUncertainty));
 
-    Matrix q(S.sol->getSubMatrixBlockIndices(S.var["q"], 0));
-    Matrix x(S.sol->getSubMatrixBlockIndices(S.var["x"], 0));
-    Matrix alpha(S.sol->getSubMatrixBlockIndices(S.var["alpha"], 0));
+    Matrix q(S.sol.getSubMatrixBlockIndices(S.var["q"], 0));
+    Matrix x(S.sol.getSubMatrixBlockIndices(S.var["x"], 0));
+    Matrix alpha(S.sol.getSubMatrixBlockIndices(S.var["alpha"], 0));
     Matrix Kx(matrixMultiply(K, x));
     Matrix NJq(matrixMultiply(NJ, q));
     Matrix Ealpha(matrixMultiply(E, alpha));
@@ -1538,9 +1537,9 @@ GraspSolver::logSolution(SolutionStruct &S)
   std::map<std::string, int>::iterator it;
   for (it=S.var.begin(); it!=S.var.end(); it++) {
     output << it->first << std::endl;
-    output << S.sol->getSubMatrixBlockIndices(it->second, 0) << std::endl;
+    output << S.sol.getSubMatrixBlockIndices(it->second, 0) << std::endl;
   }
-  Matrix beta(S.sol->getSubMatrixBlockIndices(S.var["beta"], 0));
+  Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
   Matrix J(g->contactJacobian(joints, contacts));
   Matrix D(Contact::frictionForceBlockMatrix(contacts));
   Matrix JTD(matrixMultiply(J.transposed(), D));
@@ -1643,7 +1642,7 @@ GraspSolver::drawContactWrenches(const Matrix &beta)
 void
 GraspSolver::drawObjectMovement(SolutionStruct &S) 
 {
-  Matrix x( S.sol->getSubMatrixBlockIndices(S.var["x"], 0) );
+  Matrix x( S.sol.getSubMatrixBlockIndices(S.var["x"], 0) );
   double minWrench[6];
   for (int i=0; i<6; i++) {
     minWrench[i] = -x.elem(i,0);
