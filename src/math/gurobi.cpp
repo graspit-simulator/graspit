@@ -32,6 +32,7 @@
 
 #include <math.h>
 #include <limits>
+#include <vector>
 #include <fstream>
 
 #include "graspit/math/matrix.h"
@@ -53,8 +54,9 @@ GRBEnv& getGurobiEnv(){
 int gurobiSolverWrapper(const Matrix &Q, const Matrix &c, 
                         const Matrix &Eq, const Matrix &b,
                         const Matrix &InEq, const Matrix &ib,
-                        std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
-                        std::vector<int> SOS_index, std::vector<int> SOS_len, std::vector<int> SOS_type,
+                        const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+                        const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &var_ind, const std::list<std::string> &sense,
+                        const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type,
                         const Matrix &lowerBounds, const Matrix &upperBounds,
                         Matrix &sol, const Matrix &types, double *objVal)
 {
@@ -115,7 +117,6 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
 
         // Add variables to the model
         GRBVar *vars = model.addVars(&lb[0], &ub[0], NULL, &vtype[0], NULL, sol.rows());
-        model.update();
 
         // Add objective function
         // quadratic objective
@@ -162,9 +163,9 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
         }
         // quadratic inequality constraint
         if (!QInEq.empty()) {
-            std::list<Matrix>::iterator Q_it = QInEq.begin();
-            std::list<Matrix>::iterator q_it = iq.begin();
-            std::list<Matrix>::iterator b_it = qib.begin();
+            std::list<Matrix>::const_iterator Q_it = QInEq.begin();
+            std::list<Matrix>::const_iterator q_it = iq.begin();
+            std::list<Matrix>::const_iterator b_it = qib.begin();
             for( ; Q_it!=QInEq.end(); Q_it++, q_it++, b_it++) {
                 GRBQuadExpr constr = 0;
                 for (int i=0; i<sol.rows(); i++) {
@@ -180,23 +181,26 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
         }
 
         // SOS constraints
-        for (int i=0; i<SOS_index.size(); i++) {
-            std::vector<double> weights(SOS_len[i]);
+        std::list<int>::const_iterator SOS_index_it = SOS_index.begin();
+        std::list<int>::const_iterator SOS_len_it = SOS_len.begin();
+        std::list<int>::const_iterator SOS_type_it = SOS_type.begin();
+        for ( ; SOS_index_it!=SOS_index.end(); SOS_index_it++, SOS_len_it++, SOS_type_it++) {
+            double weights[*SOS_len_it];
             // Weights for SOS variables should be unique
-            for (int j=0; j<weights.size(); j++) weights[j] = j;
-            if (SOS_type[i] == 1)
-                model.addSOS(vars+SOS_index[i], &weights[0], SOS_len[i], GRB_SOS_TYPE1);
-            else if (SOS_type[i] == 2)
-                model.addSOS(vars+SOS_index[i], &weights[0], SOS_len[i], GRB_SOS_TYPE2);
+            for (int j=0; j<*SOS_len_it; j++) weights[j] = j;
+            if (*SOS_type_it == 1)
+                model.addSOS(vars+(*SOS_index_it), weights, *SOS_len_it, GRB_SOS_TYPE1);
+            else if (*SOS_type_it == 2)
+                model.addSOS(vars+(*SOS_index_it), weights, *SOS_len_it, GRB_SOS_TYPE2);
             else {
                 DBGA("Requested unknown SOS constraint");
                 return -1;
             }
         }
 
-        model.update();
 
         // Optimize
+        model.update();
         model.optimize();
 
         // Retrieve solution
@@ -242,4 +246,40 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
         DBGA("Exception during gurobi optimization");
     }
     return -1;
+}
+
+int gurobiSolverWrapper(const Matrix &Q, const Matrix &c, 
+            const Matrix &Eq, const Matrix &b,
+            const Matrix &InEq, const Matrix &ib,
+            const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+            const Matrix &lowerBounds, const Matrix &upperBounds,
+            Matrix &sol, double *objVal)
+{
+  std::list<Matrix> indic_lhs;
+  std::list<Matrix> indic_rhs;
+  std::list<int> var_ind;
+  std::list<std::string> sense;
+  std::list<int> SOS_index;
+  std::list<int> SOS_len;
+  std::list<int> SOS_type;
+  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
+  return gurobiSolverWrapper(Q, c, 
+                             Eq, b, InEq, ib, QInEq, iq, qib,
+                             indic_lhs, indic_rhs, var_ind, sense,
+                             SOS_index, SOS_len, SOS_type,
+                             lowerBounds, upperBounds, sol, types, objVal);
+}
+
+int gurobiSolverWrapper(const Matrix &Q, const Matrix &c, 
+                        const Matrix &Eq, const Matrix &b,
+                        const Matrix &InEq, const Matrix &ib,
+                        const Matrix &lowerBounds, const Matrix &upperBounds,
+                        Matrix &sol, double *objVal)
+{
+  std::list<Matrix> QInEq;
+  std::list<Matrix> iq;
+  std::list<Matrix> qib;
+  return gurobiSolverWrapper(Q, c, 
+                             Eq, b, InEq, ib, QInEq, iq, qib,
+                             lowerBounds, upperBounds, sol, objVal);
 }

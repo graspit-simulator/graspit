@@ -1441,8 +1441,11 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
 
   double objVal = 0;
   Matrix sol(P.block_cols, 1);
-  int result = MIPSolver(P.Q, P.cj, Eq, b, InEq, ib, P.QInEq, P.iq, P.qib, P.SOS_index, 
-                P.SOS_len, P.SOS_type, lb, ub, sol, types, &objVal);
+  int result = MIPSolver(P.Q, P.cj, 
+                         Eq, b, InEq, ib, P.QInEq, P.iq, P.qib,
+                         P.Indic_lhs, P.Indic_rhs, P.var_ind, P.sense,
+                         P.SOS_index, P.SOS_len, P.SOS_type, 
+                         lb, ub, sol, types, &objVal);
   S.block_cols = P.block_cols;
   S.var = P.var;
   S.sol = sol;

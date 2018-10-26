@@ -435,12 +435,13 @@ int LPSolver(const Matrix &cj,
 void testLP();
 //! Gurobi Solver
 int MIPSolver(const Matrix &Q, const Matrix &c, 
-                 const Matrix &Eq, const Matrix &b, 
-                 const Matrix &InEq, const Matrix &ib, 
-                 std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
-                 std::vector<int> &SOS_index, std::vector<int> &SOS_len, std::vector<int> &SOS_type, 
-                 const Matrix &lowerBounds, const Matrix &upperBounds,
-                 Matrix &sol, const Matrix &types, double *objVal);
+              const Matrix &Eq, const Matrix &b, 
+              const Matrix &InEq, const Matrix &ib, 
+              const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+              const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &var_ind, const std::list<std::string> &sense,
+              const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type, 
+              const Matrix &lowerBounds, const Matrix &upperBounds,
+              Matrix &sol, const Matrix &types, double *objVal);
 
 //! A simple test to check the Gurobi solver works
 void testGurobi();

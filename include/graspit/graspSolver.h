@@ -58,10 +58,15 @@ struct GraspStruct {
   std::list<Matrix> QInEq;
   std::list<Matrix> iq;
   std::list<Matrix> qib;
+  // Indicator constraints
+  std::list<Matrix> Indic_lhs;
+  std::list<Matrix> Indic_rhs;
+  std::list<int> var_ind;
+  std::list<std::string> sense;
   // SOS constraints
-  std::vector<int> SOS_index;
-  std::vector<int> SOS_len;
-  std::vector<int> SOS_type;
+  std::list<int> SOS_index;
+  std::list<int> SOS_len;
+  std::list<int> SOS_type;
   // Solution bounds
   std::list<Matrix> lb_list;
   std::list<Matrix> ub_list;
