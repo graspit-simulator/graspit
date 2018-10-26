@@ -35,7 +35,7 @@ const double GraspSolver::kSpringStiffness = 1.0;
 const double GraspSolver::kNormalUncertainty = 0.0*M_PI/180.0;
 const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
-const double GraspSolver::kBetaMaxBase = 50;
+const double GraspSolver::kBetaMaxBase = 200;
 const double GraspSolver::kTauMaxBase = 2500;
 const double GraspSolver::kAlphaMaxBase = 100000;
 const double GraspSolver::kQMaxBase = 50;
