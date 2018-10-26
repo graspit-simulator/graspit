@@ -1050,21 +1050,26 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
         double difference = matrixAdd(fe_vec[edge3], new_fe_vec[2].negative()).fnorm();
         if (difference > Matrix::EPS) {
           final_fe.push_back(new_fe_vec[2]);
-          if (edge3) {
-            for (int i=edge3; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
-          }
-        } else {
-          if (edge2) {
-            for (int i=edge3; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
-          } else {
-            final_fe.pop_front();
-          }
+        }
+        if (edge3 && edge2) {
+          for (int i=edge3; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
+        } else if (!edge2) {
+          final_fe.pop_front();
         }
       } else {
         final_fe.push_back(new_fe_vec[2]);
-        if (edge2)
+        if (edge2) {
           for (int i=edge2; i<numFrictionEdges; i++) final_fe.push_back(fe_vec[i]);
+        }
       }
+
+      // Check if number of friction edges is consistent
+      if (final_fe.size() > numFrictionEdges+3) {
+        DBGA("Number of final friction edges exceeds maximum possible");
+        exit(0);
+      }
+      // Check if friction edges are correct
+      if (!checkFrictionEdges(final_fe)) exit(0);
 
       // Update friction edges
       std::list<Matrix>::iterator fe_it = final_fe.begin();
@@ -1709,7 +1714,7 @@ tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts)
 }
 
 double
-angleBetweenEdges(Matrix edge1, Matrix edge2) {
+angleBetweenEdges(const Matrix edge1, const Matrix edge2) {
   double num  = edge1.elem(0,0) * edge2.elem(0,0) + edge1.elem(1,0) * edge2.elem(1,0);
   double len1 = sqrt(pow(edge1.elem(0,0), 2) + pow(edge1.elem(1,0), 2));
   double len2 = sqrt(pow(edge2.elem(0,0), 2) + pow(edge2.elem(1,0), 2));
@@ -1719,3 +1724,39 @@ angleBetweenEdges(Matrix edge1, Matrix edge2) {
   return acos(val);
 }
 
+bool
+checkFrictionEdges(const std::list<Matrix> &frictionEdges) {
+  std::list<Matrix>::const_iterator edge1 = frictionEdges.end();
+  std::list<Matrix>::const_iterator edge2 = frictionEdges.begin();
+  edge1--;
+
+  int counter = 0;
+  for (int i=0; i<=frictionEdges.size(); i++) {
+    double angle = angleBetweenEdges(*edge1, *edge2);
+    if (angle < Matrix::EPS) {
+      if (++counter>1) {
+        DBGA("Three consecutive collinear edges");
+        return false;
+      }
+      if (matrixAdd(*edge1, (*edge2).negative()).fnorm() < Matrix::EPS) {
+        DBGA("Adjacent equal edges");
+        return false;
+      }
+    } else {
+      counter = 0;
+      double len1 = (*edge1).fnorm();
+      double len2 = (*edge2).fnorm();
+      if (len1 - len2 > Matrix::EPS) {
+        DBGA("Unequal friction edges defining sector");
+        return false;
+      }
+      if (len1 - 1.0/cos(angle / 2.0) > Matrix::EPS) {
+        DBGA("Friction edge has incorrect length");
+        return false;
+      }
+    }
+    edge1 = edge2++;
+    if (edge2 == frictionEdges.end()) edge2 = frictionEdges.begin();
+  }
+  return true;
+}

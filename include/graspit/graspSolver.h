@@ -259,7 +259,8 @@ Matrix graspMapMatrix(const Matrix &R);
 
 //  --------------------------  Useful Functions  ------------------------------  //
 
-double angleBetweenEdges(Matrix edge1, Matrix edge2);
+double angleBetweenEdges(const Matrix edge1, const Matrix edge2);
+bool checkFrictionEdges(const std::list<Matrix> &frictionEdges);
 
 #define GRASP_SOLVER_H
 #endif
