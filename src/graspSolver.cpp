@@ -1659,6 +1659,131 @@ GraspSolver::drawObjectMovement(SolutionStruct &S)
   graspitCore->getIVmgr()->drawWorstCaseWrenches();
 }
 
+Matrix
+GraspSolver::computeSignificantX(SolutionStruct &S)
+{
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix N(normalDisplacementSelectionMatrix(numContacts));
+  Matrix RT(Grasp::graspMapMatrix(R).transposed());
+  Matrix K(matrixMultiply(N, RT));
+  Matrix S_matrix(normalForceSelectionMatrix(contacts));
+  Matrix c(matrixMultiply(S_matrix, S.sol.getSubMatrixBlockIndices(S.var["beta"], 0)));
+  Matrix x(S.sol.getSubMatrixBlockIndices(S.var["x"], 0));
+  Matrix x_sig(Matrix::ZEROES<Matrix>(x.rows(), x.cols()));
+  for (int i=0; i<c.rows(); i++) {
+    if (c.elem(i,0) / c.max() > 0.05) {
+      Matrix sub_K(K.getSubMatrix(i, 0, 1, 6));
+      Matrix components(6,1);
+      for (int j=0; j<6; j++) {
+        components.elem(j,0) = sub_K.elem(0,j) * x.elem(j,0);
+      }
+      for (int j=0; j<6; j++) {
+        if (!x_sig.elem(j,0) && components.elem(j,0) / components.max() > 0.05) {
+          x_sig.elem(j,0) = x.elem(j,0);
+        }
+      }
+    }
+  }
+  return x_sig;
+}
+
+Matrix
+GraspSolver::postProcessX(SolutionStruct &S)
+{
+  Matrix q( S.sol.getSubMatrixBlockIndices(S.var["q"], 0) );
+  Matrix alpha( S.sol.getSubMatrixBlockIndices(S.var["alpha"], 0) );
+  Matrix beta( S.sol.getSubMatrixBlockIndices(S.var["beta"], 0) );
+
+  Matrix S_matrix(normalForceSelectionMatrix(contacts));
+  S_matrix.multiply(1/kSpringStiffness);
+  Matrix J(g->contactJacobian(joints, contacts));
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix N(normalDisplacementSelectionMatrix(numContacts));
+  Matrix RT(Grasp::graspMapMatrix(R).transposed());
+  Matrix K(matrixMultiply(N, RT));
+  Matrix NJ(matrixMultiply(N, J));
+  Matrix M(tangentialDisplacementSelectionMatrix(numContacts));
+  Matrix MRT(matrixMultiply(M, RT));
+  Matrix k(matrixAdd(matrixMultiply(S_matrix, beta), matrixMultiply(NJ, q)));
+
+  std::list<Matrix> spring_lhs_list;
+  std::list<Matrix> spring_rhs_list;
+  std::list<Matrix> nonpen_lhs_list;
+  std::list<Matrix> nonpen_rhs_list;
+  std::list<Matrix> slip_list;
+  std::list<Matrix> E_list;
+
+  int contact_count = 0;
+  int contact_index = 0;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++, contact_count++) {
+    int numFrictionEdges = (*it)->numFrictionEdges;
+
+    if (beta.elem(contact_index, 0) > Matrix::EPS) {
+      spring_lhs_list.push_back(K.getSubMatrix(contact_count, 0, 1, 6));
+      spring_rhs_list.push_back(k.getSubMatrix(contact_count, 0, 1, 1));
+
+      slip_list.push_back(MRT.getSubMatrix(2*contact_count, 0, 2, 6));
+      Matrix E(Matrix::ZEROES<Matrix>(2,2));
+      int edge_count = 0;
+      for (int j=0; j<numFrictionEdges; j++) {
+        if (alpha.elem(contact_index+j+1, 0) > Matrix::EPS) {
+          E.elem(0, edge_count) = (*it)->frictionEdges[6*j];
+          E.elem(1, edge_count) = (*it)->frictionEdges[6*j+1];
+          edge_count++;
+        }
+      }
+      E_list.push_back(E);
+    } else {
+      nonpen_lhs_list.push_back(K.getSubMatrix(contact_count, 0, 1, 6));
+      nonpen_rhs_list.push_back(k.getSubMatrix(contact_count, 0, 1, 1));
+    }
+
+    contact_index += numFrictionEdges+1;
+  }
+
+  Matrix E(Matrix::BLOCKDIAG<Matrix>(E_list));
+  Matrix slip_lhs_x(Matrix::BLOCKCOLUMN<Matrix>(slip_list));
+
+  Matrix spring_lhs(Matrix::BLOCKCOLUMN<Matrix>(spring_lhs_list));
+  Matrix spring_rhs(Matrix::BLOCKCOLUMN<Matrix>(spring_rhs_list));
+  Matrix nonpen_lhs(Matrix::BLOCKCOLUMN<Matrix>(nonpen_lhs_list));
+  Matrix nonpen_rhs(Matrix::BLOCKCOLUMN<Matrix>(nonpen_rhs_list));
+  Matrix slip_lhs(Matrix::BLOCKROW<Matrix>(slip_lhs_x, E.negative()));
+
+  Matrix Eq(Matrix::ZEROES<Matrix>(spring_lhs.rows()+slip_lhs.rows(), slip_lhs.cols()));
+  Eq.copySubMatrix(0, 0, spring_lhs);
+  Eq.copySubMatrix(spring_lhs.rows(), 0, slip_lhs);
+
+  Matrix b(Matrix::ZEROES<Matrix>(Eq.rows(), 1));
+  b.copySubMatrix(0, 0, spring_rhs);
+
+  Matrix InEq(Matrix::ZEROES<Matrix>(nonpen_lhs.rows(), Eq.cols()));
+  InEq.copySubMatrix(0, 0, nonpen_lhs);
+  Matrix ib(nonpen_rhs);
+
+  Matrix sol(Eq.cols(), 1);
+  Matrix Q(Matrix::ZEROES<Matrix>(sol.rows(), sol.rows()));
+  Q.copySubMatrix(0, 0, Matrix::EYE(6,6));
+
+  Matrix lb(Matrix::MIN_VECTOR(Eq.cols()));
+  lb.copySubMatrix(6, 0, Matrix::ZEROES<Matrix>(E.cols(), 1));
+  Matrix ub(Matrix::MAX_VECTOR(Eq.cols()));
+
+  double objVal;
+  int result = QPSolver(Q, Matrix(0,0),
+                        Eq, b, InEq, ib,
+                        lb, ub, sol, &objVal);
+
+  Matrix x( S.sol.getSubMatrixBlockIndices(S.var["x"], 0) );
+  if (result) {
+    DBGA("Failed to post-process object motion");
+    return x;
+  } else {
+    return sol.getSubMatrix(0, 0, 6, 1);
+  }
+}
+
 //  --------------------------  Useful Matrices  -------------------------------  //
 
 //  Selection Matrix for normal forces

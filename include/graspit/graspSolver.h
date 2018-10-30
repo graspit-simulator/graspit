@@ -252,6 +252,8 @@ private:
 
   void drawContactWrenches(const Matrix &beta);
   void drawObjectMovement(SolutionStruct &S);
+  Matrix postProcessX(SolutionStruct &S);
+  Matrix computeSignificantX(SolutionStruct &S);
 };
 
 //  --------------------------  Useful Matrices  -------------------------------  //
