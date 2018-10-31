@@ -1509,7 +1509,7 @@ MIPSolver(const Matrix &Q, const Matrix &c,
           const Matrix &Eq, const Matrix &b, 
           const Matrix &InEq, const Matrix &ib, 
           const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
-          const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &var_ind, const std::list<std::string> &sense,
+          const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &indic_var, const std::list<int> &indic_val, const std::list<std::string> &indic_sense,
           const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type, 
           const Matrix &lowerBounds, const Matrix &upperBounds,
           Matrix &sol, const Matrix &types, double *objVal)
@@ -1551,6 +1551,25 @@ MIPSolver(const Matrix &Q, const Matrix &c,
     }
   }
 
+  assert( indic_lhs.size() == indic_rhs.size() );
+  assert( indic_lhs.size() == indic_var.size() );
+  assert( indic_lhs.size() == indic_val.size() );
+  assert( indic_lhs.size() == indic_sense.size() );
+  if (!indic_lhs.empty()) {
+    std::list<Matrix>::const_iterator lhs = indic_lhs.begin();
+    std::list<Matrix>::const_iterator rhs = indic_rhs.begin();
+    std::list<int>::const_iterator var = indic_var.begin();
+    std::list<int>::const_iterator val = indic_val.begin();
+    for ( ; lhs!=indic_lhs.end(); lhs++, rhs++, var++, val++) {
+      assert( (*lhs).rows() == (*lhs).rows() );
+      assert( (*lhs).cols() == sol.rows() );
+      assert( (*rhs).cols() == 1 );
+      assert( *var >= 0 );
+      assert( *var < sol.rows() );
+      assert( *val == 0 || *val == 1);
+    }
+  }
+
   assert( SOS_index.size() == SOS_len.size() );
   assert( SOS_index.size() == SOS_type.size() );
   std::list<int>::const_iterator SOS_index_it = SOS_index.begin();
@@ -1574,7 +1593,7 @@ MIPSolver(const Matrix &Q, const Matrix &c,
 #ifdef GUROBI_SOLVER
   int result = gurobiSolverWrapper(Q, c, 
                                    Eq, b, InEq, ib, QInEq, iq, qib,
-                                   indic_lhs, indic_rhs, var_ind, sense, 
+                                   indic_lhs, indic_rhs, indic_var, indic_val, indic_sense, 
                                    SOS_index, SOS_len, SOS_type, 
                                    lowerBounds, upperBounds, sol, types, objVal);
 #else
@@ -1633,6 +1652,7 @@ testMIP()
   std::list<Matrix> indic_lhs;
   std::list<Matrix> indic_rhs;
   std::list<int> var_ind;
+  std::list<int> val_ind;
   std::list<std::string> sense;
   std::list<int> SOS_index;
   std::list<int> SOS_len;
@@ -1640,7 +1660,7 @@ testMIP()
   Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
   int result = MIPSolver(Q, c, 
                          Eq, b, InEq, ib, QInEq, iq, qib,
-                         indic_lhs, indic_rhs, var_ind, sense,
+                         indic_lhs, indic_rhs, var_ind, val_ind, sense,
                          SOS_index, SOS_len, SOS_type, 
                          lb, ub, sol, types, &obj);
 #else

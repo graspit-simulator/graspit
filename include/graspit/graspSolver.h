@@ -61,8 +61,9 @@ struct GraspStruct {
   // Indicator constraints
   std::list<Matrix> Indic_lhs;
   std::list<Matrix> Indic_rhs;
-  std::list<int> var_ind;
-  std::list<std::string> sense;
+  std::list<int> Indic_var;
+  std::list<int> Indic_val;
+  std::list<std::string> Indic_sense;
   // SOS constraints
   std::list<int> SOS_index;
   std::list<int> SOS_len;

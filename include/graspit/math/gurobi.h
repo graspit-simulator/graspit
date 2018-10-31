@@ -27,27 +27,27 @@
 #include <string>
 
 /*! \file
-	A wrapper for using the Gurobi solver from within GraspIt! Currently
-	only implemented for a specific type of binary optimization problem.
+  A wrapper for using the Gurobi solver from within GraspIt! Currently
+  only implemented for a specific type of binary optimization problem.
 */
 class Matrix;
 
 int gurobiSolverWrapper(const Matrix &Q, const Matrix &c, 
-						const Matrix &Eq, const Matrix &b,
-						const Matrix &InEq, const Matrix &ib,
-						const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
-            const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &var_ind, const std::list<std::string> &sense,
-            const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type,
-						const Matrix &lowerBounds, const Matrix &upperBounds,
-						Matrix &sol, const Matrix &types, double *objVal);
+  const Matrix &Eq, const Matrix &b,
+  const Matrix &InEq, const Matrix &ib,
+  const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+  const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &indic_var, const std::list<int> &indic_val, const std::list<std::string> &indic_sense,
+  const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type,
+  const Matrix &lowerBounds, const Matrix &upperBounds,
+  Matrix &sol, const Matrix &types, double *objVal);
 int gurobiSolverWrapper(const Matrix &Q, const Matrix &c, 
-            const Matrix &Eq, const Matrix &b,
-            const Matrix &InEq, const Matrix &ib,
-            const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
-            const Matrix &lowerBounds, const Matrix &upperBounds,
-            Matrix &sol, double *objVal);
+  const Matrix &Eq, const Matrix &b,
+  const Matrix &InEq, const Matrix &ib,
+  const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+  const Matrix &lowerBounds, const Matrix &upperBounds,
+  Matrix &sol, double *objVal);
 int gurobiSolverWrapper(const Matrix &Q, const Matrix &c, 
-            const Matrix &Eq, const Matrix &b,
-            const Matrix &InEq, const Matrix &ib,
-            const Matrix &lowerBounds, const Matrix &upperBounds,
-            Matrix &sol, double *objVal);
+  const Matrix &Eq, const Matrix &b,
+  const Matrix &InEq, const Matrix &ib,
+  const Matrix &lowerBounds, const Matrix &upperBounds,
+  Matrix &sol, double *objVal);
