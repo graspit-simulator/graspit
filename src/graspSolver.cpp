@@ -415,6 +415,33 @@ GraspSolver::frictionConeEdgeConstraint(GraspStruct &P, const Matrix &beta_p)
 }
 
 void
+GraspSolver::contactMovementIndicatorConstraint(GraspStruct &P)
+{
+  int y3_index = 0;
+  for (int i=0; i<P.var["y3"]; i++) y3_index += P.block_cols[i];
+
+  int counter = 0;
+  int index = 0;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++, counter++) {
+    int numFE = (*it)->numFrictionEdges;
+
+    Matrix sigma(Matrix::ZEROES<Matrix>(numFE, P.block_cols[P.var["alpha"]]));
+    sigma.copySubMatrix(0, index+1, Matrix::EYE(numFE, numFE));
+
+    Matrix Eq( Matrix::ZEROES<Matrix>(numFE, P.block_cols));
+    Eq.copySubMatrixBlockIndices(0, P.var["alpha"], sigma);
+    P.Indic_lhs.push_back(Eq);
+    P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(numFE, 1));
+    P.Indic_var.push_back(y3_index+counter);
+    P.Indic_val.push_back(1);
+    P.Indic_sense.push_back("eq");
+
+    index += numFE+1;
+  }
+}
+
+void
 GraspSolver::contactMovementConstraint(GraspStruct &P)
 {
   Matrix sigmaDiag(tangentialDisplacementSummationMatrix(contacts));
@@ -747,7 +774,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   else nonBackdrivableJointConstraint(P, preload, beta_p);
   frictionConeConstraint(P, beta_p);
   frictionConeEdgeConstraint(P, beta_p);
-  contactMovementConstraint(P);
+  contactMovementIndicatorConstraint(P);
   amplitudesSOS2Constraint(P, beta_p);
   virtualLimitLBConstraint(P);
 

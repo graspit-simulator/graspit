@@ -202,6 +202,8 @@ private:
   void frictionConeEdgeConstraint(GraspStruct &P, const Matrix &beta_p);
   //  constraint that determines if a contact experiences relative motion
   void contactMovementConstraint(GraspStruct &P);
+  //  constraint that determines if a contact experiences relative motion (expressed as indicator constraint)
+  void contactMovementIndicatorConstraint(GraspStruct &P);
   // a SOS2 constraint to ensure friction opposes motion
   void amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p);
   // constraint that keeps a variable v lower bounded by the largest relative approach of a variable to its virtual limit

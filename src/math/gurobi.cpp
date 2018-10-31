@@ -189,8 +189,8 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
     for ( ; lhs!=indic_lhs.end(); lhs++, rhs++, var++, val++, sen++) {
       char sense;
       if (*sen == "leq") sense = GRB_LESS_EQUAL;
-      else if (*sen == "geq") sense = GRB_EQUAL;
-      else if (*sen == "eq") sense = GRB_GREATER_EQUAL;
+      else if (*sen == "eq") sense = GRB_EQUAL;
+      else if (*sen == "geq") sense = GRB_GREATER_EQUAL;
       else {
         DBGA("Requested unknown sense in indicator constraint");
         return -1;
