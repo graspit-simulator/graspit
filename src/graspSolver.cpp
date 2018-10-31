@@ -910,6 +910,8 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     int result = solveProblem(P, S);
     if (result) return result;
 
+    DBGA("Energy: " << computeSystemEnergy(S, wrench));
+
     // get active friction and motion edges as well as friction edge amplitudes
     Matrix z(S.sol.getSubMatrixBlockIndices(S.var["z"], 0));
     Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
@@ -1452,6 +1454,22 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
 
   if (result) return result;
 
+  /*Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix N(normalDisplacementSelectionMatrix(numContacts));
+  Matrix RT(Grasp::graspMapMatrix(R).transposed());
+  Matrix K(matrixMultiply(N, RT));
+
+  DBGA("R:");
+  DBGA(R);
+  DBGA("RT:");
+  DBGA(RT);
+  DBGA("K:");
+  DBGA(K);
+  DBGA("x:");
+  DBGA(S.sol.getSubMatrixBlockIndices(S.var["x"], 0));
+  DBGA("k:");
+  DBGA(matrixMultiply(K, S.sol.getSubMatrixBlockIndices(S.var["x"], 0)));*/
+
   // Check if solution is close to virtual bounds. If so issue a warning
   if (S.var.find("beta") != S.var.end()) {
     Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
@@ -1588,6 +1606,38 @@ GraspSolver::modifyFrictionEdges()
     }
   }
   g->getObject()->redrawFrictionCones();
+}
+
+double
+GraspSolver::computeSystemEnergy(SolutionStruct &S, const Matrix &wrench)
+{
+  Matrix x( S.sol.getSubMatrixBlockIndices(S.var["x"], 0) );
+  Matrix beta( S.sol.getSubMatrixBlockIndices(S.var["beta"], 0) );
+  double E = 0;
+
+  // Work done by applied wrench
+  E += 0.5 * matrixMultiply(wrench.transposed(), x).elem(0,0);
+
+  // Work done compressing virtual springs
+  Matrix S_matrix(normalForceSelectionMatrix(contacts));
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix N(normalDisplacementSelectionMatrix(numContacts));
+  Matrix RT(Grasp::graspMapMatrix(R).transposed());
+  Matrix K(matrixMultiply(N, RT));
+  Matrix cn = matrixMultiply(S_matrix, beta);
+  Matrix kn = matrixMultiply(K, x);
+  E += 0.5 * matrixMultiply(cn.transposed(), kn).elem(0,0);
+
+  // Work done by sliding contacts
+  Matrix M(tangentialDisplacementSelectionMatrix(numContacts));
+  Matrix MRT(matrixMultiply(M, RT));
+  Matrix kf(matrixMultiply(MRT, x));
+  std::list<Contact*>::iterator it = contacts.begin();
+  for (int i=0; it!=contacts.end(); it++, i++) {
+    Matrix kif(kf.getSubMatrix(2*i, 0, 2, 1));
+    E += 0.5 * (*it)->getCof() * cn.elem(i,0) * kif.fnorm();
+  }
+  return E;
 }
 
 bool 
