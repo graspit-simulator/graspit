@@ -199,6 +199,63 @@ GraspSolver::objectMotionConstraint(GraspStruct &P, const Matrix &wrench)
 //  -------------------------  Inequality Constraints  ------------------------------  //
 
 void
+GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P)
+{
+  Matrix J(g->contactJacobian(joints, contacts));
+  Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
+  Matrix S(normalForceSelectionMatrix(contacts));
+  Matrix N(normalDisplacementSelectionMatrix(numContacts));
+  Matrix RT(Grasp::graspMapMatrix(R).transposed());
+  Matrix K(matrixMultiply(N, RT));
+  Matrix NJ(matrixMultiply(N, J));
+
+  Matrix S_k(S);
+  S_k.multiply(1/kSpringStiffness);
+
+  std::vector<int> block_rows(2, numContacts);
+  Matrix InEq(Matrix::ZEROES<Matrix>(block_rows, P.block_cols));
+  InEq.copySubMatrixBlockIndices(0, P.var["beta"], S.negative());
+  InEq.copySubMatrixBlockIndices(1, P.var["beta"], S_k.negative());
+  InEq.copySubMatrixBlockIndices(1, P.var["x"],    K);
+  InEq.copySubMatrixBlockIndices(1, P.var["q"],    NJ.negative());
+  P.InEq_list.push_back(InEq);
+  P.ib_list.push_back(Matrix::ZEROES<Matrix>(InEq.rows(), 1));
+
+  int y1_index = 0;
+  for (int i=0; i<P.var["y1"]; i++) y1_index += P.block_cols[i];
+
+  int counter = 0;
+  int index = 0;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++, counter++) {
+    int numFE = (*it)->numFrictionEdges;
+
+    // y1==0 -> Contact breaks
+    Matrix Si(Matrix::ZEROES<Matrix>(1, P.block_cols[P.var["beta"]]));
+    Si.elem(0, index) = 1.0;
+    Matrix Eq(Matrix::ZEROES<Matrix>(1, P.block_cols));
+    Eq.copySubMatrixBlockIndices(0, P.var["beta"], Si);
+    P.Indic_lhs.push_back(Eq);
+    P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(1,1));
+    P.Indic_var.push_back(y1_index+counter);
+    P.Indic_val.push_back(0);
+    P.Indic_sense.push_back("eq");
+
+    // y1==1 -> virtual spring
+    Eq.multiply(1/kSpringStiffness);
+    Eq.copySubMatrixBlockIndices(0, P.var["x"], K.getSubMatrix(counter, 0, 1, K.cols()).negative());
+    Eq.copySubMatrixBlockIndices(0, P.var["q"], NJ.getSubMatrix(counter, 0, 1, NJ.cols()));
+    P.Indic_lhs.push_back(Eq);
+    P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(1,1));
+    P.Indic_var.push_back(y1_index+counter);
+    P.Indic_val.push_back(1);
+    P.Indic_sense.push_back("eq");
+
+    index += numFE+1;
+  }
+}
+
+void
 GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p) 
 {
   std::vector<int> block_rows(4, numContacts);
@@ -256,6 +313,59 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   ib.copySubMatrixBlockIndices(2, 0, c.negative());
   ib.copySubMatrixBlockIndices(3, 0, k3);
   P.ib_list.push_back(ib);
+}
+
+void
+GraspSolver::nonBackdrivableJointIndicatorConstraint(GraspStruct &P, const Matrix &preload)
+{
+  Matrix J(g->contactJacobian(joints, contacts));
+  Matrix D(Contact::frictionForceBlockMatrix(contacts));
+  Matrix JTD(matrixMultiply(J.transposed(), D));
+
+  int y2_index = 0;
+  for (int i=0; i<P.var["y2"]; i++) y2_index += P.block_cols[i];
+
+  int numJoints = preload.rows();
+  for (int i=0; i<numJoints; i++) {
+    Matrix sq(Matrix::ZEROES<Matrix>(1, numJoints));
+    sq.elem(0, i) = 1.0;
+    if (preload.elem(i,0) == 0) {
+      Matrix Eq(Matrix::ZEROES<Matrix>(1, P.block_cols));
+      Eq.copySubMatrixBlockIndices(0, P.var["q"], sq);
+      P.Eq_list.push_back(Eq);
+      P.b_list.push_back(Matrix::ZEROES<Matrix>(1,1));
+    } else {
+      std::vector<int> block_rows(2, 1);
+      Matrix InEq(Matrix::ZEROES<Matrix>(block_rows, P.block_cols));
+      InEq.copySubMatrixBlockIndices(0, P.var["q"], sq.negative());
+      InEq.copySubMatrixBlockIndices(1, P.var["beta"], JTD.getSubMatrix(i, 0, 1, JTD.cols()).negative());
+      Matrix ib(2,1);
+      ib.elem(0,0) = 0;
+      ib.elem(1,0) = -preload.elem(i,0);
+      P.InEq_list.push_back(InEq);
+      P.ib_list.push_back(ib);
+
+      // y2==0 -> finger follows
+      Matrix Eq(Matrix::ZEROES<Matrix>(1, P.block_cols));
+      Eq.copySubMatrixBlockIndices(0, P.var["beta"], JTD.getSubMatrix(i, 0, 1, JTD.cols()));
+      Matrix b(1,1);
+      b.elem(0,0) = preload.elem(i,0);
+      P.Indic_lhs.push_back(Eq);
+      P.Indic_rhs.push_back(b);
+      P.Indic_var.push_back(y2_index+i);
+      P.Indic_val.push_back(0);
+      P.Indic_sense.push_back("eq");
+
+      // y2==1 -> q==0, finger does not backdrive
+      Eq.setAllElements(0.0);
+      Eq.copySubMatrixBlockIndices(0, P.var["q"], sq);
+      P.Indic_lhs.push_back(Eq);
+      P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(1,1));
+      P.Indic_var.push_back(y2_index+i);
+      P.Indic_val.push_back(1);
+      P.Indic_sense.push_back("eq");
+    }
+  }
 }
 
 void
@@ -395,9 +505,28 @@ GraspSolver::frictionConeConstraint(GraspStruct &P, const Matrix &beta_p)
 }
 
 void
+GraspSolver::frictionConeEdgeIndicatorConstraint(GraspStruct &P)
+{
+  Matrix F(Contact::frictionConstraintsBlockMatrix(contacts));
+  Matrix Eq(Matrix::ZEROES<Matrix>(numContacts, P.block_cols));
+  Eq.copySubMatrixBlockIndices(0, P.var["beta"], F);
+
+  int y3_index = 0;
+  for (int i=0; i<P.var["y3"]; i++) y3_index += P.block_cols[i];
+
+  for (int i=0; i<numContacts; i++) {
+    P.Indic_lhs.push_back(Eq.getSubMatrix(i, 0, 1, Eq.cols()));
+    P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(1,1));
+    P.Indic_var.push_back(y3_index+i);
+    P.Indic_val.push_back(0);
+    P.Indic_sense.push_back("eq");
+  }
+}
+
+void
 GraspSolver::frictionConeEdgeConstraint(GraspStruct &P, const Matrix &beta_p)
 {
-    // results of friction inequality arising from original contact forces
+  // results of friction inequality arising from original contact forces
   Matrix F(Contact::frictionConstraintsBlockMatrix(contacts));
   Matrix d(matrixMultiply(F, beta_p));
 
@@ -606,28 +735,30 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
     int size = P.block_cols[i];
 
     if (!key.compare("alpha")) {
-      Matrix alpha_lb(size, 1);
-      alpha_lb.setAllElements(0.0);
+      /*Matrix alpha_lb(size, 1);
+      alpha_lb.setAllElements(0.0);*/
+      Matrix alpha_lb(Matrix::MIN_VECTOR(size));
       int pos = 0;
       std::list<Contact*>::iterator it;
       for (it=contacts.begin(); it!=contacts.end(); it++) {
-        alpha_lb.elem(pos,0) = -AlphaMax;
+        alpha_lb.copySubMatrix(pos+1, 0, Matrix::ZEROES<Matrix>((*it)->numFrictionEdges, 1));
+        //alpha_lb.elem(pos,0) = -AlphaMax;
         pos += (*it)->numFrictionEdges+1;
       }
       P.lb_list.push_back(alpha_lb);
 
-      Matrix alpha_ub(size, 1);
-      alpha_ub.setAllElements(AlphaMax);
-      P.ub_list.push_back(alpha_ub);
+      /*Matrix alpha_ub(size, 1);
+      alpha_ub.setAllElements(AlphaMax);*/
+      P.ub_list.push_back(Matrix::MAX_VECTOR(size));
 
       P.types.push_back(Matrix::ZEROES<Matrix>(size, 1));
     }
 
     else if (!key.compare("beta")) {
       P.lb_list.push_back(beta_p.negative());
-      Matrix beta_ub(size, 1);
-      beta_ub.setAllElements(BetaMax);
-      P.ub_list.push_back(beta_ub);
+      /*Matrix beta_ub(size, 1);
+      beta_ub.setAllElements(BetaMax);*/
+      P.ub_list.push_back(Matrix::MAX_VECTOR(size));
       P.types.push_back(Matrix::ZEROES<Matrix>(size, 1));
     }
 
@@ -638,8 +769,9 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
     }
 
     else if (!key.compare("q")) {
-      Matrix qbound(size, 1);
-      qbound.setAllElements(QMax);
+      /*Matrix qbound(size, 1);
+      qbound.setAllElements(QMax);*/
+      Matrix qbound(Matrix::MAX_VECTOR(size));
       P.lb_list.push_back(qbound.negative());
       P.ub_list.push_back(qbound);
       P.types.push_back(Matrix::ZEROES<Matrix>(size, 1));
@@ -751,10 +883,10 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   P.var["y2"]    = 5; P.block_cols.push_back(numJoints);          P.varNames.push_back("y2");
   P.var["y3"]    = 6; P.block_cols.push_back(numContacts);        P.varNames.push_back("y3");
   P.var["z"]     = 7; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("z");
-  P.var["v"]     = 8; P.block_cols.push_back(1);                  P.varNames.push_back("v");
+  //P.var["v"]     = 8; P.block_cols.push_back(1);                  P.varNames.push_back("v");
 
   // Set virtual limits for MIP representation of linear complementarities
-  setVirtualLimits(preload, wrench);
+  //setVirtualLimits(preload, wrench);
 
   // Preload contact forces (if present)
   Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges, 1) );
@@ -762,21 +894,21 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
 
   // Objective 
   //springDeformationObjective(P);
-  virtualLimitsObjective(P);
+  //virtualLimitsObjective(P);
 
   // equality constraints
   objectWrenchConstraint(P, wrench);
   movementAmplitudesConstraint(P);
 
   // inequality constraints
-  virtualSpringConstraint(P, beta_p);
+  virtualSpringIndicatorConstraint(P);
   if (rigid) rigidJointsConstraint(P);
-  else nonBackdrivableJointConstraint(P, preload, beta_p);
+  else nonBackdrivableJointIndicatorConstraint(P, preload);
   frictionConeConstraint(P, beta_p);
-  frictionConeEdgeConstraint(P, beta_p);
+  frictionConeEdgeIndicatorConstraint(P);
   contactMovementIndicatorConstraint(P);
   amplitudesSOS2Constraint(P, beta_p);
-  virtualLimitLBConstraint(P);
+  //virtualLimitLBConstraint(P);
 
   // quadratic inequality constraints
   //objectMotionLimit(P);
@@ -1478,6 +1610,8 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
   S.block_cols = P.block_cols;
   S.var = P.var;
   S.sol = sol;
+
+  return result;
 
   if (result) return result;
 

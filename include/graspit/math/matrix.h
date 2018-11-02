@@ -443,8 +443,8 @@ int MIPSolver(const Matrix &Q, const Matrix &c,
               const Matrix &lowerBounds, const Matrix &upperBounds,
               Matrix &sol, const Matrix &types, double *objVal);
 
-//! A simple test to check the Gurobi solver works
-void testGurobi();
+//! A simple test to check the MIP solver works
+void testMIP();
 
 template <class MatrixType>
 MatrixType Matrix::ZEROES(int m, int n)

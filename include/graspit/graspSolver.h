@@ -192,14 +192,20 @@ private:
   void objectMotionConstraint(GraspStruct &P, const Matrix &wrench);
   // normal forces at contacts are determined by the deformation of virtual springs
   void virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p);
+  // normal forces at contacts are determined by the deformation of virtual springs (expressed as indicator constraint)
+  void virtualSpringIndicatorConstraint(GraspStruct &P);
   // joints may only move at their prescribed preload torque
   void nonBackdrivableJointConstraint(GraspStruct &P, const Matrix &preload, const Matrix &beta_p);
+  // joints may only move at their prescribed preload torque (expressed as indicator constraint)
+  void nonBackdrivableJointIndicatorConstraint(GraspStruct &P, const Matrix &preload);
   // constraint modeling tendon actuation
   void tendonConstraint(GraspStruct &P, const Matrix &preload, const Matrix &beta_p);
   // constraint forcing frictional forces inside the friction cone
   void frictionConeConstraint(GraspStruct &P, const Matrix &beta_p);
   // constraint forcing frictional forces on the edge of the friction cone
   void frictionConeEdgeConstraint(GraspStruct &P, const Matrix &beta_p);
+  // constraint forcing frictional forces on the edge of the friction cone (expressed as indicator constraint)
+  void frictionConeEdgeIndicatorConstraint(GraspStruct &P);
   //  constraint that determines if a contact experiences relative motion
   void contactMovementConstraint(GraspStruct &P);
   //  constraint that determines if a contact experiences relative motion (expressed as indicator constraint)
