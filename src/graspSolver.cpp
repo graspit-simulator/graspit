@@ -1561,7 +1561,7 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
   direction1.elem(0,0) = 1;
   direction2.elem(2,0) = 1;
 
-  int directionSteps = 500;
+  int directionSteps = 520;
   for (int i=0; i<directionSteps; i++) {
 
     Matrix xcomponent(direction1);
