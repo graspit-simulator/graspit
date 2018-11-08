@@ -176,6 +176,8 @@ private:
   void virtualLimitsObjective(GraspStruct &P);
   // objective that minimizes a combination of the resultant wrench and the use of virtual limits
   void resultantAndVLObjective(GraspStruct &P);
+  // objective that minimizes the preload torque required to withstand a given wrench
+  void preloadTauObjective(GraspStruct &P);
 
   // constraints that model the grasp
   // contact forces must balance applied wrench

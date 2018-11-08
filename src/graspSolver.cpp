@@ -97,6 +97,14 @@ GraspSolver::resultantAndVLObjective(GraspStruct &P)
   P.cj.multiply(1.0e-6);
 }
 
+void
+GraspSolver::preloadTauObjective(GraspStruct &P)
+{
+  int numPreloadVar = P.block_cols[P.var["tau"]];
+  P.Q = Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
+  P.Q.copySubMatrixBlockIndices(P.var["tau"], P.var["tau"], Matrix::EYE(numPreloadVar, numPreloadVar));
+}
+
 //  --------------------------  Equality Constraints  -------------------------------  //
 
 void
@@ -324,7 +332,8 @@ GraspSolver::nonBackdrivableJointIndicatorConstraint(GraspStruct &P, const Matri
 
   int y2_index = 0;
   for (int i=0; i<P.var["y2"]; i++) y2_index += P.block_cols[i];
-
+  
+  int tau_index = 0;
   int numJoints = preload.rows();
   for (int i=0; i<numJoints; i++) {
     Matrix sq(Matrix::ZEROES<Matrix>(1, numJoints));
@@ -341,7 +350,14 @@ GraspSolver::nonBackdrivableJointIndicatorConstraint(GraspStruct &P, const Matri
       InEq.copySubMatrixBlockIndices(1, P.var["beta"], JTD.getSubMatrix(i, 0, 1, JTD.cols()).negative());
       Matrix ib(2,1);
       ib.elem(0,0) = 0;
-      ib.elem(1,0) = -preload.elem(i,0);
+      if (preload.elem(i,0) > 0) {
+        ib.elem(1,0) = -preload.elem(i,0);
+      } else {
+        Matrix stau(Matrix::ZEROES<Matrix>(1, P.block_cols[P.var["tau"]]));
+        stau.elem(0, tau_index) = 1.0;
+        InEq.copySubMatrixBlockIndices(1, P.var["tau"], stau);
+        ib.elem(1,0) = 0.0;
+      }
       P.InEq_list.push_back(InEq);
       P.ib_list.push_back(ib);
 
@@ -349,7 +365,15 @@ GraspSolver::nonBackdrivableJointIndicatorConstraint(GraspStruct &P, const Matri
       Matrix Eq(Matrix::ZEROES<Matrix>(1, P.block_cols));
       Eq.copySubMatrixBlockIndices(0, P.var["beta"], JTD.getSubMatrix(i, 0, 1, JTD.cols()));
       Matrix b(1,1);
-      b.elem(0,0) = preload.elem(i,0);
+      if (preload.elem(i,0) > 0) {
+        b.elem(0,0) = preload.elem(i,0);
+      } else {
+        Matrix stau(Matrix::ZEROES<Matrix>(1, P.block_cols[P.var["tau"]]));
+        stau.elem(0, tau_index) = -1.0;
+        Eq.copySubMatrixBlockIndices(0, P.var["tau"], stau);
+        b.elem(0,0) = 0.0;
+        tau_index++;
+      }
       P.Indic_lhs.push_back(Eq);
       P.Indic_rhs.push_back(b);
       P.Indic_var.push_back(y2_index+i);
@@ -777,6 +801,12 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
       P.types.push_back(Matrix::ZEROES<Matrix>(size, 1));
     }
 
+    else if (!key.compare("tau")) {
+      P.lb_list.push_back(Matrix::ZEROES<Matrix>(size, 1));
+      P.ub_list.push_back(Matrix::MAX_VECTOR(size));
+      P.types.push_back(Matrix::ZEROES<Matrix>(size, 1));
+    }
+
     else if (!key.compare("f")) {
       Matrix f_lb(Matrix::ZEROES<Matrix>(size, 1));
       Matrix f_ub(Matrix::MAX_VECTOR(size));
@@ -874,6 +904,10 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   for (it=contacts.begin(); it!=contacts.end(); it++) {
     totalFrictionEdges += (*it)->numFrictionEdges+1;
   }
+  int numPreloadVar = 0;
+  for (int i=0; i<preload.rows(); i++) {
+    if (preload.elem(i,0) < 0) numPreloadVar++;
+  }
   // unknowns
   P.var["alpha"] = 0; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("alpha");
   P.var["beta"]  = 1; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("beta");
@@ -883,6 +917,9 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   P.var["y2"]    = 5; P.block_cols.push_back(numJoints);          P.varNames.push_back("y2");
   P.var["y3"]    = 6; P.block_cols.push_back(numContacts);        P.varNames.push_back("y3");
   P.var["z"]     = 7; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("z");
+  if (numPreloadVar) {
+    P.var["tau"] = 8; P.block_cols.push_back(numPreloadVar);      P.varNames.push_back("tau");
+  }
   //P.var["v"]     = 8; P.block_cols.push_back(1);                  P.varNames.push_back("v");
 
   // Set virtual limits for MIP representation of linear complementarities
@@ -895,6 +932,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   // Objective 
   //springDeformationObjective(P);
   //virtualLimitsObjective(P);
+  if (numPreloadVar) preloadTauObjective(P);
 
   // equality constraints
   objectWrenchConstraint(P, wrench);
@@ -1363,6 +1401,10 @@ GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench,
   Matrix beta_t(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
   if (beta_p.rows() == beta_t.rows())
     Matrix beta_t(matrixAdd(beta_t, beta_p));
+  if (S.var.find("tau") != S.var.end()) {
+    Matrix tau(S.sol.getSubMatrixBlockIndices(S.var["tau"], 0));
+    DBGA("Joint torques: " << tau.transposed());
+  }
   drawContactWrenches(beta_t);
   drawObjectMovement(S);
   return result;
