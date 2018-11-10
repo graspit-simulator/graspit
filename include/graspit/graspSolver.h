@@ -192,6 +192,8 @@ private:
   void rigidJointsConstraint(GraspStruct &P);
   // constraint that forces the object to move a certain way (for debug)
   void objectMotionConstraint(GraspStruct &P, const Matrix &wrench);
+  // constraint that makes sure resultant (and therefore object wrench) and applied wrench are collinear
+  void resultantDirectionConstraint(GraspStruct &P, const Matrix &wrench);
   // normal forces at contacts are determined by the deformation of virtual springs
   void virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p);
   // normal forces at contacts are determined by the deformation of virtual springs (expressed as indicator constraint)
@@ -225,7 +227,7 @@ private:
   // Methods that construct the problems to be solved by the optimization solver
   // Construct an optimization problem with the non-iterative formulation
   void nonIterativeFormulation(GraspStruct &P, const Matrix &preload, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1), 
-    const Matrix &beta = Matrix(0,0), bool rigid=false);
+    const Matrix &beta = Matrix(0,0), bool rigid=false, bool findMax=false);
   // Construct an optimization problem with constraints specific to a tendon actuated hand
   void nonIterativeTendonFormulation(GraspStruct &P, const Matrix &preload, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1), 
     const Matrix &beta = Matrix(0,0));
@@ -237,7 +239,7 @@ private:
     const Matrix &wrench, const Matrix &beta);
 
   // Solver for non-iterative formulations
-  int frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench);
+  int frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench, bool findMax=false);
   // Solver for iterative formulations
   int iterativeSolver(SolutionStruct &S, bool cone_movement, 
     std::tr1::function<void(GraspStruct&,const Matrix&,const Matrix&)> formulation);
