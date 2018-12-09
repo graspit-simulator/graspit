@@ -272,11 +272,11 @@ private:
 
 //  --------------------------  Useful Matrices  -------------------------------  //
 
-Matrix normalForceSelectionMatrix(std::list<Contact*> &contacts);
+Matrix normalForceSelectionMatrix(const std::list<Contact*> &contacts);
 Matrix normalDisplacementSelectionMatrix(int numContacts);
 Matrix tangentialDisplacementSelectionMatrix(int numContacts);
-Matrix tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts);
-Matrix graspMapMatrix(const Matrix &R);
+Matrix tangentialDisplacementSummationMatrix(const std::list<Contact*> &contacts);
+Matrix frictionConeEdgeMatrix(const std::list<Contact*> &contacts);
 
 //  --------------------------  Useful Functions  ------------------------------  //
 

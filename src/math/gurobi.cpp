@@ -72,7 +72,7 @@ int gurobiSolverWrapper(const Matrix &Q, const Matrix &c,
     model.getEnv().set("IntFeasTol", "1e-9");
     model.getEnv().set("FeasibilityTol", "1e-9");
     //model.getEnv().set("PreSOS2BigM", "-1");
-    model.getEnv().set("TimeLimit", "60");
+    //model.getEnv().set("TimeLimit", "60");
 
     if (b.rows())
       if (b.absMax() > 1e2)

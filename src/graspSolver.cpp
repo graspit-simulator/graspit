@@ -542,9 +542,9 @@ GraspSolver::frictionConeConstraint(GraspStruct &P, const Matrix &beta_p)
 void
 GraspSolver::frictionConeEdgeIndicatorConstraint(GraspStruct &P)
 {
-  Matrix F(Contact::frictionConstraintsBlockMatrix(contacts));
+  Matrix G(Contact::frictionConstraintsBlockMatrix(contacts));
   Matrix Eq(Matrix::ZEROES<Matrix>(numContacts, P.block_cols));
-  Eq.copySubMatrixBlockIndices(0, P.var["beta"], F);
+  Eq.copySubMatrixBlockIndices(0, P.var["beta"], G);
 
   int y3_index = 0;
   for (int i=0; i<P.var["y3"]; i++) y3_index += P.block_cols[i];
@@ -554,7 +554,7 @@ GraspSolver::frictionConeEdgeIndicatorConstraint(GraspStruct &P)
     P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(1,1));
     P.Indic_var.push_back(y3_index+i);
     P.Indic_val.push_back(0);
-    P.Indic_sense.push_back("eq");
+    P.Indic_sense.push_back("geq");
   }
 }
 
@@ -1542,18 +1542,12 @@ GraspSolver::findMaximumWrenchNonIterative(Matrix &preload, const Matrix &direct
     }
     modifyFrictionEdges();
     SolutionStruct S;
-    int result = frictionRefinementSolver(S, preload, direction, true);
+    frictionRefinementSolver(S, preload, direction, true);
     Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
     Matrix r(S.sol.getSubMatrixBlockIndices(S.var["r"], 0));
-    Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
-    Matrix D(Contact::frictionForceBlockMatrix(contacts));
-    Matrix G(g->graspMapMatrixFrictionEdges(R,D));
     g->getObject()->redrawFrictionCones();
     drawContactWrenches(beta);
     drawObjectMovement(S);
-    DBGA("wrench (applied): " << direction.transposed());
-    DBGA("wrench (object): " << matrixMultiply(G, beta).transposed());
-    DBGA("resultant: " << r.transposed());
     return direction.fnorm() - r.fnorm();
   } else {
     GraspStruct P_p;
@@ -1656,7 +1650,7 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
   direction1.elem(0,0) = 1;
   direction2.elem(1,0) = 1;
 
-  int directionSteps = 520;
+  int directionSteps = 360;
   for (int i=0; i<directionSteps; i++) {
 
     Matrix xcomponent(direction1);
@@ -2111,10 +2105,10 @@ GraspSolver::postProcessX(SolutionStruct &S)
 
 //  Selection Matrix for normal forces
 Matrix
-normalForceSelectionMatrix(std::list<Contact*> &contacts)
+normalForceSelectionMatrix(const std::list<Contact*> &contacts)
 {
   std::list<Matrix> S_list;
-  std::list<Contact*>::iterator it;
+  std::list<Contact*>::const_iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
     Matrix S(Matrix::ZEROES<Matrix>(1, (*it)->numFrictionEdges+1));
     S.elem(0,0) = 1.0;
@@ -2150,10 +2144,10 @@ tangentialDisplacementSelectionMatrix(int numContacts)
 
 //  Summation matrix for tangential contact displacements
 Matrix
-tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts)
+tangentialDisplacementSummationMatrix(const std::list<Contact*> &contacts)
 {
   std::list<Matrix> sigma_list;
-  std::list<Contact*>::iterator it;
+  std::list<Contact*>::const_iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
     Matrix sigma(1, (*it)->numFrictionEdges+1);
     sigma.setAllElements(1.0);
@@ -2162,6 +2156,27 @@ tangentialDisplacementSummationMatrix(std::list<Contact*> &contacts)
   }
 
   return Matrix::BLOCKDIAG<Matrix>(sigma_list);
+}
+
+Matrix
+frictionConeEdgeMatrix(const std::list<Contact*> &contacts) {
+  std::list<Matrix*> blocks;
+  std::list<Contact*>::const_iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    Matrix *Gi = new Matrix(Matrix::ZEROES<Matrix>(1, (*it)->numFrictionEdges + 1));
+    Gi->elem(0,0) = -1.0 * (*it)->getCof();
+    for (int i=0; i<(*it)->numFrictionEdges; i++) {
+      double len = sqrt(pow((*it)->frictionEdges[6*i], 2) + pow((*it)->frictionEdges[6*i+1], 2));
+      Gi->elem(0,i+1) = 1 / len;
+    }
+    blocks.push_back(Gi);
+  }
+  Matrix G(Matrix::BLOCKDIAG<Matrix>(&blocks));
+  while (!blocks.empty()) {
+    delete blocks.back();
+    blocks.pop_back();
+  }
+  return G;
 }
 
 double
