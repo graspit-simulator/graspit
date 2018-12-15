@@ -542,7 +542,7 @@ GraspSolver::frictionConeConstraint(GraspStruct &P, const Matrix &beta_p)
 void
 GraspSolver::frictionConeEdgeIndicatorConstraint(GraspStruct &P)
 {
-  Matrix G(Contact::frictionConstraintsBlockMatrix(contacts));
+  Matrix G(frictionConeEdgeMatrix(contacts));
   Matrix Eq(Matrix::ZEROES<Matrix>(numContacts, P.block_cols));
   Eq.copySubMatrixBlockIndices(0, P.var["beta"], G);
 
@@ -2167,7 +2167,7 @@ frictionConeEdgeMatrix(const std::list<Contact*> &contacts) {
     Gi->elem(0,0) = -1.0 * (*it)->getCof();
     for (int i=0; i<(*it)->numFrictionEdges; i++) {
       double len = sqrt(pow((*it)->frictionEdges[6*i], 2) + pow((*it)->frictionEdges[6*i+1], 2));
-      Gi->elem(0,i+1) = 1 / len;
+      Gi->elem(0,i+1) = len;
     }
     blocks.push_back(Gi);
   }
