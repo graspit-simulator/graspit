@@ -259,7 +259,7 @@ private:
   void setVirtualLimits(const Matrix &preload, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1));
 
   void modifyFrictionEdges();
-  double computeSystemEnergy(SolutionStruct &S, const Matrix &wrench); 
+  void systemEnergyError(SolutionStruct &S, const Matrix &preload, const Matrix &wrench, double *e, bool findMax = false); 
   bool removeJointsBeyondContact(std::list<Joint*> &joints, const std::list<Contact*> &contacts, 
   Matrix &preload);
   bool removePassiveJoints(std::list<Joint*> &joints, Matrix &preload);

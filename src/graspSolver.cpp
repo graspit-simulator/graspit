@@ -1131,7 +1131,9 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     int result = solveProblem(P, S);
     if (result) return result;
 
-    DBGA("Energy: " << computeSystemEnergy(S, wrench));
+    double e[2];
+    systemEnergyError(S, preload, wrench, e, findMax);
+    DBGA("Energy Error: " << e[0] << " (absolute), " << e[1] << " (relative)");
 
     // get active friction and motion edges as well as friction edge amplitudes
     Matrix z(S.sol.getSubMatrixBlockIndices(S.var["z"], 0));
@@ -1204,6 +1206,12 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
         }
       }
 
+      //  Active friction edges should have the same length
+      if (abs(len1 - len2) > Matrix::EPS) {
+        DBGA("ACtive friction edges have different length");
+        exit(0);
+      }
+
       // If the angle is already below the required tolerance we are done
       // with this contact. Otherwise work is required and we know there
       // will be at least another iteration so we can set the no-exit flag
@@ -1232,22 +1240,26 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
       new_fe_vec.reserve(3);
       Matrix new_fe(Matrix::ZEROES<Matrix>(6,1));
 
-      double mult = len1 * cos(angle / 4.0);
-      new_fe.elem(0,0) = frictionEdges[6*edge1] / mult;
-      new_fe.elem(1,0) = frictionEdges[6*edge1+1] / mult;
+      double mult = 1.0;
+      double new_angle = angle / 2.0;
+      do {
+        mult *= cos(new_angle / 2.0);
+        new_angle /= 2;
+      } while (new_angle > kFrictionConeTolerance);
+      new_fe.elem(0,0) = frictionEdges[6*edge1] / (len1 * mult);
+      new_fe.elem(1,0) = frictionEdges[6*edge1+1] / (len1 * mult);
       new_fe_vec.push_back(new_fe);
 
       new_fe.setAllElements(0.0);
       new_fe.elem(0,0) = frictionEdges[6*edge1] + frictionEdges[6*edge2];
       new_fe.elem(1,0) = frictionEdges[6*edge1+1] + frictionEdges[6*edge2+1];
-      mult = sqrt(pow(new_fe.elem(0,0), 2) + pow(new_fe.elem(1,0), 2)) * cos(angle / 4.0);
-      new_fe.multiply(1/mult);
+      double new_len = sqrt(pow(new_fe.elem(0,0), 2) + pow(new_fe.elem(1,0), 2));
+      new_fe.multiply(1/ (new_len * mult));
       new_fe_vec.push_back(new_fe);
 
       new_fe.setAllElements(0.0);
-      mult = len2 * cos(angle / 4.0);
-      new_fe.elem(0,0) = frictionEdges[6*edge2] / mult;
-      new_fe.elem(1,0) = frictionEdges[6*edge2+1] / mult;
+      new_fe.elem(0,0) = frictionEdges[6*edge2] / (len1 * mult);
+      new_fe.elem(1,0) = frictionEdges[6*edge2+1] / (len1 * mult);
       new_fe_vec.push_back(new_fe);
 
       // Populate list of final friction edges
@@ -1865,7 +1877,13 @@ GraspSolver::modifyFrictionEdges()
       double len1 = sqrt(pow((*it)->frictionEdges[6*i], 2) + pow((*it)->frictionEdges[6*i+1], 2));
       double len2 = sqrt(pow((*it)->frictionEdges[6*j], 2) + pow((*it)->frictionEdges[6*j+1], 2));
       double angle = acos(num/(len1*len2));
-      if (angle > Matrix::EPS) mult = len1 * cos(angle / 2.0);
+      if (angle > Matrix::EPS) {
+        mult = len1;
+        do {
+          mult *= cos(angle / 2.0);
+          angle /= 2;
+        } while(angle > kFrictionConeTolerance);
+      }
       (*it)->frictionEdges[6*i]   /= mult;
       (*it)->frictionEdges[6*i+1] /= mult;
       (*it)->getMate()->frictionEdges[6*i]   /= mult;
@@ -1875,36 +1893,53 @@ GraspSolver::modifyFrictionEdges()
   g->getObject()->redrawFrictionCones();
 }
 
-double
-GraspSolver::computeSystemEnergy(SolutionStruct &S, const Matrix &wrench)
+void
+GraspSolver::systemEnergyError(SolutionStruct &S, const Matrix &preload, const Matrix &wrench, double *e, bool findMax /*=false*/)
 {
   Matrix x( S.sol.getSubMatrixBlockIndices(S.var["x"], 0) );
+  Matrix q( S.sol.getSubMatrixBlockIndices(S.var["q"], 0) );
   Matrix beta( S.sol.getSubMatrixBlockIndices(S.var["beta"], 0) );
-  double E = 0;
 
   // Work done by applied wrench
-  E += 0.5 * matrixMultiply(wrench.transposed(), x).elem(0,0);
+  double E_in;
+  if (findMax) {
+    Matrix r( S.sol.getSubMatrixBlockIndices(S.var["r"], 0) );
+    E_in = -0.5 * matrixMultiply(matrixAdd(wrench, r).transposed(), x).elem(0,0);
+  } else {
+    E_in = -0.5 * matrixMultiply(wrench.transposed(), x).elem(0,0);
+  }
+
+  // Work done by joints
+  double E_tor = 0.5 * matrixMultiply(preload.transposed(), q).elem(0,0);
+  E_in += E_tor;
 
   // Work done compressing virtual springs
+  Matrix J(g->contactJacobian(joints, contacts));
   Matrix S_matrix(normalForceSelectionMatrix(contacts));
   Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
   Matrix N(normalDisplacementSelectionMatrix(numContacts));
   Matrix RT(Grasp::graspMapMatrix(R).transposed());
   Matrix K(matrixMultiply(N, RT));
+  Matrix NJ(matrixMultiply(N, J));
   Matrix cn = matrixMultiply(S_matrix, beta);
-  Matrix kn = matrixMultiply(K, x);
-  E += 0.5 * matrixMultiply(cn.transposed(), kn).elem(0,0);
+  Matrix kn = matrixAdd(matrixMultiply(K, x), matrixMultiply(NJ, q).negative());
+  double E_out = -0.5 * matrixMultiply(cn.transposed(), kn).elem(0,0);
 
   // Work done by sliding contacts
   Matrix M(tangentialDisplacementSelectionMatrix(numContacts));
   Matrix MRT(matrixMultiply(M, RT));
-  Matrix kf(matrixMultiply(MRT, x));
+  Matrix MJ(matrixMultiply(M, J));
+  Matrix kf(matrixAdd(matrixMultiply(MRT, x), matrixMultiply(MJ, q).negative()));
   std::list<Contact*>::iterator it = contacts.begin();
+  double E_fric = 0;
   for (int i=0; it!=contacts.end(); it++, i++) {
     Matrix kif(kf.getSubMatrix(2*i, 0, 2, 1));
-    E += 0.5 * (*it)->getCof() * cn.elem(i,0) * kif.fnorm();
+    double fric = 0.5 * (*it)->getCof() * cn.elem(i,0) * kif.fnorm();
+    E_fric -= fric;
   }
-  return E;
+  E_out += E_fric;
+  e[0] = E_in + E_out;
+  e[1] = (E_in + E_out) / E_in;
 }
 
 bool 
@@ -2216,10 +2251,10 @@ checkFrictionEdges(const std::list<Matrix> &frictionEdges) {
         DBGA("Unequal friction edges defining sector");
         return false;
       }
-      if (len1 - 1.0/cos(angle / 2.0) > Matrix::EPS) {
+      /*if (len1 - 1.0/cos(angle / 2.0) > Matrix::EPS) {
         DBGA("Friction edge has incorrect length");
         return false;
-      }
+      }*/
     }
     edge1 = edge2++;
     if (edge2 == frictionEdges.end()) edge2 = frictionEdges.begin();
