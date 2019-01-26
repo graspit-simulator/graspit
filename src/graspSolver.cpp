@@ -1145,7 +1145,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     if (findMax) {
       double resultant = S.sol.getSubMatrixBlockIndices(S.var["r"], 0).fnorm();
       DBGA("Resultant: " << resultant);
-      if (resultant < prev_resultant) {
+      if (resultant < prev_resultant + Matrix::EPS) {
         DBGA("Resultant is smaller than in previous iteration.");
         exit(0);
       }
@@ -1229,7 +1229,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
 
       //  Active friction edges should have the same length
       if (abs(len1 - len2) > Matrix::EPS) {
-        DBGA("ACtive friction edges have different length");
+        DBGA("Active friction edges have different length");
         exit(0);
       }
 
