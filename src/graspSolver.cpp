@@ -1145,7 +1145,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     if (findMax) {
       double resultant = S.sol.getSubMatrixBlockIndices(S.var["r"], 0).fnorm();
       DBGA("Resultant: " << resultant);
-      if (resultant < prev_resultant + Matrix::EPS) {
+      if (resultant < prev_resultant - Matrix::EPS) {
         DBGA("Resultant is smaller than in previous iteration.");
         exit(0);
       }
