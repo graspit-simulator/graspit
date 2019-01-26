@@ -33,7 +33,7 @@
 #include <iomanip>
 
 const double GraspSolver::kSpringStiffness = 1.0;
-const double GraspSolver::kNormalUncertainty = 2.5*M_PI/180.0;
+const double GraspSolver::kNormalUncertainty = 0.0*M_PI/180.0;
 const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
 const double GraspSolver::kBetaMaxBase = 200;
