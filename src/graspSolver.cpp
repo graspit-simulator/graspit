@@ -30,9 +30,10 @@
 #include "graspit/graspitCore.h"
 #include "graspit/ivmgr.h"
 #include <sstream>
+#include <iomanip>
 
 const double GraspSolver::kSpringStiffness = 1.0;
-const double GraspSolver::kNormalUncertainty = 0.0*M_PI/180.0;
+const double GraspSolver::kNormalUncertainty = 3.0*M_PI/180.0;
 const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
 const double GraspSolver::kBetaMaxBase = 200;
@@ -227,9 +228,15 @@ GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P)
   Matrix RT(Grasp::graspMapMatrix(R).transposed());
   Matrix K(matrixMultiply(N, RT));
   Matrix NJ(matrixMultiply(N, J));
+  Matrix E(tangentialDisplacementSummationMatrix(contacts));
 
   Matrix S_k(S);
   S_k.multiply(1/kSpringStiffness);
+
+  // we assume the worst case such that normal force is diminished
+  K.multiply(cos(kNormalUncertainty));
+  NJ.multiply(cos(kNormalUncertainty));
+  E.multiply(sin(kNormalUncertainty));
 
   std::vector<int> block_rows(2, numContacts);
   Matrix InEq(Matrix::ZEROES<Matrix>(block_rows, P.block_cols));
@@ -237,6 +244,7 @@ GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P)
   InEq.copySubMatrixBlockIndices(1, P.var["beta"], S_k.negative());
   InEq.copySubMatrixBlockIndices(1, P.var["x"],    K);
   InEq.copySubMatrixBlockIndices(1, P.var["q"],    NJ.negative());
+  InEq.copySubMatrixBlockIndices(1, P.var["alpha"],E.negative());
   P.InEq_list.push_back(InEq);
   P.ib_list.push_back(Matrix::ZEROES<Matrix>(InEq.rows(), 1));
 
@@ -262,8 +270,9 @@ GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P)
 
     // y1==1 -> virtual spring
     Eq.multiply(1/kSpringStiffness);
-    Eq.copySubMatrixBlockIndices(0, P.var["x"], K.getSubMatrix(counter, 0, 1, K.cols()).negative());
-    Eq.copySubMatrixBlockIndices(0, P.var["q"], NJ.getSubMatrix(counter, 0, 1, NJ.cols()));
+    Eq.copySubMatrixBlockIndices(0, P.var["x"],     K.getSubMatrix(counter, 0, 1, K.cols()).negative());
+    Eq.copySubMatrixBlockIndices(0, P.var["q"],     NJ.getSubMatrix(counter, 0, 1, NJ.cols()));
+    Eq.copySubMatrixBlockIndices(0, P.var["alpha"], E.getSubMatrix(counter, 0, 1, E.cols()));
     P.Indic_lhs.push_back(Eq);
     P.Indic_rhs.push_back(Matrix::ZEROES<Matrix>(1,1));
     P.Indic_var.push_back(y1_index+counter);
@@ -1109,9 +1118,10 @@ int
 GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench, bool findMax /*=false*/)
 {
   int counter = 0;
+  double prev_resultant = -1;
   while (true) {
 
-    DBGA("Iteration " << ++counter);
+    DBGA("Iteration " << counter++);
 
     /*std::list<Contact*>::iterator c_it;
     for (c_it=contacts.begin(); c_it!=contacts.end(); c_it++) {
@@ -1123,13 +1133,24 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
         }
         std::cout << std::endl;
       }
-    }*/
+    }
+    DBGA("E:\n" << tangentialDisplacementSummationMatrix(contacts));*/
 
     // Solve problem and exit if infeasible
     GraspStruct P;
     nonIterativeFormulation(P, preload, wrench, Matrix(0,0), false, findMax);
     int result = solveProblem(P, S);
     if (result) return result;
+
+    if (findMax) {
+      double resultant = S.sol.getSubMatrixBlockIndices(S.var["r"], 0).fnorm();
+      DBGA("Resultant: " << resultant);
+      if (resultant < prev_resultant) {
+        DBGA("Resultant is smaller than in previous iteration.");
+        exit(0);
+      }
+      prev_resultant = resultant;
+    }
 
     double e[2];
     systemEnergyError(S, preload, wrench, e, findMax);
@@ -1243,9 +1264,9 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
       double mult = 1.0;
       double new_angle = angle / 2.0;
       do {
-        mult *= cos(new_angle / 2.0);
         new_angle /= 2;
-      } while (new_angle > kFrictionConeTolerance);
+        mult *= cos(new_angle);
+      } while (new_angle > kFrictionConeTolerance / 2.0);
       new_fe.elem(0,0) = frictionEdges[6*edge1] / (len1 * mult);
       new_fe.elem(1,0) = frictionEdges[6*edge1+1] / (len1 * mult);
       new_fe_vec.push_back(new_fe);
@@ -1869,7 +1890,6 @@ GraspSolver::modifyFrictionEdges()
 {
   std::list<Contact*>::iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
-    double mult = 1.0;
     for (int i=0; i<(*it)->numFrictionEdges; i++) {
       int j = (i<(*it)->numFrictionEdges-1) ? i+1 : 0;
       double num  = (*it)->frictionEdges[6*i]   * (*it)->frictionEdges[6*j];
@@ -1877,13 +1897,14 @@ GraspSolver::modifyFrictionEdges()
       double len1 = sqrt(pow((*it)->frictionEdges[6*i], 2) + pow((*it)->frictionEdges[6*i+1], 2));
       double len2 = sqrt(pow((*it)->frictionEdges[6*j], 2) + pow((*it)->frictionEdges[6*j+1], 2));
       double angle = acos(num/(len1*len2));
+      double mult = 1.0;
       if (angle > Matrix::EPS) {
         mult = len1;
         do {
-          mult *= cos(angle / 2.0);
           angle /= 2;
-        } while(angle > kFrictionConeTolerance);
-      }
+          mult *= cos(angle);
+        } while(angle > kFrictionConeTolerance / 2.0);
+      } else continue;
       (*it)->frictionEdges[6*i]   /= mult;
       (*it)->frictionEdges[6*i+1] /= mult;
       (*it)->getMate()->frictionEdges[6*i]   /= mult;
@@ -2185,8 +2206,19 @@ tangentialDisplacementSummationMatrix(const std::list<Contact*> &contacts)
   std::list<Contact*>::const_iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
     Matrix sigma(1, (*it)->numFrictionEdges+1);
-    sigma.setAllElements(1.0);
     sigma.elem(0,0) = 0;
+    for (int i=0; i<(*it)->numFrictionEdges; i++) {
+      int j = (i<(*it)->numFrictionEdges-1) ? i+1 : 0;
+      double num  = (*it)->frictionEdges[6*i]   * (*it)->frictionEdges[6*j];
+             num += (*it)->frictionEdges[6*i+1] * (*it)->frictionEdges[6*j+1];
+      double len1 = sqrt(pow((*it)->frictionEdges[6*i], 2) + pow((*it)->frictionEdges[6*i+1], 2));
+      double len2 = sqrt(pow((*it)->frictionEdges[6*j], 2) + pow((*it)->frictionEdges[6*j+1], 2));
+      double angle = acos(num/(len1*len2));
+      if (angle > Matrix::EPS) {
+        sigma.elem(0, i+1) = len1 * cos(angle / 2.0);
+        sigma.elem(0, j+1) = len2 * cos(angle / 2.0);
+      }
+    }
     sigma_list.push_back(sigma);
   }
 
