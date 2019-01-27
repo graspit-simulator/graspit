@@ -1140,6 +1140,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     GraspStruct P;
     nonIterativeFormulation(P, preload, wrench, Matrix(0,0), false, findMax);
     int result = solveProblem(P, S);
+    writeResultsToFile(S);
     if (result) return result;
 
     if (findMax) {
@@ -1720,7 +1721,7 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
       output << std::endl;
     }
 
-    DBGA("---------------- Iteration " << i << "/" << directionSteps);
+    DBGA("---------------- Iteration " << i+1 << "/" << directionSteps << " complete");
   }
   output.close();
   return 1;
@@ -2292,4 +2293,17 @@ checkFrictionEdges(const std::list<Matrix> &frictionEdges) {
     if (edge2 == frictionEdges.end()) edge2 = frictionEdges.begin();
   }
   return true;
+}
+
+void writeResultsToFile(const SolutionStruct &S) {
+  std::ofstream file;
+  file.open("./log/solution.log", std::ios_base::app);
+  file << "######## -------- New Problem -------- ########" << std::endl;
+  std::map<std::string, int>::const_iterator it;
+  for (it=S.var.begin(); it!=S.var.end(); it++) {
+    file << it->first << std::endl;
+    file << S.sol.getSubMatrixBlockIndices(it->second, 0) << std::endl;
+  }
+  file << std::endl;
+  file.close();
 }
