@@ -1140,7 +1140,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     GraspStruct P;
     nonIterativeFormulation(P, preload, wrench, Matrix(0,0), false, findMax);
     int result = solveProblem(P, S);
-    writeResultsToFile(S);
+    writeResultsToFile(S, contacts);
     if (result) return result;
 
     if (findMax) {
@@ -2295,7 +2295,7 @@ checkFrictionEdges(const std::list<Matrix> &frictionEdges) {
   return true;
 }
 
-void writeResultsToFile(const SolutionStruct &S) {
+void writeResultsToFile(SolutionStruct &S, const std::list<Contact*> &contacts) {
   std::ofstream file;
   file.open("./log/solution.log", std::ios_base::app);
   file << "######## -------- New Problem -------- ########" << std::endl;
@@ -2304,6 +2304,12 @@ void writeResultsToFile(const SolutionStruct &S) {
     file << it->first << std::endl;
     file << S.sol.getSubMatrixBlockIndices(it->second, 0) << std::endl;
   }
+
+  Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
+  Matrix D(Contact::frictionForceBlockMatrix(contacts));
+  file << "contact forces:" << std::endl;
+  file << matrixMultiply(D, beta);
+
   file << std::endl;
   file.close();
 }

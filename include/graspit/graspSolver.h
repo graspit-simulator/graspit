@@ -282,7 +282,7 @@ Matrix frictionConeEdgeMatrix(const std::list<Contact*> &contacts);
 
 double angleBetweenEdges(const Matrix edge1, const Matrix edge2);
 bool checkFrictionEdges(const std::list<Matrix> &frictionEdges);
-void writeResultsToFile(const SolutionStruct &S);
+void writeResultsToFile(SolutionStruct &S, const std::list<Contact*> &contacts);
 
 #define GRASP_SOLVER_H
 #endif
