@@ -1140,13 +1140,13 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
     GraspStruct P;
     nonIterativeFormulation(P, preload, wrench, Matrix(0,0), false, findMax);
     int result = solveProblem(P, S);
-    writeResultsToFile(S, contacts);
+    //writeResultsToFile(S, contacts);
     if (result) return result;
 
     if (findMax) {
       double resultant = S.sol.getSubMatrixBlockIndices(S.var["r"], 0).fnorm();
       DBGA("Resultant: " << resultant);
-      if (resultant < prev_resultant - Matrix::EPS) {
+      if (resultant < prev_resultant - 10*Matrix::EPS) {
         DBGA("Resultant is smaller than in previous iteration.");
         exit(0);
       }
