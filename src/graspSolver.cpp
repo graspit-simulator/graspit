@@ -885,7 +885,7 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
       P.lb_list.push_back(Matrix::ZEROES<Matrix>(size, 1));
       Matrix v_ub(size,1);
       v_ub.setAllElements(1);
-      P.ub_list.push_back(v_ub);
+      P.ub_list.push_back(Matrix::MAX_VECTOR(size));
       P.types.push_back(Matrix::ZEROES<Matrix>(size, 1));
     }
 
