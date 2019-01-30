@@ -101,9 +101,12 @@ GraspSolver::resultantAndVLObjective(GraspStruct &P)
 void
 GraspSolver::preloadTauObjective(GraspStruct &P)
 {
-  int numPreloadVar = P.block_cols[P.var["tau"]];
   P.Q = Matrix(Matrix::ZEROES<Matrix>(P.block_cols, P.block_cols));
-  P.Q.copySubMatrixBlockIndices(P.var["tau"], P.var["tau"], Matrix::EYE(numPreloadVar, numPreloadVar));
+  Matrix cj(1, P.block_cols[P.var["tau"]]);
+  cj.setAllElements(1.0);
+  P.cj = Matrix::ZEROES<Matrix>(1, P.block_cols);
+  P.cj.copySubMatrixBlockIndices(0, P.var["tau"], cj);
+  //P.Q.copySubMatrixBlockIndices(P.var["tau"], P.var["tau"], Matrix::EYE(numPreloadVar, numPreloadVar));
 }
 
 //  --------------------------  Equality Constraints  -------------------------------  //
