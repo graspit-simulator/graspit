@@ -694,6 +694,19 @@ GraspSolver::amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p)
 }
 
 void
+GraspSolver::preloadTorqueLBConstraint(GraspStruct &P)
+{
+  int numPreloadVar = P.block_cols[P.var["tau"]];
+  Matrix ones(numPreloadVar, 1);
+  ones.setAllElements(-1.0);
+  Matrix InEq = Matrix::ZEROES<Matrix>(numPreloadVar, P.block_cols);
+  InEq.copySubMatrixBlockIndices(0, P.var["tau"], Matrix::EYE(numPreloadVar, numPreloadVar));
+  InEq.copySubMatrixBlockIndices(0, P.var["v"], ones);
+  P.InEq_list.push_back(InEq);
+  P.ib_list.push_back(Matrix::ZEROES<Matrix>(numPreloadVar, 1));
+}
+
+void
 GraspSolver::virtualLimitLBConstraint(GraspStruct &P, bool iterative /*= false*/)
 {
   Matrix J(g->contactJacobian(joints, contacts));
@@ -947,6 +960,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   P.var["z"]     = 7; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("z");
   if (numPreloadVar) {
     P.var["tau"] = 8; P.block_cols.push_back(numPreloadVar);      P.varNames.push_back("tau");
+    P.var["v"] = 9;   P.block_cols.push_back(1);                  P.varNames.push_back("v");
   } else if (findMax) {
     P.var["r"] = 8;   P.block_cols.push_back(6);                  P.varNames.push_back("r");
     P.var["s"] = 9;   P.block_cols.push_back(1);                  P.varNames.push_back("s");
@@ -963,7 +977,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   // Objective 
   //springDeformationObjective(P);
   //virtualLimitsObjective(P);
-  if (numPreloadVar) preloadTauObjective(P);
+  if (numPreloadVar) virtualLimitsObjective(P);
   else if (findMax) resultantWrenchObjective(P);
 
   // equality constraints
@@ -978,6 +992,7 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   virtualSpringIndicatorConstraint(P);
   if (rigid) rigidJointsConstraint(P);
   else nonBackdrivableJointIndicatorConstraint(P, preload);
+  if (numPreloadVar) preloadTorqueLBConstraint(P);
   frictionConeConstraint(P, beta_p);
   frictionConeEdgeIndicatorConstraint(P);
   contactMovementIndicatorConstraint(P);

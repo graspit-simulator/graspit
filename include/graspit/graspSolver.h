@@ -216,6 +216,8 @@ private:
   void contactMovementIndicatorConstraint(GraspStruct &P);
   // a SOS2 constraint to ensure friction opposes motion
   void amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p);
+  // constraint that keeps a variable v lower bounded by the largest preload torque
+  void preloadTorqueLBConstraint(GraspStruct &P);
   // constraint that keeps a variable v lower bounded by the largest relative approach of a variable to its virtual limit
   void virtualLimitLBConstraint(GraspStruct &P, bool iterative=false);
   // constraint that limits the virtual object motion
