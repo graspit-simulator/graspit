@@ -32,6 +32,10 @@
 #include <sstream>
 #include <iomanip>
 
+#define PROF_ENABLED
+#include "graspit/profiling.h"
+PROF_DECLARE(TIMER);
+
 const double GraspSolver::kSpringStiffness = 1.0;
 const double GraspSolver::kNormalUncertainty = 2.5*M_PI/180.0;
 const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
@@ -1594,7 +1598,10 @@ GraspSolver::findMaximumWrenchNonIterative(Matrix &preload, const Matrix &direct
     }
     modifyFrictionEdges();
     SolutionStruct S;
+    PROF_START_TIMER(TIMER);
     frictionRefinementSolver(S, preload, direction, true);
+    PROF_STOP_TIMER(TIMER);
+    PROF_PRINT(TIMER);
     Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
     Matrix r(S.sol.getSubMatrixBlockIndices(S.var["r"], 0));
     g->getObject()->redrawFrictionCones();
