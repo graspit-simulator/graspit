@@ -614,7 +614,7 @@ if(OPTIMIZATION_SOLVER STREQUAL GUROBI)
         PATHS ${GUROBI_ROOT}/lib/
     )
     find_library(GUROBI_LIBRARIES
-        NAMES gurobi80
+        NAMES gurobi81
         PATHS ${GUROBI_ROOT}/lib/
     )
 endif(OPTIMIZATION_SOLVER STREQUAL GUROBI)

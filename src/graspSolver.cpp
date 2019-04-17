@@ -59,23 +59,6 @@ GraspSolver::GraspSolver(Grasp *grasp)
   contacts = g->getContactList();
   joints = g->getJointsOnContactChains();
 
-  std::list<Contact*>::iterator it = contacts.end();
-  advance(it, -1);
-  contacts.erase(it);
-
-  /*// Remove multiple contacts on same link
-  std::list<Contact*>::iterator it = contacts.begin();
-  while (it!=contacts.end()) {
-    std::list<Contact*>::iterator next_it = it;
-    advance(next_it, 1);
-    if (next_it == contacts.end()) break;
-    if ((*it)->getBody1() == (*next_it)->getBody1()) {
-      (*next_it)->getBody1()->removeContact(*next_it);
-      contacts.erase(next_it);
-    }
-    it++;
-  }*/
-
   numContacts = contacts.size();
   numJoints = joints.size();
 }
@@ -1704,29 +1687,7 @@ int
 GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool iterative, 
   bool cone_movement, bool rigid)
 {
-  std::ofstream output;
-  output.open("./log/preload_test.txt");
-  output << "preload-torque, y-force, x-torque";
-  output << std::endl;
-
-  Matrix force_dir(Matrix::ZEROES<Matrix>(6,1));
-  force_dir.elem(1,0) = -1.0;
-  Matrix torque_dir(Matrix::ZEROES<Matrix>(6,1));
-  torque_dir.elem(3,0) = 1.0;
-  for (double i=0.0; i<1.05; i+=0.05) {
-    DBGA("---------------- Preload: " << i << " ----------------");
-    preload.elem(6,0) = i;
-    double max_force = findMaximumWrenchNonIterative(preload, force_dir, single_step, tendon, rigid);
-    double max_torque = findMaximumWrenchNonIterative(preload, torque_dir, single_step, tendon, rigid);
-    output << i << ", " << max_force << ", " << max_torque << std::endl;
-  }
-
-  output.close();
-  return 1;
-
-
-
-  /*int numPreloadVar = 0;
+  int numPreloadVar = 0;
   for (int i=0; i<preload.rows(); i++) {
     if (preload.elem(i,0) < 0) numPreloadVar++;
   }
@@ -1788,7 +1749,7 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
     DBGA("---------------- Iteration " << i+1 << "/" << directionSteps << " complete");
   }
   output.close();
-  return 1;*/
+  return 1;
 }
 
 
