@@ -234,6 +234,42 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
 
   //optional information
 
+  //disable collisions
+  elementList = findAllXmlElements(root, "disableCollision");
+  for (p = elementList.begin(); p != elementList.end(); p++) {
+    int b1_link, b1_chain, b2_link, b2_chain;
+    if ((*p)->QueryIntAttribute("body1_link", &b1_link)!=TIXML_SUCCESS ||
+        (*p)->QueryIntAttribute("body1_chain", &b1_chain)!=TIXML_SUCCESS ||
+        (*p)->QueryIntAttribute("body2_link", &b2_link)!=TIXML_SUCCESS ||
+        (*p)->QueryIntAttribute("body2_chain", &b2_chain)!=TIXML_SUCCESS) {
+      DBGA("Failed to read collision disabling pair");
+      continue;
+    }
+    Body *body1, *body2;
+    if (b1_chain < 0) body1 = base;
+    else {
+      if (b1_chain < getNumChains() && b1_link >=0 &&
+          b1_link < getChain(b1_chain)->getNumLinks())
+        body1 = getChain(b1_chain)->getLink(b1_link);
+      else {
+        DBGA("Incorrect pair for collision disabling");
+        continue;
+      }
+    }
+    if (b2_chain < 0) body2 = base;
+    else {
+      if (b2_chain < getNumChains() && b2_link >=0 &&
+          b2_link < getChain(b2_chain)->getNumLinks())
+        body2 = getChain(b2_chain)->getLink(b2_link);
+      else {
+        DBGA("Incorrect pair for collision disabling");
+        continue;
+      }
+    }
+    myWorld->toggleCollisions(false, body1, body2);
+  }  
+
+  
   //load approach direction
   approachTran = transf::IDENTITY;
   element = findXmlElement(root, "approachDirection");
