@@ -4,6 +4,10 @@ sudo: required
 
 dist: trusty
 
+addons:
+  apt:
+    update: true
+
 matrix:
   include:
     - os: linux
