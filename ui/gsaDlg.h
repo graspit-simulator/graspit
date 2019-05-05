@@ -33,28 +33,8 @@
 
 class Hand;
 class MainWindow;
-
-// Structure holding pointers to UI items
-struct UIParamT {
-  QLineEdit *wrenchInput;
-  QLineEdit *FxInput;
-  QLineEdit *FyInput;
-  QLineEdit *FzInput;
-  QLineEdit *MxInput;
-  QLineEdit *MyInput;
-  QLineEdit *MzInput;
-
-  QLineEdit *preloadInput;
-  std::vector<QLineEdit*> JointInput;
-
-  QCheckBox *stepInput;
-  QCheckBox *iterInput;
-  QCheckBox *coneInput;
-  QCheckBox *rigidInput;
-  QCheckBox *mapInput;
-
-  QPushButton *solveButton;
-};
+class GraspSolver;
+struct UIParamT;
 
 //! Provides an interface for running Grasp Stability Analysis routines
 /*! This dialog allows running some of the Grasp Stability Analysis routines
@@ -71,7 +51,10 @@ class GSADlg : public QDialog, public Ui::GSADlgUI
     Hand *mHand;
 
     //! Structure holding pointers to UI items
-    UIParamT mParams;
+    UIParamT *mParams;
+
+    //! Grasp Solver object that is used to analyze grasp stability
+    GraspSolver *mGraspSolver;
 
     //! Computes the default actuator preloads
     std::vector<double> getDefaultPreload();

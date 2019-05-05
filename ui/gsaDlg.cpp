@@ -27,6 +27,7 @@
 
 #include "graspit/robot.h"
 #include "graspit/grasp.h"
+#include "graspit/graspSolver.h"
 #include "mainWindow.h"
 
 #include "graspit/robots/humanHand.h"
@@ -36,8 +37,32 @@
 #define PROF_ENABLED
 #include "graspit/profiling.h"
 
+// Structure holding pointers to UI items
+struct UIParamT {
+  QLineEdit *wrenchInput;
+  QLineEdit *FxInput;
+  QLineEdit *FyInput;
+  QLineEdit *FzInput;
+  QLineEdit *MxInput;
+  QLineEdit *MyInput;
+  QLineEdit *MzInput;
+
+  QLineEdit *preloadInput;
+  std::vector<QLineEdit*> JointInput;
+
+  QCheckBox *stepInput;
+  QCheckBox *iterInput;
+  QCheckBox *coneInput;
+  QCheckBox *rigidInput;
+  QCheckBox *mapInput;
+
+  QPushButton *solveButton;
+};
+
 GSADlg::GSADlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h)
 {
+  mParams = new UIParamT();
+  mGraspSolver = new GraspSolver(mHand->getGrasp());
   setupUi(this);
   setupDlgArea();
 }
@@ -53,39 +78,39 @@ GSADlg::setupDlgArea()
   QLayout *wl = new QGridLayout(forceLayout,4,2,0);
 
   wl->addWidget(new QLabel(QString("Mult:")));
-  mParams.wrenchInput = new QLineEdit();
-  mParams.wrenchInput->setText(QString::number(1.0));
-  wl->addWidget(mParams.wrenchInput);
+  mParams->wrenchInput = new QLineEdit();
+  mParams->wrenchInput->setText(QString::number(1.0));
+  wl->addWidget(mParams->wrenchInput);
 
   wl->addWidget(new QLabel(QString("Fx:")));
-  mParams.FxInput = new QLineEdit();
-  mParams.FxInput->setText(QString::number(0.0));
-  wl->addWidget(mParams.FxInput);
+  mParams->FxInput = new QLineEdit();
+  mParams->FxInput->setText(QString::number(0.0));
+  wl->addWidget(mParams->FxInput);
 
   wl->addWidget(new QLabel(QString("Fy:")));
-  mParams.FyInput = new QLineEdit();
-  mParams.FyInput->setText(QString::number(0.0));
-  wl->addWidget(mParams.FyInput);
+  mParams->FyInput = new QLineEdit();
+  mParams->FyInput->setText(QString::number(0.0));
+  wl->addWidget(mParams->FyInput);
 
   wl->addWidget(new QLabel(QString("Fz:")));
-  mParams.FzInput = new QLineEdit();
-  mParams.FzInput->setText(QString::number(0.0));
-  wl->addWidget(mParams.FzInput);
+  mParams->FzInput = new QLineEdit();
+  mParams->FzInput->setText(QString::number(0.0));
+  wl->addWidget(mParams->FzInput);
 
   wl->addWidget(new QLabel(QString("Tx:")));
-  mParams.MxInput = new QLineEdit();
-  mParams.MxInput->setText(QString::number(0.0));
-  wl->addWidget(mParams.MxInput);
+  mParams->MxInput = new QLineEdit();
+  mParams->MxInput->setText(QString::number(0.0));
+  wl->addWidget(mParams->MxInput);
 
   wl->addWidget(new QLabel(QString("Ty:")));
-  mParams.MyInput = new QLineEdit();
-  mParams.MyInput->setText(QString::number(0.0));
-  wl->addWidget(mParams.MyInput);
+  mParams->MyInput = new QLineEdit();
+  mParams->MyInput->setText(QString::number(0.0));
+  wl->addWidget(mParams->MyInput);
 
   wl->addWidget(new QLabel(QString("Tz:")));
-  mParams.MzInput = new QLineEdit();
-  mParams.MzInput->setText(QString::number(0.0));
-  wl->addWidget(mParams.MzInput);
+  mParams->MzInput = new QLineEdit();
+  mParams->MzInput->setText(QString::number(0.0));
+  wl->addWidget(mParams->MzInput);
 
   QVBoxLayout *jointLayout = new QVBoxLayout(hl);
   int preloadSize;
@@ -102,11 +127,11 @@ GSADlg::setupDlgArea()
   QLayout *jl = new QGridLayout(jointLayout,4,2,0);
 
   jl->addWidget(new QLabel(QString("Mult:")));
-  mParams.preloadInput = new QLineEdit();
-  mParams.preloadInput->setText(QString::number(1.0));
-  jl->addWidget(mParams.preloadInput);
+  mParams->preloadInput = new QLineEdit();
+  mParams->preloadInput->setText(QString::number(1.0));
+  jl->addWidget(mParams->preloadInput);
 
-  mParams.JointInput.clear();
+  mParams->JointInput.clear();
 
   std::vector<double> preload(preloadSize, 0.0);
   preload = getDefaultPreload();
@@ -115,7 +140,7 @@ GSADlg::setupDlgArea()
     jl->addWidget(new QLabel(QString("P")+QString::number(i)+QString(":")));
     QLineEdit *line = new QLineEdit();
     jl->addWidget(line);
-    mParams.JointInput.push_back(line);
+    mParams->JointInput.push_back(line);
     line->setText(QString::number(preload[i]));
   }
 
@@ -132,49 +157,51 @@ GSADlg::setupDlgArea()
   bool map = false;
 
   ol->addWidget(new QLabel(QString("Single step:")));
-  mParams.stepInput = new QCheckBox();
-  mParams.stepInput->setChecked(single_step);
-  ol->addWidget(mParams.stepInput);
+  mParams->stepInput = new QCheckBox();
+  mParams->stepInput->setChecked(single_step);
+  ol->addWidget(mParams->stepInput);
   
   ol->addWidget(new QLabel(QString("Iterative:")));
-  mParams.iterInput = new QCheckBox();
-  mParams.iterInput->setChecked(iterative);
-  ol->addWidget(mParams.iterInput);  
+  mParams->iterInput = new QCheckBox();
+  mParams->iterInput->setChecked(iterative);
+  ol->addWidget(mParams->iterInput);  
 
   ol->addWidget(new QLabel(QString("Cone Movement:")));
-  mParams.coneInput = new QCheckBox();
-  mParams.coneInput->setChecked(cone_movement);
-  mParams.coneInput->setEnabled(iterative);
-  ol->addWidget(mParams.coneInput);
+  mParams->coneInput = new QCheckBox();
+  mParams->coneInput->setChecked(cone_movement);
+  mParams->coneInput->setEnabled(iterative);
+  ol->addWidget(mParams->coneInput);
 
   ol->addWidget(new QLabel(QString("Rigid:")));
-  mParams.rigidInput = new QCheckBox();
-  mParams.rigidInput->setChecked(rigid);
-  mParams.rigidInput->setDisabled(mHand->inherits("HumanHand"));
-  mParams.rigidInput->setDisabled(single_step);
-  ol->addWidget(mParams.rigidInput);
+  mParams->rigidInput = new QCheckBox();
+  mParams->rigidInput->setChecked(rigid);
+  mParams->rigidInput->setDisabled(mHand->inherits("HumanHand"));
+  mParams->rigidInput->setDisabled(single_step);
+  ol->addWidget(mParams->rigidInput);
 
   ol->addWidget(new QLabel(QString("2D Map:")));
-  mParams.mapInput = new QCheckBox();
-  mParams.mapInput->setChecked(map);
-  ol->addWidget(mParams.mapInput);
+  mParams->mapInput = new QCheckBox();
+  mParams->mapInput->setChecked(map);
+  ol->addWidget(mParams->mapInput);
 
-  QObject::connect(mParams.iterInput, SIGNAL (toggled(bool)),
-    mParams.coneInput, SLOT (setEnabled(bool)));
-  QObject::connect(mParams.stepInput, SIGNAL (toggled(bool)),
-    mParams.rigidInput, SLOT (setDisabled(bool)));
-  QObject::connect(mParams.rigidInput, SIGNAL (toggled(bool)),
-    mParams.stepInput, SLOT (setDisabled(bool)));
+  QObject::connect(mParams->iterInput, SIGNAL (toggled(bool)),
+    mParams->coneInput, SLOT (setEnabled(bool)));
+  QObject::connect(mParams->stepInput, SIGNAL (toggled(bool)),
+    mParams->rigidInput, SLOT (setDisabled(bool)));
+  QObject::connect(mParams->rigidInput, SIGNAL (toggled(bool)),
+    mParams->stepInput, SLOT (setDisabled(bool)));
 
-  mParams.solveButton = new QPushButton("&Solve");
-  optionsLayout->addWidget(mParams.solveButton);
+  mParams->solveButton = new QPushButton("&Solve");
+  optionsLayout->addWidget(mParams->solveButton);
 
-  QObject::connect(mParams.solveButton, SIGNAL(clicked()), this, SLOT(solveButtonClicked()));
+  QObject::connect(mParams->solveButton, SIGNAL(clicked()), this, SLOT(solveButtonClicked()));
 }
 
 GSADlg::~GSADlg()
 {
   mMainWindow->clearContactsList();
+  delete mParams;
+  delete mGraspSolver;
 }
 
 void
