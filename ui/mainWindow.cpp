@@ -62,6 +62,7 @@
 #include "eigenGraspDlg.h"
 #include "compliantPlannerDlg.h"
 #include "gfoDlg.h"
+#include "gsaDlg.h"
 #include "contactExaminerDlg.h"
 #include "egPlannerDlg.h"
 #ifdef CGDB_ENABLED
@@ -116,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(mUI->graspCreateProjectionAction, SIGNAL(triggered()), this, SLOT(graspCreateProjection()));
   QObject::connect(mUI->graspPlannerAction, SIGNAL(triggered()), this, SLOT(graspPlanner()));
   QObject::connect(mUI->graspGFOAction, SIGNAL(triggered()), this, SLOT(graspForceOptimization()));
+  QObject::connect(mUI->graspStabilityAction, SIGNAL(triggered()), this, SLOT(graspStabilityAnalysis()));
   // -- grasp menu, part I
   QObject::connect(mUI->graspEigenGrasp_InterfaceAction, SIGNAL(triggered()),
                    this, SLOT(eigenGraspActivated()));
@@ -585,6 +587,7 @@ void MainWindow::updateGraspMenu()
   mUI->graspQualityMeasuresAction->setEnabled(handFound);
   mUI->graspPlannerAction->setEnabled(handFound);
   mUI->graspGFOAction->setEnabled(handFound);
+  mUI->graspStabilityAction->setEnabled(handFound);
   mUI->graspEigenGrasp_InterfaceAction->setEnabled(handFound);
   mUI->graspContact_ExaminerAction->setEnabled(bodyFound);
   mUI->graspEigenGrasp_PlannerAction->setEnabled(handFound);
@@ -684,6 +687,19 @@ MainWindow::graspForceOptimization()
     return;
   }
   GFODlg *dlg = new GFODlg(this, world->getCurrentHand(), mWindow);
+  dlg->setAttribute(Qt::WA_ShowModal, false);
+  dlg->setAttribute(Qt::WA_DeleteOnClose, true);
+  dlg->show();
+}
+
+void
+MainWindow::graspStabilityAnalysis()
+{
+  if (!world->getCurrentHand()) {
+    DBGA("No hand selected");
+    return;
+  }
+  GSADlg *dlg = new GSADlg(this, world->getCurrentHand(), mWindow);
   dlg->setAttribute(Qt::WA_ShowModal, false);
   dlg->setAttribute(Qt::WA_DeleteOnClose, true);
   dlg->show();

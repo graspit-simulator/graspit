@@ -105,6 +105,7 @@ class MainWindow : public QObject
     void graspQualityMeasures();
     void graspCreateProjection(Grasp *g = NULL);
     void graspForceOptimization();
+    void graspStabilityAnalysis();
     void graspPlanner();
     void updateGraspMenu();
     //-------------

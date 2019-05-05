@@ -644,6 +644,7 @@ set (GRASPIT_FORMS
     ${GSRC}/ui/contactExaminerDlg.ui 
     ${GSRC}/ui/eigenGraspDlg.ui 
     ${GSRC}/ui/gfoDlg.ui 
+    ${GSRC}/ui/gsaDlg.ui 
     ${GSRC}/ui/gloveCalibrationDlg.ui 
     ${GSRC}/ui/graspCaptureDlg.ui 
     ${GSRC}/ui/gwsProjDlgBase.ui 
@@ -663,6 +664,7 @@ set (GRASPIT_FORM_HEADERS
     ${GSRC}/ui/contactExaminerDlg.h 
     ${GSRC}/ui/eigenGraspDlg.h 
     ${GSRC}/ui/gfoDlg.h 
+    ${GSRC}/ui/gsaDlg.h 
     ${GSRC}/ui/gloveCalibrationDlg.h 
     ${GSRC}/ui/graspCaptureDlg.h 
     ${GSRC}/ui/gwsProjDlg.h 
@@ -681,6 +683,7 @@ set (GRASPIT_FORM_SOURCES
     ${GSRC}/ui/contactExaminerDlg.cpp 
     ${GSRC}/ui/eigenGraspDlg.cpp 
     ${GSRC}/ui/gfoDlg.cpp 
+    ${GSRC}/ui/gsaDlg.cpp 
     ${GSRC}/ui/gloveCalibrationDlg.cpp 
     ${GSRC}/ui/graspCaptureDlg.cpp 
     ${GSRC}/ui/gwsProjDlg.cpp 
@@ -704,6 +707,7 @@ set (MOC_HEADERS
     ${GSRC}/ui/contactExaminerDlg.h
     ${GSRC}/ui/settingsDlg.h
     ${GSRC}/ui/gfoDlg.h
+    ${GSRC}/ui/gsaDlg.h
     ${GSRC}/ui/qmDlg.h
     ${GSRC}/ui/gwsProjDlg.h
 )
