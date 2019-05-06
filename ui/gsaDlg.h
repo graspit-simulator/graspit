@@ -27,13 +27,11 @@
 #define _gsadlg_h_
 
 #include "ui_gsaDlg.h"
-#include <QDialog>
-#include <QCheckBox>
-#include <QPushButton>
 
 class Hand;
 class MainWindow;
 class GraspSolver;
+class QHBoxLayout;
 struct UIParamT;
 
 //! Provides an interface for running Grasp Stability Analysis routines
@@ -56,17 +54,35 @@ class GSADlg : public QDialog, public Ui::GSADlgUI
     //! Grasp Solver object that is used to analyze grasp stability
     GraspSolver *mGraspSolver;
 
+    //! Widget for settings area
+    QWidget *mSettingsArea;
+
     //! Computes the default actuator preloads
     std::vector<double> getDefaultPreload();
 
-    //! Setup the dialog area
-    void setupDlgArea();
+    //! Build the settings area
+    void buildSettingsArea();
+
+    //! Build the solver settings area
+    void refinementSettingsArea(QHBoxLayout *hl);
+    void iterativeSettingsArea(QHBoxLayout *hl);
+
+    //! Build the task specific settings area
+    void forcesSettingsArea(QHBoxLayout *hl);
+    void maxWrenchSettingsArea(QHBoxLayout *hl);
+    void optPreloadSettingsArea(QHBoxLayout *hl);
+    void resMapSettingsArea(QHBoxLayout *hl);
+
+    void init();
 
   public:
     GSADlg(MainWindow *mw, Hand *h, QWidget *parent = 0);
     ~GSADlg();
   public Q_SLOTS:
+    void solverTypeSelected(const QString &typeStr);
+    void solveForSelected(const QString &typeStr);
     void solveButtonClicked();
+    void countAxes();
 };
 
 #endif

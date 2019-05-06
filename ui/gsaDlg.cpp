@@ -34,29 +34,27 @@
 
 #include "graspit/debug.h"
 
+#include <QDialog>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QStandardItemModel>
+
 #define PROF_ENABLED
 #include "graspit/profiling.h"
 
 // Structure holding pointers to UI items
 struct UIParamT {
-  QLineEdit *wrenchInput;
-  QLineEdit *FxInput;
-  QLineEdit *FyInput;
-  QLineEdit *FzInput;
-  QLineEdit *MxInput;
-  QLineEdit *MyInput;
-  QLineEdit *MzInput;
+  std::list<QLineEdit*> WrenchInput;
+  std::list<QCheckBox*> WrenchPlaneInput;
 
-  QLineEdit *preloadInput;
-  std::vector<QLineEdit*> JointInput;
+  std::list<QLineEdit*> JointInput;
+  std::list<QCheckBox*> PreloadInput;
+
+  QLineEdit *angTolInput;
+  QLineEdit *normUncertInput;
 
   QCheckBox *stepInput;
-  QCheckBox *iterInput;
   QCheckBox *coneInput;
-  QCheckBox *rigidInput;
-  QCheckBox *mapInput;
-
-  QPushButton *solveButton;
 };
 
 GSADlg::GSADlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h)
@@ -64,53 +62,124 @@ GSADlg::GSADlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMai
   mParams = new UIParamT();
   mGraspSolver = new GraspSolver(mHand->getGrasp());
   setupUi(this);
-  setupDlgArea();
+  init();
+}
+
+GSADlg::~GSADlg()
+{
+  mMainWindow->clearContactsList();
+  delete mParams;
+  delete mGraspSolver;
 }
 
 void
-GSADlg::setupDlgArea()
+GSADlg::init()
 {
-  QHBoxLayout *hl = new QHBoxLayout(gsaGroupBox);
+  solverTypeComboBox->insertItem(QString("Refinement"));
+  solverTypeComboBox->insertItem(QString("Iterative"));
 
+  solveForComboBox->insertItem(QString("Contact forces"));
+  solveForComboBox->insertItem(QString("Maximum wrench"));
+  solveForComboBox->insertItem(QString("Optimal preload"));
+  solveForComboBox->insertItem(QString("Resistible wrenches"));
+
+  mSettingsArea = new QWidget(gsaGroupBox);
+  buildSettingsArea();
+}
+
+// Slot for selecting desired type of solver. Disable 'solve for'
+// options that are not compatible with selected solver from 
+// the solveForComboBox
+void
+GSADlg::solverTypeSelected(const QString &typeStr)
+{
+  QStandardItemModel *model = dynamic_cast< QStandardItemModel * >(solveForComboBox->model());
+  QStandardItem *item;
+  // Refinement solver can solve all queries currently implemented
+  if (!strcmp(typeStr.latin1(), "Refinement")) {
+    for (int i=0; i<model->rowCount(); i++) {
+      item = model->item(i);
+      item->setEnabled(true);      
+    }
+  }
+  // Iterative solver cannot solve for optimal preloads
+  else if (!strcmp(typeStr.latin1(), "Iterative")) {
+    QStandardItem *item = model->item(2);
+    item->setEnabled(false);
+    if (!model->item(solveForComboBox->currentIndex())->isEnabled()) {
+      solveForComboBox->setCurrentIndex(0);
+    }
+  }
+  buildSettingsArea();
+}
+
+// Slot for selecting what to solve for
+void
+GSADlg::solveForSelected(const QString &typeStr)
+{
+  buildSettingsArea();
+}
+
+// Build settings area corresponding to selected solver type and
+// query to solve for
+void
+GSADlg::buildSettingsArea()
+{
+  delete mParams;
+  delete mSettingsArea;
+  mParams = new UIParamT();
+  mSettingsArea = new QWidget(gsaGroupBox);
+
+  // Enable Solve button in case it was disabled by
+  // 'Resistible wrenches' computation
+  SolveButton->setEnabled(true);
+
+  QHBoxLayout *hl = new QHBoxLayout(mSettingsArea);
+
+  // Build part of settings area for query settings
+  QString solveFor = solveForComboBox->currentText();
+  if (!strcmp(solveFor.latin1(), "Contact forces")) {
+    forcesSettingsArea(hl);
+  } else if (!strcmp(solveFor.latin1(), "Maximum wrench")) {
+    maxWrenchSettingsArea(hl);
+  } else if (!strcmp(solveFor.latin1(), "Optimal preload")) {
+    optPreloadSettingsArea(hl);
+  } else if (!strcmp(solveFor.latin1(), "Resistible wrenches")) {
+    // Disable Solve button until two axes have been selected
+    SolveButton->setEnabled(false);
+    resMapSettingsArea(hl);
+  }
+
+  // Build solver options part of settings area
+  QString solverType = solverTypeComboBox->currentText();
+  if (!strcmp(solverType.latin1(), "Refinement")) {
+    refinementSettingsArea(hl);
+  } else if (!strcmp(solverType.latin1(), "Iterative")) {
+    iterativeSettingsArea(hl);
+  }
+
+  mSettingsArea->show();
+}
+
+void
+GSADlg::forcesSettingsArea(QHBoxLayout *hl)
+{
   QVBoxLayout *forceLayout = new QVBoxLayout(hl);
   forceLayout->addWidget(new QLabel(QString("Applied wrench:")));
 
   QLayout *wl = new QGridLayout(forceLayout,4,2,0);
 
-  wl->addWidget(new QLabel(QString("Mult:")));
-  mParams->wrenchInput = new QLineEdit();
-  mParams->wrenchInput->setText(QString::number(1.0));
-  wl->addWidget(mParams->wrenchInput);
-
-  wl->addWidget(new QLabel(QString("Fx:")));
-  mParams->FxInput = new QLineEdit();
-  mParams->FxInput->setText(QString::number(0.0));
-  wl->addWidget(mParams->FxInput);
-
-  wl->addWidget(new QLabel(QString("Fy:")));
-  mParams->FyInput = new QLineEdit();
-  mParams->FyInput->setText(QString::number(0.0));
-  wl->addWidget(mParams->FyInput);
-
-  wl->addWidget(new QLabel(QString("Fz:")));
-  mParams->FzInput = new QLineEdit();
-  mParams->FzInput->setText(QString::number(0.0));
-  wl->addWidget(mParams->FzInput);
-
-  wl->addWidget(new QLabel(QString("Tx:")));
-  mParams->MxInput = new QLineEdit();
-  mParams->MxInput->setText(QString::number(0.0));
-  wl->addWidget(mParams->MxInput);
-
-  wl->addWidget(new QLabel(QString("Ty:")));
-  mParams->MyInput = new QLineEdit();
-  mParams->MyInput->setText(QString::number(0.0));
-  wl->addWidget(mParams->MyInput);
-
-  wl->addWidget(new QLabel(QString("Tz:")));
-  mParams->MzInput = new QLineEdit();
-  mParams->MzInput->setText(QString::number(0.0));
-  wl->addWidget(mParams->MzInput);
+  QString lab[] = {"Fx:", "Fy:", "Fz:", "Mx:", "My:", "Mz:"};
+  std::list<QString> labels(lab, lab+6);
+  std::list<QString>::iterator l_it = labels.begin();
+  std::list<QLineEdit*>::iterator e_it = mParams->WrenchInput.begin();
+  for ( ; l_it!=labels.end(); l_it++, e_it++) {
+    wl->addWidget(new QLabel(*l_it));
+    QLineEdit *line = new QLineEdit();
+    line->setText(QString::number(0.0));
+    mParams->WrenchInput.push_back(line);
+    wl->addWidget(line);
+  }
 
   QVBoxLayout *jointLayout = new QVBoxLayout(hl);
   int preloadSize;
@@ -125,12 +194,6 @@ GSADlg::setupDlgArea()
   }
 
   QLayout *jl = new QGridLayout(jointLayout,4,2,0);
-
-  jl->addWidget(new QLabel(QString("Mult:")));
-  mParams->preloadInput = new QLineEdit();
-  mParams->preloadInput->setText(QString::number(1.0));
-  jl->addWidget(mParams->preloadInput);
-
   mParams->JointInput.clear();
 
   std::vector<double> preload(preloadSize, 0.0);
@@ -143,71 +206,216 @@ GSADlg::setupDlgArea()
     mParams->JointInput.push_back(line);
     line->setText(QString::number(preload[i]));
   }
-
-  QVBoxLayout *optionsLayout = new QVBoxLayout(hl);
-  optionsLayout->setAlignment(Qt::AlignTop);
-  optionsLayout->addWidget(new QLabel(QString("Solver Options:")));
-
-  QLayout *ol = new QGridLayout(optionsLayout,4,2,1);
-
-  bool single_step = false;
-  bool iterative = false;
-  bool cone_movement = false;
-  bool rigid = false;
-  bool map = false;
-
-  ol->addWidget(new QLabel(QString("Single step:")));
-  mParams->stepInput = new QCheckBox();
-  mParams->stepInput->setChecked(single_step);
-  ol->addWidget(mParams->stepInput);
-  
-  ol->addWidget(new QLabel(QString("Iterative:")));
-  mParams->iterInput = new QCheckBox();
-  mParams->iterInput->setChecked(iterative);
-  ol->addWidget(mParams->iterInput);  
-
-  ol->addWidget(new QLabel(QString("Cone Movement:")));
-  mParams->coneInput = new QCheckBox();
-  mParams->coneInput->setChecked(cone_movement);
-  mParams->coneInput->setEnabled(iterative);
-  ol->addWidget(mParams->coneInput);
-
-  ol->addWidget(new QLabel(QString("Rigid:")));
-  mParams->rigidInput = new QCheckBox();
-  mParams->rigidInput->setChecked(rigid);
-  mParams->rigidInput->setDisabled(mHand->inherits("HumanHand"));
-  mParams->rigidInput->setDisabled(single_step);
-  ol->addWidget(mParams->rigidInput);
-
-  ol->addWidget(new QLabel(QString("2D Map:")));
-  mParams->mapInput = new QCheckBox();
-  mParams->mapInput->setChecked(map);
-  ol->addWidget(mParams->mapInput);
-
-  QObject::connect(mParams->iterInput, SIGNAL (toggled(bool)),
-    mParams->coneInput, SLOT (setEnabled(bool)));
-  QObject::connect(mParams->stepInput, SIGNAL (toggled(bool)),
-    mParams->rigidInput, SLOT (setDisabled(bool)));
-  QObject::connect(mParams->rigidInput, SIGNAL (toggled(bool)),
-    mParams->stepInput, SLOT (setDisabled(bool)));
-
-  mParams->solveButton = new QPushButton("&Solve");
-  optionsLayout->addWidget(mParams->solveButton);
-
-  QObject::connect(mParams->solveButton, SIGNAL(clicked()), this, SLOT(solveButtonClicked()));
 }
 
-GSADlg::~GSADlg()
+void
+GSADlg::maxWrenchSettingsArea(QHBoxLayout *hl)
 {
-  mMainWindow->clearContactsList();
-  delete mParams;
-  delete mGraspSolver;
+  QVBoxLayout *forceLayout = new QVBoxLayout(hl);
+  forceLayout->addWidget(new QLabel(QString("Wrench direction:")));
+
+  QLayout *wl = new QGridLayout(forceLayout,4,2,0);
+
+  QString lab[] = {"Fx:", "Fy:", "Fz:", "Mx:", "My:", "Mz:"};
+  std::list<QString> labels(lab, lab+6);
+  std::list<QString>::iterator l_it = labels.begin();
+  std::list<QLineEdit*>::iterator e_it = mParams->WrenchInput.begin();
+  for ( ; l_it!=labels.end(); l_it++, e_it++) {
+    wl->addWidget(new QLabel(*l_it));
+    QLineEdit *line = new QLineEdit();
+    line->setText(QString::number(0.0));
+    mParams->WrenchInput.push_back(line);
+    wl->addWidget(line);
+  }
+
+  QVBoxLayout *jointLayout = new QVBoxLayout(hl);
+  int preloadSize;
+  if (mHand->inherits("HumanHand")) {
+    jointLayout->addWidget(new QLabel(QString("Tendon Preloads:")));
+    preloadSize = ((HumanHand*)mHand)->getNumTendons();
+  } else {
+    jointLayout->addWidget(new QLabel(QString("Preload torques:")));
+    mHand->getGrasp()->collectContacts();
+    std::list<Joint*> joints = mHand->getGrasp()->getJointsOnContactChains(); 
+    preloadSize = joints.size();
+  }
+
+  QLayout *jl = new QGridLayout(jointLayout,4,2,0);
+  mParams->JointInput.clear();
+
+  std::vector<double> preload(preloadSize, 0.0);
+  preload = getDefaultPreload();
+
+  for (int i=0; i<preloadSize; i++) {
+    jl->addWidget(new QLabel(QString("P")+QString::number(i)+QString(":")));
+    QLineEdit *line = new QLineEdit();
+    jl->addWidget(line);
+    mParams->JointInput.push_back(line);
+    line->setText(QString::number(preload[i]));
+  }
+}
+
+void
+GSADlg::optPreloadSettingsArea(QHBoxLayout *hl)
+{
+  QVBoxLayout *forceLayout = new QVBoxLayout(hl);
+  forceLayout->addWidget(new QLabel(QString("Applied wrench:")));
+
+  QLayout *wl = new QGridLayout(forceLayout,4,2,0);
+
+  QString lab[] = {"Fx:", "Fy:", "Fz:", "Mx:", "My:", "Mz:"};
+  std::list<QString> labels(lab, lab+6);
+  std::list<QString>::iterator l_it = labels.begin();
+  std::list<QLineEdit*>::iterator e_it = mParams->WrenchInput.begin();
+  for ( ; l_it!=labels.end(); l_it++, e_it++) {
+    wl->addWidget(new QLabel(*l_it));
+    QLineEdit *line = new QLineEdit();
+    line->setText(QString::number(0.0));
+    mParams->WrenchInput.push_back(line);
+    wl->addWidget(line);
+  }
+
+  QVBoxLayout *jointLayout = new QVBoxLayout(hl);
+  int preloadSize;
+  if (mHand->inherits("HumanHand")) {
+    jointLayout->addWidget(new QLabel(QString("Tendon Preloads:")));
+    preloadSize = ((HumanHand*)mHand)->getNumTendons();
+  } else {
+    jointLayout->addWidget(new QLabel(QString("Preload torques:")));
+    mHand->getGrasp()->collectContacts();
+    std::list<Joint*> joints = mHand->getGrasp()->getJointsOnContactChains(); 
+    preloadSize = joints.size();
+  }
+
+  QLayout *jl = new QGridLayout(jointLayout,preloadSize+1,3,0);
+  mParams->JointInput.clear();
+
+  std::vector<double> preload(preloadSize, 0.0);
+  preload = getDefaultPreload();
+
+  for (int i=0; i<preloadSize; i++) {
+    jl->addWidget(new QLabel(QString("P")+QString::number(i)+QString(":")));
+    QLineEdit *line = new QLineEdit();
+    jl->addWidget(line);
+    mParams->JointInput.push_back(line);
+    line->setText(QString::number(preload[i]));
+    QCheckBox *box = new QCheckBox();
+    jl->addWidget(box);
+    mParams->PreloadInput.push_back(box);
+    QObject::connect(box, SIGNAL (toggled(bool)), line, SLOT (setDisabled(bool)));
+  }
+}
+
+void
+GSADlg::resMapSettingsArea(QHBoxLayout *hl)
+{
+  QVBoxLayout *forceLayout = new QVBoxLayout(hl);
+  forceLayout->setAlignment(Qt::AlignTop);
+  forceLayout->addWidget(new QLabel(QString("Select plane dimensions:")));
+
+  QLayout *wl = new QGridLayout(forceLayout,4,2,0);
+
+  QString lab[] = {"Fx:", "Fy:", "Fz:", "Mx:", "My:", "Mz:"};
+  std::list<QString> labels(lab, lab+6);
+  std::list<QString>::iterator l_it = labels.begin();
+  std::list<QLineEdit*>::iterator e_it = mParams->WrenchInput.begin();
+  for ( ; l_it!=labels.end(); l_it++, e_it++) {
+    wl->addWidget(new QLabel(*l_it));
+    QCheckBox *box = new QCheckBox();
+    QObject::connect(box, SIGNAL (toggled(bool)), this, SLOT (countAxes()));
+    mParams->WrenchPlaneInput.push_back(box);
+    wl->addWidget(box);
+  }
+
+  QVBoxLayout *jointLayout = new QVBoxLayout(hl);
+  int preloadSize;
+  if (mHand->inherits("HumanHand")) {
+    jointLayout->addWidget(new QLabel(QString("Tendon Preloads:")));
+    preloadSize = ((HumanHand*)mHand)->getNumTendons();
+  } else {
+    jointLayout->addWidget(new QLabel(QString("Preload torques:")));
+    mHand->getGrasp()->collectContacts();
+    std::list<Joint*> joints = mHand->getGrasp()->getJointsOnContactChains(); 
+    preloadSize = joints.size();
+  }
+
+  QLayout *jl = new QGridLayout(jointLayout,4,2,0);
+  mParams->JointInput.clear();
+
+  std::vector<double> preload(preloadSize, 0.0);
+  preload = getDefaultPreload();
+
+  for (int i=0; i<preloadSize; i++) {
+    jl->addWidget(new QLabel(QString("P")+QString::number(i)+QString(":")));
+    QLineEdit *line = new QLineEdit();
+    jl->addWidget(line);
+    mParams->JointInput.push_back(line);
+    line->setText(QString::number(preload[i]));
+  }
+}
+
+void
+GSADlg::refinementSettingsArea(QHBoxLayout *hl)
+{
+  QVBoxLayout *settingsLayout = new QVBoxLayout(hl);
+  settingsLayout->setAlignment(Qt::AlignTop);
+  settingsLayout->addWidget(new QLabel(QString("Refinement solver settings:")));
+  
+  settingsLayout->addWidget(new QLabel("Angular tolerance:"));
+  mParams->angTolInput = new QLineEdit();
+  mParams->angTolInput->setText(QString::number(1.0));
+  settingsLayout->addWidget(mParams->angTolInput);
+
+  settingsLayout->addWidget(new QLabel("Contact normal uncertainty:"));
+  mParams->normUncertInput = new QLineEdit();
+  mParams->normUncertInput->setText(QString::number(2.5));
+  settingsLayout->addWidget(mParams->normUncertInput);
+}
+
+void
+GSADlg::iterativeSettingsArea(QHBoxLayout *hl)
+{
+  QVBoxLayout *settingsLayout = new QVBoxLayout(hl);
+  settingsLayout->setAlignment(Qt::AlignTop);
+  settingsLayout->addWidget(new QLabel(QString("Iterative solver settings:")));
+
+  QGridLayout *sl = new QGridLayout(settingsLayout,4,2,0);
+
+  sl->addWidget(new QLabel(QString("Single step:")));
+  mParams->stepInput = new QCheckBox();
+  sl->addWidget(mParams->stepInput);
+
+  sl->addWidget(new QLabel(QString("Cone Movement:")));
+  mParams->coneInput = new QCheckBox();
+  sl->addWidget(mParams->coneInput);
 }
 
 void
 GSADlg::solveButtonClicked()
 {
   DBGA("Success!");
+}
+
+void
+GSADlg::countAxes()
+{
+  int counter = 0;
+  std::list<QCheckBox*>::iterator it = mParams->WrenchPlaneInput.begin();
+  for ( ; it!= mParams->WrenchPlaneInput.end(); it++)
+    if ((*it)->isChecked()) counter++;
+  if (counter < 2) {
+    SolveButton->setEnabled(false);
+    it = mParams->WrenchPlaneInput.begin();
+    for ( ; it!=mParams->WrenchPlaneInput.end(); it++)
+      (*it)->setEnabled(true);
+  }
+  if (counter == 2) {
+    SolveButton->setEnabled(true);
+    it = mParams->WrenchPlaneInput.begin();
+    for ( ; it!=mParams->WrenchPlaneInput.end(); it++) {
+      if (!(*it)->isChecked()) (*it)->setEnabled(false);
+    }
+  }
 }
 
 std::vector<double> 
