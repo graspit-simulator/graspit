@@ -78,6 +78,15 @@ class GSADlg : public QDialog, public Ui::GSADlgUI
   public:
     GSADlg(MainWindow *mw, Hand *h, QWidget *parent = 0);
     ~GSADlg();
+
+    static const char *REFINEMENT;
+    static const char *ITERATIVE;
+
+    static const char *FORCES;
+    static const char *MAX_WRENCH;
+    static const char *OPT_PRELOAD;
+    static const char *RES_MAP;
+
   public Q_SLOTS:
     void solverTypeSelected(const QString &typeStr);
     void solveForSelected(const QString &typeStr);

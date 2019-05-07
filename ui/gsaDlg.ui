@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>594</width>
-    <height>299</height>
+    <height>308</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>50</y>
      <width>571</width>
-     <height>211</height>
+     <height>221</height>
     </rect>
    </property>
    <property name="title">
@@ -61,7 +61,7 @@
   <widget class="QLabel" name="TextLabel2_2">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>220</x>
      <y>10</y>
      <width>71</width>
      <height>31</height>
@@ -83,9 +83,9 @@
   <widget class="QComboBox" name="solveForComboBox">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>290</x>
      <y>10</y>
-     <width>121</width>
+     <width>161</width>
      <height>30</height>
     </rect>
    </property>
@@ -94,7 +94,7 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>270</y>
+     <y>280</y>
      <width>82</width>
      <height>26</height>
     </rect>
@@ -107,7 +107,7 @@
    <property name="geometry">
     <rect>
      <x>508</x>
-     <y>270</y>
+     <y>280</y>
      <width>82</width>
      <height>26</height>
     </rect>
