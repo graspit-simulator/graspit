@@ -156,7 +156,6 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspit/quality/qualVolume.h
     ${GSRC}/include/graspit/quality/qualPCR.h
     ${GSRC}/include/graspit/quality/qualPGR.h
-    ${GSRC}/include/graspit/quality/qualStability.h
     ${GSRC}/include/graspit/debug.h
     ${GSRC}/include/graspit/dof.h
     ${GSRC}/include/graspit/dynamics/dynamics.h
@@ -257,7 +256,6 @@ set (GRASPIT_QUALITY_HEADERS
     ${GSRC}/include/graspit/quality/qualPCR.h
     ${GSRC}/include/graspit/quality/qualPGR.h
     ${GSRC}/include/graspit/quality/qualVolume.h
-    ${GSRC}/include/graspit/quality/qualStability.h
 )
 
 # all headers which are in the  cmdline
@@ -423,7 +421,6 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/quality/qualVolume.cpp
     ${GSRC}/src/quality/qualPCR.cpp
     ${GSRC}/src/quality/qualPGR.cpp
-    ${GSRC}/src/quality/qualStability.cpp
     ${GSRC}/src/dof.cpp 
     ${GSRC}/src/dynamics/dynamics.cpp 
     ${GSRC}/src/dynamics/dynJoint.cpp 
