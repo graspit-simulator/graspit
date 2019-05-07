@@ -39,7 +39,6 @@ class QualityMeasure;
 class QHBox;
 class QLineEdit;
 class QWidget;
-class Grasp;
 
 //! A collection of pointers to exchange data with the qm dialog box
 /*!

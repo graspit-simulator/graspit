@@ -33,7 +33,6 @@
 #include "graspit/quality/qualVolume.h"
 #include "graspit/quality/qualPCR.h"
 #include "graspit/quality/qualPGR.h"
-#include "graspit/quality/qualStability.h"
 
 #include <QGridLayout>
 #include <QBoxLayout>
@@ -47,7 +46,6 @@
 
 #include "graspit/grasp.h"
 #include "graspit/gws.h"
-#include "graspit/math/matrix.h"
 #include "graspit/robot.h"
 
 #include <limits>
@@ -59,7 +57,7 @@
 //Static class variables
 
 //! A list of the possible qm types expressed as strings
-const char *QualityMeasure::TYPE_LIST[] = {"Epsilon", "Volume", "PCR", "PGR", "Stability", NULL};
+const char *QualityMeasure::TYPE_LIST[] = {"Epsilon", "Volume", "PCR", "PGR", NULL};
 
 /*!
   Sets the name of this QM to the text contained within the name widget.
@@ -111,10 +109,6 @@ QualityMeasure::buildParamArea(qmDlgDataT *qmData)
   else if (!strcmp(qmData->qmType,QualPGR::getClassType())) {
     QualPGR::buildParamArea(qmData);
   }
-
-  else if (!strcmp(qmData->qmType,QualStability::getClassType())) {
-    QualStability::buildParamArea(qmData);
-  }
 }
 
 /*!
@@ -138,10 +132,6 @@ QualityMeasure::createInstance(qmDlgDataT *qmData)
 
   else if (!strcmp(qmData->qmType,QualPGR::getClassType())) {
     return new QualPGR(qmData);
-  }
-
-  else if (!strcmp(qmData->qmType,QualStability::getClassType())) {
-    return new QualStability(qmData);
   }
 
   return NULL;
