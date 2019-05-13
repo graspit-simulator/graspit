@@ -32,6 +32,7 @@ class Hand;
 class MainWindow;
 class GraspSolver;
 class QHBoxLayout;
+class QVBoxLayout;
 struct UIParamT;
 
 //! Provides an interface for running Grasp Stability Analysis routines
@@ -51,9 +52,6 @@ class GSADlg : public QDialog, public Ui::GSADlgUI
     //! Structure holding pointers to UI items
     UIParamT *mParams;
 
-    //! Grasp Solver object that is used to analyze grasp stability
-    GraspSolver *mGraspSolver;
-
     //! Widget for settings area
     QWidget *mSettingsArea;
 
@@ -68,10 +66,10 @@ class GSADlg : public QDialog, public Ui::GSADlgUI
     void iterativeSettingsArea(QHBoxLayout *hl);
 
     //! Build the task specific settings area
-    void forcesSettingsArea(QHBoxLayout *hl);
-    void maxWrenchSettingsArea(QHBoxLayout *hl);
-    void optPreloadSettingsArea(QHBoxLayout *hl);
-    void resMapSettingsArea(QHBoxLayout *hl);
+    void forcesSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl);
+    void maxWrenchSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl);
+    void optPreloadSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl);
+    void resMapSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl);
 
     void init();
 
@@ -92,6 +90,24 @@ class GSADlg : public QDialog, public Ui::GSADlgUI
     void solveForSelected(const QString &typeStr);
     void solveButtonClicked();
     void countAxes();
+};
+
+//! Simple class that implements an LED status light for Qt
+class LEDIndicator : public QWidget {
+  Q_OBJECT
+public:
+  LEDIndicator(QWidget *parent = 0) {
+    mColor = Qt::gray;
+  }
+  void setColor(QColor color) {
+    mColor = color;
+    repaint();
+  }
+protected:
+  void paintEvent(QPaintEvent *);
+  QSize sizeHint() const {return QSize(16,16);}
+private:
+  QColor mColor;
 };
 
 #endif

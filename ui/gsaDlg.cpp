@@ -35,6 +35,7 @@
 #include "graspit/debug.h"
 
 #include <QDialog>
+#include <QPainter>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QStandardItemModel>
@@ -57,6 +58,9 @@ struct UIParamT {
   QCheckBox *coneInput;
 
   QLineEdit *fileInput;
+
+  LEDIndicator *stableIndicator;
+  QLabel *maxWrenchOutput;
 };
 
 //! Possible solver types and queries expressed as strings
@@ -71,7 +75,6 @@ const char *GSADlg::RES_MAP = "Resistible wrenches";
 GSADlg::GSADlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMainWindow(mw), mHand(h)
 {
   mParams = new UIParamT();
-  mGraspSolver = new GraspSolver(mHand->getGrasp());
   setupUi(this);
   init();
 }
@@ -80,7 +83,6 @@ GSADlg::~GSADlg()
 {
   mMainWindow->clearContactsList();
   delete mParams;
-  delete mGraspSolver;
 }
 
 void
@@ -150,20 +152,21 @@ GSADlg::buildSettingsArea()
   // 'Resistible wrenches' computation
   SolveButton->setEnabled(true);
 
-  QHBoxLayout *hl = new QHBoxLayout(mSettingsArea);
+  QVBoxLayout *vl = new QVBoxLayout(mSettingsArea);
+  QHBoxLayout *hl = new QHBoxLayout(vl);
 
   // Build part of settings area for query settings
   QString solveFor = solveForComboBox->currentText();
   if (!strcmp(solveFor.latin1(), GSADlg::FORCES)) {
-    forcesSettingsArea(hl);
+    forcesSettingsArea(hl, vl);
   } else if (!strcmp(solveFor.latin1(), GSADlg::MAX_WRENCH)) {
-    maxWrenchSettingsArea(hl);
+    maxWrenchSettingsArea(hl, vl);
   } else if (!strcmp(solveFor.latin1(), GSADlg::OPT_PRELOAD)) {
-    optPreloadSettingsArea(hl);
+    optPreloadSettingsArea(hl, vl);
   } else if (!strcmp(solveFor.latin1(), GSADlg::RES_MAP)) {
     // Disable Solve button until two axes have been selected
     SolveButton->setEnabled(false);
-    resMapSettingsArea(hl);
+    resMapSettingsArea(hl, vl);
   }
 
   // Build solver options part of settings area
@@ -178,13 +181,13 @@ GSADlg::buildSettingsArea()
 }
 
 void
-GSADlg::forcesSettingsArea(QHBoxLayout *hl)
+GSADlg::forcesSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl)
 {
-  QVBoxLayout *forceLayout = new QVBoxLayout(hl);
-  forceLayout->setAlignment(Qt::AlignTop);
-  forceLayout->addWidget(new QLabel(QString("Applied wrench:")));
+  QVBoxLayout *wrenchLayout = new QVBoxLayout(hl);
+  wrenchLayout->setAlignment(Qt::AlignTop);
+  wrenchLayout->addWidget(new QLabel(QString("Applied wrench:")));
 
-  QLayout *wl = new QGridLayout(forceLayout,4,2,0);
+  QLayout *wl = new QGridLayout(wrenchLayout,4,2,0);
 
   QString lab[] = {"Fx:", "Fy:", "Fz:", "Mx:", "My:", "Mz:"};
   std::list<QString> labels(lab, lab+6);
@@ -224,16 +227,23 @@ GSADlg::forcesSettingsArea(QHBoxLayout *hl)
     mParams->JointInput.push_back(line);
     line->setText(QString::number(preload[i]));
   }
+
+  QHBoxLayout *statusLayout = new QHBoxLayout(vl);
+  statusLayout->addWidget(new QLabel(QString("Stable:")));
+  statusLayout->addStretch(1);
+  mParams->stableIndicator = new LEDIndicator();
+  statusLayout->addWidget(mParams->stableIndicator);
+  statusLayout->addStretch(25);
 }
 
 void
-GSADlg::maxWrenchSettingsArea(QHBoxLayout *hl)
+GSADlg::maxWrenchSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl)
 {
-  QVBoxLayout *forceLayout = new QVBoxLayout(hl);
-  forceLayout->setAlignment(Qt::AlignTop);
-  forceLayout->addWidget(new QLabel(QString("Wrench direction:")));
+  QVBoxLayout *wrenchLayout = new QVBoxLayout(hl);
+  wrenchLayout->setAlignment(Qt::AlignTop);
+  wrenchLayout->addWidget(new QLabel(QString("Wrench direction:")));
 
-  QLayout *wl = new QGridLayout(forceLayout,4,2,0);
+  QLayout *wl = new QGridLayout(wrenchLayout,4,2,0);
 
   QString lab[] = {"Fx:", "Fy:", "Fz:", "Mx:", "My:", "Mz:"};
   std::list<QString> labels(lab, lab+6);
@@ -273,10 +283,19 @@ GSADlg::maxWrenchSettingsArea(QHBoxLayout *hl)
     mParams->JointInput.push_back(line);
     line->setText(QString::number(preload[i]));
   }
+
+  QHBoxLayout *outputLayout = new QHBoxLayout(vl);
+  outputLayout->addWidget(new QLabel(QString("Maximum magnitude:")));
+  mParams->maxWrenchOutput = new QLabel();
+  mParams->maxWrenchOutput->setFrameShape(QFrame::Panel);
+  mParams->maxWrenchOutput->setFrameShadow(QFrame::Sunken);
+  mParams->maxWrenchOutput->setFixedWidth(100);
+  outputLayout->addWidget(mParams->maxWrenchOutput);
+  outputLayout->addStretch();
 }
 
 void
-GSADlg::optPreloadSettingsArea(QHBoxLayout *hl)
+GSADlg::optPreloadSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl)
 {
   QVBoxLayout *forceLayout = new QVBoxLayout(hl);
   forceLayout->setAlignment(Qt::AlignTop);
@@ -325,11 +344,12 @@ GSADlg::optPreloadSettingsArea(QHBoxLayout *hl)
     jl->addWidget(box);
     mParams->PreloadInput.push_back(box);
     QObject::connect(box, SIGNAL (toggled(bool)), line, SLOT (setDisabled(bool)));
+    QObject::connect(box, SIGNAL (toggled(bool)), line, SLOT (clear(void)));
   }
 }
 
 void
-GSADlg::resMapSettingsArea(QHBoxLayout *hl)
+GSADlg::resMapSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl)
 {
   QVBoxLayout *forceLayout = new QVBoxLayout(hl);
   forceLayout->setAlignment(Qt::AlignTop);
@@ -423,8 +443,20 @@ GSADlg::iterativeSettingsArea(QHBoxLayout *hl)
 void
 GSADlg::solveButtonClicked()
 {
+  mHand->getGrasp()->update();
+  GraspSolver graspSolver(mHand->getGrasp());
+
   QString solverType = solverTypeComboBox->currentText();
   QString solveFor = solveForComboBox->currentText();
+
+  // Clear output areas until computation is completed
+  if (!strcmp(solveFor.latin1(), GSADlg::FORCES)) {
+    mParams->stableIndicator->setColor(Qt::gray);
+    mParams->stableIndicator->repaint();
+  } else if (!strcmp(solveFor.latin1(), GSADlg::MAX_WRENCH)) {
+    mParams->maxWrenchOutput->setText(QString("Running..."));
+    mParams->maxWrenchOutput->repaint();
+  }
 
   // All but the resistible wrenches query specify a wrench.
   // The resistible wrenches query requires two directions
@@ -471,15 +503,26 @@ GSADlg::solveButtonClicked()
   if (!strcmp(solverType.latin1(), GSADlg::REFINEMENT)) {
     double coneTol = mParams->coneTolInput->text().toDouble();
     double normUnc = mParams->normUncInput->text().toDouble();
+    coneTol *= M_PI/180.0;
+    normUnc *= M_PI/180.0;
 
-    if (!strcmp(solveFor.latin1(), GSADlg::FORCES))
-      mGraspSolver->checkWrenchRefinement(preload, wrench, coneTol, normUnc);
-    else if (!strcmp(solveFor.latin1(), GSADlg::MAX_WRENCH))
-      mGraspSolver->findMaximumWrenchRefinement(preload, wrench, coneTol, normUnc);
-    else if (!strcmp(solveFor.latin1(), GSADlg::OPT_PRELOAD))
-      mGraspSolver->optimalPreloads(preload, wrench, coneTol, normUnc);
+    if (!strcmp(solveFor.latin1(), GSADlg::FORCES)) {
+      int result = graspSolver.checkWrenchRefinement(preload, wrench, coneTol, normUnc);
+      result ? mParams->stableIndicator->setColor(Qt::red) : mParams->stableIndicator->setColor(Qt::green);
+    }
+    else if (!strcmp(solveFor.latin1(), GSADlg::MAX_WRENCH)) {
+      double max = graspSolver.findMaximumWrenchRefinement(preload, wrench, coneTol, normUnc);
+      mParams->maxWrenchOutput->setText(QString::number(max));
+    }
+    else if (!strcmp(solveFor.latin1(), GSADlg::OPT_PRELOAD)) {
+      Matrix opt = graspSolver.optimalPreloads(preload, wrench, coneTol, normUnc);
+      std::list<QLineEdit*>::iterator it=mParams->JointInput.begin();
+      for (int i=0; i<preload.rows(); i++, it++) {
+        (*it)->setText(QString::number(opt.elem(i,0)));
+      }
+    }
     else if (!strcmp(solveFor.latin1(), GSADlg::RES_MAP)) {
-      mGraspSolver->create2DMapRefinement(preload, direction1, direction2, stream, coneTol, normUnc);
+      graspSolver.create2DMapRefinement(preload, direction1, direction2, stream, coneTol, normUnc);
       stream.close();
     }
 
@@ -487,12 +530,16 @@ GSADlg::solveButtonClicked()
     bool step = mParams->stepInput->isChecked();
     bool cone = mParams->coneInput->isChecked();
 
-    if (!strcmp(solveFor.latin1(), GSADlg::FORCES))
-      mGraspSolver->checkWrenchIterative(preload, wrench, step, cone);
-    else if (!strcmp(solveFor.latin1(), GSADlg::MAX_WRENCH))
-      mGraspSolver->findMaximumWrenchIterative(preload, wrench, step, cone);
+    if (!strcmp(solveFor.latin1(), GSADlg::FORCES)) {
+      int result = graspSolver.checkWrenchIterative(preload, wrench, step, cone);
+      result ? mParams->stableIndicator->setColor(Qt::red) : mParams->stableIndicator->setColor(Qt::green);
+    }
+    else if (!strcmp(solveFor.latin1(), GSADlg::MAX_WRENCH)) {
+      double max = graspSolver.findMaximumWrenchIterative(preload, wrench, step, cone);
+      mParams->maxWrenchOutput->setText(QString::number(max));
+    }
     else if (!strcmp(solveFor.latin1(), GSADlg::RES_MAP)) {
-      mGraspSolver->create2DMapIterative(preload, direction1, direction2, stream, step, cone);
+      graspSolver.create2DMapIterative(preload, direction1, direction2, stream, step, cone);
       stream.close();
     }
   }
@@ -510,8 +557,7 @@ GSADlg::countAxes()
     it = mParams->PlaneInput.begin();
     for ( ; it!=mParams->PlaneInput.end(); it++)
       (*it)->setEnabled(true);
-  }
-  if (counter == 2) {
+  } else if (counter == 2) {
     SolveButton->setEnabled(true);
     it = mParams->PlaneInput.begin();
     for ( ; it!=mParams->PlaneInput.end(); it++) {
@@ -569,4 +615,12 @@ GSADlg::getDefaultPreload()
   }
   
   return joint_preload;
+}
+
+void
+LEDIndicator::paintEvent(QPaintEvent *)
+{
+  QPainter p(this);
+  p.setBrush(QBrush(mColor, Qt::SolidPattern));
+  p.drawEllipse(0,0,15,15);
 }
