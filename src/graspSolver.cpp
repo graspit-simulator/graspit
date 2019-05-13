@@ -37,8 +37,6 @@
 PROF_DECLARE(TIMER);
 
 const double GraspSolver::kSpringStiffness = 1.0;
-const double GraspSolver::kNormalUncertainty = 2.5*M_PI/180.0;
-const double GraspSolver::kFrictionConeTolerance = 1.0*M_PI/180.0;
 
 const double GraspSolver::kBetaMaxBase = 200;
 const double GraspSolver::kTauMaxBase = 2500;
@@ -226,7 +224,7 @@ GraspSolver::resultantDirectionConstraint(GraspStruct &P, const Matrix &wrench)
 //  -------------------------  Inequality Constraints  ------------------------------  //
 
 void
-GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P)
+GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P, double normUnc)
 {
   Matrix J(g->contactJacobian(joints, contacts));
   Matrix R(Contact::localToWorldWrenchBlockMatrix(contacts));
@@ -241,9 +239,9 @@ GraspSolver::virtualSpringIndicatorConstraint(GraspStruct &P)
   S_k.multiply(1/kSpringStiffness);
 
   // we assume the worst case such that normal force is diminished
-  K.multiply(cos(kNormalUncertainty));
-  NJ.multiply(cos(kNormalUncertainty));
-  E.multiply(sin(kNormalUncertainty));
+  K.multiply(cos(normUnc));
+  NJ.multiply(cos(normUnc));
+  E.multiply(sin(normUnc));
 
   std::vector<int> block_rows(2, numContacts);
   Matrix InEq(Matrix::ZEROES<Matrix>(block_rows, P.block_cols));
@@ -305,15 +303,9 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   Matrix RT(Grasp::graspMapMatrix(R).transposed());
   Matrix K(matrixMultiply(N, RT));
   Matrix NJ(matrixMultiply(N, J));
-  Matrix E(tangentialDisplacementSummationMatrix(contacts));
 
   Matrix S_k(S);
   S_k.multiply(1/kSpringStiffness);
-
-  // we assume the worst case such that normal force is diminished
-  K.multiply(cos(kNormalUncertainty));
-  NJ.multiply(cos(kNormalUncertainty));
-  E.multiply(sin(kNormalUncertainty));
 
   // vector of normal forces at contacts
   Matrix c(matrixMultiply(S, beta_p));
@@ -332,7 +324,6 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   InEq.copySubMatrixBlockIndices(1, P.var["beta"], S_k.negative());
   InEq.copySubMatrixBlockIndices(1, P.var["x"],    K);
   InEq.copySubMatrixBlockIndices(1, P.var["q"],    NJ.negative());
-  InEq.copySubMatrixBlockIndices(1, P.var["alpha"],E.negative());
 
   InEq.copySubMatrixBlockIndices(2, P.var["beta"], S);
   InEq.copySubMatrixBlockIndices(2, P.var["y1"],   k1);
@@ -340,7 +331,6 @@ GraspSolver::virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p)
   InEq.copySubMatrixBlockIndices(3, P.var["beta"], S_k);
   InEq.copySubMatrixBlockIndices(3, P.var["x"],    K.negative());
   InEq.copySubMatrixBlockIndices(3, P.var["q"],    NJ);
-  InEq.copySubMatrixBlockIndices(3, P.var["alpha"],E);
   InEq.copySubMatrixBlockIndices(3, P.var["y1"],   k2);
   P.InEq_list.push_back(InEq);
 
@@ -542,17 +532,18 @@ GraspSolver::tendonConstraint(GraspStruct &P, const Matrix &preload, const Matri
 }
 
 void
-GraspSolver::frictionConeConstraint(GraspStruct &P, const Matrix &beta_p) 
+GraspSolver::frictionConeConstraint(GraspStruct &P, const Matrix &beta_p/*=Matrix(0,0)*/) 
 {
   // results of friction inequality arising from original contact forces
   Matrix F(Contact::frictionConstraintsBlockMatrix(contacts));
-  Matrix d(matrixMultiply(F, beta_p));
+  Matrix d(Matrix::ZEROES<Matrix>(F.rows(), 1));
+  if (beta_p.rows()) d = matrixMultiply(F, beta_p).negative();
 
   Matrix InEq( Matrix::ZEROES<Matrix>(numContacts, P.block_cols) );
   InEq.copySubMatrixBlockIndices(0, P.var["beta"], F);
   P.InEq_list.push_back(InEq);
 
-  P.ib_list.push_back(d.negative());
+  P.ib_list.push_back(d);
 }
 
 void
@@ -641,7 +632,7 @@ GraspSolver::contactMovementConstraint(GraspStruct &P)
 }
 
 void
-GraspSolver::amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p)
+GraspSolver::amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p/*=Matrix(0,0)*/)
 {
   int z_index = 0;
   for (int i=0; i<P.var["z"]; i++) z_index += P.block_cols[i];
@@ -693,7 +684,8 @@ GraspSolver::amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p)
   P.InEq_list.push_back(InEq);
 
   Matrix ib( Matrix::ZEROES<Matrix>(block_rows, 1) );
-  ib.copySubMatrixBlockIndices(1, 0, matrixMultiply(betaDiag, beta_p.negative()));
+  if (beta_p.rows())
+    ib.copySubMatrixBlockIndices(1, 0, matrixMultiply(betaDiag, beta_p.negative()));
   P.ib_list.push_back(ib);
 }
 
@@ -722,22 +714,15 @@ GraspSolver::virtualLimitLBConstraint(GraspStruct &P, bool iterative /*= false*/
   Matrix RT(Grasp::graspMapMatrix(R).transposed());
   Matrix K(matrixMultiply(N, RT));
   Matrix NJ(matrixMultiply(N, J));
-  Matrix E(tangentialDisplacementSummationMatrix(contacts));
-
-  K.multiply(cos(kNormalUncertainty));
-  NJ.multiply(cos(kNormalUncertainty));
-  E.multiply(sin(kNormalUncertainty));
 
   int numBetas = P.block_cols[P.var["beta"]];
   int numQs = P.block_cols[P.var["q"]];
   int numAlphas = 1;
-  if (!iterative) numAlphas = P.block_cols[P.var["alpha"]];
   std::vector<int> block_rows;
   block_rows.push_back(numBetas);
   block_rows.push_back(numJoints);
   block_rows.push_back(numQs);
   block_rows.push_back(numContacts);
-  if (!iterative) block_rows.push_back(numAlphas);
   Matrix InEq( Matrix::ZEROES<Matrix>(block_rows, P.block_cols) );
 
   Matrix S_beta(numBetas, 1);
@@ -760,11 +745,6 @@ GraspSolver::virtualLimitLBConstraint(GraspStruct &P, bool iterative /*= false*/
   InEq.copySubMatrixBlockIndices(3, P.var["x"], K.negative());
   InEq.copySubMatrixBlockIndices(3, P.var["q"], NJ);
   InEq.copySubMatrixBlockIndices(3, P.var["v"], S_k);
-  if (!iterative) {
-    InEq.copySubMatrixBlockIndices(3, P.var["alpha"], E);
-    InEq.copySubMatrixBlockIndices(4, P.var["alpha"], Matrix::EYE(numAlphas, numAlphas));
-    InEq.copySubMatrixBlockIndices(4, P.var["v"], S_alpha);
-  }
   P.InEq_list.push_back(InEq);
 
   P.ib_list.push_back(Matrix::ZEROES<Matrix>(block_rows, 1));
@@ -790,7 +770,7 @@ GraspSolver::objectMotionLimit(GraspStruct &P)
 //  ------------------------  Variable Bounds and Types  -----------------------------  //
 
 void 
-GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
+GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p/*=Matrix(0,0)*/)
 {
   std::list<std::string>::iterator it;
   for (it=P.varNames.begin(); it!=P.varNames.end(); it++) {
@@ -819,7 +799,8 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
     }
 
     else if (!key.compare("beta")) {
-      P.lb_list.push_back(beta_p.negative());
+      if (beta_p.rows()) P.lb_list.push_back(beta_p.negative());
+      else P.lb_list.push_back(Matrix::ZEROES<Matrix>(size, 1));
       /*Matrix beta_ub(size, 1);
       beta_ub.setAllElements(BetaMax);*/
       P.ub_list.push_back(Matrix::MAX_VECTOR(size));
@@ -921,38 +902,29 @@ GraspSolver::variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p)
   }
 }
 
-//  -----------  Routines constructing non-iterative problems  ----------------  //
+//  ----  Routines constructing refinement solver problems  ----  //
 
-//! The non-iterative formulation for direct drive hands
+//! The variables necessary for a base problem formulation for the
+//! refinement solver
 /*!
-  Variables: contact motion amplitude (alpha)
-             contact force amplitude (beta)
-             object motion (x)
-             joint motion (q)
-             contact breaking decision variable (y1)
-             joint backdriving decision variable (y2)
-             contact sliding decision variable (y3)
-             SOS2 variables for contact forces and motions (z)
-             relative closeness of variables to virtual limits (v)
+  alpha: contact motion amplitude
+  beta: contact force amplitude
+  x: object motion
+  q: joint motion
+  y1: contact breaking decision variable
+  y2: joint backdriving decision variable
+  y3: contact sliding decision variable
+  z: SOS2 variables for contact forces and motions
 */
 void
-GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload, 
-  const Matrix &wrench /*=ZEROES*/, const Matrix &beta /*=Matrix(0,0)*/, 
-  bool rigid /*=false*/, bool findMax /*=false*/) 
+GraspSolver::refinementBaseVariables(GraspStruct &P)
 {
   int totalFrictionEdges = 0;
   std::list<Contact*>::iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
     totalFrictionEdges += (*it)->numFrictionEdges+1;
   }
-  int numPreloadVar = 0;
-  for (int i=0; i<preload.rows(); i++) {
-    if (preload.elem(i,0) < 0) numPreloadVar++;
-  }
-  if (numPreloadVar && findMax) {
-    DBGA("Cannot find optimal preload and maximum wrench at the same time.");
-    exit(0);
-  }
+
   // unknowns
   P.var["alpha"] = 0; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("alpha");
   P.var["beta"]  = 1; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("beta");
@@ -961,53 +933,94 @@ GraspSolver::nonIterativeFormulation(GraspStruct &P, const Matrix &preload,
   P.var["y1"]    = 4; P.block_cols.push_back(numContacts);        P.varNames.push_back("y1");
   P.var["y2"]    = 5; P.block_cols.push_back(numJoints);          P.varNames.push_back("y2");
   P.var["y3"]    = 6; P.block_cols.push_back(numContacts);        P.varNames.push_back("y3");
-  P.var["z"]     = 7; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("z");
-  if (numPreloadVar) {
-    P.var["tau"] = 8; P.block_cols.push_back(numPreloadVar);      P.varNames.push_back("tau");
-    P.var["v"] = 9;   P.block_cols.push_back(1);                  P.varNames.push_back("v");
-  } else if (findMax) {
-    P.var["r"] = 8;   P.block_cols.push_back(6);                  P.varNames.push_back("r");
-    P.var["s"] = 9;   P.block_cols.push_back(1);                  P.varNames.push_back("s");
-  }
-  //P.var["v"]     = 8; P.block_cols.push_back(1);                  P.varNames.push_back("v");
+  P.var["z"]     = 7; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("z");  
+}
 
-  // Set virtual limits for MIP representation of linear complementarities
-  //setVirtualLimits(preload, wrench);
-
-  // Preload contact forces (if present)
-  Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges, 1) );
-  if (beta.rows()) beta_p.copyMatrix(beta);
-
-  // Objective 
-  //springDeformationObjective(P);
-  //virtualLimitsObjective(P);
-  if (numPreloadVar) virtualLimitsObjective(P);
-  else if (findMax) resultantWrenchObjective(P);
-
+//! The constraints making up a base problem formulation for the
+//! refinement solver
+void
+GraspSolver::refinementBaseConstraints(GraspStruct &P, const Matrix &preload, 
+                                       double normUnc, bool rigid) 
+{
   // equality constraints
-  if (findMax) {
-    resultantWrenchConstraint(P, wrench);
-    resultantDirectionConstraint(P, wrench);
-  }
-  else objectWrenchConstraint(P, wrench);
   movementAmplitudesConstraint(P);
 
   // inequality constraints
-  virtualSpringIndicatorConstraint(P);
+  virtualSpringIndicatorConstraint(P, normUnc);
   if (rigid) rigidJointsConstraint(P);
   else nonBackdrivableJointIndicatorConstraint(P, preload);
-  if (numPreloadVar) preloadTorqueLBConstraint(P);
-  frictionConeConstraint(P, beta_p);
+  frictionConeConstraint(P);
   frictionConeEdgeIndicatorConstraint(P);
   contactMovementIndicatorConstraint(P);
-  amplitudesSOS2Constraint(P, beta_p);
-  //virtualLimitLBConstraint(P);
-
-  // quadratic inequality constraints
-  //objectMotionLimit(P);
+  amplitudesSOS2Constraint(P);
 
   // solution bounds and types
-  variableBoundsAndTypes(P, beta_p);
+  variableBoundsAndTypes(P);
+}
+
+//! The equilibrium problem formulation for the refinement solver
+void
+GraspSolver::refinementFormulationEquilibrium(GraspStruct &P, const Matrix &preload,
+  double normUnc, const Matrix &wrench /*=ZEROES*/, bool rigid /*=false*/)
+{
+  refinementBaseVariables(P);
+  refinementBaseConstraints(P, preload, normUnc, rigid);
+
+  // equality constraints
+  objectWrenchConstraint(P, wrench);
+}
+
+//! The maximum wrench problem formulation for the refinement solver
+/*!
+  Variables
+  r: residual
+  s: magnitude of residual
+*/
+void
+GraspSolver::refinementFormulationFindMax(GraspStruct &P, const Matrix &preload,
+  double normUnc, const Matrix &direction, bool rigid /*=false*/)
+{
+  refinementBaseVariables(P);
+  P.var["r"] = 8; P.block_cols.push_back(6); P.varNames.push_back("r");
+  P.var["s"] = 9; P.block_cols.push_back(1); P.varNames.push_back("s");
+  refinementBaseConstraints(P, preload, normUnc, rigid);
+
+  // objective: minimize resultant
+  resultantWrenchObjective(P);
+
+  // equality constraints
+  resultantWrenchConstraint(P, direction);
+  resultantDirectionConstraint(P, direction);
+}
+
+//! The optimal preload problem formulation for the refinement solver
+/*!
+  Variables
+  tau: preload torques
+  v: maximum preload torque
+*/
+
+void
+GraspSolver::refinementFormulationPreload(GraspStruct &P, const Matrix &preload,
+  double normUnc, const Matrix &wrench /*=ZEROES*/, bool rigid /*=false*/)
+{
+  refinementBaseVariables(P);
+  int numPreloadVar = 0;
+  for (int i=0; i<preload.rows(); i++) {
+    if (preload.elem(i,0) < 0) numPreloadVar++;
+  }
+  P.var["tau"] = 8; P.block_cols.push_back(numPreloadVar); P.varNames.push_back("tau");
+  P.var["v"] = 9;   P.block_cols.push_back(1);             P.varNames.push_back("v");
+  refinementBaseConstraints(P, preload, normUnc, rigid);
+
+  // objective: minimize maximum joint torque
+  virtualLimitsObjective(P);
+
+  // equality constraints
+  objectWrenchConstraint(P, wrench);
+
+  // inequality constraints
+  preloadTorqueLBConstraint(P);
 }
 
 void
@@ -1137,47 +1150,15 @@ GraspSolver::iterativeTendonFormulation(GraspStruct &P, const Matrix &preload, c
 }
 
 int
-GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench, bool findMax /*=false*/)
+GraspSolver::refinementSolver(SolutionStruct &S, std::tr1::function<void(GraspStruct&)> formulation, double coneTol)
 {
-  int counter = 0;
-  //double prev_resultant = -1;
   while (true) {
-
-    DBGA("Iteration " << counter++);
-
-    /*std::list<Contact*>::iterator c_it;
-    for (c_it=contacts.begin(); c_it!=contacts.end(); c_it++) {
-      DBGA("Friction edges: " << (*c_it)->numFrictionEdges);
-      for (int i=0; i<2; i++) {
-        for (int j=0; j<(*c_it)->numFrictionEdges; j++) {
-          double val = (*c_it)->frictionEdges[6*j + i];
-          std::cout << std::setprecision(4) << (sqrt(pow(val,2)) > Matrix::EPS ? val : 0.0) << "\t\t";
-        }
-        std::cout << std::endl;
-      }
-    }
-    DBGA("E:\n" << tangentialDisplacementSummationMatrix(contacts));*/
 
     // Solve problem and exit if infeasible
     GraspStruct P;
-    nonIterativeFormulation(P, preload, wrench, Matrix(0,0), false, findMax);
+    formulation(P);
     int result = solveProblem(P, S);
-    //writeResultsToFile(S, contacts);
     if (result) return result;
-
-    if (findMax) {
-      double resultant = S.sol.getSubMatrixBlockIndices(S.var["r"], 0).fnorm();
-      DBGA("Maximum wrench: " << 1-resultant);
-      /*if ((prev_resultant - resultant) / (1-prev_resultant) > 0.01) {
-        DBGA("Resultant is smaller than in previous iteration.");
-        exit(0);
-      }
-      prev_resultant = resultant;*/
-    }
-
-    double e[2];
-    systemEnergyError(S, preload, wrench, e, findMax);
-    DBGA("Energy Error: " << e[0] << " (absolute), " << e[1] << " (relative)");
 
     // get active friction and motion edges as well as friction edge amplitudes
     Matrix z(S.sol.getSubMatrixBlockIndices(S.var["z"], 0));
@@ -1259,7 +1240,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
       // If the angle is already below the required tolerance we are done
       // with this contact. Otherwise work is required and we know there
       // will be at least another iteration so we can set the no-exit flag
-      if (angle <= kFrictionConeTolerance) continue;
+      if (angle <= coneTol) continue;
       complete = false;
 
       // Check if adding new friction edges would exceed container size
@@ -1289,7 +1270,7 @@ GraspSolver::frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const 
       do {
         new_angle /= 2;
         mult *= cos(new_angle);
-      } while (new_angle > kFrictionConeTolerance / 2.0);
+      } while (new_angle > coneTol / 2.0);
       new_fe.elem(0,0) = frictionEdges[6*edge1] / (len1 * mult);
       new_fe.elem(1,0) = frictionEdges[6*edge1+1] / (len1 * mult);
       new_fe_vec.push_back(new_fe);
@@ -1437,67 +1418,86 @@ GraspSolver::iterativeSolver(SolutionStruct &S, bool cone_movement,
 //  -----------------------  Grasp Analysis Routines  ----------------------------  //
 
 int
-GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench, 
-  bool single_step, bool tendon /*=false*/, bool rigid /*= false*/)
+GraspSolver::checkWrenchRefinement(Matrix &preload, const Matrix &wrench, double coneTol/*=1.0*/, double normUnc/*=2.5*/)
 {
-  if (removeJointsBeyondContact(joints, contacts, preload))
-    if (tendon) {
-      DBGA("Removed joint beyond contact. For underactuated hands this is not allowed");
-      exit(0);
-    }
-
-  int totalFrictionEdges = 0;
+  removeJointsBeyondContact(joints, contacts, preload);
   std::list<Contact*>::iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
     (*it)->setUpFrictionEdges();
     (*it)->getMate()->setUpFrictionEdges();
-    totalFrictionEdges += (*it)->numFrictionEdges+1;
   }
-  Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges, 1) );
+  modifyFrictionEdges(coneTol);
 
-  int result;
-  GraspStruct P;
   SolutionStruct S;
-  if (single_step) {
-    modifyFrictionEdges();
-    result = frictionRefinementSolver(S, preload, wrench);
-    g->getObject()->redrawFrictionCones();
-  } else {
-    GraspStruct P_p;
-    SolutionStruct S_p;
-    if (tendon) nonIterativeTendonFormulation(P_p, preload);
-    else nonIterativeFormulation(P_p, preload);
-    int preload_result = solveProblem(P_p, S_p);
-    if (preload_result) {
-      DBGA("Preload creation failed");
-      return preload_result;
-    }
-    beta_p.copyMatrix(S_p.sol.getSubMatrixBlockIndices(S_p.var["beta"], 0));
-    if (tendon) nonIterativeTendonFormulation(P, preload, wrench, beta_p);
-    else nonIterativeFormulation(P, preload, wrench, beta_p, rigid);
-    result = solveProblem(P, S);  
-  }
+  std::tr1::function<void(GraspStruct&)> formulation
+    = std::tr1::bind(&GraspSolver::refinementFormulationEquilibrium, this, 
+      std::tr1::placeholders::_1, preload, normUnc, wrench, false);
+  int result = refinementSolver(S, formulation, coneTol);
+  g->getObject()->redrawFrictionCones();
   if (result) return result;
-  Matrix beta_t(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
-  if (beta_p.rows() == beta_t.rows())
-    Matrix beta_t(matrixAdd(beta_t, beta_p));
-  if (S.var.find("tau") != S.var.end()) {
-    Matrix tau(S.sol.getSubMatrixBlockIndices(S.var["tau"], 0));
-    DBGA("Joint torques: " << tau.transposed());
-  }
-  drawContactWrenches(beta_t);
+
+  Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
+  drawContactWrenches(beta);
   drawObjectMovement(S);
   return result;
 }
-int 
-GraspSolver::checkWrenchNonIterative(Matrix &preload, const Matrix &wrench, 
-  const Matrix &beta_p, bool tendon, bool rigid) 
+
+double
+GraspSolver::findMaximumWrenchRefinement(Matrix &preload, const Matrix &direction, double coneTol/*=1.0*/, double normUnc/*=2.5*/)
 {
-  GraspStruct P;
+  removeJointsBeyondContact(joints, contacts, preload);
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    (*it)->setUpFrictionEdges();
+    (*it)->getMate()->setUpFrictionEdges();
+  }
+  modifyFrictionEdges(coneTol);
+
   SolutionStruct S;
-  if (tendon) nonIterativeTendonFormulation(P, preload, wrench, beta_p);
-  else nonIterativeFormulation(P, preload, wrench, beta_p, rigid);
-  return solveProblem(P, S); 
+  std::tr1::function<void(GraspStruct&)> formulation
+    = std::tr1::bind(&GraspSolver::refinementFormulationFindMax, this, 
+      std::tr1::placeholders::_1, preload, normUnc, direction, false);
+  int result = refinementSolver(S, formulation, coneTol);
+  g->getObject()->redrawFrictionCones();
+  if (result) return 0.0;
+
+  Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
+  drawContactWrenches(beta);
+  drawObjectMovement(S);
+  Matrix r(S.sol.getSubMatrixBlockIndices(S.var["r"], 0));
+  return direction.fnorm() - r.fnorm();
+}
+
+Matrix
+GraspSolver::optimalPreloads(Matrix &preload, const Matrix &wrench, double coneTol/*=1.0*/, double normUnc/*=2.5*/)
+{
+  removeJointsBeyondContact(joints, contacts, preload);
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    (*it)->setUpFrictionEdges();
+    (*it)->getMate()->setUpFrictionEdges();
+  }
+  modifyFrictionEdges(coneTol);
+
+  SolutionStruct S;
+  std::tr1::function<void(GraspStruct&)> formulation
+    = std::tr1::bind(&GraspSolver::refinementFormulationPreload, this, 
+      std::tr1::placeholders::_1, preload, normUnc, wrench, false);
+  int result = refinementSolver(S, formulation, coneTol);
+  g->getObject()->redrawFrictionCones();
+  if (result) return Matrix(0,0);
+
+  Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
+  drawContactWrenches(beta);
+  drawObjectMovement(S);
+
+  Matrix tau(S.sol.getSubMatrixBlockIndices(S.var["tau"], 0));
+  Matrix optPreload(preload);
+  int i,j;
+  for (i=j=0; i<preload.rows(); i++)
+    if (optPreload.elem(i,0) < 0)
+      optPreload.elem(i,0) = tau.elem(j++,0);
+  return optPreload;
 }
 
 int
@@ -1578,62 +1578,6 @@ GraspSolver::checkWrenchIterative(Matrix &preload, const Matrix &wrench,
 }
 
 double
-GraspSolver::findMaximumWrenchNonIterative(Matrix &preload, const Matrix &direction,
-  bool single_step, bool tendon /*=false*/, bool rigid /*= false*/)
-{
-  if (removeJointsBeyondContact(joints, contacts, preload))
-    if (tendon) {
-      DBGA("Removed joint beyond contact. For underactuated hands this is not allowed");
-      exit(0);
-    }
-
-  std::tr1::function<int(const Matrix&)> func;
-  if (single_step) {
-    /*func = std::tr1::bind((int(GraspSolver::*)(Matrix&,const Matrix&,bool,bool,bool))&GraspSolver::checkWrenchNonIterative, 
-      this, preload, std::tr1::placeholders::_1, single_step, tendon, false);*/
-    std::list<Contact*>::iterator it;
-    for (it=contacts.begin(); it!=contacts.end(); it++) {
-      (*it)->setUpFrictionEdges();
-      (*it)->getMate()->setUpFrictionEdges();
-    }
-    modifyFrictionEdges();
-    SolutionStruct S;
-    PROF_START_TIMER(TIMER);
-    frictionRefinementSolver(S, preload, direction, true);
-    PROF_STOP_TIMER(TIMER);
-    PROF_PRINT(TIMER);
-    Matrix beta(S.sol.getSubMatrixBlockIndices(S.var["beta"], 0));
-    Matrix r(S.sol.getSubMatrixBlockIndices(S.var["r"], 0));
-    g->getObject()->redrawFrictionCones();
-    drawContactWrenches(beta);
-    drawObjectMovement(S);
-    return direction.fnorm() - r.fnorm();
-  } else {
-    GraspStruct P_p;
-    SolutionStruct S_p;
-    if (tendon) nonIterativeTendonFormulation(P_p, preload);
-    else nonIterativeFormulation(P_p, preload);
-    int preload_result = solveProblem(P_p, S_p);
-    if (preload_result) {
-      DBGA("Preload creation failed");
-      return preload_result;
-    }
-    Matrix beta_p(S_p.sol.getSubMatrixBlockIndices(S_p.var["beta"], 0));
-    func = std::tr1::bind((int(GraspSolver::*)(Matrix&,const Matrix&,const Matrix&,bool,bool))&GraspSolver::checkWrenchNonIterative, 
-      this, preload, std::tr1::placeholders::_1, beta_p, tendon, rigid); 
-  }
-
-  double max = Matrix::binarySearch(func, direction, BIN_ULIMIT);
-  Matrix wrench(direction);
-  wrench.multiply(max);
-  if (checkWrenchNonIterative(preload, wrench, single_step, tendon, rigid)) {
-    DBGA("Failed maximum resistible wrench returned by the binary search!");
-    assert(0);
-  }
-  return max;
-}
-
-double
 GraspSolver::findMaximumWrenchIterative(Matrix &preload, const Matrix &direction,
   bool single_step, bool cone_movement, bool tendon /*=false*/, bool rigid /*= false*/)
 {
@@ -1683,31 +1627,11 @@ GraspSolver::findMaximumWrenchIterative(Matrix &preload, const Matrix &direction
   return max;
 }
 
-int 
-GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool iterative, 
-  bool cone_movement, bool rigid)
+void
+GraspSolver::create2DMapRefinement(Matrix &preload, const Matrix &direction1, const Matrix &direction2,
+  std::ofstream &file, double coneTol/*=1.0*/, double normUnc/*=2.5*/)
 {
-  int numPreloadVar = 0;
-  for (int i=0; i<preload.rows(); i++) {
-    if (preload.elem(i,0) < 0) numPreloadVar++;
-  }
-
-  std::ofstream output;
-  output.open("./log/2Dmap.txt");
-  output << "d1, d2";
-  for (int i=0; i<numPreloadVar; i++) {
-    output << ", t" << i;
-  }
-  output << std::endl;
-
-  // Directions defining the plane in which to create the 2D map. If there
-  // is a lot of detail in one direction specifically and you want a higher
-  // density of points in that direction, you can increase the magnitude of
-  // the vector defining that direction
-  Matrix direction1(Matrix::ZEROES<Matrix>(6,1));
-  Matrix direction2(Matrix::ZEROES<Matrix>(6,1));
-  direction1.elem(0,0) = 1;
-  direction2.elem(1,0) = 1;
+  file << "d1, d2" << std::endl;
 
   int directionSteps = 360;
   for (int i=0; i<directionSteps; i++) {
@@ -1719,37 +1643,45 @@ GraspSolver::create2DMap(Matrix &preload, bool single_step, bool tendon, bool it
 
     Matrix direction(matrixAdd(xcomponent, ycomponent));
     direction.multiply(1.0 / direction.fnorm());
-    if (!numPreloadVar) {
-      double max;
-      if (iterative) max = findMaximumWrenchIterative(preload, direction, single_step, cone_movement, tendon, rigid);  
-      else max = findMaximumWrenchNonIterative(preload, direction, single_step, tendon, rigid);
+    double max = findMaximumWrenchRefinement(preload, direction, coneTol, normUnc);
 
-      Matrix w_max(2,1);
-      w_max.elem(0,0) = sin(2*M_PI*i/directionSteps) * direction1.fnorm();
-      w_max.elem(1,0) = cos(2*M_PI*i/directionSteps) * direction2.fnorm();
-      w_max.multiply(max/w_max.fnorm());
-      output << -w_max.elem(0,0) << ", " << -w_max.elem(1,0) << "\n";
-    } else {
-      std::list<Contact*>::iterator it;
-      for (it=contacts.begin(); it!=contacts.end(); it++) {
-        (*it)->setUpFrictionEdges();
-        (*it)->getMate()->setUpFrictionEdges();
-      }
-      modifyFrictionEdges();
-      SolutionStruct S;
-      int result = frictionRefinementSolver(S, preload, direction);
-      Matrix tau(S.sol.getSubMatrixBlockIndices(S.var["tau"], 0));
-      output << sin(2*M_PI*i/directionSteps) << ", " << cos(2*M_PI*i/directionSteps);
-      for (int j=0; j<numPreloadVar; j++) {
-        output << ", " << tau.elem(j,0);
-      }
-      output << std::endl;
-    }
+    Matrix w_max(2,1);
+    w_max.elem(0,0) = sin(2*M_PI*i/directionSteps);
+    w_max.elem(1,0) = cos(2*M_PI*i/directionSteps);
+    w_max.multiply(max);
+    file << -w_max.elem(0,0) << ", " << -w_max.elem(1,0) << "\n";
 
     DBGA("---------------- Iteration " << i+1 << "/" << directionSteps << " complete");
   }
-  output.close();
-  return 1;
+}
+
+void
+GraspSolver::create2DMapIterative(Matrix &preload, const Matrix &direction1, const Matrix &direction2,
+  std::ofstream &file, bool single_step/*=false*/, bool cone_movement/*=false*/, bool tendon/*=false*/,
+  bool rigid/*=false*/)
+{
+  file << "d1, d2" << std::endl;
+
+  int directionSteps = 360;
+  for (int i=0; i<directionSteps; i++) {
+
+    Matrix xcomponent(direction1);
+    Matrix ycomponent(direction2);
+    xcomponent.multiply(sin(2*M_PI*i/directionSteps));
+    ycomponent.multiply(cos(2*M_PI*i/directionSteps));
+
+    Matrix direction(matrixAdd(xcomponent, ycomponent));
+    direction.multiply(1.0 / direction.fnorm());
+    double max = findMaximumWrenchIterative(preload, direction, single_step, cone_movement, tendon, rigid);  
+
+    Matrix w_max(2,1);
+    w_max.elem(0,0) = sin(2*M_PI*i/directionSteps);
+    w_max.elem(1,0) = cos(2*M_PI*i/directionSteps);
+    w_max.multiply(max);
+    file << -w_max.elem(0,0) << ", " << -w_max.elem(1,0) << "\n";
+
+    DBGA("---------------- Iteration " << i+1 << "/" << directionSteps << " complete");
+  }
 }
 
 
@@ -1855,20 +1787,12 @@ GraspSolver::solveProblem(GraspStruct &P, SolutionStruct &S)
     Matrix RT(Grasp::graspMapMatrix(R).transposed());
     Matrix K(matrixMultiply(N, RT));
     Matrix NJ(matrixMultiply(N, J));
-    Matrix E(tangentialDisplacementSummationMatrix(contacts));
-
-    K.multiply(cos(kNormalUncertainty));
-    NJ.multiply(cos(kNormalUncertainty));
-    E.multiply(sin(kNormalUncertainty));
 
     Matrix q(S.sol.getSubMatrixBlockIndices(S.var["q"], 0));
     Matrix x(S.sol.getSubMatrixBlockIndices(S.var["x"], 0));
-    Matrix alpha(S.sol.getSubMatrixBlockIndices(S.var["alpha"], 0));
     Matrix Kx(matrixMultiply(K, x));
     Matrix NJq(matrixMultiply(NJ, q));
-    Matrix Ealpha(matrixMultiply(E, alpha));
-    Matrix springs(matrixAdd(matrixMultiply(NJ, q), matrixMultiply(K, x).negative()));
-    Matrix k(matrixAdd(springs, matrixMultiply(E, alpha)));
+    Matrix k(matrixAdd(matrixMultiply(NJ, q), matrixMultiply(K, x).negative()));
     if (k.max() > kVirtualLimitTolerance * KMax) {
       DBGA("k (" << k.max() 
         << ") is larger than " << kVirtualLimitTolerance << " of the virtual limit ("
@@ -1912,7 +1836,7 @@ GraspSolver::setVirtualLimits(const Matrix &preload, const Matrix &wrench /*=ZER
 }
 
 void
-GraspSolver::modifyFrictionEdges()
+GraspSolver::modifyFrictionEdges(double coneTol)
 {
   std::list<Contact*>::iterator it;
   for (it=contacts.begin(); it!=contacts.end(); it++) {
@@ -1929,7 +1853,7 @@ GraspSolver::modifyFrictionEdges()
         do {
           angle /= 2;
           mult *= cos(angle);
-        } while(angle > kFrictionConeTolerance / 2.0);
+        } while(angle > coneTol / 2.0);
       } else continue;
       (*it)->frictionEdges[6*i]   /= mult;
       (*it)->frictionEdges[6*i+1] /= mult;

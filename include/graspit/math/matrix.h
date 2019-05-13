@@ -102,6 +102,8 @@ class Matrix {
     int mRows, mCols;
   public:
     enum Type {DENSE, SPARSE};
+    //! An empty matrix
+    Matrix() {initialize(0,0);}
     //! A matrix of the given size with unspecified contents
     Matrix(int m, int n);
     //! A matrix of the given size in terms of block indices

@@ -17,9 +17,9 @@
 // You should have received a copy of the GNU General Public License
 // along with GraspIt!.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Author(s): Maximilian K.G. Haas-Heger and Matei T. Ciocarlie
+// Author(s): Maximilian K.G. Haas-Heger
 //
-// $Id: gws.h,v 1.9 2016/07/25 15:21:24 mkghaas Exp $
+// $Id: graspSolver.h,v 1.9 2016/07/25 15:21:24 mkghaas Exp $
 //
 //######################################################################
 
@@ -32,11 +32,11 @@
 #include <fstream>
 #include <tr1/functional>
 
+#include "graspit/joint.h"
 #include "graspit/grasp.h"
 #include "graspit/robot.h"
 #include "graspit/robots/humanHand.h"
 #include "graspit/contact/contact.h"
-#include "graspit/joint.h"
 #include "graspit/math/matrix.h"
 
 // struct that holds all the elements necessary to completely define a 
@@ -44,8 +44,8 @@
 struct GraspStruct {
 
   // Pointers to objective Matrices
-  Matrix Q = Matrix(0,0);
-  Matrix cj = Matrix(0,0);
+  Matrix Q;
+  Matrix cj;
 
   // lists that contain matrices defining the constraints
   // Linear Equality
@@ -86,7 +86,7 @@ struct GraspStruct {
 // struct that stores the solution of an optimization problem
 struct SolutionStruct {
   // pointer to matrix containing the solution
-  Matrix sol = Matrix(0,0);
+  Matrix sol;
   // block indices for unknowns
   std::vector<int> block_cols;
   // map that allows translating variable names to matrix block indices
@@ -101,26 +101,27 @@ class GraspSolver {
 public:
   GraspSolver(Grasp *grasp);
 
-  // Check if a graps can withstand a given wrench using the non-iterative formulation
-  int checkWrenchNonIterative(Matrix &preload, 
-                              const Matrix &wrench, 
-                              bool single_step,
-                              bool tendon=false,
-                              bool rigid=false);
-  // Check if a grasp can withstand a given wrench using the iterative formulation
+  // Check if a graps can withstand a given wrench using the refinement solver
+  int checkWrenchRefinement(Matrix &preload, const Matrix &wrench, double coneTol = 1.0, double normUnc = 2.5);
+  // Find maximum wrench a grasp can withstand along a given direction using the refinement solver
+  double findMaximumWrenchRefinement(Matrix &preload, const Matrix &direction, double coneTol = 1.0, double normUnc = 2.5);
+  // Find optimal joint preloads that balance given wrench
+  Matrix optimalPreloads(Matrix &preload, const Matrix &wrench, double coneTol = 1.0, double normUnc = 2.5);
+  // Creates a 2D map of maximum resistible wrenches with the refinement solver
+  void create2DMapRefinement(Matrix &preload,
+                             const Matrix &direction1,
+                             const Matrix &direction2,
+                             std::ofstream &file,
+                             double coneTol = 1.0,
+                             double normUnc = 2.5);
+
+  // Check if a grasp can withstand a given wrench using the iterative solver
   int checkWrenchIterative(Matrix &preload, 
                            const Matrix &wrench,
                            bool single_step, 
                            bool cone_movement,
                            bool tendon=false,
                            bool rigid=false);
-
-  // Find maximum wrench a grasp can withstand along a given direction using the non-iterative formulation
-  double findMaximumWrenchNonIterative(Matrix &preload, 
-                                       const Matrix &direction,
-                                       bool single_step,
-                                       bool tendon=false,
-                                       bool rigid=false);
   // Find maximum wrench a grasp can withstand along a given direction using the iterative formulation
   double findMaximumWrenchIterative(Matrix &preload, 
                                     const Matrix &direction,
@@ -128,18 +129,17 @@ public:
                                     bool cone_movement,
                                     bool tendon=false,
                                     bool rigid=false);
-
-  // Creates a 2D map of maximum resistible wrenches for a sampling of directions in the plane of the two directions given
-  int create2DMap(Matrix &preload, 
-                  bool single_step, 
-                  bool tendon,
-                  bool iterative, 
-                  bool cone_movement,
-                  bool rigid);
+  // Creates a 2D map of maximum resistible wrenches with the iterative solver
+  void create2DMapIterative(Matrix &preload,
+                            const Matrix &direction1,
+                            const Matrix &direction2,
+                            std::ofstream &file,
+                            bool single_step = false, 
+                            bool cone_movement = false,
+                            bool tendon = false,
+                            bool rigid = false);
 
   static const double kSpringStiffness;
-  static const double kNormalUncertainty;
-  static const double kFrictionConeTolerance;
 
   static const double kBetaMaxBase;
   static const double kTauMaxBase;
@@ -197,7 +197,7 @@ private:
   // normal forces at contacts are determined by the deformation of virtual springs
   void virtualSpringConstraint(GraspStruct &P, const Matrix &beta_p);
   // normal forces at contacts are determined by the deformation of virtual springs (expressed as indicator constraint)
-  void virtualSpringIndicatorConstraint(GraspStruct &P);
+  void virtualSpringIndicatorConstraint(GraspStruct &P, double normUnc);
   // joints may only move at their prescribed preload torque
   void nonBackdrivableJointConstraint(GraspStruct &P, const Matrix &preload, const Matrix &beta_p);
   // joints may only move at their prescribed preload torque (expressed as indicator constraint)
@@ -205,7 +205,7 @@ private:
   // constraint modeling tendon actuation
   void tendonConstraint(GraspStruct &P, const Matrix &preload, const Matrix &beta_p);
   // constraint forcing frictional forces inside the friction cone
-  void frictionConeConstraint(GraspStruct &P, const Matrix &beta_p);
+  void frictionConeConstraint(GraspStruct &P, const Matrix &beta_p = Matrix(0,0));
   // constraint forcing frictional forces on the edge of the friction cone
   void frictionConeEdgeConstraint(GraspStruct &P, const Matrix &beta_p);
   // constraint forcing frictional forces on the edge of the friction cone (expressed as indicator constraint)
@@ -215,7 +215,7 @@ private:
   //  constraint that determines if a contact experiences relative motion (expressed as indicator constraint)
   void contactMovementIndicatorConstraint(GraspStruct &P);
   // a SOS2 constraint to ensure friction opposes motion
-  void amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p);
+  void amplitudesSOS2Constraint(GraspStruct &P, const Matrix &beta_p = Matrix(0,0));
   // constraint that keeps a variable v lower bounded by the largest preload torque
   void preloadTorqueLBConstraint(GraspStruct &P);
   // constraint that keeps a variable v lower bounded by the largest relative approach of a variable to its virtual limit
@@ -224,12 +224,21 @@ private:
   void objectMotionLimit(GraspStruct &P);
 
   // solution bounds and types
-  void variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p);
+  void variableBoundsAndTypes(GraspStruct &P, const Matrix &beta_p = Matrix(0,0));
 
   // Methods that construct the problems to be solved by the optimization solver
-  // Construct an optimization problem with the non-iterative formulation
-  void nonIterativeFormulation(GraspStruct &P, const Matrix &preload, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1), 
-    const Matrix &beta = Matrix(0,0), bool rigid=false, bool findMax=false);
+  // Variables necessary for a base problem for the refinement solver
+  void refinementBaseVariables(GraspStruct &P);
+  // Constraints necessary for a base problem for the refinement solver
+  void refinementBaseConstraints(GraspStruct &P, const Matrix &preload, double normUnc, bool rigid);
+  // Construct an equilibrium problem for the refinement solver
+  void refinementFormulationEquilibrium(GraspStruct &P, const Matrix &preload, double normUnc, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1), 
+    bool rigid=false);
+  // Construct a maximum wrench problem for the refinement solver
+  void refinementFormulationFindMax(GraspStruct &P, const Matrix &preload, double normUnc, const Matrix &direction, bool rigid=false);
+  // Construct an optimal preload problem for the refinement solver
+  void refinementFormulationPreload(GraspStruct &P, const Matrix &preload, double normUnc, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1), 
+    bool rigid=false);
   // Construct an optimization problem with constraints specific to a tendon actuated hand
   void nonIterativeTendonFormulation(GraspStruct &P, const Matrix &preload, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1), 
     const Matrix &beta = Matrix(0,0));
@@ -240,9 +249,9 @@ private:
   void iterativeTendonFormulation(GraspStruct &P, const Matrix &preload, const Matrix &startingX, const Matrix &movement_directions, 
     const Matrix &wrench, const Matrix &beta);
 
-  // Solver for non-iterative formulations
-  int frictionRefinementSolver(SolutionStruct &S, Matrix &preload, const Matrix &wrench, bool findMax=false);
-  // Solver for iterative formulations
+  // Refinement solver. Must be passed appropriately formulated problems
+  int refinementSolver(SolutionStruct &S, std::tr1::function<void(GraspStruct&)> formulation, double coneTol);
+  // Iterative solver. Must be passed appropriately formulated problems
   int iterativeSolver(SolutionStruct &S, bool cone_movement, 
     std::tr1::function<void(GraspStruct&,const Matrix&,const Matrix&)> formulation);
 
@@ -260,7 +269,7 @@ private:
 
   void setVirtualLimits(const Matrix &preload, const Matrix &wrench = Matrix::ZEROES<Matrix>(6,1));
 
-  void modifyFrictionEdges();
+  void modifyFrictionEdges(double coneTol);
   void systemEnergyError(SolutionStruct &S, const Matrix &preload, const Matrix &wrench, double *e, bool findMax = false); 
   bool removeJointsBeyondContact(std::list<Joint*> &joints, const std::list<Contact*> &contacts, 
   Matrix &preload);
