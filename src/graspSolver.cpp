@@ -1075,8 +1075,14 @@ void
 GraspSolver::iterativeFormulation(GraspStruct &P, const Matrix &preload, const Matrix &startingX, 
   const Matrix &movement_directions, const Matrix &wrench, const Matrix &beta, bool rigid) 
 {
+  int totalFrictionEdges = 0;
+  std::list<Contact*>::iterator it;
+  for (it=contacts.begin(); it!=contacts.end(); it++) {
+    totalFrictionEdges += (*it)->numFrictionEdges+1;
+  }
+
   // unknowns
-  P.var["beta"]  = 0; P.block_cols.push_back(9*numContacts); P.varNames.push_back("beta");
+  P.var["beta"]  = 0; P.block_cols.push_back(totalFrictionEdges); P.varNames.push_back("beta");
   P.var["x"]     = 1; P.block_cols.push_back(6);             P.varNames.push_back("x");
   P.var["q"]     = 2; P.block_cols.push_back(numJoints);     P.varNames.push_back("q");
   P.var["y1"]    = 3; P.block_cols.push_back(numContacts);   P.varNames.push_back("y1");
@@ -1089,7 +1095,7 @@ GraspSolver::iterativeFormulation(GraspStruct &P, const Matrix &preload, const M
   setVirtualLimits(preload, wrench);
 
   // Preload contact forces (if present)
-  Matrix beta_p( Matrix::ZEROES<Matrix>(9*numContacts,1) );
+  Matrix beta_p( Matrix::ZEROES<Matrix>(totalFrictionEdges,1) );
   if (beta.rows()) beta_p.copyMatrix(beta);
 
   // Objective
