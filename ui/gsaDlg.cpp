@@ -371,7 +371,7 @@ GSADlg::resMapSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl)
 
   forceLayout->addWidget(new QLabel(QString("Output file:")));
   std::stringstream default_filename;
-  default_filename << std::getenv("GRASPIT") << "resistible_wreches.csv";
+  default_filename << std::getenv("GRASPIT") << "resistible_wrenches.csv";
   mParams->fileInput = new QLineEdit();
   mParams->fileInput->setText(default_filename.str().c_str());
   forceLayout->addWidget(mParams->fileInput);
