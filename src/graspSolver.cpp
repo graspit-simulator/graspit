@@ -1657,7 +1657,7 @@ GraspSolver::create2DMapRefinement(Matrix &preload, const Matrix &direction1, co
     w_max.multiply(max);
     file << -w_max.elem(0,0) << ", " << -w_max.elem(1,0) << "\n";
 
-    DBGA("---------------- Iteration " << i+1 << "/" << directionSteps << " complete");
+    DBGA("Iteration " << i+1 << "/" << directionSteps << ": " << max);
   }
 }
 

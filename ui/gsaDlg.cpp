@@ -371,7 +371,7 @@ GSADlg::resMapSettingsArea(QHBoxLayout *hl, QVBoxLayout *vl)
 
   forceLayout->addWidget(new QLabel(QString("Output file:")));
   std::stringstream default_filename;
-  default_filename << std::getenv("GRASPIT") << "resistible_wrenches.csv";
+  default_filename << std::getenv("GRASPIT") << "/build/resistible_wrenches.csv";
   mParams->fileInput = new QLineEdit();
   mParams->fileInput->setText(default_filename.str().c_str());
   forceLayout->addWidget(mParams->fileInput);
@@ -468,7 +468,7 @@ GSADlg::solveButtonClicked()
     int i,j;
     for (i=j=0; it!=mParams->PlaneInput.end(); i++, it++) {
       if ((*it)->isChecked() && j==0) {direction1.elem(i,0) = 1.0; j++;}
-      if ((*it)->isChecked() && j==1) {direction2.elem(i,0) = 1.0; j++;}
+      else if ((*it)->isChecked() && j==1) {direction2.elem(i,0) = 1.0; j++;}
     }
   } else {
     std::list<QLineEdit*>::iterator it=mParams->WrenchInput.begin();
