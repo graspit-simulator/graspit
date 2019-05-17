@@ -46,7 +46,6 @@
 
 #include "graspit/grasp.h"
 #include "graspit/gws.h"
-#include "graspit/math/matrix.h"
 #include "graspit/robot.h"
 
 #include <limits>

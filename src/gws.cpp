@@ -496,7 +496,7 @@ GWS::buildHyperplanesFromWrenches(void *wr, int numWrenches,
     if (useDimensions[d]) { dimensions++; }
   }
 
-  sprintf(options, "qhull Pp n Qx C-0.0001");
+  sprintf(options, "qhull Pp n Qx QJ C-0.0001");
   qh_initflags(options);
   qh_init_B(&wrenches[0], numWrenches, dimensions, ismalloc);
   qh_qhull();

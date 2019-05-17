@@ -165,6 +165,7 @@ set (GRASPIT_INCLUDEDIR_HEADERS
     ${GSRC}/include/graspit/gloveInterface.h
     ${GSRC}/include/graspit/grasp.h
     ${GSRC}/include/graspit/graspRecord.h
+    ${GSRC}/include/graspit/graspSolver.h
     ${GSRC}/include/graspit/gws.h
     ${GSRC}/include/graspit/gwsprojection.h
     ${GSRC}/include/graspit/ivmgr.h
@@ -430,6 +431,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/graspitServer.cpp 
     ${GSRC}/src/graspitApp.cpp 
     ${GSRC}/src/graspRecord.cpp 
+    ${GSRC}/src/graspSolver.cpp 
     ${GSRC}/src/gws.cpp 
     ${GSRC}/src/gwsprojection.cpp 
     ${GSRC}/src/ivmgr.cpp 
@@ -605,11 +607,11 @@ if(OPTIMIZATION_SOLVER STREQUAL GUROBI)
         ${GSRC}/src/math/gurobi.cpp
         )
     find_library(GUROBI_CPP_LIBRARIES
-        NAMES gurobi_c++
+        NAMES gurobi_g++5.2
         PATHS ${GUROBI_ROOT}/lib/
     )
     find_library(GUROBI_LIBRARIES
-        NAMES gurobi65
+        NAMES gurobi81
         PATHS ${GUROBI_ROOT}/lib/
     )
 endif(OPTIMIZATION_SOLVER STREQUAL GUROBI)
@@ -639,6 +641,7 @@ set (GRASPIT_FORMS
     ${GSRC}/ui/contactExaminerDlg.ui 
     ${GSRC}/ui/eigenGraspDlg.ui 
     ${GSRC}/ui/gfoDlg.ui 
+    ${GSRC}/ui/gsaDlg.ui 
     ${GSRC}/ui/gloveCalibrationDlg.ui 
     ${GSRC}/ui/graspCaptureDlg.ui 
     ${GSRC}/ui/gwsProjDlgBase.ui 
@@ -658,6 +661,7 @@ set (GRASPIT_FORM_HEADERS
     ${GSRC}/ui/contactExaminerDlg.h 
     ${GSRC}/ui/eigenGraspDlg.h 
     ${GSRC}/ui/gfoDlg.h 
+    ${GSRC}/ui/gsaDlg.h 
     ${GSRC}/ui/gloveCalibrationDlg.h 
     ${GSRC}/ui/graspCaptureDlg.h 
     ${GSRC}/ui/gwsProjDlg.h 
@@ -676,6 +680,7 @@ set (GRASPIT_FORM_SOURCES
     ${GSRC}/ui/contactExaminerDlg.cpp 
     ${GSRC}/ui/eigenGraspDlg.cpp 
     ${GSRC}/ui/gfoDlg.cpp 
+    ${GSRC}/ui/gsaDlg.cpp 
     ${GSRC}/ui/gloveCalibrationDlg.cpp 
     ${GSRC}/ui/graspCaptureDlg.cpp 
     ${GSRC}/ui/gwsProjDlg.cpp 
@@ -699,6 +704,7 @@ set (MOC_HEADERS
     ${GSRC}/ui/contactExaminerDlg.h
     ${GSRC}/ui/settingsDlg.h
     ${GSRC}/ui/gfoDlg.h
+    ${GSRC}/ui/gsaDlg.h
     ${GSRC}/ui/qmDlg.h
     ${GSRC}/ui/gwsProjDlg.h
 )

@@ -1414,8 +1414,25 @@ Grasp::stiffnessMatrix(const std::list<Joint*> &joints,
   Matrix H(contactModelMatrix(numContacts, states));
 
   // Finger tip compliance
-  Matrix Cs(Matrix::EYE(6*numContacts, 6*numContacts));
-  for (int i=0; i<numContacts; i++) Cs.elem(6*i+2, 6*i+2) = 0.2;  
+  Matrix Cs(Matrix::ZEROES<Matrix>(6*numContacts, 6*numContacts));
+  std::list<Contact*>::const_iterator it = contacts.begin();
+  for (int i=0; it!=contacts.end(); i++, it++) {
+    double normalCompl = (*it)->getBody1()->getNormalCompl();
+    double shearCompl = (*it)->getBody1()->getShearCompl();
+    if (normalCompl > 0) {
+      Cs.elem(6*i+2, 6*i+2) = normalCompl;
+    } else {
+      Cs.elem(6*i+2, 6*i+2) = 1.0;
+    }
+    if (shearCompl > 0) {
+      Cs.elem(6*i, 6*i) = shearCompl;
+      Cs.elem(6*i+1, 6*i+1) = shearCompl;
+    } else {
+      Cs.elem(6*i, 6*i) = 1.0;
+      Cs.elem(6*i+1, 6*i+1) = 1.0;
+    }
+  }
+
   // Joint compliance
   Matrix Cq(Matrix::ZEROES<Matrix>(numJoints, numJoints));
   Matrix J(contactJacobian(joints, contacts));
@@ -1658,16 +1675,18 @@ Grasp::displayContactWrenches(std::list<Contact *> *contacts,
   for (it = contacts->begin(); it != contacts->end(); it++, count++) {
     Contact *contact = *it;
     if (contact->getBody2()->isDynamic()) {
+      Matrix linkFrame(contact->localToWorldWrenchMatrix());
+      Matrix bodyFrame(contact->getMate()->localToWorldWrenchMatrix());
+      Matrix bodyInv(bodyFrame);
+      matrixInverse(bodyFrame, bodyInv);
+      Matrix transform(matrixMultiply(bodyInv, linkFrame));
+      Matrix linkWrench(contactWrenches.getSubMatrix(6*count, 0, 6, 1));
+      Matrix bodyWrench(matrixMultiply(transform, linkWrench));
       //wrench is also scaled down for now for rendering and output purposes
-      //we also transform the wrench to the mate's coordinate system, which
-      //usually involves negating the x and z axes
       double dynWrench[6];
       for (int i = 0; i < 6; i++) {
-        dynWrench[i] = -1.0 * 1.0e-6 * contactWrenches.elem(6 * count + i, 0);
+        dynWrench[i] = 1.0e-6 * bodyWrench.elem(i, 0);
       }
-      //the y axis is not negated
-      dynWrench[1] = -1.0 * dynWrench[1];
-      dynWrench[4] = -1.0 * dynWrench[4];
       contact->getMate()->setDynamicContactWrench(dynWrench);
     }
   }

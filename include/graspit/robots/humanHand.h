@@ -57,6 +57,28 @@ class SoTransform;
 class SoDrawStyle;
 class Tendon;
 
+class JointPulley {
+private:
+  Tendon *mOwner;
+  //! Robot chain number that pulley is attached to
+  int mChain;
+  //! Joint number for the joint that the pulley is on
+  int mJoint;
+  //! Radius of pulley
+  double mRadius;
+
+public:
+
+  JointPulley(Tendon* myOwner, int chain, int joint, double radius) : 
+    mOwner(myOwner), mChain(chain), mJoint(joint), mRadius(radius) {}
+
+  Tendon* getTendon(){return mOwner;}
+
+  int getChainNum(){return mChain;}
+  int getJointNum(){return mJoint;}
+  double getRadius(){return mRadius;}
+};
+
 /*! An insertion point is a point where a tendon inserts into, or
   changes direction on a link of a robot. Currently it is the
   only way to change the routing of a tendon, as intersection
@@ -240,6 +262,9 @@ class Tendon {
     /*! This has to be a list because we create ins points dynamically when wrapping around wrappers. */
     std::list<TendonInsertionPoint *> mInsPointList;
 
+    //! The list of joint pulleys that the tendon passes through
+    std::vector<JointPulley *> mJointPulleyVec;
+
     QString mTendonName;
 
     bool mVisible;
@@ -311,6 +336,10 @@ class Tendon {
 
     //! Returns the n-th permanent insertion point
     TendonInsertionPoint *getPermInsPoint(int n);
+
+    int getNumJointPulleys() const {return mJointPulleyVec.size();}
+
+    JointPulley *getJointPulley(int i){return mJointPulleyVec[i];}
 
     //! Returns total friction acting along the tendon
     double getTotalFrictionCoefficient();

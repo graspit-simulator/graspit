@@ -431,6 +431,7 @@
         <addaction name="graspQualityMeasuresAction" />
         <addaction name="graspPlannerAction" />
         <addaction name="graspGFOAction" />        
+        <addaction name="graspStabilityAction" />        
         <addaction name="separator" />
         <addaction name="graspEigenGrasp_InterfaceAction" />
         <addaction name="graspEigenGrasp_PlannerAction" />
@@ -704,6 +705,17 @@
       </property>
       <property name="text" >
         <string>Grasp Force Optimization...</string>
+      </property>
+    </action>
+    <action name="graspStabilityAction" >
+      <property name="name" >
+        <cstring>graspStabilityAction</cstring>
+      </property>
+      <property name="iconText" >
+        <string>Grasp Stability Analysis...</string>
+      </property>
+      <property name="text" >
+        <string>Grasp Stability Analysis...</string>
       </property>
     </action>
     <action name="graspCompliantPlannerAction" >

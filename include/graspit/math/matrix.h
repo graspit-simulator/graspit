@@ -102,6 +102,8 @@ class Matrix {
     int mRows, mCols;
   public:
     enum Type {DENSE, SPARSE};
+    //! An empty matrix
+    Matrix() {initialize(0,0);}
     //! A matrix of the given size with unspecified contents
     Matrix(int m, int n);
     //! A matrix of the given size in terms of block indices
@@ -173,6 +175,8 @@ class Matrix {
       blockIndicesToRealIndices(i, j, startRow, startCol, numRows, numCols);
       return getSubMatrix(startRow, startCol, numRows, numCols);
     }
+
+    Matrix &operator=(const Matrix &M);
 
     friend std::ostream &operator<<(std::ostream &os, const Matrix &m);
     void print(FILE *fp = stderr, std::string name = "") const;
@@ -433,15 +437,16 @@ int LPSolver(const Matrix &cj,
 void testLP();
 //! Gurobi Solver
 int MIPSolver(const Matrix &Q, const Matrix &c, 
-                 const Matrix &Eq, const Matrix &b, 
-                 const Matrix &InEq, const Matrix &ib, 
-                 std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
-                 std::vector<int> &SOS_index, std::vector<int> &SOS_len, std::vector<int> &SOS_type, 
-                 const Matrix &lowerBounds, const Matrix &upperBounds,
-                 Matrix &sol, const Matrix &types, double *objVal);
+              const Matrix &Eq, const Matrix &b, 
+              const Matrix &InEq, const Matrix &ib, 
+              const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+              const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &indic_var, const std::list<int> &indic_val, const std::list<std::string> &indic_sense,
+              const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type, 
+              const Matrix &lowerBounds, const Matrix &upperBounds,
+              Matrix &sol, const Matrix &types, double *objVal);
 
-//! A simple test to check the Gurobi solver works
-void testGurobi();
+//! A simple test to check the MIP solver works
+void testMIP();
 
 template <class MatrixType>
 MatrixType Matrix::ZEROES(int m, int n)

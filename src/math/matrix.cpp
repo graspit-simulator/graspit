@@ -740,6 +740,18 @@ SparseMatrix::transpose()
   }
 }
 
+Matrix &
+Matrix::operator=(const Matrix &M)
+{
+  resize(M.rows(), M.cols());
+  if (mRows) {
+    memcpy(mData, M.mData, mRows*mCols*sizeof(double));
+  }
+  mBlocksNumRows = M.mBlocksNumRows;
+  mBlocksNumCols = M.mBlocksNumCols;
+  return *this; 
+}
+
 std::ostream &
 operator<<(std::ostream &os, const Matrix &m)
 {
@@ -1205,16 +1217,9 @@ int QPSolver(const Matrix &Q, const Matrix &cj, const Matrix &Eq,
                                       lowerBounds, upperBounds, sol,
                                       objVal);
 #elif defined GUROBI_SOLVER
-  std::list<Matrix> QInEq;
-  std::list<Matrix> iq;
-  std::list<Matrix> qib;
-  std::vector<int> SOS_index;
-  std::vector<int> SOS_len;
-  std::vector<int> SOS_type;
-  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
-  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, 
-                                   SOS_index, SOS_len, SOS_type, lowerBounds,
-                                   upperBounds, sol, types, objVal);
+  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib,
+                                   lowerBounds, upperBounds, sol,
+                                   objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning.
@@ -1404,20 +1409,12 @@ LPSolver(const Matrix &cj,
   int result = mosekNNSolverWrapper(Q, cj, Eq, b, InEq, ib,
                                     lowerBounds, upperBounds, sol, objVal);
 #elif defined OASES_QP
-  int result = QPOASESSolverWrapperLP(Q, Eq, b, InEq, ib,
+  int result = QPOASESSolverWrapperLP(cj, Eq, b, InEq, ib,
                                       lowerBounds, upperBounds, sol,
                                       objVal);
 #elif defined GUROBI_SOLVER
-  std::list<Matrix> QInEq ;
-  std::list<Matrix> iq;
-  std::list<Matrix> qib;
-  std::vector<int> SOS_index;
-  std::vector<int> SOS_len;
-  std::vector<int> SOS_type;
-  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
-  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib, QInEq, iq, qib, 
-                                   SOS_index, SOS_len, SOS_type, lowerBounds,
-                                   upperBounds, sol, types, objVal);
+  int result = gurobiSolverWrapper(Q, cj, Eq, b, InEq, ib,
+                                   lowerBounds, upperBounds, sol, objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning.
@@ -1509,12 +1506,13 @@ testLP()
 */
 int 
 MIPSolver(const Matrix &Q, const Matrix &c, 
-             const Matrix &Eq, const Matrix &b, 
-             const Matrix &InEq, const Matrix &ib, 
-             std::list<Matrix> &QInEq, std::list<Matrix> &iq, std::list<Matrix> &qib,
-             std::vector<int> &SOS_index, std::vector<int> &SOS_len, std::vector<int> &SOS_type, 
-             const Matrix &lowerBounds, const Matrix &upperBounds,
-             Matrix &sol, const Matrix &types, double *objVal)
+          const Matrix &Eq, const Matrix &b, 
+          const Matrix &InEq, const Matrix &ib, 
+          const std::list<Matrix> &QInEq, const std::list<Matrix> &iq, const std::list<Matrix> &qib,
+          const std::list<Matrix> &indic_lhs, const std::list<Matrix> &indic_rhs, const std::list<int> &indic_var, const std::list<int> &indic_val, const std::list<std::string> &indic_sense,
+          const std::list<int> &SOS_index, const std::list<int> &SOS_len, const std::list<int> &SOS_type, 
+          const Matrix &lowerBounds, const Matrix &upperBounds,
+          Matrix &sol, const Matrix &types, double *objVal)
 {
   if (Q.rows()) {
     assert( Q.cols() == sol.rows() );
@@ -1538,9 +1536,9 @@ MIPSolver(const Matrix &Q, const Matrix &c,
   assert(QInEq.size() == qib.size());
 
   if (!QInEq.empty()) {
-    std::list<Matrix>::iterator Q_it = QInEq.begin();
-    std::list<Matrix>::iterator q_it = iq.begin(); 
-    std::list<Matrix>::iterator b_it = qib.begin();
+    std::list<Matrix>::const_iterator Q_it = QInEq.begin();
+    std::list<Matrix>::const_iterator q_it = iq.begin(); 
+    std::list<Matrix>::const_iterator b_it = qib.begin();
     for( ; Q_it!=QInEq.end(); Q_it++, q_it++, b_it++) {
       assert( (*Q_it).cols() == sol.rows() );
       assert( (*Q_it).rows() == sol.rows() );
@@ -1553,13 +1551,35 @@ MIPSolver(const Matrix &Q, const Matrix &c,
     }
   }
 
+  assert( indic_lhs.size() == indic_rhs.size() );
+  assert( indic_lhs.size() == indic_var.size() );
+  assert( indic_lhs.size() == indic_val.size() );
+  assert( indic_lhs.size() == indic_sense.size() );
+  if (!indic_lhs.empty()) {
+    std::list<Matrix>::const_iterator lhs = indic_lhs.begin();
+    std::list<Matrix>::const_iterator rhs = indic_rhs.begin();
+    std::list<int>::const_iterator var = indic_var.begin();
+    std::list<int>::const_iterator val = indic_val.begin();
+    for ( ; lhs!=indic_lhs.end(); lhs++, rhs++, var++, val++) {
+      assert( (*lhs).rows() == (*lhs).rows() );
+      assert( (*lhs).cols() == sol.rows() );
+      assert( (*rhs).cols() == 1 );
+      assert( *var >= 0 );
+      assert( *var < sol.rows() );
+      assert( *val == 0 || *val == 1);
+    }
+  }
+
   assert( SOS_index.size() == SOS_len.size() );
   assert( SOS_index.size() == SOS_type.size() );
-  for (int i=0; i<SOS_index.size(); i++) {
-    assert( SOS_index[i] >= 0 );
-    assert( SOS_len[i] > 0 );
-    assert( (SOS_type[i] == 1) || (SOS_type[i] == 2) );
-    assert( SOS_index[i] + SOS_len[i] <= sol.rows() );
+  std::list<int>::const_iterator SOS_index_it = SOS_index.begin();
+  std::list<int>::const_iterator SOS_len_it = SOS_len.begin();
+  std::list<int>::const_iterator SOS_type_it = SOS_type.begin();
+  for ( ; SOS_index_it!=SOS_index.end(); SOS_index_it++, SOS_len_it++, SOS_type_it++) {
+    assert( *SOS_index_it >= 0 );
+    assert( *SOS_len_it > 0 );
+    assert( (*SOS_type_it == 1) || (*SOS_type_it == 2) );
+    assert( *SOS_index_it + *SOS_len_it <= sol.rows() );
   }
 
   assert( sol.cols() == 1 );
@@ -1571,9 +1591,11 @@ MIPSolver(const Matrix &Q, const Matrix &c,
   assert( types.cols() == 1 );
 
 #ifdef GUROBI_SOLVER
-  int result = gurobiSolverWrapper(Q, c, Eq, b, InEq, ib, QInEq, iq, qib, 
-                                   SOS_index, SOS_len, SOS_type, lowerBounds,
-                                   upperBounds, sol, types, objVal);
+  int result = gurobiSolverWrapper(Q, c, 
+                                   Eq, b, InEq, ib, QInEq, iq, qib,
+                                   indic_lhs, indic_rhs, indic_var, indic_val, indic_sense, 
+                                   SOS_index, SOS_len, SOS_type, 
+                                   lowerBounds, upperBounds, sol, types, objVal);
 #else
   int result = 0;
   objVal = objVal; // Fix for unreferenced formal parameter warning. 
@@ -1619,23 +1641,28 @@ testMIP()
   qib.push_back(qib_1);
   qib.push_back(qib_2);
 
-  // SOS1 constraints
-  std::vector<int> SOS_index;
-  std::vector<int> SOS_len;
-  std::vector<int> SOS_type;
-
   Matrix lb(3,1);
   lb.setAllElements(0);
   Matrix ub(3,1);
   ub.setAllElements(100);
-  Matrix types(Matrix::ZEROES<Matrix>(3,1));
   Matrix sol(3,1);
   double obj;
 
 #ifdef GUROBI_SOLVER
-  int result = MIPSolver(Q, c, Eq, b, InEq, ib, QInEq, iq, 
-                            qib, SOS_index, SOS_len, SOS_type, 
-                            lb, ub, sol, types, &obj);
+  std::list<Matrix> indic_lhs;
+  std::list<Matrix> indic_rhs;
+  std::list<int> var_ind;
+  std::list<int> val_ind;
+  std::list<std::string> sense;
+  std::list<int> SOS_index;
+  std::list<int> SOS_len;
+  std::list<int> SOS_type;
+  Matrix types(Matrix::ZEROES<Matrix>(sol.rows(), 1));
+  int result = MIPSolver(Q, c, 
+                         Eq, b, InEq, ib, QInEq, iq, qib,
+                         indic_lhs, indic_rhs, var_ind, val_ind, sense,
+                         SOS_index, SOS_len, SOS_type, 
+                         lb, ub, sol, types, &obj);
 #else
   DBGA("Gurobi Solver not installed");
   int result = 1;

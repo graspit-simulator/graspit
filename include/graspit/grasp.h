@@ -167,6 +167,9 @@ class Grasp : public QObject {
     /*! Returns the number of quality measures defined for this grasp. */
     int                     getNumQM() const {return numQM;}
 
+    /*! Returns a pointer to the hand that is the focus of this grasp. */
+    Hand *                  getHand() const {return hand;}
+
     /*! Return a pointer to the object that is the focus of this grasp. */
     GraspableBody          *getObject() const {return object;}
 
@@ -247,6 +250,13 @@ class Grasp : public QObject {
 
     //! Gets a list with only the joints on chains that have contacts on them
     std::list<Joint *> getJointsOnContactChains();
+
+    //! Get a list of contacts for this grasp
+    std::list<Contact*> getContactList() {
+      std::list<Contact*> contacts;
+      contacts.insert(contacts.begin(),contactVec.begin(), contactVec.end());
+      return contacts;
+    }
 
     //! A version of the contact grasp Jacobian, used for GFO routines
     Matrix contactJacobian(const std::list<Joint *> &joints,
