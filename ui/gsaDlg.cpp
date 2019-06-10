@@ -517,8 +517,10 @@ GSADlg::solveButtonClicked()
     else if (!strcmp(solveFor.latin1(), GSADlg::OPT_PRELOAD)) {
       Matrix opt = graspSolver.optimalPreloads(preload, wrench, coneTol, normUnc);
       std::list<QLineEdit*>::iterator it=mParams->JointInput.begin();
-      for (int i=0; i<preload.rows(); i++, it++) {
-        (*it)->setText(QString::number(opt.elem(i,0)));
+      if (opt.rows()) {
+        for (int i=0; i<preload.rows(); i++, it++) {
+          (*it)->setText(QString::number(opt.elem(i,0)));
+        }
       }
     }
     else if (!strcmp(solveFor.latin1(), GSADlg::RES_MAP)) {
@@ -544,6 +546,34 @@ GSADlg::solveButtonClicked()
     }
   }
 }
+
+/*void
+GSADlg::special(Matrix &preload, double coneTol, double normUnc)
+{
+  mHand->getGrasp()->update();
+  GraspSolver graspSolver(mHand->getGrasp());
+  return;
+
+  std::ofstream stream;
+  stream.open("/home/max/graspit/build/output.csv");
+  stream << "Preload, Fy, Mx\n";
+  double max;
+  double torque = 0.0;
+  Matrix Fy(Matrix::ZEROES<Matrix>(6,1));
+  Fy.elem(1,0) = -1.0;
+  Matrix Mx(Matrix::ZEROES<Matrix>(6,1));
+  Mx.elem(3,0) = 1.0;
+  while (torque <= 1.0) {
+    stream << torque << ", ";
+    preload.elem(6,0) = torque;
+    max = graspSolver.findMaximumWrenchRefinement(preload, Fy, coneTol, normUnc);
+    stream << max << ", ";
+    max = graspSolver.findMaximumWrenchRefinement(preload, Mx, coneTol, normUnc);
+    stream << max << std::endl;
+    torque += 0.01;
+  }
+  stream.close();
+}*/
 
 void
 GSADlg::countAxes()
