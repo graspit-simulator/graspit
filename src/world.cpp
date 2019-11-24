@@ -1076,6 +1076,15 @@ World::addRobot(Robot *robot, bool addToScene)
       }
     }
   }
+  // Disable collisions between default-colliding pairs
+  CollisionReport report;
+  const int numContacts = mCollisionInterface->allContacts(&report, Contact::THRESHOLD, NULL);
+  for (int i = 0; i < numContacts; ++i) {
+    DBGA("In collision by default, disabling: "
+    << report[i].first->getName().toStdString().c_str() << " -- " << report[i].second->getName().toStdString().c_str());
+    mCollisionInterface->activatePair(report[i].first, report[i].second, false);
+  }
+
   if (robot->inherits("Hand")) {
     handVec.push_back((Hand *)robot);
     if (numGB > 0) { ((Hand *)robot)->getGrasp()->setObject(GBVec[0]); }
