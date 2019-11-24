@@ -91,6 +91,11 @@ DOF::initDOF(Robot *myRobot, const std::vector<Joint *> &jList)
   limits. Also forces defaultValue to be inside those limits.*/
 void DOF::updateMinMax()
 {
+  if (jointList.empty())
+  {
+    DBGA("Error: joint list is empty, cannot update min/max in DOF.");
+    return;
+  }
   maxq = (*jointList.begin())->getMax() / getStaticRatio(*jointList.begin());
   minq = (*jointList.begin())->getMin() / getStaticRatio(*jointList.begin());
   DBGP("Joint 0 min "  << minq << " max " << maxq);

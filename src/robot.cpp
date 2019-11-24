@@ -221,7 +221,15 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
         }
       }
     }
-    dofVec[d]->initDOF(this, jointList);
+    if (!jointList.empty())
+    {
+      dofVec[d]->initDOF(this, jointList);
+    }
+    else
+    {
+      DBGA("WARNING: DOF " << d << " is not present in any chain and won't be "
+           << "initialized. Check your robot XML file.");
+    }
   }
   //with DOF initialized with joints, we can set default values
   forceDefaultDOFVals();
@@ -587,7 +595,15 @@ Robot::cloneFrom(Robot *original)
         }
       }
     }
-    dofVec[d]->initDOF(this, jointList);
+    if (!jointList.empty())
+    {
+      dofVec[d]->initDOF(this, jointList);
+    }
+    else
+    {
+      DBGA("WARNING: DOF " << d << " is not present in any chain and won't be "
+           << "initialized. Check your robot XML file.");
+    }
   }
   //with DOF initialized with joints, we can set default values
   forceDefaultDOFVals();
