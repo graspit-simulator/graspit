@@ -259,8 +259,8 @@ bool Tendon::insPointInsideWrapper()
       //convert them to world coordinates
       Link *link = wrapper->getAttachedLink();
       //position tmpPos = position(l1.toSbVec3f()) * (link->getTran());
-      l1 = link->getTran().affine() * l1;
-      l2 = link->getTran().affine() * l2;
+      l1 = link->getTran() * l1;
+      l2 = link->getTran() * l2;
 
       double d = pointLineDistance(p0, l1, l2);
       if (d < wrapper->radius)
@@ -307,8 +307,8 @@ inline bool wrapperIntersection(TendonWrapper *wrapper, QString tendonName,
   //convert them to world coordinates
   Link *link = wrapper->getAttachedLink();
 
-  P3 = link->getTran().affine() * P3;
-  P4 = link->getTran().affine() * P4;
+  P3 = link->getTran() * P3;
+  P4 = link->getTran() * P4;
 
   vec3 Pa, Pb;
   double mua = 0, mub = 0;
@@ -350,7 +350,7 @@ inline bool wrapperIntersection(TendonWrapper *wrapper, QString tendonName,
     dPrev = dPrev.normalized();
     vec3 dRes = Pb + (wrapper->radius) * dPrev;
     // transform it to coordinate system of wrapper */
-    newInsPtPos = link->getTran().inverse().affine() * dRes;
+    newInsPtPos = link->getTran().inverse() * dRes;
     return true;
   }
   return false;
