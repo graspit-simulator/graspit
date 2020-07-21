@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<root>
+	<material>plastic</material>
+	<mass>1</mass>
+	<cog>0 0 0 </cog>
+	<inertia_matrix>1 0 0 0 1 0 0 0 1</inertia_matrix>
+	<geometryFile>pg70_finger1_link.iv</geometryFile>
+</root>

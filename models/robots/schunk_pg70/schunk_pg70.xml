@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<robot type="Hand">
+	<palm>pg70_base_link.xml</palm>
+	<dof type='r'>
+		<defaultVelocity>2</defaultVelocity>
+		<maxEffort>100</maxEffort>
+		<Kp>1e+09</Kp>
+		<Kd>1e+07</Kd>
+		<draggerScale>20</draggerScale>
+	</dof>
+
+	<dof type='r'>
+		<defaultVelocity>2</defaultVelocity>
+		<maxEffort>100</maxEffort>
+		<Kp>1e+09</Kp>
+		<Kd>1e+07</Kd>
+		<draggerScale>20</draggerScale>
+	</dof>
+
+	<chain> 
+		<transform> 
+			<translation>0 47.5 40</translation>
+			<rotationMatrix>1 0 0 0 -1 0 0 0 -1 </rotationMatrix> 
+		</transform>
+		<joint type='Prismatic'>
+			<theta>0</theta>
+			<d> d0+0</d>
+			<a>0</a>
+			<alpha>0</alpha>
+			<minValue>-1</minValue>
+			<maxValue>40</maxValue>
+			<viscousFriction>5.0e+7</viscousFriction>
+		</joint>
+		<link dynamicJointType='Prismatic'>pg70_finger1_link.xml</link>
+	</chain>
+	<chain> 
+		<transform> 
+			<translation>0 47.5 -40</translation>
+			<rotationMatrix>1 0 0 0 1 0 0 0 1 </rotationMatrix> 
+		</transform>
+		<joint type='Prismatic'>
+			<theta>0</theta>
+			<d> d1+0</d>
+			<a>0</a>
+			<alpha>0</alpha>
+			<minValue>-1</minValue>
+			<maxValue>40</maxValue>
+			<viscousFriction>5.0e+7</viscousFriction>
+		</joint>
+		<link dynamicJointType='Prismatic'>pg70_finger2_link.xml</link>
+	</chain>
+	<eigenGrasps>eigen/eigen.xml</eigenGrasps>
+	<virtualContacts>virtual/contacts.xml</virtualContacts>
+</robot>
