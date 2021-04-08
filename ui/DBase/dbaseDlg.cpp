@@ -77,9 +77,9 @@ void DBaseDlg::init()
   if (mDBMgr) {
     getModelList();
   }
-  sortBox->insertItem("Epsilon");
-  sortBox->insertItem("Volume");
-  sortBox->insertItem("Energy");
+  sortBox->addItem("Epsilon");
+  sortBox->addItem("Volume");
+  sortBox->addItem("Energy");
 }
 
 void DBaseDlg::destroy()
@@ -150,7 +150,7 @@ void DBaseDlg::connectButton_clicked()
 
 #ifndef ROS_DATABASE_MANAGER
   mDBMgr = new db_planner::SqlDatabaseManager(hostLineEdit->text().toStdString(),
-                                              atoi(portLineEdit->text().latin1()),
+                                              atoi(portLineEdit->text().toLatin1()),
                                               usernameLineEdit->text().toStdString(),
                                               passwordLineEdit->text().toStdString(),
                                               databaseLineEdit->text().toStdString(),
@@ -465,22 +465,22 @@ void DBaseDlg::displayModelList() {
   std::set<string> tags;
   mModelMap.clear();
   for (int i = 0; i < (int)mModelList.size(); ++i) {
-    modelsComboBox->insertItem(QString(mModelList[i]->ModelName().c_str()));
+    modelsComboBox->addItem(QString(mModelList[i]->ModelName().c_str()));
     tags.insert(mModelList[i]->Tags().begin(), mModelList[i]->Tags().end());
     mModelMap.insert(std::make_pair(mModelList[i]->ModelName(), i));
   }
   classesComboBox->clear();
-  classesComboBox->insertItem("ALL");
+  classesComboBox->addItem("ALL");
   for (std::set<string>::iterator i = tags.begin(); i != tags.end(); ++i) {
-    classesComboBox->insertItem(QString((*i).c_str()));
+    classesComboBox->addItem(QString((*i).c_str()));
   }
 }
 
 void DBaseDlg::displayGraspTypeList(std::vector<std::string> list) {
   typesComboBox->clear();
-  typesComboBox->insertItem("ALL");
+  typesComboBox->addItem("ALL");
   for (size_t i = 0; i < list.size(); ++i) {
-    typesComboBox->insertItem(QString(list[i].c_str()));
+    typesComboBox->addItem(QString(list[i].c_str()));
   }
 }
 
@@ -503,7 +503,7 @@ void DBaseDlg::showGrasp(int i)
       return;
     }
     static_cast<GraspitDBGrasp *>(mGraspList[i])->getFinalGraspPlanningState()->execute();
-    if (graspitCore->getWorld()->getCurrentHand()->isA("Barrett")) {
+    if (graspitCore->getWorld()->getCurrentHand()->metaObject()->className() == QString("Barrett")) {
       graspitCore->getWorld()->getCurrentHand()->autoGrasp(true);
     }
   }

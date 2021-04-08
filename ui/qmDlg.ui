@@ -53,7 +53,7 @@
      </widget>
     </item>
     <item rowspan="2" row="0" column="0" >
-     <widget class="Q3ListBox" name="qmListBox" >
+     <widget class="QListWidget" name="qmListBox" >
       <property name="sizePolicy" >
        <sizepolicy>
         <hsizetype>0</hsizetype>
@@ -89,7 +89,7 @@
      </widget>
     </item>
     <item rowspan="3" row="1" column="1" colspan="2" >
-     <widget class="Q3GroupBox" name="qmSettingsBox" >
+     <widget class="QGroupBox" name="qmSettingsBox" >
       <property name="sizePolicy" >
        <sizepolicy>
         <hsizetype>7</hsizetype>
@@ -100,9 +100,6 @@
       </property>
       <property name="title" >
        <string>Settings</string>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Vertical</enum>
       </property>
      </widget>
     </item>
@@ -129,7 +126,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="Q3GroupBox" name="groupBox8" >
+  <widget class="QGroupBox" name="groupBox8" >
    <property name="geometry" >
     <rect>
      <x>10</x>
@@ -140,9 +137,6 @@
    </property>
    <property name="title" >
     <string/>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QPushButton" name="OKButton" >
     <property name="geometry" >
@@ -203,22 +197,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-   <pixmap></pixmap>
-  </customwidget>
-  <customwidget>
-   <class>Q3ListBox</class>
-   <extends>Q3Frame</extends>
-   <header>q3listbox.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
-  </customwidget>
- </customwidgets>
  <includes>
   <include location="local" >graspit/graspitCore.h</include>
   <include location="local" >graspit/ivmgr.h</include>
@@ -292,7 +270,7 @@
   </connection>
   <connection>
    <sender>qmListBox</sender>
-   <signal>highlighted(int)</signal>
+   <signal>currentRowChanged(int)</signal>
    <receiver>QMDlgUI</receiver>
    <slot>selectQM(int)</slot>
    <hints>

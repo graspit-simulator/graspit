@@ -57,14 +57,14 @@ class SettingsDlg : public QObject
 
   private Q_SLOTS:
     void checkCOFEntry(int row, int col);
-    void saveCurrentCOF(int row, int col);
-    void saveCurrentKCOF(int row, int col);
+    void saveCurrentCOF(int row, int col, int prevRow, int prevCol);
+    void saveCurrentKCOF(int row, int col, int prevRow, int prevCol);
     void checkKCOFEntry(int row, int col);
     void validateDlg();
 
   public:
     Ui::SettingsDlgUI *dlgUI;
-    SettingsDlg(QWidget *parent = 0, Qt::WFlags f = 0) {
+    SettingsDlg(QWidget *parent = 0, Qt::WindowFlags f = 0) {
       dlgImpl = new QDialog(parent, f);
       dlgUI = new Ui::SettingsDlgUI;
       dlgUI->setupUi(dlgImpl);

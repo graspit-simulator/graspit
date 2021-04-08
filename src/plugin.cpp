@@ -114,7 +114,7 @@ PluginCreator *PluginCreator::loadFromLibrary(std::string libName)
     //filename is an absolute path
     QFile file(filename);
     if (!file.exists()) {
-      DBGA("Could not find absolute plugin file " << filename.latin1());
+      DBGA("Could not find absolute plugin file " << filename.toLatin1().toStdString());
       return NULL;
     }
   } else {
@@ -137,17 +137,17 @@ PluginCreator *PluginCreator::loadFromLibrary(std::string libName)
       }
     }
     if (!found) {
-      DBGA("Could not find relative plugin file " << filename.latin1() <<
+      DBGA("Could not find relative plugin file " << filename.toLatin1().toStdString() <<
            " in any directory specified in GRASPIT_PLUGIN_DIR");
       return NULL;
     }
   }
 
   //look for the library file and load it
-  PLUGIN_DYNLIB_HANDLE handle = PLUGIN_DYNLIB_OPEN(filename.toAscii().constData());
+  PLUGIN_DYNLIB_HANDLE handle = PLUGIN_DYNLIB_OPEN(filename.toLatin1().constData());
   char *errstr = PLUGIN_DYNLIB_ERROR();
   if (!handle) {
-    DBGA("Failed to open dynamic library " << filename.toAscii().constData());
+    DBGA("Failed to open dynamic library " << filename.toLatin1().constData());
     if (errstr) { DBGA("Error: " << errstr); }
     return NULL;
   }
@@ -160,7 +160,7 @@ PluginCreator *PluginCreator::loadFromLibrary(std::string libName)
   //maybe in the future a better solution can be found...
   PluginCreator::CreatePluginFctn _createPluginFctn = (CreatePluginFctn) PLUGIN_DYNLIB_IMPORT(handle, "createPlugin");
   if (PLUGIN_DYNLIB_ERROR()) {
-    DBGA("Could not load symbol createPlugin from library " << filename.toAscii().constData());
+    DBGA("Could not load symbol createPlugin from library " << filename.toLatin1().constData());
     return NULL;
   }
   PluginCreator::CreatePluginFctn createPluginFctn = reinterpret_cast<PluginCreator::CreatePluginFctn>(_createPluginFctn);
@@ -168,7 +168,7 @@ PluginCreator *PluginCreator::loadFromLibrary(std::string libName)
   //read the type of plugin
   PluginCreator::GetTypeFctn _getTypeFctn = (GetTypeFctn) PLUGIN_DYNLIB_IMPORT(handle, "getType");
   if (PLUGIN_DYNLIB_ERROR()) {
-    DBGA("Could not load symbol getType from library " << filename.toAscii().constData());
+    DBGA("Could not load symbol getType from library " << filename.toLatin1().constData());
     return NULL;
   }
   PluginCreator::GetTypeFctn getTypeFctn = reinterpret_cast<PluginCreator::GetTypeFctn>(_getTypeFctn);
@@ -176,7 +176,7 @@ PluginCreator *PluginCreator::loadFromLibrary(std::string libName)
   std::cout << "Function name " << (*getTypeFctn)() << std::endl;
   std::string type = (*getTypeFctn)();
   if (type.empty()) {
-    DBGA("Could not get plugin type from library " << filename.toAscii().constData());
+    DBGA("Could not get plugin type from library " << filename.toLatin1().constData());
   }
 
   //create the PluginCreator and push it back

@@ -85,7 +85,7 @@ Robot::~Robot()
   if (mGloveInterface) { delete mGloveInterface; }
   if (mEigenGrasps) { delete mEigenGrasps; }
 
-  std::cout << "Deleted robot: " << name() << std::endl;
+  std::cout << "Deleted robot: " << getName().toStdString() << std::endl;
 }
 
 /*! Loads the robot information from an XML node, which is asumed
@@ -115,8 +115,8 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
   QString sensorType = element->Attribute("sensorType");
   if (element) {
     valueStr = element->GetText();
-    valueStr = valueStr.stripWhiteSpace();
-    base = new Link(this, -1, -1, myWorld, (QString(name()) + "Base").latin1());
+    valueStr = valueStr.trimmed();
+    base = new Link(this, -1, -1, myWorld, (QString(getName()) + "Base").toLatin1().constData());
     if (!base  || base->load(ivdir + valueStr) == FAILURE) {
       if (base) { delete base; }
       base = NULL;
@@ -161,7 +161,7 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       QTWARNING("DOF Type not found");
       return FAILURE;
     }
-    QString dofType = valueStr.stripWhiteSpace();
+    QString dofType = valueStr.trimmed();
     if (dofType == "r") {
       dofVec[f] = new RigidDOF();
     }
@@ -288,8 +288,8 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       return FAILURE;
     }
     valueStr = tmp->GetText();
-    valueStr = valueStr.simplifyWhiteSpace().stripWhiteSpace();
-    QStringList l = QStringList::split(' ', valueStr);
+    valueStr = valueStr.simplified().trimmed();
+    QStringList l = valueStr.split(' ');
     if (l.count() != 3) {
       DBGA("Invalid approach direction input");
       return FAILURE;
@@ -311,8 +311,8 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       return FAILURE;
     }
     valueStr = tmp->GetText();
-    valueStr = valueStr.simplifyWhiteSpace().stripWhiteSpace();
-    l = QStringList::split(' ', valueStr);
+    valueStr = valueStr.simplified().trimmed();
+    l = valueStr.split(' ');
     if (l.count() != 3) {
       DBGA("Invalid approach direction input");
       return FAILURE;
@@ -347,10 +347,10 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
   element = findXmlElement(root, "eigenGrasps");
   if (element) {
     valueStr = element->GetText();
-    valueStr = valueStr.stripWhiteSpace();
+    valueStr = valueStr.trimmed();
     QString eigenFile = rootPath + valueStr;
     if (loadEigenData(eigenFile) == SUCCESS) {
-      DBGA("Using eigengrasps from file: " << valueStr.latin1());
+      DBGA("Using eigengrasps from file: " << valueStr.toLatin1().constData());
       eigenLoaded = true;
     }
   }
@@ -363,13 +363,13 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
   element = findXmlElement(root, "virtualContacts");
   if (element) {
     valueStr = element->GetText();
-    valueStr = valueStr.stripWhiteSpace();
+    valueStr = valueStr.trimmed();
     QString contactFile = rootPath + valueStr;
     if (loadContactData(contactFile) == SUCCESS) {
-      DBGA("Loaded virtual contacts from file " << valueStr.latin1());
+      DBGA("Loaded virtual contacts from file " << valueStr.toLatin1().constData());
       showVirtualContacts(true);
     } else {
-      DBGA("Failed to load virtual contacts from file " << valueStr.latin1());
+      DBGA("Failed to load virtual contacts from file " << valueStr.toLatin1().constData());
     }
   }
 
@@ -378,15 +378,15 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
   element = findXmlElement(root, "cyberGlove");
   if (element) {
     valueStr = element->GetText();
-    valueStr = valueStr.stripWhiteSpace();
+    valueStr = valueStr.trimmed();
     mGloveInterface = new GloveInterface(this);
     QString calibFile = rootPath + valueStr;
-    if (!mGloveInterface->loadCalibration(calibFile.latin1())) {
-      DBGA("Failed to load glove calibration file " << calibFile.latin1());
+    if (!mGloveInterface->loadCalibration(calibFile.toLatin1().constData())) {
+      DBGA("Failed to load glove calibration file " << calibFile.toLatin1().constData());
       delete mGloveInterface; mGloveInterface = NULL;
       mUseCyberGlove = false;
     } else {
-      DBGA("Cyberglove calibration loaded from " << calibFile.latin1());
+      DBGA("Cyberglove calibration loaded from " << calibFile.toLatin1().constData());
       mUseCyberGlove = true;
     }
   }
@@ -399,7 +399,7 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
       DBGA("There was a problem reading the Flock of Birds data in the configuration file");
       return FAILURE;
     }
-    birdNumber = birdNumber.stripWhiteSpace();
+    birdNumber = birdNumber.trimmed();
     mBirdNumber = birdNumber.toInt();
     transf sensorTrans;
     const TiXmlElement *tmp = findXmlElement(element, "transform");
@@ -422,8 +422,8 @@ Robot::loadFromXml(const TiXmlElement *root, QString rootPath)
 int
 Robot::loadEigenData(QString filename)
 {
-  if (!mEigenGrasps->readFromFile(filename.latin1())) {
-    DBGA("Unable to load eigenGrasp file " << filename.latin1());
+  if (!mEigenGrasps->readFromFile(filename.toLatin1().constData())) {
+    DBGA("Unable to load eigenGrasp file " << filename.toLatin1().constData());
     return FAILURE;
   }
   QString name = filename.section('/', -1, -1);
@@ -436,7 +436,7 @@ int
 Robot::loadContactData(QString filename)
 {
 
-  TiXmlDocument doc(filename);
+  TiXmlDocument doc(filename.toLatin1().constData());
   if (doc.LoadFile() == false) {
     QTWARNING("Could not open " + filename);
     return FAILURE;
@@ -480,10 +480,10 @@ Robot::loadContactData(QString filename)
 int
 Robot::loadContactData(QString filename)
 {
-  std::ifstream inFile(filename.latin1(), std::ios::in);
+  std::ifstream inFile(filename.toLatin1().constData(), std::ios::in);
   if (!inFile.is_open())
   {
-    fprintf(stderr, "Could not open filename %s\n", filename.latin1());
+    fprintf(stderr, "Could not open filename %s\n", filename.toLatin1().constData());
     return FAILURE;
   }
 
@@ -550,7 +550,7 @@ Robot::cloneFrom(Robot *original)
 
   //new robots have contact indicators disabled by default
   if (base) { delete base; }
-  base = new Link(this, -1, -1, myWorld, (QString(name()) + "Base").latin1());
+  base = new Link(this, -1, -1, myWorld, (QString(getName()) + "Base").toLatin1().constData());
   base->cloneFrom(original->getBase());
   //base->initDynamics();
   IVRoot = new SoSeparator;
@@ -769,8 +769,8 @@ world and connect it to the base of this robot.
 Link *
 Robot::importMountPiece(QString filename)
 {
-  QString mountName = QString(name()) + "_mount";
-  mountPiece = new Link(this, -1, -1, myWorld, mountName.latin1());
+  QString mountName = QString(getName()) + "_mount";
+  mountPiece = new Link(this, -1, -1, myWorld, mountName.toLatin1().constData());
   if (mountPiece->load(filename) == FAILURE) {
     delete mountPiece; mountPiece = NULL; return NULL;
   }
@@ -871,7 +871,7 @@ move independently.
 void
 Robot::detachRobot(Robot *r)
 {
-  DBGA("Detaching Robot " << r->getName().latin1() << " from " << getName().latin1());
+  DBGA("Detaching Robot " << r->getName().toLatin1().constData() << " from " << getName().toLatin1().constData());
   r->parent = NULL;
   chainVec[r->parentChainNum]->detachRobot(r);
 }
@@ -1448,10 +1448,10 @@ Robot::interpolateJoints(double *initialVals, double *finalVals,
   if (deltat < 1.0e-20 || t < 0) {
 #ifdef GRASPITDBG
     std::cerr << "t: " << t << "  d: " << deltat << std::endl;
-    std::cerr << "I am " << getName().latin1() << std::endl;
+    std::cerr << "I am " << getName().toLatin1().constData() << std::endl;
     for (int i = 0; i < (int)colReport->size(); i++) {
-      std::cerr << (*colReport)[i].first->getName().latin1() << " -- "
-                << (*colReport)[i].second->getName().latin1() << std::endl;
+      std::cerr << (*colReport)[i].first->getName().toLatin1().constData() << " -- "
+                << (*colReport)[i].second->getName().toLatin1().constData() << std::endl;
     }
     std::cerr << "min dist: " << minDist << std::endl << std::endl;
 #endif
@@ -1643,8 +1643,8 @@ Robot::jumpDOFToContact(double *desiredVals, int *stoppedJoints, int *numCols)
     lateContacts.clear();
     for (int i = 0; i < (int)colReport.size(); i++) {
       lateContacts.push_back(colReport[i]);
-      DBGP("Contact: " << colReport[i].first->getName().latin1() << "--" <<
-           colReport[i].second->getName().latin1());
+      DBGP("Contact: " << colReport[i].first->getName().toLatin1().constData() << "--" <<
+           colReport[i].second->getName().toLatin1().constData());
     }
     for (int d = 0; d < numDOF; d++) {
       DBGP("Dof " << d << "initial " << initialDofVals[d] << " new " << newDofVals[d]);
@@ -2503,7 +2503,7 @@ Hand::quickOpen(double speedFactor)
       success = true;
     }
   }
-  if (loops > 20) { DBGA("Open finger loops: " << loops << " Hand: " << myName.latin1()); }
+  if (loops > 20) { DBGA("Open finger loops: " << loops << " Hand: " << myName.toLatin1().constData()); }
   delete [] desiredVals;
   delete [] desiredSteps;
   return success;

@@ -36,7 +36,6 @@
 #include <typeinfo>
 
 #include <QString>
-#include <q3listbox.h>
 
 //#include "mainWindow.h"
 #include "graspit/grasp.h"

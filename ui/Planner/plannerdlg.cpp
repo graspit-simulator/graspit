@@ -89,7 +89,7 @@ void PlannerDlg::init()
   if (grasp->getNumQM() == 0) { GenerateButton->setEnabled(false); }
   else {
     for (i = 0; i < grasp->getNumQM(); i++) {
-      qmComboBox->insertItem(grasp->getQM(i)->getName());
+      qmComboBox->addItem(grasp->getQM(i)->getName());
     }
   }
 }
@@ -134,7 +134,7 @@ void PlannerDlg::generateGrasps()
 
   myGraspManager->get_graspTester()->set_testingParameters(e, f);
   myGraspManager->get_graspTester()->
-  useQM(qmComboBox->currentItem());
+  useQM(qmComboBox->currentIndex());
   myGraspManager->set_render(visualizeBox->isChecked());
 
   if (automaticCheckBox->isChecked() || filenameLineEdit->text().isEmpty()) {
@@ -144,7 +144,7 @@ void PlannerDlg::generateGrasps()
   }
   else {
     if (filenameLineEdit->text().contains("master.txt")) {
-      masterFile.setName(filenameLineEdit->text());
+      masterFile.setFileName(filenameLineEdit->text());
       if (!masterFile.open(QIODevice::ReadOnly)) {
         QTWARNING("Could not open master grasp file");
         return;
@@ -186,7 +186,7 @@ void PlannerDlg::newQM()
   if (grasp->getNumQM() > 0) { GenerateButton->setEnabled(true); }
   qmComboBox->clear();
   for (int i = 0; i < grasp->getNumQM(); i++) {
-    qmComboBox->insertItem(grasp->getQM(i)->getName());
+    qmComboBox->addItem(grasp->getQM(i)->getName());
   }
 }
 

@@ -21,7 +21,8 @@
 //
 // $Id: barrettHandDlg.cpp,v 1.5 2009/04/21 16:21:57 cmatei Exp $
 //
-//#######################################################################include "barrettHandDlg.h"
+//######################################################################
+#include "barrettHandDlg.h"
 
 #include <QValidator>
 #include <QPushButton>
@@ -38,7 +39,7 @@
 
 void BarrettHandDlg::init()
 {
-  QLineEdit *stepSize = (QLineEdit *) this->child("stepSize", "QLineEdit");
+  QLineEdit *stepSize = (QLineEdit *) this->findChild<QLineEdit*>("stepSize");
   stepSize->setValidator(new QIntValidator(0, 180, stepSize));
   withinSimulationUpdate = false;
   simulatedHandForContinuousOperation = NULL;
@@ -58,7 +59,7 @@ bool BarrettHandDlg::setWorld(World *w)
 #endif
   world = w;
   if (!world->getCurrentHand()) { return false; }
-  if (!world->getCurrentHand()->isA("Barrett")) { return false; }
+  if (!world->getCurrentHand()->metaObject()->className() == QString("Barrett")) { return false; }
   mSimBarrett = (Barrett *)world->getCurrentHand();
   mRealBarrett = mSimBarrett->getRealHand();
   if (!mRealBarrett) { return false; }
@@ -158,7 +159,7 @@ void BarrettHandDlg::toggleContinuousOperation()
     text = new QString("Begin continuous operation");
   }
 
-  QPushButton *button = (QPushButton *) this->child("continuousOperationButton", "QPushButton");
+  QPushButton *button = (QPushButton *) this->findChild<QPushButton *>("continuousOperationButton");
   button->setText(*text);
   delete text;
 }

@@ -80,7 +80,7 @@ void GraspTransferCheckTask::start()
   if (!world->getNumHands()) {
     QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
-    DBGA("Grasp transfer task: loading hands from " << handPath.latin1());
+    DBGA("Grasp transfer task: loading hands from " << handPath.toLatin1().constData());
     mHand1 = static_cast<Hand *>(world->importRobot(handPath));
     mHand2 = static_cast<Hand *>(world->importRobot(handPath));
     if (!mHand1 || !mHand2) {

@@ -56,8 +56,8 @@ void
 CompliantPlannerDlg::init()
 {
   mPlanner = new ListPlanner(mHand);
-  energyTypeBox->insertItem("COMPLIANT_ENERGY");
-  energyTypeBox->insertItem("DYNAMIC_AUTO_GRASP_ENERGY");
+  energyTypeBox->addItem("COMPLIANT_ENERGY");
+  energyTypeBox->addItem("DYNAMIC_AUTO_GRASP_ENERGY");
   mPlanner->setRenderType(RENDER_ALWAYS);
   mPlanner->setStatStream(&std::cerr);
   mOut = NULL;
@@ -73,8 +73,8 @@ CompliantPlannerDlg::init()
   QIntValidator *val2 = new QIntValidator(this);
   testOneEdit->setValidator(val2);
   testOneEdit->setText("0");
-  resultsBox->insertItem("console");
-  resultsBox->insertItem("file:");
+  resultsBox->addItem("console");
+  resultsBox->addItem("file:");
   resultsFileEdit->setText("comp_plan.txt");
 
   QDoubleValidator *dVal = new QDoubleValidator(0.5, 1.5, 3, this);
@@ -448,13 +448,13 @@ CompliantPlannerDlg::updateOut()
     return;
   }
   QString filename("data\\" + resultsFileEdit->text());
-  mOut = new std::fstream(filename.latin1(), std::fstream::out | std::fstream::app);
+  mOut = new std::fstream(filename.toLatin1().constData(), std::fstream::out | std::fstream::app);
   if (mOut->fail()) {
-    DBGA("Failed to open file " << filename.latin1());
+    DBGA("Failed to open file " << filename.toLatin1().constData());
     delete mOut; mOut = NULL;
-    resultsBox->setCurrentItem(0);
+    resultsBox->setCurrentIndex(0);
   } else {
-    DBGA("Output file opened: " << filename.latin1());
+    DBGA("Output file opened: " << filename.toLatin1().constData());
   }
 }
 

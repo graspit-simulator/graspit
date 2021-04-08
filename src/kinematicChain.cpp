@@ -216,7 +216,7 @@ KinematicChain::initChainFromXml(const TiXmlElement *root, QString &linkDir)
       QTWARNING("No Dynamic Joint Type Specified");
       return FAILURE;
     }
-    jointType = jointType.stripWhiteSpace();
+    jointType = jointType.trimmed();
     if (jointType == "Revolute") {
       dynJointTypes.push_back(DynJoint::REVOLUTE);
       lastJointNum += 1;
@@ -237,9 +237,9 @@ KinematicChain::initChainFromXml(const TiXmlElement *root, QString &linkDir)
     }
 
     QString linkFilename = (*p)->GetText();
-    linkFilename = linkFilename.stripWhiteSpace();
-    QString linkName = QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
-    linkVec[l] = new Link(owner, chainNum, l, owner->getWorld(), linkName.latin1());
+    linkFilename = linkFilename.trimmed();
+    QString linkName = QString(owner->getName()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
+    linkVec[l] = new Link(owner, chainNum, l, owner->getWorld(), linkName.toLatin1().constData());
     QString sensorType = (*p)->Attribute("sensorType");
 
     if (linkVec[l]->load(linkDir + linkFilename) == FAILURE) {
@@ -256,7 +256,7 @@ KinematicChain::initChainFromXml(const TiXmlElement *root, QString &linkDir)
     QString collisionRule = (*p)->Attribute("collisionRule");
 
     if (!collisionRule.isNull()) {
-      collisionRule = collisionRule.stripWhiteSpace();
+      collisionRule = collisionRule.trimmed();
       if (collisionRule == "Off") {
         linkVec[l]->addToIvc(true);
         linkVec[l]->myWorld->toggleCollisions(false, linkVec[l], NULL);
@@ -269,7 +269,7 @@ KinematicChain::initChainFromXml(const TiXmlElement *root, QString &linkDir)
          */
         linkVec[l]->addToIvc();
         QString targetChain = (*p)->Attribute("targetChain");
-        targetChain = targetChain.stripWhiteSpace();
+        targetChain = targetChain.trimmed();
         if (targetChain == "base") {
           linkVec[l]->myWorld->toggleCollisions(false, linkVec[l], owner->getBase());
         }
@@ -375,8 +375,8 @@ KinematicChain::cloneFrom(const KinematicChain *original)
   std::vector<int> dynJointTypes;
   for (int l = 0; l < numLinks; l++) {
     lastJoint[l] = original->getLastJoint(l);
-    QString linkName =  QString(owner->name()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
-    linkVec[l] = new Link(owner, chainNum, l, owner->getWorld(), linkName);
+    QString linkName =  QString(owner->getName()) + QString("_chain%1_link%2").arg(chainNum).arg(l);
+    linkVec[l] = new Link(owner, chainNum, l, owner->getWorld(), linkName.toLatin1().constData());
     linkVec[l]->cloneFrom(original->getLink(l));
     //linkVec[l]->setTransparency(0.5);
     IVRoot->addChild(linkVec[l]->getIVRoot());

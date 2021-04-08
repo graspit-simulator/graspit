@@ -176,47 +176,47 @@ QualPCR::buildParamArea(qmDlgDataT *qmData)
     wrenchMultiplier = qmData->grasp->getObject()->getMass() * 1.0e-3 * 9.80665 * 1.0e6;
   } 
 
-  QGridLayout *wl = new QGridLayout(qmData->settingsArea,8,2);
+  QGridLayout *wl = new QGridLayout(qmData->settingsArea);
 
-  wl->addWidget(new QLabel(QString("Multiplier:")));
+  wl->addWidget(new QLabel(QString("Multiplier:")), 0, 0);
   params.wrenchInput = new QLineEdit();
   params.wrenchInput->setText(QString::number(wrenchMultiplier));
-  wl->addWidget(params.wrenchInput);
+  wl->addWidget(params.wrenchInput, 0, 1);
 
-  wl->addWidget(new QLabel(QString("Force X:")));
+  wl->addWidget(new QLabel(QString("Force X:")), 1, 0);
   params.FxInput = new QLineEdit();
   params.FxInput->setText(QString::number(wrench[0]));
-  wl->addWidget(params.FxInput);
+  wl->addWidget(params.FxInput, 1, 1);
 
-  wl->addWidget(new QLabel(QString("Force Y:")));
+  wl->addWidget(new QLabel(QString("Force Y:")), 2, 0);
   params.FyInput = new QLineEdit();
   params.FyInput->setText(QString::number(wrench[1]));
-  wl->addWidget(params.FyInput);
+  wl->addWidget(params.FyInput, 2, 1);
 
-  wl->addWidget(new QLabel(QString("Force Z:")));
+  wl->addWidget(new QLabel(QString("Force Z:")), 3, 0);
   params.FzInput = new QLineEdit();
   params.FzInput->setText(QString::number(wrench[2]));
-  wl->addWidget(params.FzInput);
+  wl->addWidget(params.FzInput, 3, 1);
 
-  wl->addWidget(new QLabel(QString("Torque X:")));
+  wl->addWidget(new QLabel(QString("Torque X:")), 4, 0);
   params.MxInput = new QLineEdit();
   params.MxInput->setText(QString::number(wrench[3]));
-  wl->addWidget(params.MxInput);
+  wl->addWidget(params.MxInput, 4, 1);
 
-  wl->addWidget(new QLabel(QString("Torque Y:")));
+  wl->addWidget(new QLabel(QString("Torque Y:")), 5, 0);
   params.MyInput = new QLineEdit();
   params.MyInput->setText(QString::number(wrench[4]));
-  wl->addWidget(params.MyInput);
+  wl->addWidget(params.MyInput, 5, 1);
 
-  wl->addWidget(new QLabel(QString("Torque Z:")));
+  wl->addWidget(new QLabel(QString("Torque Z:")), 6, 0);
   params.MzInput = new QLineEdit();
   params.MzInput->setText(QString::number(wrench[5]));
-  wl->addWidget(params.MzInput);
+  wl->addWidget(params.MzInput, 6, 1);
 
-  wl->addWidget(new QLabel(QString("Maximum Force:")));
+  wl->addWidget(new QLabel(QString("Maximum Force:")), 7, 0);
   params.maxForceInput = new QLineEdit();
   params.maxForceInput->setText(QString::number(maxForce));
-  wl->addWidget(params.maxForceInput);
+  wl->addWidget(params.maxForceInput, 7, 1);
 
   qmData->paramPtr = &params;
 }

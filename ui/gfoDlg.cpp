@@ -48,15 +48,15 @@ GFODlg::GFODlg(MainWindow *mw, Hand *h, QWidget *parent) : QDialog(parent), mMai
 {
   setupUi(this);
   statusLabel->setText("Status: optimization off");
-  optimizationTypeBox->insertItem("Contact force existence");
-  optimizationTypeBox->insertItem("Contact force optimization");
-  optimizationTypeBox->insertItem("Grasp force existence");
-  optimizationTypeBox->insertItem("Grasp force optimization");
-  optimizationTypeBox->insertItem("Compliant joint equilibrium");
-  optimizationTypeBox->insertItem("DOF force equilibrium");
-  if (mHand->isA("McGrip")) {
-    optimizationTypeBox->insertItem("McGrip tendon route");
-    optimizationTypeBox->insertItem("McGrip joint equilibrium");
+  optimizationTypeBox->addItem("Contact force existence");
+  optimizationTypeBox->addItem("Contact force optimization");
+  optimizationTypeBox->addItem("Grasp force existence");
+  optimizationTypeBox->addItem("Grasp force optimization");
+  optimizationTypeBox->addItem("Compliant joint equilibrium");
+  optimizationTypeBox->addItem("DOF force equilibrium");
+  if (mHand->metaObject()->className() == QString("McGrip")) {
+    optimizationTypeBox->addItem("McGrip tendon route");
+    optimizationTypeBox->addItem("McGrip joint equilibrium");
   }
   QObject::connect(exitButton, SIGNAL(clicked()), this, SLOT(exitButtonClicked()));
   QObject::connect(mHand, SIGNAL(configurationChanged()), this, SLOT(handConfigurationChanged()));
@@ -138,7 +138,7 @@ GFODlg::displayResults(int result)
 void
 GFODlg::mcgripEquilibrium()
 {
-  if (!mHand->isA("McGrip")) {
+  if (!mHand->metaObject()->className() == QString("McGrip")) {
     DBGA("Hand is not a McGrip!");
     return;
   }
@@ -148,7 +148,7 @@ GFODlg::mcgripEquilibrium()
 
 void GFODlg::tendonRouteOptimization()
 {
-  if (!mHand->isA("McGrip")) {
+  if (!mHand->metaObject()->className() == QString("McGrip")) {
     DBGA("Hand is not a McGrip!");
     return;
   }

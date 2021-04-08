@@ -45,7 +45,7 @@
           <item>
             <widget class="QLabel" name="pixmapLabel1" >
               <property name="pixmap" >
-                <pixmap>logo.png</pixmap>
+                <pixmap>:/images/logo.png</pixmap>
               </property>
               <property name="scaledContents" >
                 <bool>true</bool>

@@ -157,7 +157,7 @@ void ContactExaminerDlg::saveButton_clicked()
   }
 
   std::ofstream outFile;
-  outFile.open(fn.latin1(), std::ios::out | std::ios::trunc);
+  outFile.open(fn.toLatin1().constData(), std::ios::out | std::ios::trunc);
   if (!outFile.is_open())
   {
     fprintf(stderr, "Failed to open file for writing\n");
@@ -168,7 +168,7 @@ void ContactExaminerDlg::saveButton_clicked()
 
   outFile << "<?xml version=\"1.0\" ?>\n";
   outFile << "<virtual_contacts>\n";
-  outFile << "<robot_name>" << mHand->getName().latin1() << "</robot_name>" << std::endl;
+  outFile << "<robot_name>" << mHand->getName().toLatin1().constData() << "</robot_name>" << std::endl;
   outFile << "<num_contacts>" << (int)mMarkedContacts.size()<< "</num_contacts>" << std::endl;
 
   if (handRadioButton->isChecked()) {

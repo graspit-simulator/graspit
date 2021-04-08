@@ -55,7 +55,7 @@ void CompliantGraspCopyTask::start()
   loadHand();
   if (mStatus == FAILED) { return; }
 
-  if (!mHand->isA("Pr2Gripper2010")) {
+  if (!mHand->metaObject()->className() == QString("Pr2Gripper2010")) {
     DBGA("Compliant copy task only works on the PR2 gripper");
     mStatus = FAILED;
     return;

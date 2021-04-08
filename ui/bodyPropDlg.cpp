@@ -110,15 +110,15 @@ void BodyPropDlg::init()
   else { origIsDynamic = false; }
 
   for (i = 0; i < w->getNumMaterials(); i++) {
-    materialComboBox->insertItem(w->getMaterialName(i));
+    materialComboBox->addItem(w->getMaterialName(i));
   }
   int firstMat = bodyVec[0]->getMaterial();
   for (i = 1; i < numBodies; i++)
     if (bodyVec[i]->getMaterial() != firstMat) { break; }
-  if (i == numBodies) { materialComboBox->setCurrentItem(firstMat); }
+  if (i == numBodies) { materialComboBox->setCurrentIndex(firstMat); }
   else {
-    materialComboBox->insertItem(QString("Keep Original"));
-    materialComboBox->setCurrentItem(w->getNumMaterials());
+    materialComboBox->addItem(QString("Keep Original"));
+    materialComboBox->setCurrentIndex(w->getNumMaterials());
   }
 
   bool showFC = bodyVec[0]->frictionConesShown();
@@ -127,13 +127,13 @@ void BodyPropDlg::init()
   if (i == numBodies) { fcCheckBox->setChecked(showFC); }
   else {
     fcCheckBox->setTristate(true);
-    fcCheckBox->setNoChange();
+    fcCheckBox->setCheckState(Qt::PartiallyChecked);
   }
 
   float transp = bodyVec[0]->getTransparency();
   for (i = 1; i < numBodies; i++)
     if (bodyVec[i]->getTransparency() != transp) { break; }
-  if (i == numBodies) { transparencySlider->setValue((int)(transp * transparencySlider->maxValue())); }
+  if (i == numBodies) { transparencySlider->setValue((int)(transp * transparencySlider->maximum())); }
 
   boundingCheckBox->setChecked(false);
   boundingSpinBox->setEnabled(false);
@@ -148,7 +148,7 @@ void BodyPropDlg::init()
 */
 void BodyPropDlg::setTransparency(int val)
 {
-  float ratio = (float)val / (float)transparencySlider->maxValue();
+  float ratio = (float)val / (float)transparencySlider->maximum();
   for (int i = 0; i < numBodies; i++) {
     bodyVec[i]->setTransparency(ratio);
   }
@@ -161,8 +161,8 @@ void BodyPropDlg::setTransparency(int val)
 void BodyPropDlg::setShowAxes(int state)
 {
   if (!dynBod) { return; }
-  if (state == QCheckBox::On) { dynBod->showAxes(true); }
-  else if (state == QCheckBox::Off) { dynBod->showAxes(false); }
+  if (state == Qt::Checked) { dynBod->showAxes(true); }
+  else if (state == Qt::Unchecked) { dynBod->showAxes(false); }
 }
 
 /*!
@@ -172,9 +172,9 @@ void BodyPropDlg::setShowAxes(int state)
 void BodyPropDlg::setShowFC(int state)
 {
   for (int i = 0; i < numBodies; i++)
-    if (state == QCheckBox::On) { bodyVec[i]->showFrictionCones(true); }
-    else if (state == QCheckBox::Off) { bodyVec[i]->showFrictionCones(false); }
-    else if (state == QCheckBox::NoChange) { bodyVec[i]->showFrictionCones(origShowFC[i]); }
+    if (state == Qt::Checked) { bodyVec[i]->showFrictionCones(true); }
+    else if (state == Qt::Unchecked) { bodyVec[i]->showFrictionCones(false); }
+    else if (state == Qt::PartiallyChecked) { bodyVec[i]->showFrictionCones(origShowFC[i]); }
 }
 
 /*!
@@ -189,15 +189,15 @@ void BodyPropDlg::setShowFC(int state)
 void BodyPropDlg::setDynamic(int state)
 {
   if (dynBod) {
-    if (state == QCheckBox::On) { dynBod->setUseDynamics(true); }
-    else if (state == QCheckBox::Off) {
+    if (state == Qt::Checked) { dynBod->setUseDynamics(true); }
+    else if (state == Qt::Unchecked) {
       dynBod->setUseDynamics(false);
       axesCheckBox->setEnabled(false);
       dynamicForcesCheckBox->setEnabled(false);
       massLineEdit->setEnabled(false);
     }
   }
-  else if (state == QCheckBox::On) {
+  else if (state == Qt::Checked) {
     bodyVec[0]->getWorld()->deselectElement(bodyVec[0]);
     dynBod = bodyVec[0]->getWorld()->makeBodyDynamic(bodyVec[0], DynamicBody::defaultMass);
     dynBod->getWorld()->selectElement(dynBod);
@@ -205,7 +205,7 @@ void BodyPropDlg::setDynamic(int state)
     origAxesShown = dynBod->axesShown();
     origDynContactForcesShown = dynBod->dynContactForcesShown();
   }
-  if (state == QCheckBox::On) {
+  if (state == Qt::Checked) {
     axesCheckBox->setEnabled(true);
     dynamicForcesCheckBox->setEnabled(true);
     massLineEdit->setEnabled(true);
@@ -221,8 +221,8 @@ void BodyPropDlg::setDynamic(int state)
 void BodyPropDlg::setShowDynContactForces(int state)
 {
   if (!dynBod) { return; }
-  if (state == QCheckBox::On) { dynBod->showDynContactForces(true); }
-  else if (state == QCheckBox::Off) { dynBod->showDynContactForces(false); }
+  if (state == Qt::Checked) { dynBod->showDynContactForces(true); }
+  else if (state == Qt::Unchecked) { dynBod->showDynContactForces(false); }
 }
 
 /*!

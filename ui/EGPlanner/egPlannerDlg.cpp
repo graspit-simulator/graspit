@@ -68,16 +68,16 @@ void EigenGraspPlannerDlg::init()
   std::vector<std::string> registeredEnergies = SearchEnergyFactory::getInstance()->getAllRegisteredEnergy();
   for(std::vector<std::string>::const_iterator it = registeredEnergies.begin(); it != registeredEnergies.end(); it++)
   {
-      energyBox->insertItem(QString::fromStdString(*it));
+      energyBox->addItem(QString::fromStdString(*it));
   }
-  energyBox->setCurrentItem(5);
+  energyBox->setCurrentIndex(5);
 
-  plannerTypeBox->insertItem("Sim. Ann.");
-  plannerTypeBox->insertItem("Loop");
-  plannerTypeBox->insertItem("Multi-Threaded");
-  plannerTypeBox->insertItem("Online");
-  plannerTypeBox->insertItem("Time Test");
-  plannerTypeBox->setCurrentItem(0);
+  plannerTypeBox->addItem("Sim. Ann.");
+  plannerTypeBox->addItem("Loop");
+  plannerTypeBox->addItem("Multi-Threaded");
+  plannerTypeBox->addItem("Online");
+  plannerTypeBox->addItem("Time Test");
+  plannerTypeBox->setCurrentIndex(0);
 
   plannerInitButton->setEnabled(TRUE);
   plannerResetButton->setEnabled(FALSE);
@@ -93,23 +93,22 @@ void EigenGraspPlannerDlg::init()
   n.setNum(70000);
   annStepsEdit->setText(n);
 
-  spaceSearchBox->insertItem("Complete");
-  spaceSearchBox->insertItem("Axis-angle");
-  spaceSearchBox->insertItem("Ellipsoid");
-  spaceSearchBox->insertItem("Approach");
-  spaceSearchBox->setCurrentItem(1);
+  spaceSearchBox->addItem("Complete");
+  spaceSearchBox->addItem("Axis-angle");
+  spaceSearchBox->addItem("Ellipsoid");
+  spaceSearchBox->addItem("Approach");
+  spaceSearchBox->setCurrentIndex(1);
 
   prevGraspButton->setEnabled(FALSE);
   nextGraspButton->setEnabled(FALSE);
   bestGraspButton->setEnabled(FALSE);
 
-  variableBox->setColumnLayout(0, Qt::Vertical);
-
-  varGridLayout = new QGridLayout(variableBox->layout(), 1, 5);
+  varGridLayout = new QGridLayout(variableBox);
+  varGridLayout->addLayout(variableBox->layout(), 1, 5);
   varGridLayout->setSpacing(5);
   varGridLayout->setAlignment(Qt::AlignTop);
-  varGridLayout->addMultiCellWidget(spaceSearchLabel, 0, 0, 0, 1);
-  varGridLayout->addMultiCellWidget(spaceSearchBox, 0, 0, 2, 4);
+  varGridLayout->addWidget(spaceSearchLabel, 0, 0, 1, 1);
+  varGridLayout->addWidget(spaceSearchBox, 0, 2, 1, 4);
 
   varGridLayout->addWidget(new QLabel("On", variableBox), 1, 0);
   varGridLayout->addWidget(new QLabel("Name", variableBox), 1, 1);
@@ -132,11 +131,11 @@ void EigenGraspPlannerDlg::destroy()
   for (unsigned int i = 0; i < varNames.size(); i++) {
     //  varMainLayout->removeItem(varLayouts[i]);
 
-    varGridLayout->remove(varNames[i]);
-    varGridLayout->remove(varCheck[i]);
-    varGridLayout->remove(varInput[i]);
-    varGridLayout->remove(varTarget[i]);
-    varGridLayout->remove(varConfidence[i]);
+    varGridLayout->removeWidget(varNames[i]);
+    varGridLayout->removeWidget(varCheck[i]);
+    varGridLayout->removeWidget(varInput[i]);
+    varGridLayout->removeWidget(varTarget[i]);
+    varGridLayout->removeWidget(varConfidence[i]);
 
     delete varNames[i];
     delete varCheck[i];
@@ -183,11 +182,11 @@ void EigenGraspPlannerDlg::setVariableLayout()
 {
   //cleanup
   for (unsigned int i = 0; i < varNames.size(); i++) {
-    varGridLayout->remove(varNames[i]);
-    varGridLayout->remove(varCheck[i]);
-    varGridLayout->remove(varInput[i]);
-    varGridLayout->remove(varTarget[i]);
-    varGridLayout->remove(varConfidence[i]);
+    varGridLayout->removeWidget(varNames[i]);
+    varGridLayout->removeWidget(varCheck[i]);
+    varGridLayout->removeWidget(varInput[i]);
+    varGridLayout->removeWidget(varTarget[i]);
+    varGridLayout->removeWidget(varConfidence[i]);
     delete varNames[i];
     delete varCheck[i];
     delete varInput[i];
@@ -210,10 +209,12 @@ void EigenGraspPlannerDlg::setVariableLayout()
     QCheckBox *inputCheck = new QCheckBox(variableBox);
     connect(inputCheck, SIGNAL(clicked()), this, SLOT(variableInputChanged()));
     QLabel *target = new QLabel("N/A", variableBox);
-    QSlider *slider = new QSlider(0, 100, 10, 0, Qt::Horizontal, variableBox);
+    QSlider *slider = new QSlider(Qt::Horizontal, variableBox);
+    slider->setRange(0, 100);
+    slider->setPageStep(10);
     connect(slider, SIGNAL(sliderReleased()), this, SLOT(variableInputChanged()));
 
-    slider->setLineStep(1);
+    slider->setSingleStep(1);
     slider->setMaximumWidth(50);
     varGridLayout->addWidget(check, 2 + i, 0);
     varGridLayout->addWidget(name, 2 + i, 1);
@@ -578,14 +579,14 @@ void EigenGraspPlannerDlg::plannerInit_clicked()
     if (mPlanner) { delete mPlanner; }
     mPlanner = new GuidedPlanner(mHand);
     ((GuidedPlanner *)mPlanner)->setModelState(mHandObjectState);
-    energyBox->setCurrentItem(2);
+    energyBox->setCurrentIndex(2);
     energyBox->setEnabled(FALSE);
   } else if (s == QString("Online")) {
     if (mPlanner) { delete mPlanner; }
     mPlanner = new OnLinePlanner(mHand);
     ((OnLinePlanner *)mPlanner)->setModelState(mHandObjectState);
     energyBox->setEnabled(TRUE);
-    energyBox->setCurrentItem(5);
+    energyBox->setCurrentIndex(5);
     QString n;
     n.setNum(2000);
     annStepsEdit->setText(n);
@@ -669,16 +670,16 @@ void EigenGraspPlannerDlg::onlinePlannerUpdate()
   ActionType s = op->getAction();
   switch (s) {
     case ACTION_PLAN:
-      num.setAscii("PLANNING");
+      num = QString("PLANNING");
       break;
     case ACTION_GRASP:
-      num.setAscii("GRASPING");
+      num = QString("GRASPING");
       break;
     case ACTION_OPEN:
-      num.setAscii("OPEN");
+      num = QString("OPEN");
       break;
     default:
-      num.setAscii("N/A");
+      num = QString("N/A");
       break;
   }
   onlineStatusLabel->setText("Status: " + num);
@@ -773,7 +774,7 @@ void EigenGraspPlannerDlg::inputLoadButton_clicked()
     return;
   }
 
-  FILE *fp = fopen(fn.latin1(), "r");
+  FILE *fp = fopen(fn.toLatin1().constData(), "r");
   bool success = true;
   if (!fp) {
     DBGA("Failed to open input file!");

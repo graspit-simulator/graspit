@@ -171,7 +171,7 @@ Body::Body(const Body &b) : WorldElement(b)
 Body::~Body()
 {
   breakContacts();
-  DBGP("Deleting Body: " << myName.latin1());
+  DBGP("Deleting Body: " << myName.toLatin1().toStdString());
 }
 
 /*! Clones this body from an original. This means that the two bodies have independent
@@ -310,7 +310,7 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
     } else if (mGeometryFileType == "ply") {
       result = loadGeometryPLY(valueStr);
     } else {
-      DBGA("Unknown geometry file type: " << mGeometryFileType.latin1());
+      DBGA("Unknown geometry file type: " << mGeometryFileType.toLatin1().toStdString());
       result = FAILURE;
     }
     if (result == FAILURE) {
@@ -367,7 +367,7 @@ Body::loadFromXml(const TiXmlElement *root, QString rootPath)
 
 int
 Body::saveToXml(QTextStream &xml) {
-  xml << "\t\t\t<material>" << myWorld->getMaterialName(material).latin1() << "</material>" << endl;
+  xml << "\t\t\t<material>" << myWorld->getMaterialName(material).toLatin1().constData() << "</material>" << endl;
   if (youngMod > 0) {
     xml << "\t\t\t<youngs>" << youngMod << "</youngs>" << endl;
   }
@@ -380,8 +380,8 @@ Body::saveToXml(QTextStream &xml) {
   if (mUsesFlock) {
     xml << "\t\t\t<useFlockOfBirds>" << mBirdNumber << "</useFlockOfBirds>" << endl;
   }
-  xml << "\t\t\t<geometryFile type = \"" << mGeometryFileType.latin1() << "\">"
-      << mGeometryFilename.latin1() << "</geometryFile>" << endl;
+  xml << "\t\t\t<geometryFile type = \"" << mGeometryFileType.toLatin1().constData() << "\">"
+      << mGeometryFilename.toLatin1().constData() << "</geometryFile>" << endl;
   return SUCCESS;
 }
 
@@ -417,7 +417,7 @@ Body::load(const QString &filename)
   }
 
   //load the graspit specific information in XML format
-  TiXmlDocument doc(xmlFilename);
+  TiXmlDocument doc(xmlFilename.toStdString());
   if (doc.LoadFile() == false) {
     QTWARNING("Could not open " + xmlFilename);
     return FAILURE;
@@ -434,7 +434,7 @@ Body::load(const QString &filename)
     } else if (fileType == "ply") {
       element->SetAttribute("type", "ply");
     }
-    TiXmlText *text = new TiXmlText(relFilename);
+    TiXmlText *text = new TiXmlText(relFilename.toStdString());
     element->LinkEndChild(text);
     doc.RootElement()->LinkEndChild(element);
   }
@@ -457,7 +457,7 @@ int
 Body::loadGeometryIV(const QString &filename)
 {
   SoInput myInput;
-  if (!myInput.openFile(filename.latin1())) {
+  if (!myInput.openFile(filename.toLatin1().constData())) {
     QTWARNING("Could not open Inventor file " + filename);
     return FAILURE;
   }
@@ -999,10 +999,10 @@ Body::breakContacts()
 int
 Body::loadContactData(QString fn)
 {
-  std::ifstream inFile(fn.latin1(), std::ios::in);
+  std::ifstream inFile(fn.toLatin1().constData(), std::ios::in);
   if (!inFile.is_open())
   {
-    fprintf(stderr, "Could not open filename %s\n", fn.latin1());
+    fprintf(stderr, "Could not open filename %s\n", fn.toLatin1().constData());
     return FAILURE;
   }
 
@@ -1010,7 +1010,7 @@ Body::loadContactData(QString fn)
   VirtualContactOnObject *newContact;
   inFile >> numContacts;
   {
-    fprintf(stderr, "Failed to read contacts from %s\n", fn.latin1());
+    fprintf(stderr, "Failed to read contacts from %s\n", fn.toLatin1().constData());
     return FAILURE;
   }
 
@@ -1019,7 +1019,7 @@ Body::loadContactData(QString fn)
     newContact = new VirtualContactOnObject();
     if (!newContact->readFromFile(inFile))
     {
-      fprintf(stderr, "Failed to a contacts from %s\n", fn.latin1());
+      fprintf(stderr, "Failed to a contacts from %s\n", fn.toLatin1().constData());
       return FAILURE;
     }
     newContact->setBody(this);
@@ -1451,9 +1451,9 @@ DynamicBody::loadFromXml(const TiXmlElement *root, QString rootPath)
   } else {
     overrideCog = true;
     valueStr = element->GetText();
-    valueStr = valueStr.simplifyWhiteSpace();
+    valueStr = valueStr.simplified();
     QStringList l;
-    l = QStringList::split(' ', valueStr.stripWhiteSpace());
+    l = valueStr.trimmed().split(' ');
     if (l.count() != 3) {
       QTWARNING("Invalid Center of Gravity Input");
       return FAILURE;
@@ -1471,9 +1471,9 @@ DynamicBody::loadFromXml(const TiXmlElement *root, QString rootPath)
   } else {
     overrideI = true;
     valueStr = element->GetText();
-    valueStr = valueStr.simplifyWhiteSpace();
+    valueStr = valueStr.simplified();
     QStringList l;
-    l = QStringList::split(' ', valueStr.stripWhiteSpace());
+    l = valueStr.trimmed().split(' ');
     if (l.count() != 9) { //error
       QTWARNING("Invalid Inertia Matrix Input");
       return FAILURE;

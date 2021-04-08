@@ -145,12 +145,12 @@ bool DBaseBatchPlanner::processArguments(int argc, char **argv)
     mScanDirectory = new char[1000];
     strcpy(mScanDirectory, argv[9]);
     QString testfile = QString(mScanDirectory) + QString("scan_log.txt");
-    FILE *tf = fopen(testfile.latin1(), "a");
+    FILE *tf = fopen(testfile.toLatin1().constData(), "a");
     if (!tf) {
-      DBGAF(mLogStream, "Failed scan directory test: " << testfile.latin1());
+      DBGAF(mLogStream, "Failed scan directory test: " << testfile.toLatin1().constData());
       return false;
     }
-    fprintf(tf, "Starting object: %s\n", mObject->getName().latin1());
+    fprintf(tf, "Starting object: %s\n", mObject->getName().toLatin1().constData());
     fclose(tf);
   }
 
@@ -204,7 +204,7 @@ bool DBaseBatchPlanner::startPlanner()
       numChildren = numCPU.toInt();
     }
     if (numChildren <= 0) {
-      DBGAF(mLogStream, "Can not understand NUMBER_OF_PROCESSORS: " << numCPU.latin1());
+      DBGAF(mLogStream, "Can not understand NUMBER_OF_PROCESSORS: " << numCPU.toLatin1().constData());
     }
 #else
     //on Linux we hard-code 2 CPU's for now
@@ -470,9 +470,9 @@ void DBaseBatchPlanner::writeCloudToFile(int i, int j, const std::vector<positio
   n.setNum(j);
   filename = filename + QString("_") + n + QString(".txt");
 
-  FILE *f = fopen(filename.latin1(), "w");
+  FILE *f = fopen(filename.toLatin1().constData(), "w");
   if (!f) {
-    DBGAF(mLogStream, "Failed to open file " << filename.latin1());
+    DBGAF(mLogStream, "Failed to open file " << filename.toLatin1().constData());
     fprintf(stderr, "Failed to open scan file\n");
     return;
   }
@@ -496,9 +496,9 @@ void DBaseBatchPlanner::writeRawToFile(int i, int j, const std::vector<RawScanPo
   n.setNum(j);
   filename = filename + QString("_") + n + QString(".txt");
 
-  FILE *f = fopen(filename.latin1(), "w");
+  FILE *f = fopen(filename.toLatin1().constData(), "w");
   if (!f) {
-    DBGAF(mLogStream, "Failed to open file " << filename.latin1());
+    DBGAF(mLogStream, "Failed to open file " << filename.toLatin1().constData());
     fprintf(stderr, "Failed to open scan file\n");
     return;
   }

@@ -28,9 +28,8 @@
  */
 
 #ifndef GRASPITSERVER_HXX
-#include <q3serversocket.h>
-#include <q3socket.h>
-#include <qstringlist.h>
+#include <QTcpSocket>
+#include <QTcpServer>
 #include <iostream>
 #include <vector>
 
@@ -68,7 +67,7 @@ class Robot;
   the input.
 
 */
-class ClientSocket : public Q3Socket
+class ClientSocket : public QTcpSocket
 {
     Q_OBJECT
 
@@ -80,11 +79,12 @@ class ClientSocket : public Q3Socket
       to use \a sock .
     */
     ClientSocket(int sock, QObject *parent = 0, const char *name = 0) :
-      Q3Socket(parent, name)
+      QTcpSocket(parent)
     {
+      this->setObjectName(name);
       connect(this, SIGNAL(readyRead()), SLOT(readClient()));
       connect(this, SIGNAL(connectionClosed()), SLOT(connectionClosed()));
-      setSocket(sock);
+      // setSocket(sock);
     }
 
     ~ClientSocket();
@@ -132,13 +132,13 @@ class ClientSocket : public Q3Socket
   port and if a connection is requested, it creates a new ClientSocket, which
   will handle all communication.
 */
-class GraspItServer : public Q3ServerSocket
+class GraspItServer : public QTcpServer
 {
     Q_OBJECT
     //  std::vector<SocketNotifier *> snVec;
 
   public:
-    GraspItServer(Q_UINT16 port, int backlog = 1, QObject *parent = 0,
+    GraspItServer(quint16 port, int backlog = 1, QObject *parent = 0,
                   const char *name = 0);
 
     /*! Stub */

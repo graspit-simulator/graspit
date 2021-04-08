@@ -34,7 +34,7 @@
   all plugins.
 */
 
-#include <Q3GroupBox>
+#include <QGroupBox>
 #include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/sensors/SoIdleSensor.h>

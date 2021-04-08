@@ -159,7 +159,7 @@ grasp_tester::saveGraspsToFile(const QString &filename, bool append)
 {
   if (saveToFile) { graspFile.close(); }
 
-  graspFile.setName(filename);
+  graspFile.setFileName(filename);
   if (append) {
     if (graspFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
       graspOut.setDevice(&graspFile);

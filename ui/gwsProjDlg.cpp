@@ -85,7 +85,7 @@ GWSProjDlg::GWSProjDlg(QWidget *parent) : QDialog(parent)
   coordButtonGroup->setId(tzCheckBox, 5);
   //coordButtonGroup->hide();
   for (int i = 0; GWS::TYPE_LIST[i]; i++) {
-    gwsTypeComboBox->insertItem(QString(GWS::TYPE_LIST[i]));
+    gwsTypeComboBox->addItem(QString(GWS::TYPE_LIST[i]));
   }
   OKButton->setEnabled(false);
 }

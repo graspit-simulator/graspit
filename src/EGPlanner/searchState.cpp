@@ -137,7 +137,7 @@ VariableSet::getVariable(QString name)
   for (unsigned int i = 0; i < mVariables.size(); i++) {
     if (mVariables[i]->getName() == name) { return mVariables[i]; }
   }
-  DBGP("Requested variable " << name.latin1() << " not found in search state");
+  DBGP("Requested variable " << name.toLatin1().constData() << " not found in search state");
   return NULL;
 }
 
@@ -147,7 +147,7 @@ VariableSet::getConstVariable(QString name) const
   for (unsigned int i = 0; i < mVariables.size(); i++) {
     if (mVariables[i]->getName() == name) { return mVariables[i]; }
   }
-  DBGP("Requested variable " << name.latin1() << " not found in search state");
+  DBGP("Requested variable " << name.toLatin1().constData() << " not found in search state");
   return NULL;
 }
 
@@ -157,7 +157,7 @@ VariableSet::readVariable(QString name) const
   for (unsigned int i = 0; i < mVariables.size(); i++) {
     if (mVariables[i]->getName() == name) { return mVariables[i]->getValue(); }
   }
-  DBGP("Requested variable " << name.latin1() << " not found in search state");
+  DBGP("Requested variable " << name.toLatin1().constData() << " not found in search state");
   return 0;
 }
 
@@ -169,7 +169,7 @@ VariableSet::setParameter(QString name, double value)
     if (it->name() == name) { break; }
   }
   if (it == mParameters.end()) {
-    DBGA("Parameter " << name.latin1() << " not found!");
+    DBGA("Parameter " << name.toLatin1().constData() << " not found!");
     assert(0);
     return;
   }
@@ -184,7 +184,7 @@ VariableSet::getParameter(QString name) const
     if (it->name() == name) { break; }
   }
   if (it == mParameters.end()) {
-    DBGA("Parameter " << name.latin1() << " not found!");
+    DBGA("Parameter " << name.toLatin1().constData() << " not found!");
     assert(0);
     return 0;
   }
@@ -199,7 +199,7 @@ VariableSet::addParameter(QString name, double value)
     if (it->name() == name) { break; }
   }
   if (it != mParameters.end()) {
-    DBGA("Parameter " << name.latin1() << " already present!");
+    DBGA("Parameter " << name.toLatin1().constData() << " already present!");
     assert(0);
     return;
   }
@@ -214,7 +214,7 @@ VariableSet::removeParameter(QString name)
     if (it->name() == name) { break; }
   }
   if (it == mParameters.end()) {
-    DBGA("Parameter " << name.latin1() << " does not exist!");
+    DBGA("Parameter " << name.toLatin1().constData() << " does not exist!");
     assert(0);
     return;
   }
@@ -321,7 +321,7 @@ VariableSet::print() const
   fprintf(stderr, "\n");
   fprintf(stderr, "Type: %d\n", getType());
   for (int i = 0; i < getNumVariables(); i++) {
-    fprintf(stderr, "%s = %.2f; ", mVariables[i]->getName().latin1(), mVariables[i]->getValue());
+    fprintf(stderr, "%s = %.2f; ", mVariables[i]->getName().toLatin1().constData(), mVariables[i]->getValue());
   }
   fprintf(stderr, "\n");
 }
@@ -595,7 +595,7 @@ HandObjectState::distance(const HandObjectState *s) const
   vec3 dvec = t1.translation() - t2.translation();
   double d = dvec.norm();
 
-  if (mTargetObject->isA("GraspableBody")) {
+  if (mTargetObject->metaObject()->className() == QString("GraspableBody")) {
     d = d / ((GraspableBody *)mTargetObject)->getMaxRadius();
   } else {
     d = d / 200;

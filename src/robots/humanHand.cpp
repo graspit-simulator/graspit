@@ -332,9 +332,9 @@ inline bool wrapperIntersection(TendonWrapper *wrapper, QString tendonName,
     vec3 dPrevLink = Pa_link - Pb_link;
     double length = dPrevLink.norm();
     dPrevLink = normalise(dPrevLink);
-    //DBGA("Tendon " << tendonName.latin1() << " has wrapping side; direction is " << dPrevLink);
+    //DBGA("Tendon " << tendonName.toLatin1().toStdString() << " has wrapping side; direction is " << dPrevLink);
     if ( dPrevLink % wrapping_direction < 0 ) {
-      DBGA("Tendon " << tendonName.latin1() << " on the wrong side of a wrapper at mua " << mua);
+      DBGA("Tendon " << tendonName.toLatin1().toStdString() << " on the wrong side of a wrapper at mua " << mua);
       //new insertion point is in opposite direction
       vec3 dRes = vec3(Pb_link.toSbVec3f() ) - ( wrapper->radius) * dPrevLink;
       newInsPtPos = position ( dRes.toSbVec3f() );
@@ -1182,7 +1182,7 @@ int HumanHand::loadFromXml(const TiXmlElement *root, QString rootPath)
   for (size_t t = 0; t < mTendonVec.size(); t++)
   {
     IVRoot->addChild(mTendonVec[t]->getIVRoot());
-    DBGA("Tendon " << mTendonVec[t]->getName().ascii() << " read and added");
+    DBGA("Tendon " << mTendonVec[t]->getName().toLatin1().toStdString() << " read and added");
   }
 
   elementList = findAllXmlElements(root, "tendonWrapper");

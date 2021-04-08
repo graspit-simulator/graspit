@@ -84,7 +84,7 @@ void GraspPlanningTask::start()
   } else {
     QString handPath = mDBMgr->getHandGraspitPath(QString(mPlanningTask.handName.c_str()));
     handPath = QString(getenv("GRASPIT")) + handPath;
-    DBGA("Grasp Planning Task: loading hand from " << handPath.latin1());
+    DBGA("Grasp Planning Task: loading hand from " << handPath.toLatin1().constData());
     mHand = static_cast<Hand *>(world->importRobot(handPath));
     if (!mHand) {
       DBGA("Failed to load hand");

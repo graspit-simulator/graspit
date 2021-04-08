@@ -154,9 +154,9 @@ grasp_manager::loadPrimitives()
   filename = filename.section('.', -2, -2) + ".iv";
   QString path = directory + filename;
 
-  printf("Loading primitive %s.\n", path.latin1());
+  printf("Loading primitive %s.\n", path.toLatin1().constData());
 
-  if (!(myInput.openFile(path.latin1()))) {
+  if (!(myInput.openFile(path.toLatin1().constData()))) {
     pr_error("could not open primitives file!");
     primitives = my_body->getIVGeomRoot();
     printf("%s\n", prDir);

@@ -26,7 +26,7 @@
     <string>Exit</string>
    </property>
   </widget>
-  <widget class="Q3GroupBox" name="groupBox3">
+  <widget class="QGroupBox" name="groupBox3">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -37,9 +37,6 @@
    </property>
    <property name="title">
     <string>Planner</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QLabel" name="textLabel1">
     <property name="geometry">
@@ -120,7 +117,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="Q3GroupBox" name="groupBox8">
+  <widget class="QGroupBox" name="groupBox8">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -131,9 +128,6 @@
    </property>
    <property name="title">
     <string>Settings and results</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QPushButton" name="nextGraspButton">
     <property name="geometry">
@@ -390,7 +384,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="Q3GroupBox" name="onlineDetailsGroup">
+  <widget class="QGroupBox" name="onlineDetailsGroup">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -401,9 +395,6 @@
    </property>
    <property name="title">
     <string>OnLine Planning Details</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QLabel" name="objDistLabel">
     <property name="geometry">
@@ -628,7 +619,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="Q3GroupBox" name="inputBox">
+  <widget class="QGroupBox" name="inputBox">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -639,9 +630,6 @@
    </property>
    <property name="title">
     <string>Input</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QPushButton" name="inputLoadButton">
     <property name="geometry">
@@ -670,7 +658,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="Q3GroupBox" name="variableBox">
+  <widget class="QGroupBox" name="variableBox">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -681,9 +669,6 @@
    </property>
    <property name="title">
     <string>Space Search</string>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QComboBox" name="spaceSearchBox">
     <property name="geometry">
@@ -715,14 +700,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <includes>
   <include location="global">vector</include>
  </includes>

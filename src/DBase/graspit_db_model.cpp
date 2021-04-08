@@ -62,7 +62,7 @@ int GraspitDBModel::loadGeometry()
     DBGA("Failed to load .ply geometry from file " << GeometryPath());
     return mGraspableBody->loadGeometryPLY(filename);
   } else {
-    DBGA("Uknown geometry file extension: " << extension.latin1());
+    DBGA("Uknown geometry file extension: " << extension.toLatin1().constData());
     return FAILURE;
   }
 }

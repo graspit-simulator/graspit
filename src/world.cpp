@@ -33,7 +33,7 @@
 #include <QStringList>
 #include <QSettings>
 #include <QPushButton>
-#include <Q3GroupBox>
+#include <QGroupBox>
 #include <QFile>
 #include <QDateTime>
 #include <QTextStream>
@@ -110,9 +110,10 @@ that will handle all user interaction. Also initialized collision detection
 system and reads in global settings such as friction coefficients
 */
 World::World(QObject *parent, const char *name) :
-  QObject(parent, name),
+  QObject(parent),
   myIVmgr(NULL)
 {
+  this->setObjectName(name);
   numBodies = numGB = numRobots = numHands = 0;
   numSelectedBodyElements = numSelectedRobotElements = 0;
   numSelectedElements = 0;
@@ -179,7 +180,7 @@ World::~World()
   }
 
   for (i = numBodies - 1; i >= 0; i--) {
-    DBGP("Deleting body: " << i << " " << bodyVec[i]->getName().latin1());
+    DBGP("Deleting body: " << i << " " << bodyVec[i]->getName().toLatin1().constData());
     destroyElement(bodyVec[i]);
   }
 
@@ -360,9 +361,9 @@ World::readSettings()
 
   setDefaults();
 
-  dynamicsTimeStep = settings.readDoubleEntry(QString("/GraspIt/") + QString("World/dynamicsTimeStep"), dynamicsTimeStep);
+  dynamicsTimeStep = settings.value(QString("/GraspIt/") + QString("World/dynamicsTimeStep"), dynamicsTimeStep).toDouble();
 
-  newNumMaterials = settings.readNumEntry(QString("/GraspIt/") + QString("World/numMaterials"), numMaterials);
+  newNumMaterials = settings.value(QString("/GraspIt/") + QString("World/numMaterials"), numMaterials).toInt();
 
   newcofTable = (double **)malloc(newNumMaterials * sizeof(double *));
   newkcofTable = (double **)malloc(newNumMaterials * sizeof(double *));
@@ -374,33 +375,33 @@ World::readSettings()
   }
 
   for (i = 0; i < numMaterials; i++) {
-    newMaterialNames[i] = settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i), materialNames[i]);
+    newMaterialNames[i] = settings.value(QString("/GraspIt/") + QString("World/material%1").arg(i), materialNames[i]).toString();
 
     for (j = i; j < numMaterials; j++) {
       newcofTable[i][j] = newcofTable[j][i] =
-                            settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j), cofTable[i][j]);
+                            settings.value(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j), cofTable[i][j]).toDouble();
 
       newkcofTable[i][j] = newkcofTable[j][i] =
-                             settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j), kcofTable[i][j]);
+                             settings.value(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j), kcofTable[i][j]).toDouble();
     }
 
     for (; j < newNumMaterials; j++) {
       newcofTable[i][j] = newcofTable[j][i] =
-                            settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
+                            settings.value(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j)).toDouble();
 
       newkcofTable[i][j] = newkcofTable[j][i] =
-                             settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
+                             settings.value(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j)).toDouble();
     }
   }
   for (; i < newNumMaterials; i++) {
-    newMaterialNames.push_back(settings.readEntry(QString("/GraspIt/") + QString("World/material%1").arg(i)));
+    newMaterialNames.push_back(settings.value(QString("/GraspIt/") + QString("World/material%1").arg(i)).toString());
 
     for (j = i; j < newNumMaterials; j++) {
       newcofTable[i][j] = newcofTable[j][i] =
-                            settings.readDoubleEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j));
+                            settings.value(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j)).toDouble();
 
       newkcofTable[i][j] = newkcofTable[j][i] =
-                             settings.readDoubleEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j));
+                             settings.value(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j)).toDouble();
     }
   }
 
@@ -426,12 +427,12 @@ World::saveSettings()
   QSettings settings(organization, application);
 
   int i, j;
-  settings.writeEntry(QString("/GraspIt/") + QString("World/numMaterials"), numMaterials);
+  settings.setValue(QString("/GraspIt/") + QString("World/numMaterials"), numMaterials);
   for (i = 0; i < numMaterials; i++) {
-    settings.writeEntry(QString("/GraspIt/") + QString("World/material%1").arg(i), materialNames[i]);
+    settings.setValue(QString("/GraspIt/") + QString("World/material%1").arg(i), materialNames[i]);
     for (j = i; j < numMaterials; j++) {
-      settings.writeEntry(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j), cofTable[i][j]);
-      settings.writeEntry(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j), kcofTable[i][j]);
+      settings.setValue(QString("/GraspIt/") + QString("World/cof%1%2").arg(i).arg(j), cofTable[i][j]);
+      settings.setValue(QString("/GraspIt/") + QString("World/kcof%1%2").arg(i).arg(j), kcofTable[i][j]);
     }
   }
 }
@@ -529,7 +530,7 @@ World::load(const QString &filename)
     graspitRoot += "/";
   }
   //load the graspit specific information in XML format
-  TiXmlDocument doc(filename);
+  TiXmlDocument doc(filename.toLatin1().constData());
   if (doc.LoadFile() == false) {
     QTWARNING("Could not open file " + filename);
     return FAILURE;
@@ -568,8 +569,8 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
       if (xmlElement) {
         elementName = xmlElement->GetText();
         elementPath = rootPath + elementName;
-        elementPath = elementPath.stripWhiteSpace();
-        DBGP("importing " << elementPath.latin1());
+        elementPath = elementPath.trimmed();
+        DBGP("importing " << elementPath.toLatin1().constData());
         element = importBody("Body", elementPath);
         if (!element) {
           QTWARNING("Could not open " + elementPath);
@@ -609,8 +610,8 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
       if (xmlElement) {
         elementName = xmlElement->GetText();
         elementPath = rootPath + elementName;
-        elementPath = elementPath.stripWhiteSpace();
-        DBGP("importing " << elementPath.latin1());
+        elementPath = elementPath.trimmed();
+        DBGP("importing " << elementPath.toLatin1().constData());
         element = importBody("GraspableBody", elementPath);
         if (!element) {
           QTWARNING("Could not open " + elementPath);
@@ -654,7 +655,7 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
       }
       elementName = xmlElement->GetText();
       elementPath = rootPath + elementName;
-      DBGP("importing " << elementPath.latin1());
+      DBGP("importing " << elementPath.toLatin1().constData());
       if ((robot = importRobot(elementPath)) == NULL) {
         QTWARNING("Could not open " + elementPath);
         return FAILURE;
@@ -663,7 +664,7 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
       xmlElement = findXmlElement(child, "dofValues");
       if (xmlElement) {
         QString dofValues =  xmlElement->GetText();
-        dofValues = dofValues.stripWhiteSpace().simplifyWhiteSpace();
+        dofValues = dofValues.trimmed().simplified();
         QTextStream lineStream(&dofValues, QIODevice::ReadOnly);
         robot->readDOFVals(lineStream);
       }
@@ -705,10 +706,10 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
       if (xmlElement) {
         mountFilename = xmlElement->GetText();
         if (!mountFilename.isEmpty()) {
-          mountFilename = mountFilename.stripWhiteSpace();
+          mountFilename = mountFilename.trimmed();
           KinematicChain *prevChain = robotVec[prevRobNum]->getChain(chainNum);
           mountFilename = rootPath + mountFilename;
-          DBGA("Mount filename: " << mountFilename.latin1());
+          DBGA("Mount filename: " << mountFilename.toLatin1().constData());
           if ((mountPiece = robotVec[nextRobNum]->importMountPiece(mountFilename))) {
             addLink(mountPiece);
             toggleCollisions(false, prevChain->getLink(prevChain->getNumLinks() - 1), mountPiece);
@@ -728,8 +729,8 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
         return FAILURE;
       }
       QString position = xmlElement->GetText();
-      position = position.simplifyWhiteSpace().stripWhiteSpace();
-      l = QStringList::split(' ', position);
+      position = position.simplified().trimmed();
+      l = position.split(' ');
       if (l.count() != 3) {
         QTWARNING("Invalid camera position input");
         return FAILURE;
@@ -748,8 +749,8 @@ World::loadFromXml(const TiXmlElement *root, QString rootPath)
         return FAILURE;
       }
       QString orientation = xmlElement->GetText();
-      position = orientation.simplifyWhiteSpace().stripWhiteSpace();
-      l = QStringList::split(' ', orientation);
+      position = orientation.simplified().trimmed();
+      l = orientation.split(' ');
       if (l.count() != 4) {
         QTWARNING("Invalid camera orientation input");
         return FAILURE;
@@ -809,7 +810,7 @@ World::save(const QString &filename)
   stream << "<?xml version=\"1.0\" ?>" << endl;
   stream << "<world>" << endl;
   for (i = 0; i < numBodies; i++) {
-    if (bodyVec[i]->isA("Body")) {
+    if (bodyVec[i]->metaObject()->className() == QString("Body")) {
       stream << "\t<obstacle>" << endl;
       if (bodyVec[i]->getFilename() == "unspecified") {
         stream << "\t\t<body>" << endl;
@@ -820,7 +821,7 @@ World::save(const QString &filename)
         stream << "\t\t</body>" << endl;
       }
       else {
-        stream << "\t\t<filename>" << bodyVec[i]->getFilename().latin1() << "</filename>" << endl;
+        stream << "\t\t<filename>" << bodyVec[i]->getFilename().toLatin1().constData() << "</filename>" << endl;
       }
       stream << "\t\t<transform>" << endl;
       stream << "\t\t\t<fullTransform>" << bodyVec[i]->getTran() << "</fullTransform>" << endl;
@@ -838,7 +839,7 @@ World::save(const QString &filename)
         stream << "\t\t</body>" << endl;
       }
       else {
-        stream << "\t\t<filename>" << bodyVec[i]->getFilename().latin1() << "</filename>" << endl;
+        stream << "\t\t<filename>" << bodyVec[i]->getFilename().toLatin1().constData() << "</filename>" << endl;
       }
       stream << "\t\t<transform>" << endl;
       stream << "\t\t\t<fullTransform>" << bodyVec[i]->getTran() << "</fullTransform>" << endl;
@@ -849,7 +850,7 @@ World::save(const QString &filename)
 
   for (i = 0; i < numRobots; i++) {
     stream << "\t<robot>" << endl;
-    stream << "\t\t<filename>" << robotVec[i]->getFilename().latin1() << "</filename>" << endl;
+    stream << "\t\t<filename>" << robotVec[i]->getFilename().toLatin1().constData() << "</filename>" << endl;
     stream << "\t\t<dofValues>";
     robotVec[i]->writeDOFVals(stream);
     stream << "</dofValues>" << endl;
@@ -1002,7 +1003,7 @@ World::addLink(Link *newLink)
 Robot *
 World::importRobot(QString filename)
 {
-  TiXmlDocument doc(filename);
+  TiXmlDocument doc(filename.toLatin1().constData());
   if (doc.LoadFile() == false) {
     QTWARNING("Could not open " + filename);
     return NULL;
@@ -1019,7 +1020,7 @@ World::importRobot(QString filename)
     QTWARNING("Class Type not found");
     return NULL;
   }
-  line = line.stripWhiteSpace();
+  line = line.trimmed();
 
   Robot *robot = (Robot *) getWorldElementFactory().createElement(line.toStdString(), this, NULL);
 

@@ -15,7 +15,7 @@
     <property name="windowTitle" >
       <string>Glove Calibration</string>
     </property>
-    <widget class="Q3GroupBox" name="groupBox5" >
+    <widget class="QGroupBox" name="groupBox5" >
       <property name="geometry" >
         <rect>
           <x>10</x>
@@ -212,7 +212,7 @@
         </property>
       </widget>
     </widget>
-    <widget class="Q3GroupBox" name="groupBox3" >
+    <widget class="QGroupBox" name="groupBox3" >
       <property name="geometry" >
         <rect>
           <x>10</x>

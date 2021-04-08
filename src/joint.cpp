@@ -212,7 +212,7 @@ PrismaticJoint::initJointFromXml(const TiXmlElement *root, int jnum)
   const TiXmlElement *element = findXmlElement(root, "d");
   if (element) {
     dQStr = element->GetText();
-    dQStr = dQStr.stripWhiteSpace();
+    dQStr = dQStr.trimmed();
     strcpy(dStr, dQStr.toStdString().c_str());
   } else {
     return FAILURE;
@@ -303,7 +303,7 @@ RevoluteJoint::initJointFromXml(const TiXmlElement *root, int jnum)
   const TiXmlElement *element = findXmlElement(root, "theta");
   if (element) {
     thQStr = element->GetText();
-    thQStr = thQStr.stripWhiteSpace();
+    thQStr = thQStr.trimmed();
     strcpy(thStr, thQStr.toStdString().c_str());
   }
   else {

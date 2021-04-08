@@ -143,9 +143,9 @@ GraspCaptureDlg::saveToFileButtonClicked()
                                           QString(getenv("GRASPIT")), "Text Files (*.txt)"));
   if (fn.isEmpty()) { return; }
   if (fn.section('.', 1).isEmpty()) { fn.append(".txt"); }
-  FILE *fp = fopen(fn.ascii(), "a");
+  FILE *fp = fopen(fn.toUtf8().constData(), "a");
   if (!fp) {
-    DBGA("Failed to open save file " << fn.ascii());
+    DBGA("Failed to open save file " << fn.toUtf8().constData());
     return;
   }
   std::list<GraspPlanningState *>::iterator it;

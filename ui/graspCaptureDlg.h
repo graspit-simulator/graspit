@@ -54,9 +54,9 @@ class QualityIndicator : public QDialog, public Ui::QualityIndicatorUI
     void setBar(double value) {
       qualityBar->setValue((value / 0.25) * 100);
       if (value > 0.0) {
-        fcLabel->setEnabled(TRUE);
+        fcLabel->setEnabled(true);
       } else {
-        fcLabel->setEnabled(FALSE);
+        fcLabel->setEnabled(false);
       }
     }
 };

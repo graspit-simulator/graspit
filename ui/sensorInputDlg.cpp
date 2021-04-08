@@ -96,7 +96,7 @@ SensorInputDlg::timerInternalCB()
     bool process = true;
     // If the Flock is attached to a real Barrett, we ignore readings
     // while the motors of the Barrett are active, as they corrupt the bird.
-    if (mWorld->getCurrentHand() && mWorld->getCurrentHand()->isA("Barrett")) {
+    if (mWorld->getCurrentHand() && mWorld->getCurrentHand()->metaObject()->className() == QString("Barrett")) {
       if (((Barrett *)mWorld->getCurrentHand())->isBusy()) { process = false; }
     }
     if (process) {

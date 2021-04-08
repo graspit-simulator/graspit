@@ -222,7 +222,7 @@ void DBasePlannerDlg::createGWSButton_clicked() {
 // put the entries into the distance function combo box
 void DBasePlannerDlg::initializeDistanceComboBox(std::vector<string> entries) {
   for (int i = 0; i < (int)entries.size(); ++i) {
-    distanceFunctionComboBox->insertItem(QString(entries[i].c_str()));
+    distanceFunctionComboBox->addItem(QString(entries[i].c_str()));
   }
 }
 
@@ -304,7 +304,7 @@ void DBasePlannerDlg::showGrasp(db_planner::Grasp *grasp) {
   }
   static_cast<GraspitDBModel *>(mPlanningModel)->getGraspableBody()->setTran(transf::IDENTITY);
   g->getPreGraspPlanningState()->execute();
-  if (mHand->isA("Barrett") && testedGraspRadioButton->isChecked()) {
+  if (mHand->metaObject()->className() == QString("Barrett") && testedGraspRadioButton->isChecked()) {
     graspitCore->getWorld()->getCurrentHand()->autoGrasp(true);
   }
   mHand->getWorld()->findAllContacts();
@@ -316,7 +316,7 @@ void DBasePlannerDlg::updateNeighborList() {
   neighborComboBoxInReconstruction = true;
   neighborComboBox->clear();
   for (int i = 0; i < (int)mNeighbors.size(); ++i) {
-    neighborComboBox->insertItem(mNeighbors[i].first->ModelName().c_str());
+    neighborComboBox->addItem(mNeighbors[i].first->ModelName().c_str());
   }
   neighborComboBoxInReconstruction = false;
 }

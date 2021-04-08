@@ -43,8 +43,7 @@
 
 #include "ui_mainWindow.h"
 
-#include <Q3MainWindow>
-//#include <QMainWindow>
+#include <QMainWindow>
 #include <QString>
 #include <QObject>
 
@@ -65,7 +64,7 @@ class MainWindow : public QObject
     void destroyChildren();
   public:
     Ui::MainWindowUI *mUI;
-    Q3MainWindow *mWindow;
+    QMainWindow *mWindow;
 
     MainWindow(QWidget *parent = 0);
     virtual ~MainWindow() {

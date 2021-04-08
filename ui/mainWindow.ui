@@ -3,7 +3,7 @@
   <comment></comment>
   <exportmacro></exportmacro>
   <class>MainWindowUI</class>
-  <widget class="Q3MainWindow" name="MainWindowUI" >
+  <widget class="QMainWindow" name="MainWindowUI" >
     <property name="geometry" >
       <rect>
         <x>0</x>
@@ -24,7 +24,7 @@
           <number>0</number>
         </property>
         <item>
-          <widget class="Q3GroupBox" name="worldBox" >
+          <widget class="QGroupBox" name="worldBox" >
             <property name="sizePolicy" >
               <sizepolicy>
                 <hsizetype>7</hsizetype>
@@ -73,7 +73,7 @@
               <number>6</number>
             </property>
             <item>
-              <widget class="Q3GroupBox" name="qualityGroupBox" >
+              <widget class="QGroupBox" name="qualityGroupBox" >
                 <property name="sizePolicy" >
                   <sizepolicy>
                     <hsizetype>5</hsizetype>
@@ -99,12 +99,12 @@
                     <number>6</number>
                   </property>
                   <item>
-                    <widget class="Q3ListBox" name="qualityListBox" >
+                    <widget class="QListWidget" name="qualityListBox" >
                       <property name="focusPolicy" >
                         <enum>Qt::NoFocus</enum>
                       </property>
                       <property name="selectionMode" >
-                        <enum>Q3ListBox::NoSelection</enum>
+                        <enum>QListWidget::NoSelection</enum>
                       </property>
                       <item>
                         <property name="text" >
@@ -117,7 +117,7 @@
               </widget>
             </item>
             <item>
-              <widget class="Q3GroupBox" name="contactsGroupBox" >
+              <widget class="QGroupBox" name="contactsGroupBox" >
                 <property name="sizePolicy" >
                   <sizepolicy>
                     <hsizetype>5</hsizetype>
@@ -143,7 +143,7 @@
                     <number>6</number>
                   </property>
                   <item>
-                    <widget class="Q3ListBox" name="contactsListBox" >
+                    <widget class="QListWidget" name="contactsListBox" >
                       <property name="focusPolicy" >
                         <enum>Qt::NoFocus</enum>
                       </property>
@@ -156,11 +156,8 @@
         </item>
       </layout>
     </widget>
-    <widget class="Q3ToolBar" name="toolBar" >
-      <property name="resizeEnabled" >
-        <bool>false</bool>
-      </property>
-      <property name="label" >
+    <widget class="QToolBar" name="toolBar" >
+      <property name="windowTitle" >
         <string>File</string>
       </property>
       <addaction name="fileNewAction" />
@@ -168,11 +165,8 @@
       <addaction name="fileSaveAction" />
       <addaction name="separator" />
     </widget>
-    <widget class="Q3ToolBar" name="Toolbar_2" >
-      <property name="resizeEnabled" >
-        <bool>false</bool>
-      </property>
-      <property name="label" >
+    <widget class="QToolBar" name="Toolbar_2" >
+      <property name="windowTitle" >
         <string>Body Tools</string>
       </property>
       <widget class="QComboBox" name="materialComboBox" >
@@ -188,17 +182,13 @@
       <addaction name="selectToolAction" />
       <addaction name="separator" />
       <addaction name="elementCollisionToggleAction" />
-      <addaction name="materialComboBox" />
     </widget>
-    <widget class="Q3ToolBar" name="ToolbarDynamics" >
-      <property name="resizeEnabled" >
-        <bool>false</bool>
-      </property>
-      <property name="label" >
+    <widget class="QToolBar" name="ToolbarDynamics" >
+      <property name="windowTitle" >
         <string>Dynamics</string>
       </property>
       <widget class="QLCDNumber" name="timeReadout" >
-        <property name="numDigits" >
+        <property name="digitCount" >
           <number>9</number>
         </property>
         <property name="toolTip" stdset="0" >
@@ -208,13 +198,9 @@
       <addaction name="dynamicsPopAction" />
       <addaction name="dynamicsPushAction" />
       <addaction name="dynamicsPlayAction" />
-      <addaction name="timeReadout" />
     </widget>
-    <widget class="Q3ToolBar" name="graspToolbar" >
-      <property name="resizeEnabled" >
-        <bool>false</bool>
-      </property>
-      <property name="label" >
+    <widget class="QToolBar" name="graspToolbar" >
+      <property name="windowTitle" >
         <string>Grasp</string>
       </property>
       <widget class="QComboBox" name="handSelectionBox" >
@@ -233,14 +219,9 @@
           <string>Body to grasp</string>
         </property>
       </widget>
-      <addaction name="handSelectionBox" />
-      <addaction name="graspedBodyBox" />
     </widget>
-    <widget class="Q3ToolBar" name="tendonToolbar" >
-      <property name="resizeEnabled" >
-        <bool>false</bool>
-      </property>
-      <property name="label" >
+    <widget class="QToolBar" name="tendonToolbar" >
+      <property name="windowTitle" >
         <string>Tendon forces</string>
       </property>
       <widget class="QLabel" name="Tendon_force_label" >
@@ -376,18 +357,6 @@
           <string/>
         </property>
       </widget>
-      <addaction name="Tendon_force_label" />
-      <addaction name="tendonNamesBox" />
-      <addaction name="tendonActiveForceLabel" />
-      <addaction name="TendonForceInput" />
-      <addaction name="tendonPassiveForceLabel" />
-      <addaction name="tendonPassiveForceEdit" />
-      <addaction name="tendonExcursionLabel" />
-      <addaction name="tendonExcursionEdit" />
-      <addaction name="tendonVisibleLabel" />
-      <addaction name="tendonVisibleCheckBox" />
-      <addaction name="forcesVisibleLabel" />
-      <addaction name="forcesVisibleCheckBox" />
     </widget>
     <widget class="QMenuBar" name="menubar" >
       <widget class="QMenu" name="fileMenu" >
@@ -485,11 +454,11 @@
       <addaction name="helpMenu" />
     </widget>
     <action name="fileNewAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileNewAction</cstring>
       </property>
       <property name="icon" >
-        <iconset>filenew.xpm</iconset>
+        <iconset>:/images/filenew.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>New</string>
@@ -502,11 +471,11 @@
       </property>
     </action>
     <action name="fileOpenAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileOpenAction</cstring>
       </property>
       <property name="icon" >
-        <iconset>fileopen.xpm</iconset>
+        <iconset>:/images/fileopen.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>Open</string>
@@ -519,11 +488,11 @@
       </property>
     </action>
     <action name="fileSaveAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileSaveAction</cstring>
       </property>
       <property name="icon" >
-        <iconset>filesave.xpm</iconset>
+        <iconset>:/images/filesave.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>Save</string>
@@ -536,7 +505,7 @@
       </property>
     </action>
     <action name="fileSaveAsAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileSaveAsAction</cstring>
       </property>
       <property name="iconText" >
@@ -550,7 +519,7 @@
       </property>
     </action>
     <action name="fileExitAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileExitAction</cstring>
       </property>
       <property name="iconText" >
@@ -564,7 +533,7 @@
       </property>
     </action>
     <action name="helpManualAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>helpManualAction</cstring>
       </property>
       <property name="iconText" >
@@ -581,7 +550,7 @@
       </property>
     </action>
     <action name="helpIndexAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>helpIndexAction</cstring>
       </property>
       <property name="iconText" >
@@ -595,7 +564,7 @@
       </property>
     </action>
     <action name="helpAboutAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>helpAboutAction</cstring>
       </property>
       <property name="iconText" >
@@ -609,7 +578,7 @@
       </property>
     </action>
     <action name="fileImportRobotAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileImportRobotAction</cstring>
       </property>
       <property name="iconText" >
@@ -620,7 +589,7 @@
       </property>
     </action>
     <action name="fileImportObjectAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileImportObjectAction</cstring>
       </property>
       <property name="iconText" >
@@ -631,7 +600,7 @@
       </property>
     </action>
     <action name="fileImportObstacleAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileImportObstacleAction</cstring>
       </property>
       <property name="iconText" >
@@ -642,7 +611,7 @@
       </property>
     </action>
     <action name="fileSaveImageAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileSaveImageAction</cstring>
       </property>
       <property name="iconText" >
@@ -653,7 +622,7 @@
       </property>
     </action>
     <action name="graspCreateProjectionAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspCreateProjectionAction</cstring>
       </property>
       <property name="iconText" >
@@ -664,7 +633,7 @@
       </property>
     </action>
     <action name="graspQualityMeasuresAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspQualityMeasuresAction</cstring>
       </property>
       <property name="iconText" >
@@ -675,7 +644,7 @@
       </property>
     </action>
     <action name="fileEditSettingsAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileEditSettingsAction</cstring>
       </property>
       <property name="iconText" >
@@ -686,7 +655,7 @@
       </property>
     </action>
     <action name="graspPlannerAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspPlannerAction</cstring>
       </property>
       <property name="iconText" >
@@ -697,7 +666,7 @@
       </property>
     </action>
     <action name="graspGFOAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspGFOAction</cstring>
       </property>
       <property name="iconText" >
@@ -708,7 +677,7 @@
       </property>
     </action>
     <action name="graspStabilityAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspStabilityAction</cstring>
       </property>
       <property name="iconText" >
@@ -719,7 +688,7 @@
       </property>
     </action>
     <action name="graspCompliantPlannerAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspCompliantPlannerAction</cstring>
       </property>
       <property name="iconText" >
@@ -730,14 +699,14 @@
       </property>
     </action>
     <action name="dynamicsPlayAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dynamicsPlayAction</cstring>
       </property>
       <property name="checkable" >
         <bool>true</bool>
       </property>
       <property name="icon" >
-        <iconset>play.xpm</iconset>
+        <iconset>:/images/play.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>Start Simulation</string>
@@ -747,11 +716,11 @@
       </property>
     </action>
     <action name="dynamicsPopAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dynamicsPopAction</cstring>
       </property>
       <property name="icon" >
-        <iconset>prevMark.xpm</iconset>
+        <iconset>:/images/prevMark.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>Pop State</string>
@@ -761,11 +730,11 @@
       </property>
     </action>
     <action name="dynamicsPushAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dynamicsPushAction</cstring>
       </property>
       <property name="icon" >
-        <iconset>mark.xpm</iconset>
+        <iconset>:/images/mark.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>Push State</string>
@@ -775,14 +744,14 @@
       </property>
     </action>
     <action name="elementCollisionToggleAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>elementCollisionToggleAction</cstring>
       </property>
       <property name="checkable" >
         <bool>true</bool>
       </property>
       <property name="icon" >
-        <iconset>collide.xpm</iconset>
+        <iconset>:/images/collide.xpm</iconset>
       </property>
       <property name="iconText" >
         <string>Collisions ON</string>
@@ -792,7 +761,7 @@
       </property>
     </action>
     <action name="elementBodyPropertiesAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>elementBodyPropertiesAction</cstring>
       </property>
       <property name="enabled" >
@@ -806,7 +775,7 @@
       </property>
     </action>
     <action name="graspAutoGraspAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspAutoGraspAction</cstring>
       </property>
       <property name="iconText" >
@@ -820,7 +789,7 @@
       </property>
     </action>
     <action name="helpAboutQTAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>helpAboutQTAction</cstring>
       </property>
       <property name="iconText" >
@@ -831,7 +800,7 @@
       </property>
     </action>
     <action name="fileImport_Human_HandAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>fileImport_Human_HandAction</cstring>
       </property>
       <property name="iconText" >
@@ -842,7 +811,7 @@
       </property>
     </action>
     <action name="dynamicsArch_BuilderAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dynamicsArch_BuilderAction</cstring>
       </property>
       <property name="iconText" >
@@ -853,7 +822,7 @@
       </property>
     </action>
     <action name="sensorsSensor_InputAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>sensorsSensor_InputAction</cstring>
       </property>
       <property name="iconText" >
@@ -864,7 +833,7 @@
       </property>
     </action>
     <action name="stereoOnAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>stereoOnAction</cstring>
       </property>
       <property name="iconText" >
@@ -875,7 +844,7 @@
       </property>
     </action>
     <action name="stereoOffAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>stereoOffAction</cstring>
       </property>
       <property name="iconText" >
@@ -886,7 +855,7 @@
       </property>
     </action>
     <action name="stereoFlip_leftrightAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>stereoFlip_leftrightAction</cstring>
       </property>
       <property name="iconText" >
@@ -897,7 +866,7 @@
       </property>
     </action>
     <action name="dbaseGraspCaptureAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dbaseGraspCaptureAction</cstring>
       </property>
       <property name="iconText" >
@@ -908,7 +877,7 @@
       </property>
     </action>
     <action name="graspEigenGrasp_InterfaceAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspEigenGrasp_InterfaceAction</cstring>
       </property>
       <property name="iconText" >
@@ -919,7 +888,7 @@
       </property>
     </action>
     <action name="graspContact_ExaminerAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspContact_ExaminerAction</cstring>
       </property>
       <property name="iconText" >
@@ -930,7 +899,7 @@
       </property>
     </action>
     <action name="graspEigenGrasp_PlannerAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspEigenGrasp_PlannerAction</cstring>
       </property>
       <property name="iconText" >
@@ -941,7 +910,7 @@
       </property>
     </action>
     <action name="sensorsBarrett_HandAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>sensorsBarrett_HandAction</cstring>
       </property>
       <property name="iconText" >
@@ -952,7 +921,7 @@
       </property>
     </action>
     <action name="graspAuto_OpenAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>graspAuto_OpenAction</cstring>
       </property>
       <property name="iconText" >
@@ -963,7 +932,7 @@
       </property>
     </action>
     <action name="elementPrimitivesAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>elementPrimitivesAction</cstring>
       </property>
       <property name="enabled" >
@@ -977,7 +946,7 @@
       </property>
     </action>
     <action name="dbaseGUIAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dbaseGUIAction</cstring>
       </property>
       <property name="iconText" >
@@ -988,7 +957,7 @@
       </property>
     </action>
     <action name="dbasePlannerAction" >
-      <property name="name" >
+      <property name="objectName" >
         <cstring>dbasePlannerAction</cstring>
       </property>
       <property name="iconText" >
@@ -1000,7 +969,7 @@
     </action>
     <actiongroup name="elementGroup" >
       <action name="translateToolAction" >
-        <property name="name" >
+        <property name="objectName" >
           <cstring>translateToolAction</cstring>
         </property>
         <property name="checkable" >
@@ -1010,7 +979,7 @@
           <bool>true</bool>
         </property>
         <property name="icon" >
-          <iconset>translateTool.xpm</iconset>
+          <iconset>:/images/translateTool.xpm</iconset>
         </property>
         <property name="iconText" >
           <string>Translate</string>
@@ -1026,14 +995,14 @@
         </property>
       </action>
       <action name="rotateToolAction" >
-        <property name="name" >
+        <property name="objectName" >
           <cstring>rotateToolAction</cstring>
         </property>
         <property name="checkable" >
           <bool>true</bool>
         </property>
         <property name="icon" >
-          <iconset>rotateTool.xpm</iconset>
+          <iconset>:/images/rotateTool.xpm</iconset>
         </property>
         <property name="iconText" >
           <string>Rotate</string>
@@ -1049,14 +1018,14 @@
         </property>
       </action>
       <action name="selectToolAction" >
-        <property name="name" >
+        <property name="objectName" >
           <cstring>selectToolAction</cstring>
         </property>
         <property name="checkable" >
           <bool>true</bool>
         </property>
         <property name="icon" >
-          <iconset>selectTool.xpm</iconset>
+          <iconset>:/images/selectTool.xpm</iconset>
         </property>
         <property name="iconText" >
           <string>Select</string>
@@ -1071,7 +1040,7 @@
           <string>F4</string>
         </property>
       </action>
-      <property name="name" >
+      <property name="objectName" >
         <cstring>elementGroup</cstring>
       </property>
     </actiongroup>
