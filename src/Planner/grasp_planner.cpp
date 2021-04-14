@@ -60,9 +60,7 @@
 #include <Inventor/nodes/SoTransformSeparator.h>
 #include <Inventor/nodes/SoDirectionalLight.h>
 
-#ifdef Q_WS_X11
 #include <unistd.h>
-#endif
 
 /* graspit includes */
 #include "graspit/contact/contact.h"

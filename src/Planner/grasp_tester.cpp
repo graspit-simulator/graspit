@@ -60,10 +60,8 @@
 #include <Inventor/SbColor.h>
 #include <Inventor/nodes/SoTransform.h>
 
-#ifdef Q_WS_X11
 #include <unistd.h>
 #include <sys/time.h>
-#endif
 
 #include <list>
 

@@ -57,9 +57,7 @@
 #include <Inventor/SbLinear.h>
 #include <Inventor/nodes/SoSelection.h>
 
-#ifdef Q_WS_X11
 #include <unistd.h>
-#endif
 
 /* graspit includes */
 #include "graspit/graspitCore.h"

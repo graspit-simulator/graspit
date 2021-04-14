@@ -32,9 +32,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-#ifdef Q_WS_X11
 #include <unistd.h>
-#endif
 #include "graspit/mytools.h"
 #include "graspit/dynamics/dynamics.h"
 #include "graspit/dynamics/dynJoint.h"
