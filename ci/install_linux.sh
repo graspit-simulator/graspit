@@ -1,10 +1,6 @@
 APT='
 cmake
-libqt4-dev
-libqt4-opengl-dev
-libqt4-sql-psql
-libcoin80-dev
-libsoqt4-dev
+libsoqt520
 libblas-dev
 liblapack-dev
 libqhull-dev 

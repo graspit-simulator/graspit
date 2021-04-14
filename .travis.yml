@@ -2,7 +2,7 @@ language: cpp
 
 sudo: required
 
-dist: trusty
+dist: focal
 
 addons:
   apt:
