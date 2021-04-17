@@ -125,7 +125,7 @@ void QMDlg::addEditQM()
     qmListBox->insertItem(selectedQM, qmName->text());
   }
 
-  qmListBox->setCurrentItem(0);
+  qmListBox->setCurrentRow(0);
   qmListBox->update();
   qmListBox->show();
 
