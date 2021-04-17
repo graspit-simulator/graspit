@@ -11,14 +11,14 @@
 #include "ivmgr.h"
 #include "world.h"
 #include "plannerdlg.h"
-#include "quality.h"
+#include "quality/quality.h"
 #include "robot.h"
 #include "qmDlg.h"
 #include "grasp.h"
-#include "collisionInterface.h"
-#include "collisionStructures.h"
+#include "Collision/collisionInterface.h"
+#include "Collision/collisionStructures.h"
 #include "collisionModel.h"
-#include "Graspit/collisionAlgorithms.h"
+#include "Collision/Graspit/collisionAlgorithms.h"
 #include "bBox.h"
 
 #define SLOP 0.001
@@ -142,8 +142,6 @@ int main(int argc, char **argv)
 {
   GraspItApp app(argc, NULL);
   GraspitCore core(argc, NULL);
-
-  app.setMainWidget(core.getMainWindow()->mWindow);
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

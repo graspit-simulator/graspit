@@ -960,6 +960,7 @@ set_target_properties( primative_planner_tests eigen_tests transform_tests grasp
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
 )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_dependencies(primative_planner_tests googletest)
 add_dependencies(eigen_tests googletest)
