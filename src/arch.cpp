@@ -164,7 +164,7 @@ void create_arch(World *world, double inner_radius, double outer_radius, double 
   for (int i = 0; i < n_blocks; i++) {
     QString name("Block "), id;
     name.append(id.setNum(i));
-    GraspableBody *addBlock = new GraspableBody(world, name.latin1());
+    GraspableBody *addBlock = new GraspableBody(world, name.toLatin1().constData());
     addBlock->cloneFrom(block); //this also adds it to collision detection!
     world->addBody(addBlock);
 

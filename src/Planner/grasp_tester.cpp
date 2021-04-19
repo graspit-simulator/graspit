@@ -60,10 +60,8 @@
 #include <Inventor/SbColor.h>
 #include <Inventor/nodes/SoTransform.h>
 
-#ifdef Q_WS_X11
 #include <unistd.h>
 #include <sys/time.h>
-#endif
 
 #include <list>
 
@@ -159,7 +157,7 @@ grasp_tester::saveGraspsToFile(const QString &filename, bool append)
 {
   if (saveToFile) { graspFile.close(); }
 
-  graspFile.setName(filename);
+  graspFile.setFileName(filename);
   if (append) {
     if (graspFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
       graspOut.setDevice(&graspFile);

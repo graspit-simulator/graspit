@@ -124,7 +124,7 @@ EigenGrasp::writeToFile(TiXmlElement *ep)
   {
     varStr.setNum(i);
     varStr = "d" + varStr;
-    DimVals->SetDoubleAttribute(varStr, mVals[i]);
+    DimVals->SetDoubleAttribute(varStr.toLatin1().constData(), mVals[i]);
   }
   ep->LinkEndChild(DimVals);
 
@@ -199,7 +199,7 @@ EigenGrasp::readFromXml(const TiXmlElement *element)
   EVList = findAllXmlElements(element, "DimVals");
   if (!countXmlElements(element, "DimVals")) {DBGA("DimVals tag missing from file."); return 0;}
   for (int i = 0; i < mSize; i++) {
-    valueStr = (*EVList.begin())->Attribute(QString("d") + QString::number(i));
+    valueStr = (*EVList.begin())->Attribute((QString("d") + QString::number(i)).toStdString().c_str());
     if (valueStr.isNull() || valueStr.isEmpty()) { mVals[i] = 0.0; }
     else {
       mVals[i] = valueStr.toDouble(&ok);
@@ -385,9 +385,9 @@ EigenGraspInterface::readFromFile(QString filename)
   }
 
   //load the graspit specific information in XML format or fail
-  TiXmlDocument doc(xmlFilename);
+  TiXmlDocument doc(xmlFilename.toStdString());
   if (doc.LoadFile() == false) {
-    DBGA("Failed to open EG file: " << filename.latin1());
+    DBGA("Failed to open EG file: " << filename.toLatin1().toStdString());
     QTWARNING("Could not open " + xmlFilename);
     return 0;
   }

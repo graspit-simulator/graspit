@@ -197,9 +197,10 @@ operator>>(QTextStream &is, vec3 &v)
 QTextStream &
 operator<<(QTextStream &os, const vec3 &v)
 {
-  int oldFlags = os.setf(QTextStream::showpos);
+  QTextStream::NumberFlags oldFlags = os.numberFlags();
+  os.setNumberFlags(QTextStream::ForceSign);
   os << '[' << v[0] << ' ' << v[1] << ' ' << v[2] << ']';
-  os.flags(oldFlags);
+  os.setNumberFlags(oldFlags);
   return os;
 }
 
@@ -232,11 +233,12 @@ operator>>(QTextStream &is, mat3 &m)
 QTextStream &
 operator<<(QTextStream &os, const mat3 &m)
 {
-  int oldFlags = os.setf(QTextStream::showpos);
+  QTextStream::NumberFlags oldFlags = os.numberFlags();
+  os.setNumberFlags(QTextStream::ForceSign);
   os << '[' << m(0) << ' ' << m(3) << ' ' << m(6) << ']' << endl;
   os << '[' << m(1) << ' ' << m(4) << ' ' << m(7) << ']' << endl;
   os << '[' << m(2) << ' ' << m(5) << ' ' << m(8) << ']' << endl;
-  os.flags(oldFlags);
+  os.setNumberFlags(oldFlags);
   return os;
 }
 
@@ -260,9 +262,10 @@ operator>>(QTextStream &is, Quaternion &q)
 QTextStream &
 operator<<(QTextStream &os, const Quaternion &q)
 {
-  int oldFlags = os.setf(QTextStream::showpos);
+  QTextStream::NumberFlags oldFlags = os.numberFlags();
+  os.setNumberFlags(QTextStream::ForceSign);
   os << '(' << q.w() << ' ' << q.x() << ' ' << q.y() << ' ' << q.z() << ')';
-  os.flags(oldFlags);
+  os.setNumberFlags(oldFlags);
   return os;
 }
 
@@ -331,7 +334,7 @@ readTransRotFromQTextStream(QTextStream &stream, transf &tr)
   do {
     if (!line.isNull() && (line[0] == 'r' || line[0] == 't' || line[0] == 'T' || line[0] == 'R')) {
       if (line[0] == 'r') { /* rotation */
-        strings = QStringList::split(QChar(' '), line);
+        strings = line.split(' ');
         if (strings.count() < 3) { return FAILURE; }
         theta = strings[1].toDouble(&ok); if (!ok) { return FAILURE; }
         axis = strings[2][0];
@@ -348,7 +351,7 @@ readTransRotFromQTextStream(QTextStream &stream, transf &tr)
         tmpTr = transf::AXIS_ANGLE_ROTATION(theta, tmpVec);
       }
       else if (line[0] == 't') { /* translation */
-        strings = QStringList::split(QChar(' '), line);
+        strings = line.split(' ');
         if (strings.count() < 4) { return FAILURE; }
         x = strings[1].toDouble(&ok); if (!ok) { return FAILURE; }
         y = strings[2].toDouble(&ok); if (!ok) { return FAILURE; }

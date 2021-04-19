@@ -209,11 +209,11 @@ EGPlanner::createAndUseClone()
     mHand->getWorld()->getCollisionInterface()->newThread();
   }
   Hand *clone;
-  if (mHand->isA("Barrett")) {
+  if (mHand->metaObject()->className() == QString("Barrett")) {
     clone = new Barrett(mHand->getWorld(), "Barrett clone");
-  } else if (mHand->isA("Pr2Gripper")) {
+  } else if (mHand->metaObject()->className() == QString("Pr2Gripper")) {
     clone = new Pr2Gripper(mHand->getWorld(), "PR2 Gripper clone");
-  } else if (mHand->isA("RobotIQ")) {
+  } else if (mHand->metaObject()->className() == QString("RobotIQ")) {
     clone = new RobotIQ(mHand->getWorld(), "RobotIQ clone");
   } else {
     clone = new Hand(mHand->getWorld(), "Hand clone");

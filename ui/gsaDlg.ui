@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Grasp Stability Analysis</string>
   </property>
-  <widget class="Q3GroupBox" name="gsaGroupBox">
+  <widget class="QGroupBox" name="gsaGroupBox">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -120,14 +120,6 @@
    </property>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

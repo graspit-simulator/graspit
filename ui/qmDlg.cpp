@@ -48,17 +48,16 @@ void QMDlg::init()
   Grasp *g = graspitCore->getWorld()->getCurrentHand()->getGrasp();
   int i;
 
-  qmListBox->insertItem("New quality measure");
+  qmListBox->addItem("New quality measure");
   for (qp = g->qmList.begin(), i = 1; qp != g->qmList.end(); qp++, i++) {
-    qmListBox->insertItem((*qp)->getName());
+    qmListBox->addItem((*qp)->getName());
   }
 
   for (i = 0; QualityMeasure::TYPE_LIST[i]; i++) {
-    qmTypeComboBox->insertItem(QString(QualityMeasure::TYPE_LIST[i]));
+    qmTypeComboBox->addItem(QString(QualityMeasure::TYPE_LIST[i]));
   }
 
-  qmSettingsBox->setColumnLayout(0, Qt::Vertical);
-  QHBoxLayout *settingsBoxLayout = new QHBoxLayout(qmSettingsBox->layout());
+  QHBoxLayout *settingsBoxLayout = new QHBoxLayout(qmSettingsBox);
   settingsBoxLayout->setAlignment(Qt::AlignTop);
 
   qmDlgData.settingsArea = new QWidget(qmSettingsBox);
@@ -70,6 +69,7 @@ void QMDlg::init()
   gravityBox->setChecked(g->isGravitySet());
 
   qmListBox->setCurrentItem(0);
+  qmListBox->setFocus();
 }
 
 
@@ -78,7 +78,7 @@ void QMDlg::init()
 */
 void QMDlg::selectQMType(const QString &typeStr)
 {
-  qmDlgData.qmType = typeStr.latin1();
+  qmDlgData.qmType = typeStr.toStdString().c_str();
   updateSettingsBox();
 }
 
@@ -93,7 +93,7 @@ void QMDlg::updateSettingsBox()
 
   qmDlgData.settingsArea = new QWidget(qmSettingsBox);
   qmSettingsBox->layout()->setAlignment(Qt::AlignTop);
-  qmSettingsBox->layout()->add(qmDlgData.settingsArea);
+  qmSettingsBox->layout()->addWidget(qmDlgData.settingsArea);
   QualityMeasure::buildParamArea(&qmDlgData);
 
   qmDlgData.settingsArea->show();
@@ -113,18 +113,19 @@ void QMDlg::addEditQM()
 
   newQM = QualityMeasure::createInstance(&qmDlgData);
 
-  selectedQM = qmListBox->currentItem();
+  selectedQM = qmListBox->currentRow();
   if (selectedQM == 0) { // create a new quality measure
     g->addQM(newQM);
 
-    qmListBox->insertItem(qmName->text());
+    qmListBox->addItem(qmName->text());
   }
   else { // replace an old quality measure with a new one
     g->replaceQM(selectedQM - 1, newQM);
-    qmListBox->changeItem(qmName->text(), selectedQM);
+    qmListBox->takeItem(selectedQM);
+    qmListBox->insertItem(selectedQM, qmName->text());
   }
 
-  qmListBox->setCurrentItem(0);
+  qmListBox->setCurrentRow(0);
   qmListBox->update();
   qmListBox->show();
 
@@ -139,14 +140,14 @@ void QMDlg::deleteQM()
   int selectedQM;
   int numItems;
 
-  selectedQM = qmListBox->currentItem();
+  selectedQM = qmListBox->currentRow();
   graspitCore->getWorld()->getCurrentHand()->getGrasp()->
   removeQM(selectedQM - 1);
-  qmListBox->removeItem(selectedQM);
+  qmListBox->takeItem(selectedQM);
 
   // select the next item in the list
   numItems = qmListBox->count();
-  qmListBox->setCurrentItem(selectedQM < numItems ? selectedQM : 0);
+  qmListBox->setCurrentRow(selectedQM < numItems ? selectedQM : 0);
   qmListBox->update();
 }
 
@@ -162,7 +163,7 @@ void QMDlg::selectQM(int which)
   if (which == 0) { // "New quality measure" selected
     qmDlgData.currQM = NULL;
     qmDlgData.qmType = QualityMeasure::TYPE_LIST[0];
-    qmTypeComboBox->setCurrentItem(0);
+    qmTypeComboBox->setCurrentIndex(0);
     DeleteButton->setEnabled(false);
     qmName->setText(QString("New Quality Measure"));
   }
@@ -173,12 +174,12 @@ void QMDlg::selectQM(int which)
 
     for (int i = 0; QualityMeasure::TYPE_LIST[i]; i++) {
       if (!strcmp(QualityMeasure::TYPE_LIST[i], qmDlgData.currQM->getType())) {
-        qmTypeComboBox->setCurrentItem(i);
+        qmTypeComboBox->setCurrentIndex(i);
         qmDlgData.qmType = QualityMeasure::TYPE_LIST[i];
         break;
       }
     }
-    qmName->setText(qmListBox->text(which));
+    qmName->setText(qmListBox->item(which)->text());
   }
   updateSettingsBox();
 }

@@ -307,7 +307,7 @@ int GraspitDynamics::computeNewVelocities(double timeStep) {
           DynamicBody *contactedBody = (DynamicBody *)(*cp)->getBody2();
 
           // is this body is a link, add all robots connected to the link
-          if (contactedBody->isA("Link")) {
+          if (contactedBody->metaObject()->className() == QString("Link")) {
             Robot *robot = ((Robot *)((Link *)contactedBody)->getOwner())->getBaseRobot();
             robot->getAllLinks(robotLinks);
             robot->getAllAttachedRobots(islandRobots);

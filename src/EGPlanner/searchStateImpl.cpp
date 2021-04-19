@@ -64,10 +64,10 @@ void PostureStateEigen::createVariables()
     if (mHand->getEigenGrasps()->getGrasp(i)->mPredefinedLimits) {
       min = mHand->getEigenGrasps()->getGrasp(i)->mMin;
       max = mHand->getEigenGrasps()->getGrasp(i)->mMax;
-    } else if (mHand->isA("Pr2Gripper")) {
+    } else if (mHand->metaObject()->className() == QString("Pr2Gripper")) {
       min = -0.6f;
       max = 0.6f;
-    } else if (mHand->isA("Pr2Gripper2010")) {
+    } else if (mHand->metaObject()->className() == QString("Pr2Gripper2010")) {
       min = -0.45f;
       max = 0.45f;
     } else {

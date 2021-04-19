@@ -351,7 +351,7 @@ Contact::localToWorldWrenchMatrix() const
   //also scale by object max radius so we get same units as force
   //and optimization does not favor torque over force
   double scale = 1.0;
-  if (getBody2()->isA("GraspableBody")) {
+  if (getBody2()->metaObject()->className() == QString("GraspableBody")) {
     scale = scale / static_cast<GraspableBody *>(getBody2())->getMaxRadius();
   }
   CR.multiply(scale);

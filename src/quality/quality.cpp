@@ -38,7 +38,6 @@
 #include <QBoxLayout>
 #include <QHBoxLayout>
 #include <QWidget>
-#include <q3groupbox.h>
 #include <QLayout>
 #include <QLabel>
 #include <QLineEdit>

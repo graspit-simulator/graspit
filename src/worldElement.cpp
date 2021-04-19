@@ -50,7 +50,7 @@ const double WorldElement::ONE_STEP = 1.0e6;
   Protected constructor should only be called by subclasses.
   It initializes an empty worldElement.
 */
-WorldElement::WorldElement(World *w, const char *name) : QObject((QObject *)w, name)
+WorldElement::WorldElement(World *w, const char *name) : QObject((QObject *)w)
 {
   myWorld = w; IVRoot = NULL;
   if (!name) { myName = "unnamed"; }
@@ -63,7 +63,7 @@ WorldElement::WorldElement(World *w, const char *name) : QObject((QObject *)w, n
 /*!
   Protected copy constructor (should not be called by user)
 */
-WorldElement::WorldElement(const WorldElement &e) : QObject((QObject *)e.myWorld, e.name())
+WorldElement::WorldElement(const WorldElement &e) : QObject((QObject *)e.myWorld)
 {
   myWorld = e.myWorld;
   myName = e.myName;
@@ -140,8 +140,8 @@ WorldElement::interpolateTo(transf lastTran, transf newTran, const CollisionRepo
     if (deltat <= 1.0e-20 || t < 0) {
       for (int i = 0; i < numCols; i++) {
         double dist = myWorld->getDist(colReport[i].first, colReport[i].second);
-        DBGA(colReport[i].first->getName().latin1() << " -- " <<
-             colReport[i].second->getName().latin1() << " is " << dist);
+        DBGA(colReport[i].first->getName().toLatin1().constData() << " -- " <<
+             colReport[i].second->getName().toLatin1().constData() << " is " << dist);
       }
     }
 
@@ -181,10 +181,10 @@ bool WorldElement::jumpTo(transf newTran, CollisionReport *contactReport)
 
 #ifdef GRASPITDBG
     for (i = 0; i < numCols; i++) {
-      std::cerr << colReport[i].first->getName().latin1() << " -- "
-                << colReport[i].second->getName().latin1() << std::endl;
+      std::cerr << colReport[i].first->getName().toLatin1().constData() << " -- "
+                << colReport[i].second->getName().toLatin1().constData() << std::endl;
     }
-    DBGP("I am " << myName.latin1());
+    DBGP("I am " << myName.toLatin1().constData());
 #endif
 
     success = interpolateTo(lastTran, getTran(), colReport);
@@ -302,7 +302,7 @@ WorldElement::moveTo(transf &newTran, double translStepSize, double rotStepSize)
   }
 
   if (!success) {
-    DBGA("JumpTo error, stopping execution. Object " << myName.latin1() << " in thread "
+    DBGA("JumpTo error, stopping execution. Object " << myName.toLatin1().constData() << " in thread "
          << getWorld()->getCollisionInterface()->getThreadId());
   } else {
     myWorld->findContacts(contactReport);

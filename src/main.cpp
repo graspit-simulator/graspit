@@ -81,7 +81,7 @@ int main(int argc, char **argv)
   if (!headless) {
     if (app.splashEnabled()) {
       app.showSplash();
-      QApplication::setOverrideCursor(Qt::waitCursor);
+      QApplication::setOverrideCursor(Qt::WaitCursor);
     }
   }
 
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 
   if (!headless)
   {
-    app.setMainWidget(core.getMainWindow()->mWindow);
+    app.setActiveWindow(core.getMainWindow()->mWindow);
     if (app.splashEnabled()) {
       app.closeSplash();
       QApplication::restoreOverrideCursor();

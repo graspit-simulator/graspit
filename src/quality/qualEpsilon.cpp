@@ -51,7 +51,7 @@ struct QualEpsilonParamT {
 QualEpsilon::QualEpsilon(qmDlgDataT *data) : QualityMeasure(data)
 {
   QualEpsilonParamT *params = (QualEpsilonParamT *)data->paramPtr;
-  gws = grasp->addGWS(params->gwsTypeComboBox->currentText().latin1());
+  gws = grasp->addGWS(params->gwsTypeComboBox->currentText().toLatin1());
 }
 
 QualEpsilon::QualEpsilon(Grasp *g, QString n, const char *gwsType) : QualityMeasure(g, n)
@@ -143,25 +143,28 @@ QualEpsilon::buildParamArea(qmDlgDataT *qmData)
   std::cout << "building qualepsilon" << std::endl;
 #endif
 
-  QLayout *l = new QGridLayout(qmData->settingsArea, 2, 2, 1);
-  l->setAutoAdd(true);
+  QGridLayout *l = new QGridLayout(qmData->settingsArea);
 
   // create the GWS type menu
-  new QLabel(QString("Limit unit GWS using:"), qmData->settingsArea);
-  params.gwsTypeComboBox = new QComboBox(qmData->settingsArea, "gwsComboBox");
+  l->addWidget(new QLabel(QString("Limit unit GWS using:"), qmData->settingsArea), 0, 0);
+  params.gwsTypeComboBox = new QComboBox(qmData->settingsArea);
+  params.gwsTypeComboBox->setObjectName("gwsComboBox");
+  l->addWidget(params.gwsTypeComboBox, 0, 1);
 
-  new QLabel(QString("Task Wrench Space (TWS):"), qmData->settingsArea);
-  params.twsTypeComboBox = new QComboBox(qmData->settingsArea, "twsComboBox");
+  l->addWidget(new QLabel(QString("Task Wrench Space (TWS):"), qmData->settingsArea), 1, 0);
+  params.twsTypeComboBox = new QComboBox(qmData->settingsArea);
+  params.twsTypeComboBox->setObjectName("twsComboBox");
+  l->addWidget(params.twsTypeComboBox, 1, 1);
 
   // count the number of possible gws types
   for (i = 0; GWS::TYPE_LIST[i]; i++) {
-    params.gwsTypeComboBox->insertItem(QString(GWS::TYPE_LIST[i]));
+    params.gwsTypeComboBox->addItem(QString(GWS::TYPE_LIST[i]));
     if (currQM && !strcmp(currQM->gws->getType(), GWS::TYPE_LIST[i])) {
-      params.gwsTypeComboBox->setCurrentItem(i);
+      params.gwsTypeComboBox->setCurrentIndex(i);
     }
   }
 
-  params.twsTypeComboBox->insertItem(QString("Unit Ball"));
+  params.twsTypeComboBox->addItem(QString("Unit Ball"));
 
   qmData->paramPtr = &params;
 }

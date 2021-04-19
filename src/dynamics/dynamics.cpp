@@ -32,9 +32,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-#ifdef Q_WS_X11
 #include <unistd.h>
-#endif
 #include "graspit/mytools.h"
 #include "graspit/dynamics/dynamics.h"
 #include "graspit/dynamics/dynJoint.h"
@@ -198,10 +196,10 @@ moveBodies(int numBodies, std::vector<DynamicBody *> bodyVec, double h)
     memcpy(currv, bodyVec[bn]->getVelocity(), 6 * sizeof(double));;
 
 #ifdef GRASPITDBG
-    fprintf(stdout, "object %s old velocity: \n", bodyVec[bn]->getName().latin1());
+    fprintf(stdout, "object %s old velocity: \n", bodyVec[bn]->getName().toLatin1().constData());
     for (int i = 0; i < 6; i++) { fprintf(stdout, "%le   ", currv[i]); }
     printf("\n");
-    fprintf(stdout, "object %s old position: \n", bodyVec[bn]->getName().latin1());
+    fprintf(stdout, "object %s old position: \n", bodyVec[bn]->getName().toLatin1().constData());
     for (int i = 0; i < 7; i++) { fprintf(stdout, "%le   ", currq[i]); }
 #endif
 
@@ -242,10 +240,10 @@ moveBodies(int numBodies, std::vector<DynamicBody *> bodyVec, double h)
     dgemv("N", 7, 6, h, V, 7, currv, 1, 1.0, newPos, 1);
 
 #ifdef GRASPITDBG
-    fprintf(stdout, "object %s new velocity: \n", bodyVec[bn]->getName().latin1());
+    fprintf(stdout, "object %s new velocity: \n", bodyVec[bn]->getName().toLatin1().constData());
     for (int i = 0; i < 6; i++) { fprintf(stdout, "%le   ", currv[i]); }
     printf("\n");
-    fprintf(stdout, "object %s new position: \n", bodyVec[bn]->getName().latin1());
+    fprintf(stdout, "object %s new position: \n", bodyVec[bn]->getName().toLatin1().constData());
     disp_mat(stdout, newPos, 1, 7);
 #endif
 
@@ -423,7 +421,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
     if (bodyVec[bn]->getDynJoint()) {
       int numCon = bodyVec[bn]->getDynJoint()->getNumConstraints();
       numDynJointConstraints += numCon;
-      DBGP(bodyVec[bn]->getName().latin1() << ": " << numCon << " constraints");
+      DBGP(bodyVec[bn]->getName().toLatin1().constData() << ": " << numCon << " constraints");
     }
     //count contacts
     objContactList = bodyVec[bn]->getContacts();
@@ -529,7 +527,7 @@ iterateDynamics(std::vector<Robot *> robotVec,
       fprintf(stderr, "%f %f %f\n", Jcg_B[0], Jcg_B[1], Jcg_B[2]);
       fprintf(stderr, "%f %f %f\n", Jcg_B[3], Jcg_B[4], Jcg_B[5]);
       fprintf(stderr, "%f %f %f\n", Jcg_B[6], Jcg_B[7], Jcg_B[8]);
-      fprintf(stderr, "Body is %s\n", bodyVec[bn]->getName().latin1());
+      fprintf(stderr, "Body is %s\n", bodyVec[bn]->getName().toLatin1().constData());
     }
 
     currM = M + ((6 * bn) * Mrows + bn * 6); //point to the correct block of M

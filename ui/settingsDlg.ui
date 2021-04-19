@@ -100,7 +100,7 @@
       </widget>
      </item>
      <item>
-      <widget class="Q3Table" name="staticFrictionTable" >
+      <widget class="QTableWidget" name="staticFrictionTable" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>7</hsizetype>
@@ -108,12 +108,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="numRows" >
-        <number>0</number>
-       </property>
-       <property name="numCols" >
-        <number>0</number>
        </property>
       </widget>
      </item>
@@ -128,7 +122,7 @@
       </widget>
      </item>
      <item>
-      <widget class="Q3Table" name="kineticFrictionTable" >
+      <widget class="QTableWidget" name="kineticFrictionTable" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>7</hsizetype>
@@ -136,12 +130,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="numRows" >
-        <number>0</number>
-       </property>
-       <property name="numCols" >
-        <number>0</number>
        </property>
       </widget>
      </item>
@@ -228,15 +216,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3Table</class>
-   <extends>Q3Frame</extends>
-   <header>q3table.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>settingsTabs</tabstop>
   <tabstop>staticFrictionTable</tabstop>
@@ -265,9 +244,9 @@
   </connection>
   <connection>
    <sender>staticFrictionTable</sender>
-   <signal>currentChanged(int,int)</signal>
-   <receiver>SettingsDlgUI</receiver>
-   <slot>saveCurrentCOF(int,int)</slot>
+   <signal>currentCellChanged(int,int,int,int)</signal>
+   <receiver>SettingsDlg</receiver>
+   <slot>saveCurrentCOF(int,int,int,int)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>20</x>
@@ -281,8 +260,8 @@
   </connection>
   <connection>
    <sender>staticFrictionTable</sender>
-   <signal>valueChanged(int,int)</signal>
-   <receiver>SettingsDlgUI</receiver>
+   <signal>cellChanged(int,int)</signal>
+   <receiver>SettingsDlg</receiver>
    <slot>checkCOFEntry(int,int)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -297,9 +276,9 @@
   </connection>
   <connection>
    <sender>kineticFrictionTable</sender>
-   <signal>currentChanged(int,int)</signal>
-   <receiver>SettingsDlgUI</receiver>
-   <slot>saveCurrentKCOF(int,int)</slot>
+   <signal>currentCellChanged(int,int,int,int)</signal>
+   <receiver>SettingsDlg</receiver>
+   <slot>saveCurrentKCOF(int,int,int,int)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>20</x>
@@ -313,8 +292,8 @@
   </connection>
   <connection>
    <sender>kineticFrictionTable</sender>
-   <signal>valueChanged(int,int)</signal>
-   <receiver>SettingsDlgUI</receiver>
+   <signal>cellChanged(int,int)</signal>
+   <receiver>SettingsDlg</receiver>
    <slot>checkKCOFEntry(int,int)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -330,7 +309,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>SettingsDlgUI</receiver>
+   <receiver>SettingsDlg</receiver>
    <slot>validateDlg()</slot>
    <hints>
     <hint type="sourcelabel" >

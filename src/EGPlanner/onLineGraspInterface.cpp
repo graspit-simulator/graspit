@@ -46,7 +46,7 @@ void
 OnLineGraspInterface::useRealBarrettHand(bool s)
 {
   if (s) {
-    if (!mHand->isA("Barrett")) {
+    if (!mHand->metaObject()->className() == QString("Barrett")) {
       DBGA("Can't use real hand: this is not a Barrett!");
       mBarrettHand = NULL;
       return;

@@ -48,30 +48,29 @@ GraspItApp::showSplash()
 {
   QRect screen = QApplication::desktop()->screenGeometry();
   QSettings config;
-  config.insertSearchPath(QSettings::Windows, "/Columbia");
+  config.setPath(QSettings::IniFormat, QSettings::UserScope, "/Columbia");
 
   QRect mainRect;
   QString keybase = "/GraspIt/0.9/";
-  bool show = config.readBoolEntry(keybase + "SplashScreen", TRUE);
-  mainRect.setX(config.readNumEntry(keybase + "Geometries/MainwindowX", 0));
-  mainRect.setY(config.readNumEntry(keybase + "Geometries/MainwindowY", 0));
-  mainRect.setWidth(config.readNumEntry(keybase + "Geometries/MainwindowWidth", 500));
-  mainRect.setHeight(config.readNumEntry(keybase + "Geometries/MainwindowHeight", 500));
+  bool show = config.value(keybase + "SplashScreen", TRUE).toBool();
+  mainRect.setX(config.value(keybase + "Geometries/MainwindowX", 0).toInt());
+  mainRect.setY(config.value(keybase + "Geometries/MainwindowY", 0).toInt());
+  mainRect.setWidth(config.value(keybase + "Geometries/MainwindowWidth", 500).toInt());
+  mainRect.setHeight(config.value(keybase + "Geometries/MainwindowHeight", 500).toInt());
   screen = QApplication::desktop()->screenGeometry(QApplication::desktop()->screenNumber(mainRect.center()));
 
   if (show) {
-    splash = new QLabel(0, "splash", Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+    splash = new QLabel("splash", 0, Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
     // WStyle_Customize | WStyle_StaysOnTop
     splash->setAttribute(Qt::WA_DeleteOnClose, true);
     splash->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
-    splash->setPixmap(load_pixmap("splash.jpg"));
+    splash->setPixmap(QPixmap(":/images/splash.jpg"));
     splash->adjustSize();
     splash->setFixedSize(splash->sizeHint());
-    splash->setCaption("GraspIt!");
+    splash->setWindowTitle("GraspIt!");
     splash->move(screen.center() - QPoint(splash->width() / 2, splash->height() / 2));
     splash->show();
-    splash->repaint(FALSE);
-    QApplication::flush();
+    QApplication::processEvents(QEventLoop::AllEvents, 1);
     //  set_splash_status( "Initializing..." );
   }
 }

@@ -11,7 +11,7 @@
 #include "ivmgr.h"
 #include "world.h"
 #include "plannerdlg.h"
-#include "quality.h"
+#include "quality/quality.h"
 #include "robot.h"
 #include "qmDlg.h"
 #include "grasp.h"
@@ -72,8 +72,6 @@ TEST(TEST_PLANNER, TEST_VALID_GRASP_FOUND) {
   GraspItApp app(argc, NULL);
   GraspitCore core(argc, NULL);
 
-  app.setMainWidget(core.getMainWindow()->mWindow);
-
   QString fileName = QString(QString(getenv("GRASPIT"))+QString("/worlds/") + QString("plannerMug.xml"));
 
   graspitCore->getMainWindow()->mUI->worldBox->setTitle(fileName);
@@ -113,11 +111,6 @@ TEST(TEST_PLANNER, TEST_VALID_GRASP_FOUND) {
 
 int main(int argc, char **argv)
 {
-  GraspItApp app(argc, NULL);
-  GraspitCore core(argc, NULL);
-
-  app.setMainWidget(core.getMainWindow()->mWindow);
-
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

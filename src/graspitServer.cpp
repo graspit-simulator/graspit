@@ -64,7 +64,7 @@ ClientSocket::readBodyIndList(std::vector<Body *> &bodyVec)
   int i, numBodies, bodNum;
   bool ok;
   World *world = graspitCore->getWorld();
-  std::cout << "ReadBodyIndList Line:" << line.latin1() << std::endl;
+  std::cout << "ReadBodyIndList Line:" << line.toLatin1().constData() << std::endl;
 
   /* if the index list is empty, use every body and send
      back the count
@@ -124,7 +124,7 @@ ClientSocket::readRobotIndList(std::vector<Robot *> &robVec)
   int i, robNum, numRobots;
   bool ok;
   World *world = graspitCore->getWorld();
-  std::cout << "ReadRobotIndList Line:" << line.latin1() << std::endl;
+  std::cout << "ReadRobotIndList Line:" << line.toLatin1().constData() << std::endl;
 
   /* if the index list is empty, use every robot and send
      back the count
@@ -188,8 +188,7 @@ ClientSocket::readClient()
   while (canReadLine()) {
     line = readLine();
     line.truncate(line.length() - 1); //strip newline character
-    lineStrList =
-      QStringList::split(' ', line);
+    lineStrList = line.split(' ');
     strPtr = lineStrList.begin();
 
 #ifdef GRASPITDBG
@@ -345,8 +344,8 @@ void
 ClientSocket::sendBodyName(Body *bod)
 {
   QTextStream os(this);
-  std::cout << "sending " << bod->getName().latin1() << "\n";
-  os << bod->getName().latin1() << "\n";
+  std::cout << "sending " << bod->getName().toLatin1().constData() << "\n";
+  os << bod->getName().toLatin1().constData() << "\n";
 }
 
 /*!
@@ -357,8 +356,8 @@ void
 ClientSocket::sendRobotName(Robot *rob)
 {
   QTextStream os(this);
-  std::cout << "sending " << rob->getName().latin1() << "\n";
-  os << rob->getName().latin1() << "\n";
+  std::cout << "sending " << rob->getName().toLatin1().constData() << "\n";
+  os << rob->getName().toLatin1().constData() << "\n";
 }
 
 /*!
@@ -649,11 +648,14 @@ ClientSocket::readTorques()
   Starts a TCP server that listens on port \a port.  \a backlog specifies
   the number of pending connections the server can have.
 */
-GraspItServer::GraspItServer(Q_UINT16 port, int backlog,
+GraspItServer::GraspItServer(quint16 port, int backlog,
                              QObject *parent, const char *name) :
-  Q3ServerSocket(port, backlog, parent, name)
+  QTcpServer(parent)
 {
-  if (!ok()) {
+  this->listen(QHostAddress::Any, port);
+  this->setMaxPendingConnections(backlog);
+  this->setObjectName(name);
+  if (!isListening()) {
     qWarning("Failed to bind to port");
   }
 }

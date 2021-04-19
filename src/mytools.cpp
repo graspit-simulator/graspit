@@ -27,9 +27,6 @@
   \brief Implements the load_pixmap() function.  Other misc. functions could go here too.
 */
 
-#include <Q3MimeSourceFactory>
-#include <qmime.h>
-#include <q3dragobject.h>
 #include <QPixmap>
 
 #include "graspit/debug.h"
@@ -44,12 +41,7 @@
 */
 QPixmap load_pixmap(const QString &name)
 {
-  const QMimeSource *m = Q3MimeSourceFactory::defaultFactory()->data(name);
-  if (!m) {
-    return QPixmap();
-  }
-  QPixmap pix;
-  Q3ImageDrag::decode(m, pix);
+  QPixmap pix(name);
   return pix;
 }
 
@@ -107,8 +99,8 @@ relativePath(QString absolutePath, QString relativeToDir)
   int lastCommonRoot = -1;
   int index;
 
-  DBGP("Absolute path: " << absolutePath.latin1());
-  DBGP("Relative to  : " << relativeToDir.latin1());
+  DBGP("Absolute path: " << absolutePath.toLatin1().constData());
+  DBGP("Relative to  : " << relativeToDir.toLatin1().constData());
 
   //Find common root
   for (index = 0; index < length; index++) {
@@ -141,7 +133,7 @@ relativePath(QString absolutePath, QString relativeToDir)
   }
   relativePath.append(absoluteDirectories[absoluteDirectories.count() - 1]);
 
-  DBGP("Relative path: " << relativePath.latin1());
+  DBGP("Relative path: " << relativePath.toLatin1().constData());
   return relativePath;
 }
 
@@ -153,7 +145,7 @@ relativePath(QString absolutePath, QString relativeToDir)
 const TiXmlElement *
 findXmlElement(const TiXmlElement *root, QString defStr)
 {
-  defStr = defStr.stripWhiteSpace();
+  defStr = defStr.trimmed();
   const TiXmlElement *child = root->FirstChildElement();
   while (child != NULL) {
     if (child->Value() == defStr) { break; }
@@ -170,7 +162,7 @@ findXmlElement(const TiXmlElement *root, QString defStr)
 std::list<const TiXmlElement *>
 findAllXmlElements(const TiXmlElement *root, QString defStr)
 {
-  defStr = defStr.stripWhiteSpace();
+  defStr = defStr.trimmed();
   std::list<const TiXmlElement *> children;
   const TiXmlElement *child = root->FirstChildElement();
   while (child != NULL) {
@@ -245,15 +237,15 @@ bool getPosition(const TiXmlElement *root, vec3 &pos) {
     return false;
   }
   QString rootValue = root->Value();
-  rootValue = rootValue.stripWhiteSpace();
+  rootValue = rootValue.trimmed();
   if (!(rootValue == "position" || rootValue == "orientation")) {
     QTWARNING("The given root is not a Position Element");
     return false;
   }
   QString valueStr = root->GetText();
-  valueStr = valueStr.simplifyWhiteSpace().stripWhiteSpace();
+  valueStr = valueStr.simplified().trimmed();
   QStringList l;
-  l = QStringList::split(' ', valueStr);
+  l = valueStr.split(' ');
   if (l.count() != 3) {
     QTWARNING("Invalid position input");
     return false;
@@ -281,7 +273,7 @@ bool getTransform(const TiXmlElement *root, transf &totalTran)
     return false;
   }
   QString rootValue = root->Value();
-  rootValue = rootValue.stripWhiteSpace();
+  rootValue = rootValue.trimmed();
   if (rootValue != "transform") {
     QTWARNING("The given root is not a Transform Element");
     return false;
@@ -293,11 +285,11 @@ bool getTransform(const TiXmlElement *root, transf &totalTran)
   while (child != NULL) {
     transf newTran;
     QString valueStr = child->GetText();
-    valueStr = valueStr.simplifyWhiteSpace().stripWhiteSpace();
+    valueStr = valueStr.simplified().trimmed();
     QStringList l;
-    l = QStringList::split(' ', valueStr);
+    l = valueStr.split(' ');
     QString defString = child->Value();
-    defString = defString.stripWhiteSpace();
+    defString = defString.trimmed();
     if (defString == "translation") {
       if (l.count() != 3) {
         QTWARNING("Invalid translation transformation input");

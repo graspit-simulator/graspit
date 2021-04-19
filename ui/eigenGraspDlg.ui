@@ -28,7 +28,7 @@
     <string>Exit</string>
    </property>
   </widget>
-  <widget class="Q3GroupBox" name="groupBox3" >
+  <widget class="QGroupBox" name="groupBox3" >
    <property name="geometry" >
     <rect>
      <x>10</x>
@@ -39,9 +39,6 @@
    </property>
    <property name="title" >
     <string>Properties and control</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Vertical</enum>
    </property>
    <widget class="QPushButton" name="closeHandButton" >
     <property name="geometry" >
@@ -173,15 +170,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-   <pixmap></pixmap>
-  </customwidget>
- </customwidgets>
  <includes>
   <include location="global" >vector</include>
  </includes>

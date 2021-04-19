@@ -231,7 +231,7 @@ class IVmgr : public QWidget {
     void restoreCameraPos();
 
   public:
-    IVmgr(World *w, QWidget *parent = 0, const char *name = 0, Qt::WFlags f = 0);
+    IVmgr(World *w, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags f = 0);
     ~IVmgr();
 
     void setWorld(World *w);

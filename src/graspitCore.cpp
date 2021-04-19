@@ -34,15 +34,13 @@
   all plugins.
 */
 
-#include <Q3GroupBox>
+#include <QGroupBox>
 #include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/sensors/SoIdleSensor.h>
 #include <QLayout>
 
-#ifdef Q_WS_X11
 #include <unistd.h>
-#endif
 
 #include "graspit/cmdline/cmdline.h"
 #include "graspit/graspitCore.h"
@@ -204,8 +202,6 @@ GraspitCore::GraspitCore(int argc, char **argv):
 #endif
   }
 
-#ifdef Q_WS_X11
-
   if (args->exist("world"))
   {
     QString filename = graspitRoot + QString("/worlds/") + QString::fromStdString(args->get<std::string>("world")) + QString(".xml");
@@ -268,7 +264,6 @@ GraspitCore::GraspitCore(int argc, char **argv):
     return;
   }
 
-#endif // Q_WS_X11
   initResult =  SUCCESS;
   return;
 }

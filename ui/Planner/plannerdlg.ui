@@ -31,12 +31,9 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="Q3GroupBox" name="plannerBox" >
+      <widget class="QGroupBox" name="plannerBox" >
        <property name="title" >
         <string>Generator</string>
-       </property>
-       <property name="orientation" >
-        <enum>Qt::Vertical</enum>
        </property>
        <layout class="QVBoxLayout" >
         <property name="margin" >
@@ -56,12 +53,9 @@
          </widget>
         </item>
         <item>
-         <widget class="Q3GroupBox" name="automaticBox" >
+         <widget class="QGroupBox" name="automaticBox" >
           <property name="title" >
            <string>Automatic</string>
-          </property>
-          <property name="orientation" >
-           <enum>Qt::Vertical</enum>
           </property>
           <layout class="QGridLayout" >
            <property name="margin" >
@@ -94,15 +88,12 @@
          </widget>
         </item>
         <item>
-         <widget class="Q3GroupBox" name="manualBox" >
+         <widget class="QGroupBox" name="manualBox" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
           <property name="title" >
            <string>Manual</string>
-          </property>
-          <property name="orientation" >
-           <enum>Qt::Vertical</enum>
           </property>
           <layout class="QGridLayout" >
            <property name="margin" >
@@ -263,12 +254,9 @@
       </widget>
      </item>
      <item>
-      <widget class="Q3GroupBox" name="testerBox" >
+      <widget class="QGroupBox" name="testerBox" >
        <property name="title" >
         <string>Tester</string>
-       </property>
-       <property name="orientation" >
-        <enum>Qt::Vertical</enum>
        </property>
        <layout class="QGridLayout" >
         <property name="margin" >
@@ -474,15 +462,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-   <pixmap></pixmap>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>automaticCheckBox</tabstop>
   <tabstop>densityFactorLine</tabstop>
@@ -501,7 +480,6 @@
  </tabstops>
  <includes>
   <include location="global" >qfile.h</include>
-  <include location="global" >q3textstream.h</include>
  </includes>
  <resources/>
  <connections>

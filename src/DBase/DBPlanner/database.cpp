@@ -86,7 +86,7 @@ DatabaseConnection::DatabaseConnection(const string &host_name,
   if (!db_.open()) {
     cerr << "Database " << database_name << "@" << host_name
          << ":" << port << " could not be opened.\n";
-    cerr << "Error: " << db_.lastError().text().latin1() << std::endl;
+    cerr << "Error: " << db_.lastError().text().toStdString() << std::endl;
     connected_ = false;
   } else {
     cerr << "Database successfully opened.\n";
@@ -102,7 +102,7 @@ bool DatabaseConnection::Query(const string &sql, Table *table) const {
   query.setForwardOnly(true);
   if (!query.exec(sql.c_str())) {
     std::cerr << "SQL Query failure on query: " << sql << std::endl;
-    std::cerr << "Error: " << query.lastError().text().latin1() << std::endl;
+    std::cerr << "Error: " << query.lastError().text().toStdString() << std::endl;
     return false;
   } else {
     if (table) {

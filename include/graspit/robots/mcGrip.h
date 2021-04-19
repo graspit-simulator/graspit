@@ -110,7 +110,7 @@ class McGripGrasp : public Grasp
   public:
     //! Also check that the hand is indeed a McGrip
     McGripGrasp(Hand *h) : Grasp(h) {
-      assert(h->isA("McGrip"));
+      assert(h->metaObject()->className() == QString("McGrip"));
     }
 
     //! Optimizes contact forces tendon routes and construction parameters for one particular grasp

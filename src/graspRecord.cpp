@@ -44,8 +44,8 @@ GraspRecord::~GraspRecord()
 void GraspRecord::writeToFile(FILE *fp)
 {
   //write names
-  fprintf(fp, "%s\n", mObjectName.latin1());
-  fprintf(fp, "%s\n", mRobotName.latin1());
+  fprintf(fp, "%s\n", mObjectName.toLatin1().constData());
+  fprintf(fp, "%s\n", mRobotName.toLatin1().constData());
   //write transform
   Quaternion q = mTran.rotation();
   fprintf(fp, "%f %f %f %f ", q.x(), q.y(), q.z(), q.w());
@@ -67,8 +67,8 @@ void GraspRecord::readFromFile(FILE *fp)
     }
   } while (name[0] == '\n' || name[0] == '\0' || name[0] == ' ');
   mObjectName = QString(name);
-  mObjectName = mObjectName.stripWhiteSpace();
-  fprintf(stderr, "object: %s__\n", mObjectName.latin1());
+  mObjectName = mObjectName.trimmed();
+  fprintf(stderr, "object: %s__\n", mObjectName.toLatin1().constData());
   do {
     if (fgets(name, 1000, fp) == NULL) {
       DBGA("GraspRecord::readFromFile - failed to read robot name");
@@ -76,8 +76,8 @@ void GraspRecord::readFromFile(FILE *fp)
     }
   } while (name[0] == '\n' || name[0] == '\0' || name[0] == ' ');
   mRobotName = QString(name);
-  mRobotName = mRobotName.stripWhiteSpace();
-  fprintf(stderr, "robot: %s__\n", mRobotName.latin1());
+  mRobotName = mRobotName.trimmed();
+  fprintf(stderr, "robot: %s__\n", mRobotName.toLatin1().constData());
   //read transform
   if (fscanf(fp, "%f %f %f %f", &x, &y, &z, &w) <= 0) {
     DBGA("GraspRecord::readFromFile - failed to read record orientation.");

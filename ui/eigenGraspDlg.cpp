@@ -178,16 +178,21 @@ void EigenGraspDlg::resetSlave()
 
 void EigenGraspDlg::setSlaveLayout(int nGrasps)
 {
-  mainLayout = new QVBoxLayout(mSlave, 5);
+  mainLayout = new QVBoxLayout(mSlave);
+  mainLayout->setSpacing(5);
 
   QLabel *valueLabel = new QLabel(QString("Value:"), mSlave);
   QLabel *amplLabel = new QLabel(QString("Amplitude:"), mSlave);
   QLabel *fixedLabel = new QLabel(QString("Fixed"), mSlave);
 
-  QHBoxLayout *fakeRow = new QHBoxLayout(mainLayout, -1);
+  QHBoxLayout *fakeRow = new QHBoxLayout();
+  mainLayout->addLayout(fakeRow);
+  fakeRow->setSpacing(-1);
   fakeRow->addSpacing(400);
 
-  QHBoxLayout *labelRow = new QHBoxLayout(mainLayout, -1);
+  QHBoxLayout *labelRow = new QHBoxLayout();
+  mainLayout->addLayout(labelRow);
+  labelRow->setSpacing(-1);
   labelRow->addSpacing(5);
   labelRow->addWidget(valueLabel, 0);
   labelRow->addWidget(amplLabel, 1, Qt::AlignHCenter);
@@ -196,13 +201,15 @@ void EigenGraspDlg::setSlaveLayout(int nGrasps)
   mainLayout->addLayout(labelRow);
 
   for (int i = 0; i < nGrasps; i++) {
-    QHBoxLayout *graspRow = new QHBoxLayout(mainLayout, 10);
+    QHBoxLayout *graspRow = new QHBoxLayout();
+    mainLayout->addLayout(graspRow);
+    graspRow->setSpacing(10);
 
     QLabel *eigenValue = new QLabel(QString("0.0"), mSlave);
     QScrollBar *bar = new QScrollBar(Qt::Horizontal, mSlave);
     bar->setRange(-SLIDER_STEPS, SLIDER_STEPS);
     bar->setPageStep(5000);
-    bar->setLineStep(1000);
+    bar->setSingleStep(1000);
     bar->setValue(0);
     QCheckBox *box = new QCheckBox(mSlave);
 
@@ -237,7 +244,7 @@ void EigenGraspDlg::saveButton_clicked()
     if (fn.section('.', 1).isEmpty()) {
       fn.append(".xml");
     }
-    mEigenGrasps->writeToFile(fn.latin1());
+    mEigenGrasps->writeToFile(fn.toLatin1().constData());
   }
 }
 

@@ -69,7 +69,7 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeMacros/")
 
 find_package(Qhull REQUIRED)
-find_package(SoQt4 REQUIRED)
+find_package(SoQt REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 find_package(Eigen3)
@@ -103,10 +103,7 @@ if (OPTIMIZATION_SOLVER STREQUAL GUROBI)
 
 endif (OPTIMIZATION_SOLVER STREQUAL GUROBI)
 
-SET( QT_USE_QT3SUPPORT TRUE )
-find_package(Qt4 COMPONENTS QtCore QtSql REQUIRED)
-
-include (${QT_USE_FILE})
+find_package(Qt5 COMPONENTS Core Sql Widgets Network REQUIRED)
 
 #--------------------------------------- Core sources ---------------------------------
 
@@ -712,36 +709,6 @@ set (MOC_HEADERS
 
 
 
-#-------------------------------------- images and resources -------------------------------------------------------
-
-set (GRASPIT_IMAGES
-    ${GSRC}/src/images/play.xpm 
-    ${GSRC}/src/images/pause.xpm 
-    ${GSRC}/src/images/splash.jpg 
-    ${GSRC}/src/images/logo.png 
-    ${GSRC}/src/images/nocollide.xpm 
-    ${GSRC}/src/images/collide.xpm 
-    ${GSRC}/src/images/translateTool.xpm 
-    ${GSRC}/src/images/selectTool.xpm 
-    ${GSRC}/src/images/rotateTool.xpm 
-    ${GSRC}/src/images/mark.xpm 
-    ${GSRC}/src/images/prevMark.xpm 
-    ${GSRC}/src/images/filenew.xpm 
-    ${GSRC}/src/images/fileopen.xpm 
-    ${GSRC}/src/images/filesave.xpm 
-    ${GSRC}/src/images/filenew 
-    ${GSRC}/src/images/fileopen 
-    ${GSRC}/src/images/filesave 
-    ${GSRC}/src/images/print 
-    ${GSRC}/src/images/undo 
-    ${GSRC}/src/images/redo 
-    ${GSRC}/src/images/editcut 
-    ${GSRC}/src/images/editcopy 
-    ${GSRC}/src/images/editpaste 
-    ${GSRC}/src/images/searchfind
-)
-
-
 #-------------------------------------- The TinyXML XML parser ---------------------------------------------------
 
 set (TINYXML_INCLUDES
@@ -766,15 +733,7 @@ set (GRASPIT_CORE_SOURCES
 # The qt_image_collection.cpp must then be added to the sources to compile.
 # I also tried adding images as resource (QT4_ADD_RESOURCES) but this didn't work with the 
 # current GraspIt source.
-ADD_CUSTOM_COMMAND(OUTPUT 
-    ${CMAKE_CURRENT_BINARY_DIR}/qt_image_collection.cpp 
-    COMMAND ${QT_UIC3_EXECUTABLE} 
-    ARGS -o ${CMAKE_CURRENT_BINARY_DIR}/qt_image_collection.cpp 
-        -embed graspit ${GRASPIT_IMAGES} 
-    DEPENDS ${GRASPIT_IMAGES})
-
-SET(GRASPIT_IMAGE_SOURCES 
-    ${CMAKE_CURRENT_BINARY_DIR}/qt_image_collection.cpp)
+QT5_ADD_RESOURCES(graspit_RESOURCES_RCC src/graspitResources.qrc)
 
 ################################
 ## Make Qt Moc files of GraspIT
@@ -799,11 +758,11 @@ file(MAKE_DIRECTORY ${GRASPIT_UI_INCLUDE_PATH})
 set (OLD_CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}) # backup current binary dir
 set (CMAKE_CURRENT_BINARY_DIR ${GRASPIT_UI_INCLUDE_PATH}) #artificially changing output location for UI files
 
-QT4_WRAP_UI(UI_OUTFILES ${ALL_GRASPIT_FORMS}) # generate UI outfiles (will use CMAKE_CURRENT_BINARY_DIR)
+QT5_WRAP_UI(UI_OUTFILES ${ALL_GRASPIT_FORMS}) # generate UI outfiles (will use CMAKE_CURRENT_BINARY_DIR)
 
 set (CMAKE_CURRENT_BINARY_DIR ${OLD_CMAKE_CURRENT_BINARY_DIR}) # restore current binary dir
 
-QT4_WRAP_CPP(MOC_OUTFILES ${MOC_HEADERS})
+QT5_WRAP_CPP(MOC_OUTFILES ${MOC_HEADERS})
 
 
 # add Qt stuff to the includes
@@ -813,7 +772,6 @@ set (GRASPIT_INCLUDES
      ${SOQT_INCLUDE_DIRS}
      ${QT_INCLUDES}
      ${QT_INCLUDE_DIR}
-     ${QT_QT3SUPPORT_INCLUDE_DIR}
      ${QHULL_INCLUDE_DIRS}
 )
 
@@ -853,12 +811,11 @@ add_library(graspit SHARED ${GRASPIT_LIBRARY_SOURCES})
 # sources for executable graspit_simulator
 set(SIMULATOR_SRC ${GSRC}/src/main.cpp)
 
-add_executable(graspit_simulator ${SIMULATOR_SRC})
+add_executable(graspit_simulator ${SIMULATOR_SRC} ${graspit_RESOURCES_RCC})
 
 ## System libraries which are needed for graspit
 set(GRASPIT_LINK_LIBRARIES
    ${QT_LIBRARIES}
-   ${QT_QT3SUPPORT_LIBRARY}
    ${QHULL_LIBRARIES}
    ${SOQT_LIBRARY}
    ${LAPACK_LIBRARIES}
@@ -869,8 +826,8 @@ set(GRASPIT_LINK_LIBRARIES
 )
 
 ## Link the shared library and the executable
-target_link_libraries(graspit ${GRASPIT_LINK_LIBRARIES})
-target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES})
+target_link_libraries(graspit ${GRASPIT_LINK_LIBRARIES} Qt5::Widgets Qt5::Network Qt5::Sql)
+target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES} Qt5::Widgets Qt5::Network Qt5::Sql)
 
 ## Set install destination paths
 set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)
@@ -1003,6 +960,7 @@ set_target_properties( primative_planner_tests eigen_tests transform_tests grasp
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
 )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_dependencies(primative_planner_tests googletest)
 add_dependencies(eigen_tests googletest)
